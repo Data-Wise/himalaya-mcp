@@ -3,11 +3,11 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: setup
-## Focus: Phase 0 — Repo scaffold & specs
-## Phase: Setup
+## Status: active
+## Focus: Phase 1 — Core Read (MVP)
+## Phase: Development
 ## Priority: 3
-## Progress: 5
+## Progress: 10
 
 ## Current Session (2026-02-13)
 
@@ -15,16 +15,24 @@
 - brainstorm: deep mode (8 questions), researched Cowork + MCPB + email MCP landscape
 - decision: Claude Code plugin (bundles MCP server) over standalone MCP
 - setup: repo init, directory structure, plugin.json, package.json, CLAUDE.md
+- git init: dev branch, branch protection (main: PR + CI), CI workflow, PR template, pre-commit hook
+- worktree: `feature/core-read` at `~/.git-worktrees/himalaya-mcp/feature-core-read`
+
+## Active Worktrees
+
+| Worktree | Branch | Focus |
+|----------|--------|-------|
+| `~/.git-worktrees/himalaya-mcp/feature-core-read` | `feature/core-read` | Phase 1: subprocess client, tools, resources |
 
 ---
 
 ## Next Action
 
-1. **Phase 1: Core Read (MVP)** — implement himalaya subprocess wrapper + list/read tools
-2. npm install + build pipeline
-3. Test in Claude Code
+1. **Start Phase 1 in worktree** — `cd ~/.git-worktrees/himalaya-mcp/feature-core-read && claude`
+2. Implement himalaya subprocess wrapper (`client.ts`)
+3. Build list/search/read MCP tools + resources
 
 ---
 
 **Last Updated:** 2026-02-13
-**Status:** Phase 0 — Setup & Specs
+**Status:** Phase 1 — Core Read (MVP)
