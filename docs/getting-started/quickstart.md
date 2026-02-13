@@ -1,0 +1,64 @@
+# Quick Start
+
+Get from zero to reading email in 2 minutes.
+
+## 1. Install and Build
+
+```bash
+brew install himalaya
+git clone https://github.com/Data-Wise/himalaya-mcp.git
+cd himalaya-mcp && npm install && npm run build
+```
+
+## 2. Connect to Claude Code
+
+```bash
+ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
+```
+
+Restart Claude Code.
+
+## 3. Try It
+
+```
+You: "Check my inbox"
+```
+
+Claude calls `list_emails` and shows your recent emails:
+
+```
+Found 5 emails in INBOX:
+
+| ID     | From              | Subject                  | Date       | Flags |
+|--------|-------------------|--------------------------|------------|-------|
+| 249088 | alice@work.com    | Q1 Budget Review         | 2026-02-13 | Seen  |
+| 249064 | bob@team.com      | Sprint Retrospective     | 2026-02-13 |       |
+| 249051 | boss@work.com     | Meeting Tomorrow         | 2026-02-12 | Seen  |
+| 249030 | news@devweekly.io | This Week in TypeScript   | 2026-02-12 | Seen  |
+| 249015 | hr@company.com    | Benefits Enrollment      | 2026-02-11 |       |
+```
+
+## 4. Common Commands
+
+| What you say | What happens |
+|-------------|--------------|
+| "Check my inbox" | Lists recent emails |
+| "Read email 249088" | Shows full email body |
+| "Triage my inbox" | Classifies emails, suggests actions |
+| "Reply to 249088" | Drafts reply, shows for approval |
+| "Give me today's digest" | Priority-grouped summary |
+| "Export 249088 as markdown" | Email with YAML frontmatter |
+| "Flag 249088 as important" | Adds Flagged flag |
+| "Archive email 249064" | Moves to Archive folder |
+
+## 5. Safety
+
+- Claude **never sends email** without your explicit "yes" / "send it"
+- `send_email` shows a preview first -- you approve before it sends
+- No emails are ever deleted -- only flagged or moved
+
+## Next Steps
+
+- [User Guide](../guide/guide.md) -- all 11 tools, 4 prompts, 3 resources
+- [Workflows](../guide/workflows.md) -- triage, reply, digest, export patterns
+- [Quick Reference](../reference/refcard.md) -- one-page cheat sheet

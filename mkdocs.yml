@@ -1,0 +1,55 @@
+site_name: himalaya-mcp
+site_description: Privacy-first email MCP server and Claude Code plugin wrapping the himalaya CLI
+site_url: https://data-wise.github.io/himalaya-mcp/
+
+repo_name: Data-Wise/himalaya-mcp
+repo_url: https://github.com/Data-Wise/himalaya-mcp
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - tables
+  - attr_list
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+  - Guide:
+    - User Guide: guide/guide.md
+    - Workflows: guide/workflows.md
+  - Reference:
+    - Quick Reference: reference/refcard.md
+    - Architecture: reference/architecture.md
