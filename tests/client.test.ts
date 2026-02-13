@@ -123,14 +123,14 @@ describe("HimalayaClient", () => {
       );
     });
 
-    it("searchEnvelopes passes query", async () => {
+    it("searchEnvelopes passes query as positional args", async () => {
       setupMock("[]");
       const client = new HimalayaClient();
-      await client.searchEnvelopes("invoice", "INBOX");
+      await client.searchEnvelopes("subject invoice", "INBOX");
 
       expect(mockExecFileAsync).toHaveBeenCalledWith(
         "himalaya",
-        expect.arrayContaining(["envelope", "list", "-q", "invoice"]),
+        expect.arrayContaining(["envelope", "list", "subject", "invoice"]),
         expect.any(Object),
       );
     });

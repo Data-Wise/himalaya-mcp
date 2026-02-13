@@ -79,14 +79,21 @@ export class HimalayaClient {
     return this.exec(args, { folder: f });
   }
 
-  /** Search envelopes with a query string. */
+  /**
+   * Search envelopes with a query.
+   * Uses himalaya filter syntax (positional args):
+   *   "subject foo", "from bar", "body baz"
+   *   Operators: "and", "or", "not"
+   *   Example: "subject invoice and from paypal"
+   */
   async searchEnvelopes(query: string, folder?: string): Promise<string> {
     const args = ["envelope", "list"];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
       args.push("--folder", f);
     }
-    args.push("-q", query);
+    // Query words are positional args to himalaya (not a -q flag)
+    args.push(...query.split(" "));
     return this.exec(args, { folder: f });
   }
 
