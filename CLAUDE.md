@@ -7,7 +7,7 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Current Phase:** 1 — Core Read (MVP complete)
+- **Current Phase:** 5 — All phases complete (11 tools, 4 prompts, 3 resources, 122 tests)
 
 ### What It Does
 
@@ -32,17 +32,28 @@ Exposes email operations as MCP tools, resources, and prompts so Claude can:
 himalaya-mcp/
 ├── src/
 │   ├── index.ts                 # MCP server entry point
+│   ├── config.ts                # Env-based configuration (HIMALAYA_BINARY, etc.)
 │   ├── himalaya/
 │   │   ├── client.ts            # Subprocess wrapper (execFile, no shell injection)
 │   │   ├── parser.ts            # JSON response parser + formatEnvelope helper
-│   │   └── types.ts             # TypeScript types (Envelope, Folder, Account, etc.)
+│   │   └── types.ts             # TypeScript types (Envelope, Folder, params, etc.)
 │   ├── tools/
 │   │   ├── inbox.ts             # list_emails, search_emails
-│   │   └── read.ts              # read_email, read_email_html
-│   └── resources/
-│       └── index.ts             # email://inbox, email://message/{id}, email://folders
+│   │   ├── read.ts              # read_email, read_email_html
+│   │   ├── manage.ts            # flag_email, move_email
+│   │   ├── compose.ts           # draft_reply, send_email (two-phase safety gate)
+│   │   └── actions.ts           # export_to_markdown, create_action_item
+│   ├── prompts/
+│   │   ├── triage.ts            # triage_inbox prompt
+│   │   ├── summarize.ts         # summarize_email prompt
+│   │   ├── digest.ts            # daily_email_digest prompt
+│   │   └── reply.ts             # draft_reply prompt
+│   ├── resources/
+│   │   └── index.ts             # email://inbox, email://message/{id}, email://folders
+│   └── adapters/
+│       └── clipboard.ts         # copy_to_clipboard (pbcopy/xclip)
 ├── plugin/
-│   ├── skills/                  # Claude Code plugin skills (inbox, triage, digest)
+│   ├── skills/                  # Claude Code plugin skills (inbox, triage, digest, reply)
 │   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks
 ├── .claude-plugin/
@@ -52,13 +63,19 @@ himalaya-mcp/
 ├── tests/
 │   ├── parser.test.ts           # 13 parser tests
 │   ├── client.test.ts           # 12 client tests (subprocess mock)
-│   ├── dogfood.test.ts          # 14 dogfooding tests (realistic Claude usage)
-│   └── e2e.mjs                  # 11 e2e tests (live himalaya CLI)
+│   ├── manage.test.ts           # 7 manage tools tests
+│   ├── compose.test.ts          # 9 compose tools tests
+│   ├── actions.test.ts          # 6 export/action tests
+│   ├── prompts.test.ts          # 15 prompt registration tests
+│   ├── config.test.ts           # 7 config tests
+│   ├── clipboard.test.ts        # 4 clipboard tests
+│   ├── dogfood.test.ts          # 29 dogfooding tests (realistic Claude usage)
+│   └── e2e.test.ts              # 20 E2E tests (headless MCP server pipeline)
 ├── package.json
 └── tsconfig.json
 ```
 
-### Implemented MCP Tools
+### Implemented MCP Tools (11)
 
 | Tool | Description |
 |------|-------------|
@@ -66,8 +83,24 @@ himalaya-mcp/
 | `search_emails` | Search via himalaya filter syntax (subject, from, body, etc.) |
 | `read_email` | Read message body (plain text) |
 | `read_email_html` | Read message body (HTML) |
+| `flag_email` | Add/remove flags (Seen, Flagged, Answered, etc.) |
+| `move_email` | Move email to target folder |
+| `draft_reply` | Generate reply template with DRAFT markers |
+| `send_email` | Send email with two-phase safety gate (preview then confirm) |
+| `export_to_markdown` | Convert email to markdown with YAML frontmatter |
+| `create_action_item` | Extract action items and context from email |
+| `copy_to_clipboard` | Copy text to system clipboard (pbcopy/xclip) |
 
-### Implemented MCP Resources
+### Implemented MCP Prompts (4)
+
+| Prompt | Description |
+|--------|-------------|
+| `triage_inbox` | Guide Claude to classify emails as actionable/FYI/skip |
+| `summarize_email` | One-sentence summary + action items |
+| `daily_email_digest` | Markdown digest grouped by priority |
+| `draft_reply` | Reply composition with tone/safety guidance |
+
+### Implemented MCP Resources (3)
 
 | Resource | URI |
 |----------|-----|
@@ -95,8 +128,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (39 unit/integration tests)
-npm run test:e2e                 # E2E tests against live himalaya CLI
+npm test                         # Run vitest (122 tests across 10 test files)
 node dist/index.js               # Run MCP server directly
 ```
 
@@ -127,10 +159,10 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 |-------|-------|--------|
 | 0. Setup & Specs | Repo, structure, specs | Done |
 | 1. Core Read (MVP) | list, search, read tools + resources | Done |
-| 2. Triage + Export | classify, summarize, flag, markdown export | Pending |
-| 3. Compose + Actions | reply, send (with safety), action extraction | Pending |
-| 4. Adapters | Obsidian, Apple, clipboard, MCPB packaging | Pending |
-| 5. Plugin Skills | /email:* skills, agents, hooks | Pending |
+| 2. Triage + Export | flag, move, export_to_markdown, MCP prompts | Done |
+| 3. Compose + Actions | draft_reply, send_email (safety gate), create_action_item | Done |
+| 4. Clipboard + Config | copy_to_clipboard adapter, env-based config | Done |
+| 5. Plugin Skills | /email:* skills, agent updates, reply skill | Done |
 
 ---
 
