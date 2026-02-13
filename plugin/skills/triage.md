@@ -28,7 +28,11 @@ Classify inbox emails using Claude's reasoning via MCP prompts.
    - **Informational** - read but no action needed
    - **Skip** - spam, newsletters, can ignore
 4. Display classified results
-5. Offer batch actions (flag, move, archive)
+5. Offer batch actions:
+   - `flag_email` — mark as Flagged, Seen, etc.
+   - `move_email` — move to Archive, Trash, or custom folder
+   - `draft_reply` — draft a reply to actionable emails
+   - `create_action_item` — extract todos from actionable emails
 
 ## Output Format
 

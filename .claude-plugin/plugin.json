@@ -9,7 +9,8 @@
   "skills": [
     "./plugin/skills/inbox.md",
     "./plugin/skills/triage.md",
-    "./plugin/skills/digest.md"
+    "./plugin/skills/digest.md",
+    "./plugin/skills/reply.md"
   ],
   "agents": [
     "./plugin/agents/email-assistant.md"
