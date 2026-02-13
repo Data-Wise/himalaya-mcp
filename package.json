@@ -1,6 +1,6 @@
 {
   "name": "himalaya-mcp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "MCP server wrapping himalaya CLI for privacy-first email access in Claude",
   "type": "module",
   "main": "dist/index.js",
