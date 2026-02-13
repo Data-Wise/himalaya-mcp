@@ -1,0 +1,34 @@
+/* data-wise preset — blue primary, orange accent */
+
+:root {
+  --md-primary-fg-color: #1a73e8;
+  --md-primary-fg-color--light: #4a90d9;
+  --md-primary-fg-color--dark: #1557b0;
+  --md-accent-fg-color: #ff6b35;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #4a90d9;
+  --md-accent-fg-color: #ff8a5c;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Code block styling */
+.md-typeset code {
+  border-radius: 4px;
+}
+
+/* Navigation tabs */
+.md-tabs {
+  border-bottom: 2px solid var(--md-primary-fg-color);
+}
+
+/* Admonition accents */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: var(--md-accent-fg-color);
+}

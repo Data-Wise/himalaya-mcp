@@ -12,19 +12,55 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
 <div class="grid cards" markdown>
 
-- **11 MCP Tools** -- list, search, read, flag, move, draft reply, send, export, action items, clipboard
-- **4 MCP Prompts** -- triage inbox, summarize email, daily digest, draft reply
-- **3 MCP Resources** -- inbox listing, message by ID, folder list
-- **Two-Phase Send** -- `send_email` returns a preview first; requires explicit `confirm=true` to actually send
-- **Multi-Account** -- switch accounts per-call via `--account` parameter
-- **Plugin + Server** -- use as a Claude Code plugin or standalone MCP server
+- :envelope: **11 MCP Tools**
+
+    ---
+
+    List, search, read, flag, move, draft reply, send, export, action items, clipboard
+
+- :brain: **4 MCP Prompts**
+
+    ---
+
+    Triage inbox, summarize email, daily digest, draft reply
+
+- :lock: **Two-Phase Send**
+
+    ---
+
+    `send_email` returns a preview first; requires explicit `confirm=true`
+
+- :people_holding_hands: **Multi-Account**
+
+    ---
+
+    Switch accounts per-call via `--account` parameter
+
+- :electric_plug: **Plugin + Server**
+
+    ---
+
+    Use as a Claude Code plugin or standalone MCP server
+
+- :shield: **Privacy-First**
+
+    ---
+
+    All authentication stays local. No OAuth tokens leave your machine.
 
 </div>
 
 ## How It Works
 
-```
-Claude  <── MCP (JSON-RPC) ──>  himalaya-mcp  <── execFile ──>  himalaya CLI  <── IMAP/SMTP ──>  Mail Server
+```mermaid
+flowchart LR
+    A["`**Claude**
+    Code / Desktop`"] -->|MCP JSON-RPC| B["`**himalaya-mcp**
+    11 tools · 4 prompts`"]
+    B -->|execFile| C["`**himalaya CLI**
+    --output json`"]
+    C -->|IMAP/SMTP| D["`**Mail Server**
+    Gmail, Fastmail, etc.`"]
 ```
 
 - All authentication stays local (himalaya handles IMAP/SMTP auth)
@@ -59,7 +95,8 @@ You: "Give me today's email digest"
 
 ## Next Steps
 
-- [Installation](getting-started/installation.md) -- detailed setup guide
-- [Quick Start](getting-started/quickstart.md) -- first email in 2 minutes
-- [User Guide](guide/guide.md) -- complete tool and prompt reference
-- [Workflows](guide/workflows.md) -- common email patterns
+- **[Installation](getting-started/installation.md)** -- detailed setup guide
+- **[Quick Start](getting-started/quickstart.md)** -- first email in 2 minutes
+- **[User Guide](guide/guide.md)** -- complete tool and prompt reference
+- **[Workflows](guide/workflows.md)** -- common email patterns
+- **[Quick Reference](reference/refcard.md)** -- one-page cheat sheet
