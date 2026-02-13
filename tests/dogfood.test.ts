@@ -11,6 +11,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
 import { registerInboxTools } from "../src/tools/inbox.js";
 import { registerReadTools } from "../src/tools/read.js";
+import { registerManageTools } from "../src/tools/manage.js";
+import { registerActionTools } from "../src/tools/actions.js";
+import { registerComposeTools } from "../src/tools/compose.js";
 
 // --- Sample data matching real himalaya output ---
 
@@ -60,6 +63,12 @@ function createMockClient(): HimalayaClient {
   vi.spyOn(client, "readMessageHtml").mockResolvedValue(
     JSON.stringify("<p>Dear colleague,</p><p>Seminar at 3:30pm.</p>")
   );
+  vi.spyOn(client, "flagMessage").mockResolvedValue("{}");
+  vi.spyOn(client, "moveMessage").mockResolvedValue("{}");
+  vi.spyOn(client, "replyTemplate").mockResolvedValue(
+    JSON.stringify("From: user@example.com\nTo: mmckay@unm.edu\nSubject: Re: Reminder - Seminar Today\n\nThank you for the reminder.\n\n> Dear colleague,\n> Seminar at 3:30pm.")
+  );
+  vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
   return client;
 }
 
@@ -235,6 +244,228 @@ describe("Dogfooding: error handling", () => {
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("Error:");
+  });
+});
+
+describe("Dogfooding: flag_email", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerManageTools(server, client);
+  });
+
+  it("Scenario: 'Flag this as important' — adds Flagged flag", async () => {
+    const tool = getToolHandler(server, "flag_email");
+    const result = await tool.handler({ id: "249088", flags: ["Flagged"], action: "add", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("Added");
+    expect(result.content[0].text).toContain("Flagged");
+    expect(result.content[0].text).toContain("249088");
+    expect(client.flagMessage).toHaveBeenCalledWith("249088", ["Flagged"], "add", undefined, undefined);
+  });
+
+  it("Scenario: 'Mark as read' — adds Seen flag", async () => {
+    const tool = getToolHandler(server, "flag_email");
+    const result = await tool.handler({ id: "249088", flags: ["Seen"], action: "add", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("Added");
+    expect(result.content[0].text).toContain("Seen");
+  });
+
+  it("Scenario: 'Unflag this' — removes Flagged flag", async () => {
+    const tool = getToolHandler(server, "flag_email");
+    const result = await tool.handler({ id: "249088", flags: ["Flagged"], action: "remove", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("Removed");
+    expect(result.content[0].text).toContain("Flagged");
+  });
+
+  it("Scenario: flag error — returns isError", async () => {
+    vi.spyOn(client, "flagMessage").mockRejectedValue(new Error("connection timeout"));
+    const tool = getToolHandler(server, "flag_email");
+    const result = await tool.handler({ id: "249088", flags: ["Seen"], action: "add", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error flagging email");
+  });
+});
+
+describe("Dogfooding: move_email", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerManageTools(server, client);
+  });
+
+  it("Scenario: 'Archive this email' — moves to Archive", async () => {
+    const tool = getToolHandler(server, "move_email");
+    const result = await tool.handler({ id: "249064", target_folder: "Archive", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("Moved");
+    expect(result.content[0].text).toContain("249064");
+    expect(result.content[0].text).toContain("Archive");
+    expect(client.moveMessage).toHaveBeenCalledWith("249064", "Archive", undefined, undefined);
+  });
+
+  it("Scenario: 'Delete this spam' — moves to Trash", async () => {
+    const tool = getToolHandler(server, "move_email");
+    const result = await tool.handler({ id: "249064", target_folder: "Trash", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("Trash");
+  });
+
+  it("Scenario: move error — returns isError", async () => {
+    vi.spyOn(client, "moveMessage").mockRejectedValue(new Error("folder not found"));
+    const tool = getToolHandler(server, "move_email");
+    const result = await tool.handler({ id: "249064", target_folder: "NonExistent", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error moving email");
+  });
+});
+
+describe("Dogfooding: export_to_markdown", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerActionTools(server, client);
+  });
+
+  it("Scenario: 'Export email 249088 as markdown' — returns formatted md", async () => {
+    const tool = getToolHandler(server, "export_to_markdown");
+    const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
+
+    const text = result.content[0].text;
+    // Has YAML frontmatter
+    expect(text).toMatch(/^---/);
+    expect(text).toContain("subject:");
+    expect(text).toContain("from:");
+    expect(text).toContain("date:");
+    expect(text).toContain("flags:");
+    // Has heading with subject
+    expect(text).toContain("# Reminder - Seminar Today");
+    // Has body
+    expect(text).toContain("Dear colleague");
+    expect(text).toContain("seminar at 3:30pm");
+  });
+
+  it("Scenario: email not found — returns error", async () => {
+    const tool = getToolHandler(server, "export_to_markdown");
+    const result = await tool.handler({ id: "999999", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("not found");
+  });
+
+  it("Scenario: export error — returns isError", async () => {
+    vi.spyOn(client, "listEnvelopes").mockRejectedValue(new Error("timeout"));
+    const tool = getToolHandler(server, "export_to_markdown");
+    const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error exporting email");
+  });
+});
+
+describe("Dogfooding: draft_reply", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerComposeTools(server, client);
+  });
+
+  it("Scenario: 'Reply to the seminar email' — generates draft", async () => {
+    const tool = getToolHandler(server, "draft_reply");
+    const result = await tool.handler({
+      id: "249088", body: undefined, reply_all: undefined,
+      folder: undefined, account: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("DRAFT");
+    expect(text).toContain("Re: Reminder - Seminar Today");
+    expect(text).toContain("not sent");
+    expect(result.isError).toBeUndefined();
+  });
+});
+
+describe("Dogfooding: send_email safety gate", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerComposeTools(server, client);
+  });
+
+  it("Scenario: preview before send — does NOT send", async () => {
+    const tool = getToolHandler(server, "send_email");
+    const result = await tool.handler({
+      template: "From: me@test.com\nSubject: Test\n\nHello",
+      confirm: undefined, account: undefined,
+    }, {} as any);
+
+    expect(result.content[0].text).toContain("NOT been sent");
+    expect(client.sendTemplate).not.toHaveBeenCalled();
+  });
+
+  it("Scenario: user confirms — sends email", async () => {
+    const tool = getToolHandler(server, "send_email");
+    const template = "From: me@test.com\nTo: you@test.com\nSubject: Hi\n\nHello!";
+    const result = await tool.handler({
+      template, confirm: true, account: undefined,
+    }, {} as any);
+
+    expect(result.content[0].text).toContain("sent successfully");
+    expect(client.sendTemplate).toHaveBeenCalledWith(template, undefined);
+  });
+});
+
+describe("Dogfooding: create_action_item", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerActionTools(server, client);
+  });
+
+  it("Scenario: 'Extract actions from seminar email' — returns structured context", async () => {
+    const tool = getToolHandler(server, "create_action_item");
+    const result = await tool.handler({
+      id: "249088", folder: undefined, account: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("Reminder - Seminar Today");
+    expect(text).toContain("Megan McKay");
+    expect(text).toContain("Action items");
+    expect(text).toContain("Deadlines");
+    expect(text).toContain("seminar at 3:30pm");
+  });
+
+  it("Scenario: email body error — returns isError", async () => {
+    vi.spyOn(client, "readMessage").mockResolvedValue("");
+    const tool = getToolHandler(server, "create_action_item");
+    const result = await tool.handler({
+      id: "249088", folder: undefined, account: undefined,
+    }, {} as any);
+
+    expect(result.isError).toBe(true);
   });
 });
 

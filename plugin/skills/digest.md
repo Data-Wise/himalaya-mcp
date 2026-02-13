@@ -27,6 +27,7 @@ Generate a markdown summary of today's important emails.
 3. Use `daily_email_digest` MCP prompt to compile digest
 4. Display digest in terminal
 5. If `--export`, call `export_to_markdown` tool
+6. If `--clipboard`, call `copy_to_clipboard` with the digest text
 
 ## Output Format
 

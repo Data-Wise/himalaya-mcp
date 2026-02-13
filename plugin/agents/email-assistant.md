@@ -42,9 +42,13 @@ Autonomous agent for email triage and management via himalaya MCP.
 ## Tools Used
 
 - `list_emails` - Scan inbox
+- `search_emails` - Find specific emails
 - `read_email` - Read full body
+- `read_email_html` - Read HTML version
 - `flag_email` - Flag spam/important
 - `move_email` - Organize into folders
 - `draft_reply` - Generate reply drafts
+- `send_email` - Send email (requires confirm=true)
 - `export_to_markdown` - Save digests
 - `create_action_item` - Extract todos
+- `copy_to_clipboard` - Copy to system clipboard

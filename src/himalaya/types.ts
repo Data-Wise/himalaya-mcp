@@ -92,3 +92,46 @@ export interface ReadEmailParams {
   folder?: string;
   account?: string;
 }
+
+export interface FlagEmailParams {
+  id: string;
+  flags: string[];
+  action: "add" | "remove";
+  folder?: string;
+  account?: string;
+}
+
+export interface MoveEmailParams {
+  id: string;
+  target_folder: string;
+  folder?: string;
+  account?: string;
+}
+
+export interface ExportMarkdownParams {
+  id: string;
+  folder?: string;
+  account?: string;
+}
+
+export interface DraftReplyParams {
+  id: string;
+  body?: string;
+  reply_all?: boolean;
+  folder?: string;
+  account?: string;
+}
+
+export interface SendEmailParams {
+  /** Raw MML template (headers + body) to send */
+  template: string;
+  /** Must be true to actually send — safety gate */
+  confirm?: boolean;
+  account?: string;
+}
+
+export interface CreateActionItemParams {
+  id: string;
+  folder?: string;
+  account?: string;
+}
