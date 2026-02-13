@@ -8,6 +8,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { HimalayaClient } from "./himalaya/client.js";
+import { loadConfig } from "./config.js";
+import { registerClipboardTools } from "./adapters/clipboard.js";
 import { registerInboxTools } from "./tools/inbox.js";
 import { registerReadTools } from "./tools/read.js";
 import { registerManageTools } from "./tools/manage.js";
@@ -27,7 +29,7 @@ const server = new McpServer({
   version: VERSION,
 });
 
-const client = new HimalayaClient();
+const client = new HimalayaClient(loadConfig());
 
 // Register tools
 registerInboxTools(server, client);
@@ -35,6 +37,7 @@ registerReadTools(server, client);
 registerManageTools(server, client);
 registerActionTools(server, client);
 registerComposeTools(server, client);
+registerClipboardTools(server);
 
 // Register resources
 registerResources(server, client);
