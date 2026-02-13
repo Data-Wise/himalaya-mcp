@@ -59,7 +59,12 @@ himalaya-mcp/
 ├── .claude-plugin/
 │   └── plugin.json              # Claude Code plugin manifest
 ├── .mcp.json                    # MCP server config (uses ${CLAUDE_PLUGIN_ROOT})
-├── docs/specs/                  # Design specs
+├── docs/
+│   ├── guide.md                 # User guide (setup, tools, prompts, resources)
+│   ├── REFCARD.md               # Quick reference card
+│   ├── workflows.md             # Common email workflow patterns
+│   ├── architecture.md          # System design, module map, data flow
+│   └── specs/                   # Design specs
 ├── tests/
 │   ├── parser.test.ts           # 13 parser tests
 │   ├── client.test.ts           # 12 client tests (subprocess mock)

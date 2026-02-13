@@ -53,6 +53,13 @@ npm test              # 122 tests across 10 test files (vitest)
 
 Tests include unit tests, dogfooding tests (realistic Claude usage patterns), and headless E2E tests (full MCP server pipeline with fake himalaya binary).
 
+## Documentation
+
+- **[User Guide](docs/guide.md)** -- setup, configuration, all tools/prompts/resources
+- **[Quick Reference](docs/REFCARD.md)** -- one-page cheat sheet
+- **[Workflows](docs/workflows.md)** -- common email patterns (triage, reply, digest, export)
+- **[Architecture](docs/architecture.md)** -- system design, module map, data flow
+
 ## License
 
 MIT
