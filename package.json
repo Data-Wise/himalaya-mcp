@@ -1,0 +1,32 @@
+{
+  "name": "himalaya-mcp",
+  "version": "0.1.0",
+  "description": "MCP server wrapping himalaya CLI for privacy-first email access in Claude",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "lint": "eslint src/",
+    "pack": "npx @anthropic-ai/mcpb pack"
+  },
+  "keywords": [
+    "mcp",
+    "email",
+    "himalaya",
+    "claude",
+    "claude-code-plugin"
+  ],
+  "author": "Data-Wise",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,30 @@
+# himalaya-mcp - Email MCP Server & Claude Code Plugin
+# Privacy-first email access via himalaya CLI
+
+## Project: himalaya-mcp
+## Type: mcp-server / claude-code-plugin
+## Status: setup
+## Focus: Phase 0 — Repo scaffold & specs
+## Phase: Setup
+## Priority: 3
+## Progress: 5
+
+## Current Session (2026-02-13)
+
+**Session activity:**
+- brainstorm: deep mode (8 questions), researched Cowork + MCPB + email MCP landscape
+- decision: Claude Code plugin (bundles MCP server) over standalone MCP
+- setup: repo init, directory structure, plugin.json, package.json, CLAUDE.md
+
+---
+
+## Next Action
+
+1. **Phase 1: Core Read (MVP)** — implement himalaya subprocess wrapper + list/read tools
+2. npm install + build pipeline
+3. Test in Claude Code
+
+---
+
+**Last Updated:** 2026-02-13
+**Status:** Phase 0 — Setup & Specs

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.mcpb
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+.turbo/
