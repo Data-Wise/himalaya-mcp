@@ -12,10 +12,14 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { writeFile, mkdir, chmod, rm } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 
 const execFileAsync = promisify(execFile);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = resolve(__dirname, "..");
 
 // --- Fake himalaya binary for E2E tests ---
 
@@ -108,7 +112,7 @@ describe("E2E: MCP Server Headless", () => {
   beforeAll(async () => {
     // Build first
     await execFileAsync("npm", ["run", "build"], {
-      cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-core-read",
+      cwd: PROJECT_ROOT,
     });
 
     // Create fake himalaya
@@ -118,7 +122,7 @@ describe("E2E: MCP Server Headless", () => {
 
     // Spawn MCP server with fake himalaya in PATH
     serverProcess = spawn("node", ["dist/index.js"], {
-      cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-core-read",
+      cwd: PROJECT_ROOT,
       env: {
         ...process.env,
         PATH: `${fakeBinDir}:${process.env.PATH}`,
