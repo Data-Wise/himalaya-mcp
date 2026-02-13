@@ -33,6 +33,9 @@ theme:
     - search.highlight
     - content.code.copy
     - content.action.edit
+  font:
+    text: Source Sans Pro
+    code: Source Code Pro
   icon:
     repo: fontawesome/brands/github
 

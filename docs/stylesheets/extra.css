@@ -1,15 +1,23 @@
-/* data-wise preset — blue primary, orange accent */
+/* adhd-calm preset — warm earth tones, cozy reading */
 
 :root {
-  --md-primary-fg-color: #1a73e8;
-  --md-primary-fg-color--light: #4a90d9;
-  --md-primary-fg-color--dark: #1557b0;
-  --md-accent-fg-color: #ff6b35;
+  --md-primary-fg-color: #8b5a2b;
+  --md-primary-fg-color--light: #a67c52;
+  --md-primary-fg-color--dark: #6b4423;
+  --md-accent-fg-color: #c67a4a;
+
+  /* Cream background for reduced eye strain */
+  --md-default-bg-color: #faf6f1;
+  --md-default-bg-color--light: #fdf9f5;
 }
 
 [data-md-color-scheme="slate"] {
-  --md-primary-fg-color: #4a90d9;
-  --md-accent-fg-color: #ff8a5c;
+  --md-primary-fg-color: #a67c52;
+  --md-accent-fg-color: #d4956a;
+
+  /* Warm dark background (not harsh black) */
+  --md-default-bg-color: #2b2420;
+  --md-default-bg-color--light: #352e29;
 }
 
 /* Smooth scrolling */
@@ -17,12 +25,17 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Code block styling */
+/* Code block styling — soft contrast */
 .md-typeset code {
   border-radius: 4px;
+  background-color: rgba(139, 90, 43, 0.08);
 }
 
-/* Navigation tabs */
+[data-md-color-scheme="slate"] .md-typeset code {
+  background-color: rgba(166, 124, 82, 0.15);
+}
+
+/* Navigation tabs — warm underline */
 .md-tabs {
   border-bottom: 2px solid var(--md-primary-fg-color);
 }
@@ -31,4 +44,14 @@ html {
 .md-typeset .admonition.tip,
 .md-typeset details.tip {
   border-color: var(--md-accent-fg-color);
+}
+
+/* Softer link hover — warm glow instead of harsh highlight */
+.md-typeset a:hover {
+  color: var(--md-accent-fg-color);
+}
+
+/* Reduce visual noise — softer shadows */
+.md-header {
+  box-shadow: 0 1px 3px rgba(107, 68, 35, 0.12);
 }

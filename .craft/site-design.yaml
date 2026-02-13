@@ -1,4 +1,4 @@
-preset: "data-wise"
+preset: "adhd-calm"
 
 branding:
   name: "himalaya-mcp"
@@ -6,8 +6,8 @@ branding:
   logo: null
 
 colors:
-  primary: "#1a73e8"
-  accent: "#ff6b35"
+  primary: "#8b5a2b"
+  accent: "#c67a4a"
   scheme: "auto"
 
 navigation:
