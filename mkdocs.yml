@@ -79,5 +79,6 @@ nav:
     - User Guide: guide/guide.md
     - Workflows: guide/workflows.md
   - Reference:
+    - Command Reference: reference/commands.md
     - Quick Reference: reference/refcard.md
     - Architecture: reference/architecture.md

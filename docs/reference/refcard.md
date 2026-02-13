@@ -50,6 +50,7 @@ Draft      Draft message
 /email:triage    Classify inbox, suggest flags and moves
 /email:digest    Generate daily priority digest
 /email:reply     Draft reply with safety gate workflow
+/email:help      Help hub — browse tools, prompts, workflows
 ```
 
 ## Environment Variables
