@@ -16,7 +16,7 @@ export function registerReadTools(server: McpServer, client: HimalayaClient) {
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
-    const raw = await client.readMessage(args.id, args.folder);
+    const raw = await client.readMessage(args.id, args.folder, args.account);
     const result = parseMessageBody(raw);
 
     if (!result.ok) {
@@ -39,7 +39,7 @@ export function registerReadTools(server: McpServer, client: HimalayaClient) {
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
-    const raw = await client.readMessageHtml(args.id, args.folder);
+    const raw = await client.readMessageHtml(args.id, args.folder, args.account);
     const result = parseMessageBody(raw);
 
     if (!result.ok) {

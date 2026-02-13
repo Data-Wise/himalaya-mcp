@@ -110,14 +110,14 @@ describe("Dogfooding: list_emails", () => {
     const tool = getToolHandler(server, "list_emails");
     await tool.handler({ folder: "Sent Items", page_size: undefined, page: undefined, account: undefined }, {} as any);
 
-    expect(client.listEnvelopes).toHaveBeenCalledWith("Sent Items", undefined, undefined);
+    expect(client.listEnvelopes).toHaveBeenCalledWith("Sent Items", undefined, undefined, undefined);
   });
 
   it("Scenario: 'Show me just the last 5 emails' — passes page_size", async () => {
     const tool = getToolHandler(server, "list_emails");
     await tool.handler({ folder: undefined, page_size: 5, page: undefined, account: undefined }, {} as any);
 
-    expect(client.listEnvelopes).toHaveBeenCalledWith(undefined, 5, undefined);
+    expect(client.listEnvelopes).toHaveBeenCalledWith(undefined, 5, undefined, undefined);
   });
 });
 
@@ -135,7 +135,7 @@ describe("Dogfooding: search_emails", () => {
     const tool = getToolHandler(server, "search_emails");
     await tool.handler({ query: "subject invoice", folder: undefined, account: undefined }, {} as any);
 
-    expect(client.searchEnvelopes).toHaveBeenCalledWith("subject invoice", undefined);
+    expect(client.searchEnvelopes).toHaveBeenCalledWith("subject invoice", undefined, undefined);
   });
 
   it("Scenario: empty search results — shows helpful message", async () => {
@@ -191,7 +191,7 @@ describe("Dogfooding: read_email", () => {
     const tool = getToolHandler(server, "read_email");
     await tool.handler({ id: "123", folder: "Archive", account: undefined }, {} as any);
 
-    expect(client.readMessage).toHaveBeenCalledWith("123", "Archive");
+    expect(client.readMessage).toHaveBeenCalledWith("123", "Archive", undefined);
   });
 });
 

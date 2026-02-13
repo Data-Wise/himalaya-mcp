@@ -64,7 +64,7 @@ export class HimalayaClient {
   }
 
   /** List envelopes in a folder. */
-  async listEnvelopes(folder?: string, pageSize?: number, page?: number): Promise<string> {
+  async listEnvelopes(folder?: string, pageSize?: number, page?: number, account?: string): Promise<string> {
     const args = ["envelope", "list"];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
@@ -76,7 +76,7 @@ export class HimalayaClient {
     if (page) {
       args.push("--page", String(page));
     }
-    return this.exec(args, { folder: f });
+    return this.exec(args, { folder: f, account });
   }
 
   /**
@@ -86,7 +86,7 @@ export class HimalayaClient {
    *   Operators: "and", "or", "not"
    *   Example: "subject invoice and from paypal"
    */
-  async searchEnvelopes(query: string, folder?: string): Promise<string> {
+  async searchEnvelopes(query: string, folder?: string, account?: string): Promise<string> {
     const args = ["envelope", "list"];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
@@ -94,27 +94,27 @@ export class HimalayaClient {
     }
     // Query words are positional args to himalaya (not a -q flag)
     args.push(...query.split(" "));
-    return this.exec(args, { folder: f });
+    return this.exec(args, { folder: f, account });
   }
 
   /** Read a message body (plain text). */
-  async readMessage(id: string, folder?: string): Promise<string> {
+  async readMessage(id: string, folder?: string, account?: string): Promise<string> {
     const args = ["message", "read", id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
       args.push("--folder", f);
     }
-    return this.exec(args, { folder: f });
+    return this.exec(args, { folder: f, account });
   }
 
   /** Read a message body (HTML). */
-  async readMessageHtml(id: string, folder?: string): Promise<string> {
+  async readMessageHtml(id: string, folder?: string, account?: string): Promise<string> {
     const args = ["message", "read", "--html", id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
       args.push("--folder", f);
     }
-    return this.exec(args, { folder: f });
+    return this.exec(args, { folder: f, account });
   }
 
   /** List folders. */

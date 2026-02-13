@@ -10,7 +10,7 @@
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
-import { parseEnvelopes, parseFolders, parseMessageBody } from "../himalaya/parser.js";
+import { parseEnvelopes, parseFolders, parseMessageBody, formatEnvelope } from "../himalaya/parser.js";
 
 export function registerResources(server: McpServer, client: HimalayaClient) {
   // email://inbox — current inbox listing
@@ -18,25 +18,25 @@ export function registerResources(server: McpServer, client: HimalayaClient) {
     description: "Current inbox email listing",
     mimeType: "text/plain",
   }, async () => {
-    const raw = await client.listEnvelopes();
-    const result = parseEnvelopes(raw);
+    try {
+      const raw = await client.listEnvelopes();
+      const result = parseEnvelopes(raw);
 
-    if (!result.ok) {
-      return { contents: [{ uri: "email://inbox", text: `Error: ${result.error}` }] };
+      if (!result.ok) {
+        return { contents: [{ uri: "email://inbox", text: `Error: ${result.error}` }] };
+      }
+
+      const text = result.data.map(formatEnvelope).join("\n");
+
+      return {
+        contents: [{
+          uri: "email://inbox",
+          text: `Inbox (${result.data.length} emails):\n\n${text}`,
+        }],
+      };
+    } catch (err) {
+      return { contents: [{ uri: "email://inbox", text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };
     }
-
-    const text = result.data.map((e) => {
-      const flags = e.flags.length > 0 ? ` [${e.flags.join(", ")}]` : "";
-      const attachment = e.has_attachment ? " [attachment]" : "";
-      return `${e.id} | ${e.date} | ${e.from.name || e.from.addr} | ${e.subject}${flags}${attachment}`;
-    }).join("\n");
-
-    return {
-      contents: [{
-        uri: "email://inbox",
-        text: `Inbox (${result.data.length} emails):\n\n${text}`,
-      }],
-    };
   });
 
   // email://folders — list of available folders
@@ -44,45 +44,53 @@ export function registerResources(server: McpServer, client: HimalayaClient) {
     description: "Available email folders",
     mimeType: "text/plain",
   }, async () => {
-    const raw = await client.listFolders();
-    const result = parseFolders(raw);
+    try {
+      const raw = await client.listFolders();
+      const result = parseFolders(raw);
 
-    if (!result.ok) {
-      return { contents: [{ uri: "email://folders", text: `Error: ${result.error}` }] };
+      if (!result.ok) {
+        return { contents: [{ uri: "email://folders", text: `Error: ${result.error}` }] };
+      }
+
+      const text = result.data.map((f) => `${f.name} — ${f.desc}`).join("\n");
+
+      return {
+        contents: [{
+          uri: "email://folders",
+          text: `Folders (${result.data.length}):\n\n${text}`,
+        }],
+      };
+    } catch (err) {
+      return { contents: [{ uri: "email://folders", text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };
     }
-
-    const text = result.data.map((f) => `${f.name} — ${f.desc}`).join("\n");
-
-    return {
-      contents: [{
-        uri: "email://folders",
-        text: `Folders (${result.data.length}):\n\n${text}`,
-      }],
-    };
   });
 
   // email://message/{id} — specific message body
   const messageTemplate = new ResourceTemplate("email://message/{id}", {
-    list: undefined, // can't enumerate all messages
+    list: undefined,
   });
 
   server.registerResource("message", messageTemplate, {
     description: "Read a specific email message by ID",
     mimeType: "text/plain",
   }, async (uri, params) => {
-    const id = String(params.id);
-    const raw = await client.readMessage(id);
-    const result = parseMessageBody(raw);
+    try {
+      const id = String(params.id);
+      const raw = await client.readMessage(id);
+      const result = parseMessageBody(raw);
 
-    if (!result.ok) {
-      return { contents: [{ uri: uri.href, text: `Error: ${result.error}` }] };
+      if (!result.ok) {
+        return { contents: [{ uri: uri.href, text: `Error: ${result.error}` }] };
+      }
+
+      return {
+        contents: [{
+          uri: uri.href,
+          text: result.data || "(empty message body)",
+        }],
+      };
+    } catch (err) {
+      return { contents: [{ uri: uri.href, text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };
     }
-
-    return {
-      contents: [{
-        uri: uri.href,
-        text: result.data || "(empty message body)",
-      }],
-    };
   });
 }

@@ -50,6 +50,13 @@ export function parseAccounts(raw: string): CommandOutput<Account[]> {
   return parse<Account[]>(raw);
 }
 
+/** Format an envelope as a pipe-delimited line for LLM consumption. */
+export function formatEnvelope(e: Envelope): string {
+  const flags = e.flags.length > 0 ? ` [${e.flags.join(", ")}]` : "";
+  const attachment = e.has_attachment ? " [attachment]" : "";
+  return `${e.id} | ${e.date} | ${e.from.name || e.from.addr} | ${e.subject}${flags}${attachment}`;
+}
+
 /**
  * Parse message body response.
  * himalaya returns the body as a JSON-quoted string.

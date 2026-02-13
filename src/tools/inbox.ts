@@ -5,7 +5,7 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
-import { parseEnvelopes } from "../himalaya/parser.js";
+import { parseEnvelopes, formatEnvelope } from "../himalaya/parser.js";
 
 export function registerInboxTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("list_emails", {
@@ -17,18 +17,14 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
-    const raw = await client.listEnvelopes(args.folder, args.page_size, args.page);
+    const raw = await client.listEnvelopes(args.folder, args.page_size, args.page, args.account);
     const result = parseEnvelopes(raw);
 
     if (!result.ok) {
       return { content: [{ type: "text" as const, text: `Error: ${result.error}` }], isError: true };
     }
 
-    const summary = result.data.map((e) => {
-      const flags = e.flags.length > 0 ? ` [${e.flags.join(", ")}]` : "";
-      const attachment = e.has_attachment ? " [attachment]" : "";
-      return `${e.id} | ${e.date} | ${e.from.name || e.from.addr} | ${e.subject}${flags}${attachment}`;
-    }).join("\n");
+    const summary = result.data.map(formatEnvelope).join("\n");
 
     return {
       content: [{
@@ -46,7 +42,7 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
-    const raw = await client.searchEnvelopes(args.query, args.folder);
+    const raw = await client.searchEnvelopes(args.query, args.folder, args.account);
     const result = parseEnvelopes(raw);
 
     if (!result.ok) {
@@ -57,10 +53,7 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
       return { content: [{ type: "text" as const, text: `No emails found matching "${args.query}"` }] };
     }
 
-    const summary = result.data.map((e) => {
-      const flags = e.flags.length > 0 ? ` [${e.flags.join(", ")}]` : "";
-      return `${e.id} | ${e.date} | ${e.from.name || e.from.addr} | ${e.subject}${flags}`;
-    }).join("\n");
+    const summary = result.data.map(formatEnvelope).join("\n");
 
     return {
       content: [{
