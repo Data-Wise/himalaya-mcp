@@ -13,6 +13,7 @@ import { registerInboxTools } from "../src/tools/inbox.js";
 import { registerReadTools } from "../src/tools/read.js";
 import { registerManageTools } from "../src/tools/manage.js";
 import { registerActionTools } from "../src/tools/actions.js";
+import { registerComposeTools } from "../src/tools/compose.js";
 
 // --- Sample data matching real himalaya output ---
 
@@ -64,6 +65,10 @@ function createMockClient(): HimalayaClient {
   );
   vi.spyOn(client, "flagMessage").mockResolvedValue("{}");
   vi.spyOn(client, "moveMessage").mockResolvedValue("{}");
+  vi.spyOn(client, "replyTemplate").mockResolvedValue(
+    JSON.stringify("From: user@example.com\nTo: mmckay@unm.edu\nSubject: Re: Reminder - Seminar Today\n\nThank you for the reminder.\n\n> Dear colleague,\n> Seminar at 3:30pm.")
+  );
+  vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
   return client;
 }
 
@@ -368,6 +373,99 @@ describe("Dogfooding: export_to_markdown", () => {
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("Error exporting email");
+  });
+});
+
+describe("Dogfooding: draft_reply", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerComposeTools(server, client);
+  });
+
+  it("Scenario: 'Reply to the seminar email' — generates draft", async () => {
+    const tool = getToolHandler(server, "draft_reply");
+    const result = await tool.handler({
+      id: "249088", body: undefined, reply_all: undefined,
+      folder: undefined, account: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("DRAFT");
+    expect(text).toContain("Re: Reminder - Seminar Today");
+    expect(text).toContain("not sent");
+    expect(result.isError).toBeUndefined();
+  });
+});
+
+describe("Dogfooding: send_email safety gate", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerComposeTools(server, client);
+  });
+
+  it("Scenario: preview before send — does NOT send", async () => {
+    const tool = getToolHandler(server, "send_email");
+    const result = await tool.handler({
+      template: "From: me@test.com\nSubject: Test\n\nHello",
+      confirm: undefined, account: undefined,
+    }, {} as any);
+
+    expect(result.content[0].text).toContain("NOT been sent");
+    expect(client.sendTemplate).not.toHaveBeenCalled();
+  });
+
+  it("Scenario: user confirms — sends email", async () => {
+    const tool = getToolHandler(server, "send_email");
+    const template = "From: me@test.com\nTo: you@test.com\nSubject: Hi\n\nHello!";
+    const result = await tool.handler({
+      template, confirm: true, account: undefined,
+    }, {} as any);
+
+    expect(result.content[0].text).toContain("sent successfully");
+    expect(client.sendTemplate).toHaveBeenCalledWith(template, undefined);
+  });
+});
+
+describe("Dogfooding: create_action_item", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerActionTools(server, client);
+  });
+
+  it("Scenario: 'Extract actions from seminar email' — returns structured context", async () => {
+    const tool = getToolHandler(server, "create_action_item");
+    const result = await tool.handler({
+      id: "249088", folder: undefined, account: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("Reminder - Seminar Today");
+    expect(text).toContain("Megan McKay");
+    expect(text).toContain("Action items");
+    expect(text).toContain("Deadlines");
+    expect(text).toContain("seminar at 3:30pm");
+  });
+
+  it("Scenario: email body error — returns isError", async () => {
+    vi.spyOn(client, "readMessage").mockResolvedValue("");
+    const tool = getToolHandler(server, "create_action_item");
+    const result = await tool.handler({
+      id: "249088", folder: undefined, account: undefined,
+    }, {} as any);
+
+    expect(result.isError).toBe(true);
   });
 });
 

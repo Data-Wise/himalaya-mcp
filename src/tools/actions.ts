@@ -1,5 +1,5 @@
 /**
- * MCP tools for email actions: export to markdown.
+ * MCP tools for email actions: export to markdown, extract action items.
  */
 
 import { z } from "zod/v4";
@@ -79,6 +79,79 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
         content: [{
           type: "text" as const,
           text: `Error exporting email: ${err instanceof Error ? err.message : String(err)}`,
+        }],
+        isError: true,
+      };
+    }
+  });
+
+  server.registerTool("create_action_item", {
+    description: "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events.",
+    inputSchema: {
+      id: z.string().describe("Email message ID"),
+      folder: z.string().optional().describe("Folder name (default: INBOX)"),
+      account: z.string().optional().describe("Account name (uses default if omitted)"),
+    },
+  }, async (args) => {
+    try {
+      // Fetch envelope for context
+      const envelopeRaw = await client.listEnvelopes(args.folder, 50);
+      const envelopeResult = parseEnvelopes(envelopeRaw);
+
+      let subject = "(unknown subject)";
+      let from = "(unknown sender)";
+      let date = "(unknown date)";
+
+      if (envelopeResult.ok) {
+        const envelope = envelopeResult.data.find((e) => e.id === args.id);
+        if (envelope) {
+          subject = envelope.subject;
+          from = envelope.from.name || envelope.from.addr;
+          date = envelope.date;
+        }
+      }
+
+      // Fetch body
+      const bodyRaw = await client.readMessage(args.id, args.folder);
+      const bodyResult = parseMessageBody(bodyRaw);
+
+      if (!bodyResult.ok) {
+        return {
+          content: [{ type: "text" as const, text: `Error reading email: ${bodyResult.error}` }],
+          isError: true,
+        };
+      }
+
+      // Return email context for Claude to extract action items
+      return {
+        content: [{
+          type: "text" as const,
+          text: [
+            "Extract action items from this email:",
+            "",
+            `**Subject:** ${subject}`,
+            `**From:** ${from}`,
+            `**Date:** ${date}`,
+            "",
+            "**Body:**",
+            bodyResult.data || "(empty body)",
+            "",
+            "---",
+            "",
+            "Please identify:",
+            "- [ ] Action items / tasks",
+            "- [ ] Deadlines or due dates",
+            "- [ ] Commitments made by sender",
+            "- [ ] Questions that need answers",
+            "- [ ] Meetings or events mentioned",
+          ].join("\n"),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Error extracting actions: ${err instanceof Error ? err.message : String(err)}`,
         }],
         isError: true,
       };

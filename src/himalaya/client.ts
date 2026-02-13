@@ -148,6 +148,56 @@ export class HimalayaClient {
     return this.exec(args, { folder: f, account });
   }
 
+  /** Generate a reply template for a message. */
+  async replyTemplate(
+    id: string,
+    body?: string,
+    replyAll?: boolean,
+    folder?: string,
+    account?: string,
+  ): Promise<string> {
+    const args = ["template", "reply"];
+    const f = folder || this.opts.folder;
+    if (f && f !== "INBOX") {
+      args.push("--folder", f);
+    }
+    if (replyAll) {
+      args.push("--all");
+    }
+    args.push(id);
+    if (body) {
+      args.push(body);
+    }
+    return this.exec(args, { folder: f, account });
+  }
+
+  /** Generate a new message template. */
+  async writeTemplate(
+    headers?: string[],
+    body?: string,
+    account?: string,
+  ): Promise<string> {
+    const args = ["template", "write"];
+    if (headers) {
+      for (const h of headers) {
+        args.push("--header", h);
+      }
+    }
+    if (body) {
+      args.push(body);
+    }
+    return this.exec(args, { account });
+  }
+
+  /** Send a template (MML format). */
+  async sendTemplate(
+    template: string,
+    account?: string,
+  ): Promise<string> {
+    const args = ["template", "send", template];
+    return this.exec(args, { account });
+  }
+
   /** List folders. */
   async listFolders(): Promise<string> {
     return this.exec(["folder", "list"]);

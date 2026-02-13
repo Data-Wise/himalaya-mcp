@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerTriagePrompt } from "../src/prompts/triage.js";
 import { registerSummarizePrompt } from "../src/prompts/summarize.js";
 import { registerDigestPrompt } from "../src/prompts/digest.js";
+import { registerReplyPrompt } from "../src/prompts/reply.js";
 
 // Spy on registerPrompt to verify registration without running a full server
 function createMockServer() {
@@ -119,6 +120,62 @@ describe("MCP Prompts", () => {
       const result = await cb({});
 
       expect(result.messages[0].content.text).toContain("export_to_markdown");
+    });
+  });
+
+  describe("draft_reply", () => {
+    it("registers with correct name", () => {
+      const { server, prompts } = createMockServer();
+      registerReplyPrompt(server);
+
+      expect(prompts.has("draft_reply")).toBe(true);
+      const { config } = prompts.get("draft_reply")!;
+      expect(config.description).toContain("reply");
+    });
+
+    it("includes email ID in prompt", async () => {
+      const { server, prompts } = createMockServer();
+      registerReplyPrompt(server);
+
+      const { cb } = prompts.get("draft_reply")!;
+      const result = await cb({ id: "42", tone: undefined, instructions: undefined });
+
+      const text = result.messages[0].content.text;
+      expect(text).toContain("42");
+      expect(text).toContain("read_email");
+      expect(text).toContain("draft_reply");
+    });
+
+    it("uses custom tone", async () => {
+      const { server, prompts } = createMockServer();
+      registerReplyPrompt(server);
+
+      const { cb } = prompts.get("draft_reply")!;
+      const result = await cb({ id: "42", tone: "casual", instructions: undefined });
+
+      expect(result.messages[0].content.text).toContain("casual");
+    });
+
+    it("includes specific instructions", async () => {
+      const { server, prompts } = createMockServer();
+      registerReplyPrompt(server);
+
+      const { cb } = prompts.get("draft_reply")!;
+      const result = await cb({ id: "42", tone: undefined, instructions: "Decline the meeting politely" });
+
+      expect(result.messages[0].content.text).toContain("Decline the meeting politely");
+    });
+
+    it("emphasizes safety — never send without approval", async () => {
+      const { server, prompts } = createMockServer();
+      registerReplyPrompt(server);
+
+      const { cb } = prompts.get("draft_reply")!;
+      const result = await cb({ id: "42", tone: undefined, instructions: undefined });
+
+      const text = result.messages[0].content.text;
+      expect(text).toContain("confirm=true");
+      expect(text).toContain("approval");
     });
   });
 });

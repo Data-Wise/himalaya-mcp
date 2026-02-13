@@ -16,6 +16,8 @@ import { registerResources } from "./resources/index.js";
 import { registerTriagePrompt } from "./prompts/triage.js";
 import { registerSummarizePrompt } from "./prompts/summarize.js";
 import { registerDigestPrompt } from "./prompts/digest.js";
+import { registerComposeTools } from "./tools/compose.js";
+import { registerReplyPrompt } from "./prompts/reply.js";
 
 export const VERSION = "0.1.0";
 export const NAME = "himalaya-mcp";
@@ -32,6 +34,7 @@ registerInboxTools(server, client);
 registerReadTools(server, client);
 registerManageTools(server, client);
 registerActionTools(server, client);
+registerComposeTools(server, client);
 
 // Register resources
 registerResources(server, client);
@@ -40,6 +43,7 @@ registerResources(server, client);
 registerTriagePrompt(server);
 registerSummarizePrompt(server);
 registerDigestPrompt(server);
+registerReplyPrompt(server);
 
 // Start server
 async function main() {
