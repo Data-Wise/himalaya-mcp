@@ -18,11 +18,15 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     List, search, read, flag, move, draft reply, send, export, action items, clipboard
 
+    [:octicons-arrow-right-24: Command Reference](reference/commands.md)
+
 - :brain: **4 MCP Prompts**
 
     ---
 
     Triage inbox, summarize email, daily digest, draft reply
+
+    [:octicons-arrow-right-24: Prompt Details](reference/commands.md#prompts)
 
 - :lock: **Two-Phase Send**
 
@@ -30,23 +34,31 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     `send_email` returns a preview first; requires explicit `confirm=true`
 
+    [:octicons-arrow-right-24: Safety Model](guide/guide.md#safety-model)
+
 - :people_holding_hands: **Multi-Account**
 
     ---
 
-    Switch accounts per-call via `--account` parameter
+    Switch accounts per-call via `account` parameter
+
+    [:octicons-arrow-right-24: Multi-Account Guide](guide/workflows.md#6-multi-account-workflow)
 
 - :electric_plug: **Plugin + Server**
 
     ---
 
-    Use as a Claude Code plugin or standalone MCP server
+    Use as a Claude Code plugin (5 skills) or standalone MCP server
+
+    [:octicons-arrow-right-24: Installation](getting-started/installation.md)
 
 - :shield: **Privacy-First**
 
     ---
 
     All authentication stays local. No OAuth tokens leave your machine.
+
+    [:octicons-arrow-right-24: Architecture](reference/architecture.md)
 
 </div>
 
@@ -67,6 +79,18 @@ flowchart LR
 - No OAuth tokens leave your machine
 - Subprocess uses `execFile` (no shell injection)
 - Claude never sends email without your explicit confirmation
+
+## Plugin Skills
+
+When installed as a Claude Code plugin, these slash commands are available:
+
+| Skill | Description |
+|-------|-------------|
+| `/email:inbox` | Check inbox, list recent emails |
+| `/email:triage` | AI-powered email classification |
+| `/email:digest` | Generate daily priority digest |
+| `/email:reply` | Draft and send with safety gate |
+| `/email:help` | Help hub -- browse all tools, prompts, workflows |
 
 ## Quick Start
 
@@ -91,12 +115,15 @@ You: "Check my inbox"
 You: "Triage my last 10 emails"
 You: "Reply to the meeting email"
 You: "Give me today's email digest"
+You: "/email:help"
 ```
 
 ## Next Steps
 
 - **[Installation](getting-started/installation.md)** -- detailed setup guide
 - **[Quick Start](getting-started/quickstart.md)** -- first email in 2 minutes
-- **[User Guide](guide/guide.md)** -- complete tool and prompt reference
+- **[Command Reference](reference/commands.md)** -- all tools, prompts, and resources
+- **[User Guide](guide/guide.md)** -- complete walkthrough
 - **[Workflows](guide/workflows.md)** -- common email patterns
 - **[Quick Reference](reference/refcard.md)** -- one-page cheat sheet
+- **[Architecture](reference/architecture.md)** -- system design and security
