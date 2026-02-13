@@ -171,24 +171,6 @@ export class HimalayaClient {
     return this.exec(args, { folder: f, account });
   }
 
-  /** Generate a new message template. */
-  async writeTemplate(
-    headers?: string[],
-    body?: string,
-    account?: string,
-  ): Promise<string> {
-    const args = ["template", "write"];
-    if (headers) {
-      for (const h of headers) {
-        args.push("--header", h);
-      }
-    }
-    if (body) {
-      args.push(body);
-    }
-    return this.exec(args, { account });
-  }
-
   /** Send a template (MML format). */
   async sendTemplate(
     template: string,
