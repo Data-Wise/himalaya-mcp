@@ -4,35 +4,33 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: Phase 1 — Core Read (MVP)
+## Focus: Phase 2 — Triage + Export
 ## Phase: Development
 ## Priority: 3
-## Progress: 10
+## Progress: 35
 
-## Current Session (2026-02-13)
+## Completed
 
-**Session activity:**
-- brainstorm: deep mode (8 questions), researched Cowork + MCPB + email MCP landscape
-- decision: Claude Code plugin (bundles MCP server) over standalone MCP
-- setup: repo init, directory structure, plugin.json, package.json, CLAUDE.md
-- git init: dev branch, branch protection (main: PR + CI), CI workflow, PR template, pre-commit hook
-- worktree: `feature/core-read` at `~/.git-worktrees/himalaya-mcp/feature-core-read`
+- Phase 0: Repo scaffold, specs, CI, branch protection
+- Phase 1: Core Read MVP — subprocess client, 4 MCP tools, 3 resources, 39 tests
+- Review fixes: account param wiring, resource error handling, formatEnvelope helper
 
-## Active Worktrees
+## Current State
 
-| Worktree | Branch | Focus |
-|----------|--------|-------|
-| `~/.git-worktrees/himalaya-mcp/feature-core-read` | `feature/core-read` | Phase 1: subprocess client, tools, resources |
+- Branch: `dev` (Phase 1 merged + review fixes)
+- CI: passing
+- Tests: 39 (13 parser + 12 client + 14 dogfood) + 11 e2e
 
 ---
 
 ## Next Action
 
-1. **Start Phase 1 in worktree** — `cd ~/.git-worktrees/himalaya-mcp/feature-core-read && claude`
-2. Implement himalaya subprocess wrapper (`client.ts`)
-3. Build list/search/read MCP tools + resources
+1. Start Phase 2 — Triage + Export
+2. Implement triage prompts (triage_inbox, summarize_email)
+3. Add flag_email, move_email tools
+4. Add markdown export adapter
 
 ---
 
 **Last Updated:** 2026-02-13
-**Status:** Phase 1 — Core Read (MVP)
+**Status:** Phase 2 — Triage + Export (next)

@@ -7,7 +7,7 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Current Phase:** 0 — Setup & Specs (no implementation yet)
+- **Current Phase:** 1 — Core Read (MVP complete)
 
 ### What It Does
 
@@ -33,41 +33,47 @@ himalaya-mcp/
 ├── src/
 │   ├── index.ts                 # MCP server entry point
 │   ├── himalaya/
-│   │   ├── client.ts            # Subprocess wrapper
-│   │   ├── parser.ts            # JSON response parser
-│   │   └── types.ts             # TypeScript types
+│   │   ├── client.ts            # Subprocess wrapper (execFile, no shell injection)
+│   │   ├── parser.ts            # JSON response parser + formatEnvelope helper
+│   │   └── types.ts             # TypeScript types (Envelope, Folder, Account, etc.)
 │   ├── tools/
 │   │   ├── inbox.ts             # list_emails, search_emails
-│   │   ├── read.ts              # read_email, read_email_html
-│   │   ├── compose.ts           # draft_reply, send_email
-│   │   ├── manage.ts            # flag_email, move_email
-│   │   └── actions.ts           # export_to_markdown, create_action_item
-│   ├── resources/
-│   │   ├── inbox.ts             # email://inbox
-│   │   ├── message.ts           # email://message/{id}
-│   │   └── folders.ts           # email://folders
-│   ├── prompts/
-│   │   ├── triage.ts            # triage_inbox prompt
-│   │   ├── summarize.ts         # summarize_email prompt
-│   │   ├── draft.ts             # draft_reply prompt
-│   │   └── digest.ts            # daily_email_digest prompt
-│   ├── adapters/
-│   │   ├── markdown.ts          # Export to .md
-│   │   ├── clipboard.ts         # pbcopy
-│   │   ├── obsidian.ts          # Obsidian vault (future)
-│   │   └── apple.ts             # Apple Notes/Reminders (future)
-│   └── config.ts                # User configuration
+│   │   └── read.ts              # read_email, read_email_html
+│   └── resources/
+│       └── index.ts             # email://inbox, email://message/{id}, email://folders
 ├── plugin/
-│   ├── skills/                  # Claude Code plugin skills
-│   ├── agents/                  # Plugin agents
+│   ├── skills/                  # Claude Code plugin skills (inbox, triage, digest)
+│   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks
+├── .claude-plugin/
+│   └── plugin.json              # Claude Code plugin manifest
+├── .mcp.json                    # MCP server config (uses ${CLAUDE_PLUGIN_ROOT})
 ├── docs/specs/                  # Design specs
-├── tests/                       # Test files
-├── plugin.json                  # Claude Code plugin manifest
+├── tests/
+│   ├── parser.test.ts           # 13 parser tests
+│   ├── client.test.ts           # 12 client tests (subprocess mock)
+│   ├── dogfood.test.ts          # 14 dogfooding tests (realistic Claude usage)
+│   └── e2e.mjs                  # 11 e2e tests (live himalaya CLI)
 ├── package.json
-├── tsconfig.json
-└── manifest.json                # MCPB manifest (for Claude Desktop, future)
+└── tsconfig.json
 ```
+
+### Implemented MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_emails` | List envelopes in a folder (paginated, multi-account) |
+| `search_emails` | Search via himalaya filter syntax (subject, from, body, etc.) |
+| `read_email` | Read message body (plain text) |
+| `read_email_html` | Read message body (HTML) |
+
+### Implemented MCP Resources
+
+| Resource | URI |
+|----------|-----|
+| Inbox listing | `email://inbox` |
+| Message by ID | `email://message/{id}` |
+| Folder list | `email://folders` |
 
 ---
 
@@ -89,7 +95,8 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest
+npm test                         # Run vitest (39 unit/integration tests)
+npm run test:e2e                 # E2E tests against live himalaya CLI
 node dist/index.js               # Run MCP server directly
 ```
 
@@ -118,8 +125,8 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| 0. Setup & Specs | Repo, structure, specs | Current |
-| 1. Core Read (MVP) | list, search, read tools + resources | Pending |
+| 0. Setup & Specs | Repo, structure, specs | Done |
+| 1. Core Read (MVP) | list, search, read tools + resources | Done |
 | 2. Triage + Export | classify, summarize, flag, markdown export | Pending |
 | 3. Compose + Actions | reply, send (with safety), action extraction | Pending |
 | 4. Adapters | Obsidian, Apple, clipboard, MCPB packaging | Pending |
