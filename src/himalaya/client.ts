@@ -117,6 +117,37 @@ export class HimalayaClient {
     return this.exec(args, { folder: f, account });
   }
 
+  /** Add or remove flags on a message. */
+  async flagMessage(
+    id: string,
+    flags: string[],
+    action: "add" | "remove",
+    folder?: string,
+    account?: string,
+  ): Promise<string> {
+    const args = ["flag", action, id, ...flags];
+    const f = folder || this.opts.folder;
+    if (f && f !== "INBOX") {
+      args.push("--folder", f);
+    }
+    return this.exec(args, { folder: f, account });
+  }
+
+  /** Move a message to a different folder. */
+  async moveMessage(
+    id: string,
+    targetFolder: string,
+    folder?: string,
+    account?: string,
+  ): Promise<string> {
+    const args = ["message", "move", targetFolder, id];
+    const f = folder || this.opts.folder;
+    if (f && f !== "INBOX") {
+      args.push("--folder", f);
+    }
+    return this.exec(args, { folder: f, account });
+  }
+
   /** List folders. */
   async listFolders(): Promise<string> {
     return this.exec(["folder", "list"]);

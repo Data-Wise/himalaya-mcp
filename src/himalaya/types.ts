@@ -92,3 +92,24 @@ export interface ReadEmailParams {
   folder?: string;
   account?: string;
 }
+
+export interface FlagEmailParams {
+  id: string;
+  flags: string[];
+  action: "add" | "remove";
+  folder?: string;
+  account?: string;
+}
+
+export interface MoveEmailParams {
+  id: string;
+  target_folder: string;
+  folder?: string;
+  account?: string;
+}
+
+export interface ExportMarkdownParams {
+  id: string;
+  folder?: string;
+  account?: string;
+}
