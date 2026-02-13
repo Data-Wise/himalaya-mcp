@@ -24,8 +24,12 @@ List recent emails from your inbox via the himalaya MCP server.
 
 1. Call `list_emails` MCP tool (default: last 10 envelopes)
 2. Display summary table: sender, subject, date, flags
-3. Offer to read any specific email (`read_email` tool)
-4. Offer to triage inbox (`/email:triage`)
+3. Offer to:
+   - Read any specific email (`read_email`)
+   - Triage inbox (`/email:triage`)
+   - Reply to an email (`/email:reply`)
+   - Copy email to clipboard (`copy_to_clipboard`)
+   - Extract action items (`create_action_item`)
 
 ## Output Format
 

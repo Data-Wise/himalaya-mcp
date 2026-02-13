@@ -1,0 +1,25 @@
+preset: "adhd-calm"
+
+branding:
+  name: "himalaya-mcp"
+  tagline: "Privacy-first email MCP server and Claude Code plugin"
+  logo: null
+
+colors:
+  primary: "#8b5a2b"
+  accent: "#c67a4a"
+  scheme: "auto"
+
+navigation:
+  style: "tabs"
+  max_depth: 3
+
+features:
+  search: true
+  dark_mode: true
+  code_copy: true
+  edit_on_github: true
+  navigation_instant: true
+  navigation_tracking: true
+  mermaid: true
+  version_selector: false

@@ -3,28 +3,37 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: setup
-## Focus: Phase 0 — Repo scaffold & specs
-## Phase: Setup
+## Status: active
+## Focus: All phases complete — ready for PR to dev
+## Phase: Development
 ## Priority: 3
-## Progress: 5
+## Progress: 95
 
-## Current Session (2026-02-13)
+## Completed
 
-**Session activity:**
-- brainstorm: deep mode (8 questions), researched Cowork + MCPB + email MCP landscape
-- decision: Claude Code plugin (bundles MCP server) over standalone MCP
-- setup: repo init, directory structure, plugin.json, package.json, CLAUDE.md
+- Phase 0: Repo scaffold, specs, CI, branch protection
+- Phase 1: Core Read MVP — subprocess client, 4 MCP tools, 3 resources
+- Phase 2: Triage + Export — flag_email, move_email, export_to_markdown, 3 MCP prompts
+- Phase 3: Compose + Actions — draft_reply, send_email (safety gate), create_action_item
+- Phase 4: Clipboard + Config — copy_to_clipboard adapter, env-based config
+- Phase 5: Plugin Skills — /email:reply skill, agent updates, skill updates
+- E2E tests: headless MCP server pipeline (20 tests)
+- Total: 11 tools, 4 prompts, 3 resources, 122 tests (10 test files)
+
+## Current State
+
+- Branch: `feature/core-read` (all phases implemented)
+- CI: passing
+- Tests: 122 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 29 dogfood + 20 e2e)
 
 ---
 
 ## Next Action
 
-1. **Phase 1: Core Read (MVP)** — implement himalaya subprocess wrapper + list/read tools
-2. npm install + build pipeline
-3. Test in Claude Code
+1. Create PR from feature/core-read -> dev
+2. Future: Obsidian adapter, Apple Notes/Reminders, MCPB packaging
 
 ---
 
 **Last Updated:** 2026-02-13
-**Status:** Phase 0 — Setup & Specs
+**Status:** All phases complete — PR to dev next
