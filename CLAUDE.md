@@ -7,6 +7,7 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
+- **Version:** 1.1.0 (released)
 - **Current Phase:** 5 — All phases complete (11 tools, 4 prompts, 3 resources, 160 tests)
 
 ### What It Does
@@ -181,24 +182,27 @@ npm run build
 
 ```bash
 npm test                         # Run vitest (160 tests across 11 test files)
+npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~583KB)
 node dist/index.js               # Run MCP server directly
 ```
 
-### Adding to Claude Code
+### Install
 
-```json
-// ~/.claude/settings.json
-{
-  "mcpServers": {
-    "himalaya": {
-      "command": "node",
-      "args": ["/Users/dt/projects/dev-tools/himalaya-mcp/dist/index.js"]
-    }
-  }
-}
+```bash
+# Homebrew (recommended — installs himalaya dependency automatically)
+brew tap data-wise/tap
+brew install himalaya-mcp
+
+# Claude Code plugin (from GitHub marketplace)
+claude plugin marketplace add Data-Wise/himalaya-mcp
+claude plugin install himalaya-mcp
+
+# Claude Desktop (after installing via Homebrew or npm)
+himalaya-mcp setup
 ```
 
-Or symlink as plugin:
+### Dev Setup (local development)
+
 ```bash
 ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 ```
