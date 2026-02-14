@@ -244,3 +244,132 @@ describe("CLI setup: remove command", () => {
     // Nothing to remove, no error
   });
 });
+
+// ==============================================================================
+// E2E TESTS: Run the CLI as a real subprocess
+// ==============================================================================
+
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { mkdtemp, rm, mkdir, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+
+const execFileAsync = promisify(execFile);
+
+describe("CLI E2E: setup command", () => {
+  let tempHome: string;
+  let tempClaudeDir: string;
+  let tempConfigPath: string;
+
+  beforeEach(async () => {
+    // Create a temporary HOME directory
+    tempHome = await mkdtemp(join(tmpdir(), "himalaya-cli-test-"));
+    tempClaudeDir = join(tempHome, "Library", "Application Support", "Claude");
+    tempConfigPath = join(tempClaudeDir, "claude_desktop_config.json");
+
+    // Create the Claude config directory structure
+    await mkdir(tempClaudeDir, { recursive: true });
+  });
+
+  afterEach(async () => {
+    // Clean up temp directory
+    if (tempHome) {
+      await rm(tempHome, { recursive: true, force: true });
+    }
+  });
+
+  it("displays usage for unknown command", async () => {
+    const { stdout, stderr } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "unknown-command"],
+      { cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging" }
+    );
+
+    expect(stdout).toContain("Usage:");
+    expect(stdout).toContain("himalaya-mcp setup");
+    expect(stdout).toContain("Add MCP server to Claude Desktop");
+    expect(stderr).toBe("");
+  }, 10_000);
+
+  it("setup --check exits 1 when no config exists", async () => {
+    // Remove the config file so it doesn't exist
+    await rm(tempConfigPath, { force: true });
+
+    try {
+      await execFileAsync("node", ["dist/cli/setup.js", "--check"], {
+        cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+        env: { ...process.env, HOME: tempHome },
+      });
+      // Should not reach here
+      expect(true).toBe(false);
+    } catch (error: any) {
+      // execFile throws when exit code !== 0
+      expect(error.code).toBe(1);
+      expect(error.stdout).toContain("not found");
+    }
+  }, 10_000);
+
+  it("setup creates config then --check succeeds", async () => {
+    // Run setup
+    const { stdout: setupStdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "setup"],
+      {
+        cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+        env: { ...process.env, HOME: tempHome },
+      }
+    );
+
+    expect(setupStdout).toContain("Added");
+    expect(setupStdout).toContain("himalaya MCP server");
+
+    // Verify config file was created
+    const configContent = await readFile(tempConfigPath, "utf-8");
+    const config = JSON.parse(configContent);
+    expect(config.mcpServers?.himalaya).toBeDefined();
+    expect(config.mcpServers.himalaya.command).toBe("node");
+
+    // Run --check (will warn about missing dist/index.js but should still succeed)
+    try {
+      const { stdout: checkStdout } = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "--check"],
+        {
+          cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+          env: { ...process.env, HOME: tempHome },
+        }
+      );
+
+      expect(checkStdout).toContain("configured");
+    } catch (error: any) {
+      // If it exits with 1 due to missing dist/index.js, that's expected
+      expect(error.stdout).toContain("configured");
+      expect(error.stdout).toContain("Warning");
+    }
+  }, 10_000);
+
+  it("setup --remove removes config", async () => {
+    // First, setup the config
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+      env: { ...process.env, HOME: tempHome },
+    });
+
+    // Verify it exists
+    const configBefore = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    expect(configBefore.mcpServers?.himalaya).toBeDefined();
+
+    // Remove it
+    const { stdout } = await execFileAsync("node", ["dist/cli/setup.js", "--remove"], {
+      cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+      env: { ...process.env, HOME: tempHome },
+    });
+
+    expect(stdout).toContain("Removed");
+    expect(stdout).toContain("himalaya MCP server");
+
+    // Verify it was removed
+    const configAfter = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    expect(configAfter.mcpServers?.himalaya).toBeUndefined();
+  }, 10_000);
+});

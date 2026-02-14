@@ -94,7 +94,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 ```
 npm run build           TypeScript compilation (development)
 npm run build:bundle    esbuild single-file bundle (583KB, production)
-npm test                Run 154 tests (vitest)
+npm test                Run 160 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 
