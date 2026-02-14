@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { homedir } from "node:os";
 
 // Mock fs module before importing setup functions
@@ -255,6 +255,7 @@ import { mkdtemp, rm, mkdir, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 
 const execFileAsync = promisify(execFile);
+const PROJECT_ROOT = resolve(__dirname, "..");
 
 describe("CLI E2E: setup command", () => {
   let tempHome: string;
@@ -282,7 +283,7 @@ describe("CLI E2E: setup command", () => {
     const { stdout, stderr } = await execFileAsync(
       "node",
       ["dist/cli/setup.js", "unknown-command"],
-      { cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging" }
+      { cwd: PROJECT_ROOT }
     );
 
     expect(stdout).toContain("Usage:");
@@ -297,7 +298,7 @@ describe("CLI E2E: setup command", () => {
 
     try {
       await execFileAsync("node", ["dist/cli/setup.js", "--check"], {
-        cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+        cwd: PROJECT_ROOT,
         env: { ...process.env, HOME: tempHome },
       });
       // Should not reach here
@@ -315,7 +316,7 @@ describe("CLI E2E: setup command", () => {
       "node",
       ["dist/cli/setup.js", "setup"],
       {
-        cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+        cwd: PROJECT_ROOT,
         env: { ...process.env, HOME: tempHome },
       }
     );
@@ -335,7 +336,7 @@ describe("CLI E2E: setup command", () => {
         "node",
         ["dist/cli/setup.js", "--check"],
         {
-          cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+          cwd: PROJECT_ROOT,
           env: { ...process.env, HOME: tempHome },
         }
       );
@@ -351,7 +352,7 @@ describe("CLI E2E: setup command", () => {
   it("setup --remove removes config", async () => {
     // First, setup the config
     await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
-      cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+      cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
 
@@ -361,7 +362,7 @@ describe("CLI E2E: setup command", () => {
 
     // Remove it
     const { stdout } = await execFileAsync("node", ["dist/cli/setup.js", "--remove"], {
-      cwd: "/Users/dt/.git-worktrees/himalaya-mcp/feature-plugin-packaging",
+      cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
 

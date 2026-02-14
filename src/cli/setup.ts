@@ -38,12 +38,24 @@ function readConfig(): DesktopConfig {
     return {};
   }
   const raw = readFileSync(CONFIG_PATH, "utf-8");
-  return JSON.parse(raw) as DesktopConfig;
+  try {
+    return JSON.parse(raw) as DesktopConfig;
+  } catch {
+    console.error(`Error: Failed to parse config at ${CONFIG_PATH}`);
+    console.error("  The file contains invalid JSON. Please fix it manually.");
+    process.exit(1);
+  }
 }
 
 function writeConfig(config: DesktopConfig): void {
-  mkdirSync(CONFIG_DIR, { recursive: true });
-  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n", "utf-8");
+  try {
+    mkdirSync(CONFIG_DIR, { recursive: true });
+    writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n", "utf-8");
+  } catch {
+    console.error(`Error: Failed to write config to ${CONFIG_PATH}`);
+    console.error("  Check file permissions and try again.");
+    process.exit(1);
+  }
 }
 
 function setup(): void {
