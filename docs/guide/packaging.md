@@ -77,6 +77,47 @@ The `himalaya-mcp-install` script (created by the formula):
 
 `brew upgrade himalaya-mcp` preserves user configuration. The symlink always points to the stable opt path, so upgrades are seamless.
 
+## Release Automation
+
+When a GitHub release is published, the `homebrew-release.yml` workflow automatically updates the Homebrew formula.
+
+### Pipeline
+
+```
+GitHub Release (v1.2.0)
+  │
+  ├─ validate         Build + test + bundle, verify package.json matches tag
+  │
+  ├─ prepare          Download tarball, compute SHA256 (5 retries, 10s delay)
+  │
+  └─ update-homebrew  Call reusable update-formula.yml → PR to homebrew-tap
+```
+
+### How it works
+
+1. **Trigger** — publish a GitHub release (or manual `workflow_dispatch`)
+2. **Validate** — checks out the tag, runs `npm ci`, verifies `package.json` version matches the release tag, then builds, tests, and bundles
+3. **Prepare** — downloads the release tarball with retry logic (GitHub tarballs take seconds to materialize), computes SHA256
+4. **Update** — calls the reusable `Data-Wise/homebrew-tap/.github/workflows/update-formula.yml` workflow, which opens a PR to update `Formula/himalaya-mcp.rb` with the new version and SHA
+
+### Manual trigger
+
+For re-running or testing without creating a new release:
+
+```
+gh workflow run homebrew-release.yml \
+  -f version=1.2.0 \
+  -f auto_merge=true
+```
+
+### Required secret
+
+`HOMEBREW_TAP_GITHUB_TOKEN` — a PAT with repo access to `Data-Wise/homebrew-tap`. Set via:
+
+```bash
+gh secret set HOMEBREW_TAP_GITHUB_TOKEN --repo Data-Wise/himalaya-mcp
+```
+
 ## Marketplace Registration
 
 The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugin discovery:
@@ -145,4 +186,4 @@ Versions are synchronized across three files:
 | `.claude-plugin/plugin.json` | `version` | Claude Code plugin version |
 | `src/index.ts` | `VERSION` | MCP server reported version |
 
-All three must match. The Homebrew formula URL references the GitHub release tag (e.g., `v1.1.0`).
+All three must match. The Homebrew formula URL references the GitHub release tag (e.g., `v1.1.0`). The `homebrew-release.yml` validate job enforces this — a mismatch between the release tag and `package.json` version will fail the workflow.

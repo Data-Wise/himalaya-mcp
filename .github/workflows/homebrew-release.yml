@@ -1,0 +1,127 @@
+name: Homebrew Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.1.1)'
+        required: true
+        type: string
+      auto_merge:
+        description: 'Auto-merge the formula PR'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  validate:
+    name: Pre-Release Validation
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine version
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+          GIT_REF: ${{ github.ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION="$INPUT_VERSION"
+          else
+            VERSION="${GIT_REF#refs/tags/}"
+            VERSION="${VERSION#v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Verify version matches package.json
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "Release version: $RELEASE_VERSION"
+          echo "Package version: $PKG_VERSION"
+          if [ "$PKG_VERSION" != "$RELEASE_VERSION" ]; then
+            echo "::error::Version mismatch: package.json=$PKG_VERSION, release=$RELEASE_VERSION"
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test -- --run
+
+      - name: Bundle
+        run: npm run build:bundle
+
+      - name: Verify bundle
+        run: test -f dist/index.js && echo "Bundle OK ($(wc -c < dist/index.js) bytes)"
+
+  prepare:
+    name: Prepare Release Info
+    needs: validate
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ needs.validate.outputs.version }}
+      sha256: ${{ steps.release.outputs.sha256 }}
+
+    steps:
+      - name: Calculate tarball SHA
+        id: release
+        env:
+          VERSION: ${{ needs.validate.outputs.version }}
+        run: |
+          TARBALL_URL="https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v${VERSION}.tar.gz"
+          EMPTY_SHA="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+          # Retry up to 5 times (tarball may not be ready immediately after release)
+          for i in 1 2 3 4 5; do
+            HTTP_CODE=$(curl -sL -w '%{http_code}' -o /tmp/tarball "$TARBALL_URL")
+            if [ "$HTTP_CODE" = "200" ]; then
+              SHA256=$(shasum -a 256 /tmp/tarball | cut -d' ' -f1)
+              if [ -n "$SHA256" ] && [ "$SHA256" != "$EMPTY_SHA" ]; then
+                echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+                echo "Version: $VERSION"
+                echo "SHA256: $SHA256"
+                rm -f /tmp/tarball
+                exit 0
+              fi
+              echo "Attempt $i: Empty tarball, retrying in 10s..."
+            else
+              echo "Attempt $i: HTTP $HTTP_CODE, retrying in 10s..."
+            fi
+            sleep 10
+          done
+          rm -f /tmp/tarball
+          echo "::error::Failed to download tarball after 5 attempts"
+          exit 1
+
+  update-homebrew:
+    name: Update Homebrew Formula
+    needs: prepare
+    uses: Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@main
+    with:
+      formula_name: himalaya-mcp
+      version: ${{ needs.prepare.outputs.version }}
+      sha256: ${{ needs.prepare.outputs.sha256 }}
+      source_type: github
+      auto_merge: ${{ inputs.auto_merge || github.event_name == 'release' }}
+    secrets:
+      tap_token: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
