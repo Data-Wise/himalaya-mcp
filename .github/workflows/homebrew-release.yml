@@ -19,6 +19,8 @@ jobs:
   validate:
     name: Pre-Release Validation
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout repository
@@ -77,26 +79,15 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.release.outputs.version }}
+      version: ${{ needs.validate.outputs.version }}
       sha256: ${{ steps.release.outputs.sha256 }}
 
     steps:
-      - name: Get version and calculate SHA
+      - name: Calculate tarball SHA
         id: release
         env:
-          EVENT_NAME: ${{ github.event_name }}
-          INPUT_VERSION: ${{ github.event.inputs.version }}
-          GIT_REF: ${{ github.ref }}
+          VERSION: ${{ needs.validate.outputs.version }}
         run: |
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            VERSION="$INPUT_VERSION"
-          else
-            VERSION="${GIT_REF#refs/tags/}"
-            VERSION="${VERSION#v}"
-          fi
-
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
           TARBALL_URL="https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v${VERSION}.tar.gz"
           EMPTY_SHA="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
@@ -118,6 +109,7 @@ jobs:
             fi
             sleep 10
           done
+          rm -f /tmp/tarball
           echo "::error::Failed to download tarball after 5 attempts"
           exit 1
 

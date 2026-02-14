@@ -704,6 +704,15 @@ describe("Packaging: homebrew-release workflow", () => {
     expect(workflowContent).toContain("GIT_REF: ${{ github.ref }}");
   });
 
+  it("prepare job consumes version from validate (single source of truth)", () => {
+    expect(workflowContent).toContain("needs.validate.outputs.version");
+  });
+
+  it("validate job outputs version for downstream jobs", () => {
+    // validate outputs version so prepare doesn't re-derive it
+    expect(workflowContent).toContain("steps.version.outputs.version");
+  });
+
   it("workflow_dispatch accepts version and auto_merge inputs", () => {
     expect(workflowContent).toContain("version:");
     expect(workflowContent).toContain("auto_merge:");
