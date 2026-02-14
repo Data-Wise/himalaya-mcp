@@ -75,9 +75,19 @@ nav:
   - Getting Started:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md
+  - Tutorials:
+    - Overview: tutorials/index.md
+    - "Level 1: Getting Started":
+      - Read Your First Email: tutorials/read-first-email.md
+      - Multi-Account Email: tutorials/multi-account.md
+    - "Level 2: Productivity":
+      - Triage Your Inbox: tutorials/triage-inbox.md
+      - Reply to an Email: tutorials/reply-email.md
+      - Export & Save Emails: tutorials/export-save.md
+    - "Level 3: Automation":
+      - Automate with the Agent: tutorials/automate-agent.md
   - Guide:
     - User Guide: guide/guide.md
-    - Tutorials: guide/tutorials.md
     - Workflows: guide/workflows.md
     - Packaging: guide/packaging.md
     - Plugin Skills & Agent: guide/skills.md
