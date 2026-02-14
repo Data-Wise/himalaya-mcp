@@ -6,6 +6,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [1.1.1] - 2026-02-14
 
+### Added
+
+- Automated Homebrew formula update workflow (`homebrew-release.yml`)
+  - Triggers on GitHub release publish or manual `workflow_dispatch`
+  - 3-stage pipeline: validate (build/test/bundle + version check) → prepare (tarball SHA256 with retry) → update-homebrew (reusable workflow)
+  - Injection-safe: all GitHub context expressions use `env:` indirection
+
 ### Fixed
 
 - marketplace.json source path `"./"` back to canonical `"."` (fixes dogfood test)
