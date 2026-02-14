@@ -4,9 +4,9 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.0.0 released — all phases complete
-## Phase: Maintenance
-## Priority: 4
+## Focus: Plugin packaging & Homebrew distribution
+## Phase: Development
+## Priority: 2
 ## Progress: 100
 
 ## Completed
@@ -22,21 +22,34 @@
 
 ## Current State
 
-- Branch: `dev` (1 docs commit ahead of main)
+- Branch: `dev` (synced with main)
 - v1.0.0 released (2026-02-13)
 - GitHub Pages: https://data-wise.github.io/himalaya-mcp/
 - CI: passing
 - Tests: 122 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 29 dogfood + 20 e2e)
 
+## Active Worktree
+
+- `feature/plugin-packaging` → `~/.git-worktrees/himalaya-mcp/feature-plugin-packaging`
+- Spec: `docs/specs/SPEC-plugin-packaging-2026-02-14.md`
+- Orchestration: `ORCHESTRATE-plugin-packaging.md`
+
 ---
 
 ## Next Action
 
-A) Obsidian adapter — export emails to vault as markdown notes
-B) Apple ecosystem — Notes/Reminders integration via AppleScript
-C) MCPB packaging — distribute as standalone MCP package
+1. Phase 1: esbuild bundle (eliminate 72MB node_modules → ~300KB bundle)
+2. Phase 2: Homebrew formula (craft.rb pattern, depends_on himalaya + node)
+3. Phase 3: GitHub marketplace.json + official directory submission
+4. Phase 4: Version bump v1.1.0 + release tag
+5. Phase 5: Claude Desktop setup CLI
+
+## Future
+
+- Obsidian adapter — export emails to vault as markdown notes
+- Apple ecosystem — Notes/Reminders integration via AppleScript
 
 ---
 
 **Last Updated:** 2026-02-14
-**Status:** v1.0.0 released — all phases complete
+**Status:** Plugin packaging in progress (worktree active)
