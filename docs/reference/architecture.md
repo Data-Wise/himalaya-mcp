@@ -88,7 +88,7 @@ git tag v1.2.0 → gh release create
   │
   └─ homebrew-release.yml
       ├─ validate    npm ci → version check → build → test → bundle
-      ├─ prepare     curl tarball (5 retries) → shasum -a 256
+      ├─ prepare     curl tarball (5 retries, 30s timeout) → sha256sum
       └─ update      → Data-Wise/homebrew-tap/update-formula.yml@main
                         → PR: bump himalaya-mcp to v1.2.0
 ```

@@ -15,6 +15,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Fixed
 
+- Hardened homebrew-release tarball download: `mktemp` for temp files, `--max-time 30` on curl, `sha256sum` (native on Ubuntu runners)
+- Setup E2E tests skip gracefully when `dist/` not built (`describe.skipIf`)
 - marketplace.json source path `"./"` back to canonical `"."` (fixes dogfood test)
 
 ### Documentation
