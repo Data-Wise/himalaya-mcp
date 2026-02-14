@@ -90,17 +90,18 @@ jobs:
         run: |
           TARBALL_URL="https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v${VERSION}.tar.gz"
           EMPTY_SHA="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          TMPFILE=$(mktemp /tmp/tarball-XXXXXX)
 
           # Retry up to 5 times (tarball may not be ready immediately after release)
           for i in 1 2 3 4 5; do
-            HTTP_CODE=$(curl -sL -w '%{http_code}' -o /tmp/tarball "$TARBALL_URL")
+            HTTP_CODE=$(curl -sL --max-time 30 -w '%{http_code}' -o "$TMPFILE" "$TARBALL_URL")
             if [ "$HTTP_CODE" = "200" ]; then
-              SHA256=$(shasum -a 256 /tmp/tarball | cut -d' ' -f1)
+              SHA256=$(sha256sum "$TMPFILE" | cut -d' ' -f1)
               if [ -n "$SHA256" ] && [ "$SHA256" != "$EMPTY_SHA" ]; then
                 echo "sha256=$SHA256" >> $GITHUB_OUTPUT
                 echo "Version: $VERSION"
                 echo "SHA256: $SHA256"
-                rm -f /tmp/tarball
+                rm -f "$TMPFILE"
                 exit 0
               fi
               echo "Attempt $i: Empty tarball, retrying in 10s..."
@@ -109,7 +110,7 @@ jobs:
             fi
             sleep 10
           done
-          rm -f /tmp/tarball
+          rm -f "$TMPFILE"
           echo "::error::Failed to download tarball after 5 attempts"
           exit 1
 
