@@ -6,8 +6,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [1.1.1] - 2026-02-14
 
+### Added
+
+- Automated Homebrew formula update workflow (`homebrew-release.yml`)
+  - Triggers on GitHub release publish or manual `workflow_dispatch`
+  - 3-stage pipeline: validate (build/test/bundle + version check) → prepare (tarball SHA256 with retry) → update-homebrew (reusable workflow)
+  - Injection-safe: all GitHub context expressions use `env:` indirection
+
 ### Fixed
 
+- Hardened homebrew-release tarball download: `mktemp` for temp files, `--max-time 30` on curl, `sha256sum` (native on Ubuntu runners)
+- Setup E2E tests skip gracefully when `dist/` not built (`describe.skipIf`)
 - marketplace.json source path `"./"` back to canonical `"."` (fixes dogfood test)
 
 ### Documentation

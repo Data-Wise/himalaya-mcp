@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -622,6 +622,123 @@ describe("Packaging: .mcp.json", () => {
       readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
     );
     expect(pluginJson.mcpServers).toBeUndefined();
+  });
+});
+
+describe("Packaging: homebrew-release workflow", () => {
+  const workflowPath = join(PROJECT_ROOT, ".github", "workflows", "homebrew-release.yml");
+  const workflowContent = readFileSync(workflowPath, "utf-8");
+
+  it("exists in .github/workflows/", () => {
+    expect(existsSync(workflowPath)).toBe(true);
+  });
+
+  it("triggers on release published and workflow_dispatch", () => {
+    expect(workflowContent).toContain("release:");
+    expect(workflowContent).toContain("types: [published]");
+    expect(workflowContent).toContain("workflow_dispatch:");
+  });
+
+  it("has all three required jobs", () => {
+    // validate → prepare → update-homebrew pipeline
+    expect(workflowContent).toContain("validate:");
+    expect(workflowContent).toContain("prepare:");
+    expect(workflowContent).toContain("update-homebrew:");
+  });
+
+  it("prepare depends on validate", () => {
+    expect(workflowContent).toContain("needs: validate");
+  });
+
+  it("update-homebrew depends on prepare", () => {
+    expect(workflowContent).toContain("needs: prepare");
+  });
+
+  it("references correct formula name", () => {
+    expect(workflowContent).toContain("formula_name: himalaya-mcp");
+  });
+
+  it("downloads tarball from correct repo", () => {
+    expect(workflowContent).toContain(
+      "https://github.com/Data-Wise/himalaya-mcp/archive/refs/tags/v"
+    );
+  });
+
+  it("calls reusable update-formula workflow", () => {
+    expect(workflowContent).toContain(
+      "Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@main"
+    );
+  });
+
+  it("references HOMEBREW_TAP_GITHUB_TOKEN secret", () => {
+    expect(workflowContent).toContain("HOMEBREW_TAP_GITHUB_TOKEN");
+  });
+
+  it("validate job runs build, test, and bundle", () => {
+    expect(workflowContent).toContain("npm run build");
+    expect(workflowContent).toContain("npm test");
+    expect(workflowContent).toContain("npm run build:bundle");
+  });
+
+  it("validate job checks version consistency", () => {
+    expect(workflowContent).toContain("package.json");
+    expect(workflowContent).toContain("Version mismatch");
+  });
+
+  it("prepare job has retry logic for tarball download", () => {
+    expect(workflowContent).toContain("for i in 1 2 3 4 5");
+    expect(workflowContent).toContain("sleep 10");
+  });
+
+  it("prepare job uses curl timeout to prevent stalled connections", () => {
+    expect(workflowContent).toContain("--max-time 30");
+  });
+
+  it("prepare job uses mktemp for safe temp file handling", () => {
+    expect(workflowContent).toContain("mktemp /tmp/tarball-XXXXXX");
+  });
+
+  it("prepare job uses sha256sum (native on Ubuntu runners)", () => {
+    expect(workflowContent).toContain("sha256sum");
+    expect(workflowContent).not.toContain("shasum");
+  });
+
+  it("prepare job guards against empty tarball SHA", () => {
+    // The SHA of an empty file — used to detect incomplete downloads
+    expect(workflowContent).toContain(
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    );
+  });
+
+  it("uses env variables for GitHub context (injection safe)", () => {
+    // Version extraction uses env vars, not direct ${{ }} in run blocks
+    expect(workflowContent).toContain("EVENT_NAME: ${{ github.event_name }}");
+    expect(workflowContent).toContain("INPUT_VERSION: ${{ github.event.inputs.version }}");
+    expect(workflowContent).toContain("GIT_REF: ${{ github.ref }}");
+  });
+
+  it("prepare job consumes version from validate (single source of truth)", () => {
+    expect(workflowContent).toContain("needs.validate.outputs.version");
+  });
+
+  it("validate job outputs version for downstream jobs", () => {
+    // validate outputs version so prepare doesn't re-derive it
+    expect(workflowContent).toContain("steps.version.outputs.version");
+  });
+
+  it("workflow_dispatch accepts version and auto_merge inputs", () => {
+    expect(workflowContent).toContain("version:");
+    expect(workflowContent).toContain("auto_merge:");
+    expect(workflowContent).toContain("type: string");
+    expect(workflowContent).toContain("type: boolean");
+  });
+
+  it("all workflow files are present", () => {
+    const workflowDir = join(PROJECT_ROOT, ".github", "workflows");
+    const files = readdirSync(workflowDir).sort();
+    expect(files).toContain("ci.yml");
+    expect(files).toContain("docs.yml");
+    expect(files).toContain("homebrew-release.yml");
   });
 });
 

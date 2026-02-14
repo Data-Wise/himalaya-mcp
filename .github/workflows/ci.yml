@@ -7,21 +7,20 @@ on:
     branches: [main, dev]
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [22]
-
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
           cache: npm
 
       - run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
 
       - name: Type check
         run: npx tsc --noEmit
@@ -31,3 +30,42 @@ jobs:
 
       - name: Test
         run: npm test -- --run
+
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build esbuild bundle
+        run: npm run build:bundle
+
+      - name: Verify bundle exists
+        run: test -f dist/index.js && echo "Bundle OK ($(wc -c < dist/index.js) bytes)"
+
+  validate-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate plugin.json
+        run: python3 -m json.tool .claude-plugin/plugin.json > /dev/null
+
+      - name: Validate marketplace.json
+        run: python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
+
+      - name: Check version consistency
+        run: |
+          PKG_VER=$(node -p "require('./package.json').version")
+          PLUGIN_VER=$(python3 -c "import json; print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          MARKET_VER=$(python3 -c "import json; print(json.load(open('.claude-plugin/marketplace.json'))['metadata']['version'])")
+          echo "package.json: $PKG_VER"
+          echo "plugin.json:  $PLUGIN_VER"
+          echo "marketplace:  $MARKET_VER"
+          [ "$PKG_VER" = "$PLUGIN_VER" ] && [ "$PKG_VER" = "$MARKET_VER" ] && echo "Versions in sync" || { echo "Version mismatch!"; exit 1; }
