@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.1.1] - 2026-02-14
+
+### Fixed
+
+- marketplace.json source path `"./"` back to canonical `"."` (fixes dogfood test)
+
+### Documentation
+
+- Split tutorials into 6 individual pages with learning path diagram (#15)
+  - Level 1: Read First Email, Multi-Account
+  - Level 2: Triage Inbox, Reply to Email, Export & Save
+  - Level 3: Automate with Agent
+  - Mermaid flowchart showing progression between levels
+- Added tutorials cross-references to index, installation, quickstart, and commands pages
+- Added test breakdown table to README (unit/integration/dogfood/E2E)
+- Added "See also" cross-links in command reference to tutorials and workflows
+
 ## [1.1.0] - 2026-02-14
 
 ### Added
@@ -19,7 +36,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ### Fixed
 
 - plugin.json schema cleaned for Claude Code strict validation
-- marketplace.json source path `"."` changed to `"./"` for schema compliance
 
 ### Documentation
 
