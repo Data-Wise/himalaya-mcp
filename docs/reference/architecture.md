@@ -39,10 +39,10 @@
 
 ```
 Homebrew (Primary)                  GitHub (Fallback)
-  brew install himalaya-mcp           claude plugin add github:Data-Wise/himalaya-mcp
-  │                                   │
-  ├─ depends_on "himalaya"            └─ Copies plugin to cache
-  ├─ depends_on "node"                   Uses ${CLAUDE_PLUGIN_ROOT}
+  brew install himalaya-mcp           claude plugin marketplace add Data-Wise/himalaya-mcp
+  │                                   claude plugin install himalaya-mcp
+  ├─ depends_on "himalaya"            │
+  ├─ depends_on "node"                └─ Copies plugin to cache, uses ${CLAUDE_PLUGIN_ROOT}
   │
   ├─ libexec/
   │   ├─ .claude-plugin/plugin.json

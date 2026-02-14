@@ -57,7 +57,8 @@ brew uninstall himalaya-mcp
 ### Option 2: GitHub Plugin Install
 
 ```bash
-claude plugin add github:Data-Wise/himalaya-mcp
+claude plugin marketplace add Data-Wise/himalaya-mcp
+claude plugin install himalaya-mcp
 ```
 
 ### Option 3: From Source (development)
