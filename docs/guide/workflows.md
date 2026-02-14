@@ -172,3 +172,135 @@ search_emails(query: "from:newsletter")
 ```
 
 The email-assistant agent asks for confirmation before bulk operations on 5+ emails.
+
+## 9. Newsletter Cleanup
+
+Bulk archive newsletters and promotional emails.
+
+**Natural language:** "Clean up my newsletters from the past week"
+
+**What happens:**
+
+1. `search_emails(query: "after 2026-02-06")` -- recent emails
+2. Claude identifies newsletters by sender patterns
+3. Presents list for confirmation
+4. `flag_email(id, flags: ["Seen"], action: "add")` -- mark read
+5. `move_email(id, target_folder: "Archive")` -- archive each
+
+**Tip:** Combine with triage for efficiency:
+
+```
+You: "Triage my inbox, but auto-archive anything from
+      newsletters or marketing"
+```
+
+## 10. Meeting Preparation
+
+Pull relevant emails before a meeting.
+
+**Natural language:** "Find all emails about the Q1 review meeting"
+
+**What happens:**
+
+1. `search_emails(query: "subject Q1 review")` -- find related emails
+2. `read_email` on each -- gather context
+3. `create_action_item` on each -- extract todos and deadlines
+4. Claude summarizes all relevant context
+
+**Example:**
+
+```
+You: "I have a meeting with Alice about Q1 budget. Gather all
+      relevant emails and action items."
+
+Claude:
+Found 4 emails about Q1 budget:
+
+Email threads:
+1. Alice: Q1 Budget Review (Feb 13) -- initial review request
+2. Alice: Budget Spreadsheet Updated (Feb 10) -- revised numbers
+3. Bob: Q1 Projections (Feb 8) -- engineering estimates
+4. Alice: Budget Meeting Agenda (Feb 7) -- meeting prep
+
+Action items:
+- [ ] Review marketing line item variance
+- [ ] Prepare engineering allocation proposal
+- [ ] Bring Q4 actuals for comparison
+
+Want me to export this as markdown for your notes?
+```
+
+## 11. Email-to-Notes Pipeline
+
+Convert important emails into structured notes.
+
+**Natural language:** "Save the project update email to my notes"
+
+**What happens:**
+
+1. `read_email(id)` -- get content
+2. `export_to_markdown(id)` -- convert with YAML frontmatter
+3. `create_action_item(id)` -- extract tasks
+4. `copy_to_clipboard(text)` -- ready to paste into Obsidian, Notion, etc.
+
+**Combined output:**
+
+```
+You: "Export email 42 with action items and copy everything"
+
+Claude exports:
+---
+subject: "Project Alpha Update"
+from: "pm@company.com"
+date: "2026-02-13"
+---
+
+# Project Alpha Update
+
+[email body]
+
+## Action Items
+- [ ] Review updated timeline by Wednesday
+- [ ] Schedule stakeholder demo for next week
+
+Copied to clipboard.
+```
+
+## 12. End-of-Day Email Sweep
+
+Quick cleanup before signing off.
+
+**Natural language:** "Do an end-of-day email sweep"
+
+**What happens:**
+
+1. `list_emails(page_size: 30)` -- today's emails
+2. Claude identifies unread and unflagged items
+3. Quick classification: reply tomorrow / archive / ignore
+4. Generates a "tomorrow morning" action list
+
+**Example:**
+
+```
+You: "End-of-day sweep"
+
+Claude:
+Today's email summary:
+- 23 emails received
+- 18 already handled
+- 5 remaining:
+
+| ID     | From    | Subject           | Suggested      |
+|--------|---------|-------------------|----------------|
+| 249102 | Client  | Contract question | Reply tomorrow |
+| 249098 | Boss    | FYI: new hire     | Mark read      |
+| 249095 | DevOps  | Deploy complete   | Archive        |
+| 249091 | HR      | Survey reminder   | Archive        |
+| 249089 | Alice   | Quick question    | Reply tomorrow |
+
+Tomorrow's priority list:
+1. Reply to Client re: contract question
+2. Reply to Alice re: quick question
+
+Mark the other 3 as read and archive?
+```
