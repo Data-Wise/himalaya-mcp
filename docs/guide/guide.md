@@ -176,7 +176,7 @@ No emails are ever deleted -- only flagged or moved.
 ## Testing
 
 ```bash
-npm test    # 122 tests across 10 files (vitest)
+npm test    # 154 tests across 11 files (vitest)
 ```
 
 Test breakdown:
@@ -191,5 +191,6 @@ Test breakdown:
 | `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
 | `config.test.ts` | 7 | Env var loading, edge cases |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 29 | Realistic Claude usage scenarios |
+| `dogfood.test.ts` | 47 | Realistic Claude usage scenarios + packaging validation |
 | `e2e.test.ts` | 20 | Full MCP server pipeline with fake himalaya |
+| `setup.test.ts` | 14 | CLI setup/check/remove for Claude Desktop config |
