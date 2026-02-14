@@ -690,6 +690,19 @@ describe("Packaging: homebrew-release workflow", () => {
     expect(workflowContent).toContain("sleep 10");
   });
 
+  it("prepare job uses curl timeout to prevent stalled connections", () => {
+    expect(workflowContent).toContain("--max-time 30");
+  });
+
+  it("prepare job uses mktemp for safe temp file handling", () => {
+    expect(workflowContent).toContain("mktemp /tmp/tarball-XXXXXX");
+  });
+
+  it("prepare job uses sha256sum (native on Ubuntu runners)", () => {
+    expect(workflowContent).toContain("sha256sum");
+    expect(workflowContent).not.toContain("shasum");
+  });
+
   it("prepare job guards against empty tarball SHA", () => {
     // The SHA of an empty file — used to detect incomplete downloads
     expect(workflowContent).toContain(

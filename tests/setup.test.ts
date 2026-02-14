@@ -247,17 +247,21 @@ describe("CLI setup: remove command", () => {
 
 // ==============================================================================
 // E2E TESTS: Run the CLI as a real subprocess
+// Requires `npm run build` — skipped gracefully when dist/ is missing.
 // ==============================================================================
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { mkdtemp, rm, mkdir, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { existsSync as realExistsSync } from "node:fs";
 
 const execFileAsync = promisify(execFile);
 const PROJECT_ROOT = resolve(__dirname, "..");
+const SETUP_CLI = join(PROJECT_ROOT, "dist", "cli", "setup.js");
+const hasBuild = realExistsSync(SETUP_CLI);
 
-describe("CLI E2E: setup command", () => {
+describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   let tempHome: string;
   let tempClaudeDir: string;
   let tempConfigPath: string;
