@@ -115,6 +115,53 @@ himalaya-mcp/
 
 ---
 
+## Git Workflow
+
+```text
+main (protected) ← PR only, never direct commits
+  ↑
+dev (integration) ← Plan here, branch from here
+  ↑
+feature/* (worktrees) ← All implementation work
+```
+
+### Workflow Steps
+
+| Step | Action | Command |
+|------|--------|---------|
+| 1. Plan | Analyze on `dev`, wait for approval | `git checkout dev` |
+| 2. Branch | Create worktree for isolation | `/craft:git:worktree feature/<name>` |
+| 3. Develop | Conventional commits (`feat:`, `fix:`, etc.) | Small, atomic commits |
+| 4. Integrate | Test → rebase → PR to dev | `gh pr create --base dev` |
+| 5. Release | PR from dev to main | `gh pr create --base main --head dev` |
+
+### Constraints
+
+- **CRITICAL**: Always start work from `dev` branch
+- **Never** commit directly to `main`
+- **Never** write feature code on `dev`
+- **Always** verify branch: `git branch --show-current`
+
+### Branch Protection
+
+| Branch | Code Files | .md Files | Git Operations |
+|--------|-----------|-----------|----------------|
+| `main` | BLOCKED | BLOCKED | Commit/push BLOCKED |
+| `dev` | New: BLOCKED, Existing: allowed | ALLOWED | Commit/push allowed |
+| `feature/*` | ALLOWED | ALLOWED | All allowed |
+
+### Quick Reference
+
+| Action | Command |
+|--------|---------|
+| Create worktree | `git worktree add ~/.git-worktrees/himalaya-mcp/feature-<name> -b feature/<name> dev` |
+| List worktrees | `git worktree list` |
+| Create PR | `gh pr create --base dev` |
+| Release | `gh pr create --base main --head dev` |
+| Clean merged | `git worktree remove <path> && git branch -d feature/<name>` |
+
+---
+
 ## Development
 
 ### Prerequisites
@@ -191,4 +238,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-02-13
+**Last Updated:** 2026-02-14
