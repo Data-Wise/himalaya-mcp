@@ -1,0 +1,9 @@
+{
+  "name": "himalaya-mcp-marketplace",
+  "owner": { "name": "Data-Wise" },
+  "plugins": [{
+    "name": "himalaya-mcp",
+    "source": ".",
+    "description": "Privacy-first email MCP server wrapping himalaya CLI"
+  }]
+}

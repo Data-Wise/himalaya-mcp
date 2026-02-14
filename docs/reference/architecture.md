@@ -35,6 +35,41 @@
                                       └──────────────────────┘
 ```
 
+## Distribution Architecture
+
+```
+Homebrew (Primary)                  GitHub (Fallback)
+  brew install himalaya-mcp           claude plugin add github:Data-Wise/himalaya-mcp
+  │                                   │
+  ├─ depends_on "himalaya"            └─ Copies plugin to cache
+  ├─ depends_on "node"                   Uses ${CLAUDE_PLUGIN_ROOT}
+  │
+  ├─ libexec/
+  │   ├─ .claude-plugin/plugin.json
+  │   ├─ .claude-plugin/marketplace.json
+  │   ├─ .mcp.json
+  │   ├─ plugin/skills/*.md
+  │   ├─ plugin/agents/*.md
+  │   └─ dist/index.js (esbuild bundle, 583KB)
+  │
+  └─ post_install → himalaya-mcp-install
+      ├─ symlink → ~/.claude/plugins/himalaya-mcp
+      ├─ register → ~/.claude/local-marketplace/marketplace.json
+      └─ auto-enable → ~/.claude/settings.json
+```
+
+### Build Pipeline
+
+```
+src/index.ts (16 files)
+  │
+  ├─ npm run build          → dist/*.js + .d.ts (development)
+  │
+  └─ npm run build:bundle   → dist/index.js (583KB, production)
+      esbuild --bundle --platform=node --target=node22 --format=esm --minify
+      Inlines: @modelcontextprotocol/sdk, zod, content-type, raw-body
+```
+
 ## Module Map
 
 ```
@@ -65,8 +100,11 @@ src/
 ├── resources/
 │   └── index.ts          email://inbox, email://message/{id}, email://folders
 │
-└── adapters/
-    └── clipboard.ts      copy_to_clipboard — pbcopy (macOS) / xclip (Linux)
+├── adapters/
+│   └── clipboard.ts      copy_to_clipboard — pbcopy (macOS) / xclip (Linux)
+│
+└── cli/
+    └── setup.ts          Claude Desktop setup (add/check/remove MCP config)
 ```
 
 ## Data Flow
@@ -116,6 +154,7 @@ triage_inbox prompt
 ```
 .claude-plugin/
   plugin.json         Manifest — declares skills, agents, hooks, MCP server
+  marketplace.json    GitHub plugin discovery (self-hosted marketplace)
 
 plugin/
   skills/

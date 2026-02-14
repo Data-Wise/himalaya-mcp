@@ -7,7 +7,7 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Current Phase:** 5 — All phases complete (11 tools, 4 prompts, 3 resources, 122 tests)
+- **Current Phase:** 5 — All phases complete (11 tools, 4 prompts, 3 resources, 160 tests)
 
 ### What It Does
 
@@ -180,7 +180,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (122 tests across 10 test files)
+npm test                         # Run vitest (160 tests across 11 test files)
 node dist/index.js               # Run MCP server directly
 ```
 
