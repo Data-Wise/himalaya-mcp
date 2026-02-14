@@ -140,9 +140,9 @@ You: "/email:help"
 
 - **[Installation](getting-started/installation.md)** -- detailed setup guide
 - **[Quick Start](getting-started/quickstart.md)** -- first email in 2 minutes
+- **[Tutorials](tutorials/index.md)** -- step-by-step from beginner to automation
 - **[Command Reference](reference/commands.md)** -- all tools, prompts, and resources
 - **[User Guide](guide/guide.md)** -- complete walkthrough
 - **[Workflows](guide/workflows.md)** -- common email patterns
-- **[Packaging](guide/packaging.md)** -- distribution, bundling, Homebrew
 - **[Quick Reference](reference/refcard.md)** -- one-page cheat sheet
 - **[Architecture](reference/architecture.md)** -- system design and security
