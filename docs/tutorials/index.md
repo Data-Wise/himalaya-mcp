@@ -7,16 +7,16 @@ Step-by-step guides from simple to advanced. Each tutorial builds on the previou
 ```mermaid
 flowchart LR
     subgraph L1["Level 1: Getting Started"]
-        A1["Read Your\nFirst Email"] --> A2["Multi-Account\nEmail"]
+        A1[Read First Email] --> A2[Multi-Account]
     end
 
     subgraph L2["Level 2: Productivity"]
-        B1["Triage Your\nInbox"] --> B2["Reply to\nan Email"]
-        B2 --> B3["Export &\nSave Emails"]
+        B1[Triage Inbox] --> B2[Reply to Email]
+        B2 --> B3[Export & Save]
     end
 
     subgraph L3["Level 3: Automation"]
-        C1["Automate with\nthe Agent"]
+        C1[Automate with Agent]
     end
 
     L1 --> L2 --> L3
