@@ -7,7 +7,7 @@ himalaya-mcp is distributed as a Claude Code plugin via multiple channels. This 
 | Channel | Command | Auto-setup |
 |---------|---------|------------|
 | **Homebrew** (recommended) | `brew install data-wise/tap/himalaya-mcp` | Symlink, marketplace, auto-enable |
-| **GitHub** | `claude plugin add github:Data-Wise/himalaya-mcp` | Plugin cache |
+| **GitHub** | `claude plugin marketplace add Data-Wise/himalaya-mcp` | Plugin cache |
 | **Source** | `git clone` + `npm run build` | Manual symlink |
 | **Claude Desktop** | `himalaya-mcp setup` | MCP server config |
 
@@ -87,13 +87,20 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
   "owner": { "name": "Data-Wise" },
   "plugins": [{
     "name": "himalaya-mcp",
-    "source": ".",
-    "description": "Privacy-first email MCP server wrapping himalaya CLI"
+    "source": "./",
+    "description": "Privacy-first email MCP server wrapping himalaya CLI",
+    "category": "productivity",
+    "tags": ["email", "mcp", "himalaya", "privacy"]
   }]
 }
 ```
 
-This enables `claude plugin add github:Data-Wise/himalaya-mcp` to work.
+This enables the GitHub install flow:
+
+```bash
+claude plugin marketplace add Data-Wise/himalaya-mcp
+claude plugin install himalaya-mcp
+```
 
 ## Claude Desktop Setup CLI
 

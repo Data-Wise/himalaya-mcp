@@ -1,0 +1,47 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+Format follows [Keep a Changelog](https://keepachangelog.com/).
+
+## [1.1.0] - 2026-02-14
+
+### Added
+
+- Plugin packaging for Homebrew distribution (#10)
+  - esbuild bundle (583KB single-file, eliminates 72MB node_modules)
+  - `himalaya-mcp setup` CLI for Claude Desktop config (macOS/Linux/Windows)
+  - Homebrew formula with auto-symlink and marketplace registration
+  - `brew install data-wise/tap/himalaya-mcp` zero-config install
+- GitHub marketplace install: `claude plugin marketplace add Data-Wise/himalaya-mcp`
+- 18 setup CLI tests (unit + E2E with subprocess)
+
+### Fixed
+
+- plugin.json schema cleaned for Claude Code strict validation
+- marketplace.json source path `"."` changed to `"./"` for schema compliance
+
+### Documentation
+
+- Tutorials, skills guide, troubleshooting pages (#7)
+- Packaging guide with esbuild bundle and Homebrew formula details
+- CLI setup command reference with cross-platform config paths
+- Git workflow and branch protection rules
+- Full README rewrite with all install paths and GitHub Pages links
+- Updated install commands across all docs (refcard, architecture, index)
+
+## [1.0.0] - 2026-02-13
+
+### Added
+
+- 11 MCP tools: list_emails, search_emails, read_email, read_email_html, flag_email, move_email, draft_reply, send_email, export_to_markdown, create_action_item, copy_to_clipboard
+- 4 MCP prompts: triage_inbox, summarize_email, daily_email_digest, draft_reply
+- 3 MCP resources: email://inbox, email://message/{id}, email://folders
+- 5 plugin skills: /email:inbox, /email:triage, /email:digest, /email:reply, /email:help
+- Email assistant agent
+- Two-phase send safety gate (preview then confirm)
+- Multi-account support via `account` parameter
+- Env-based configuration (HIMALAYA_BINARY, HIMALAYA_ACCOUNT, HIMALAYA_FOLDER, HIMALAYA_TIMEOUT)
+- copy_to_clipboard adapter (pbcopy/xclip)
+- GitHub Pages documentation site
+- 142 tests across 10 test files (unit, dogfooding, E2E)

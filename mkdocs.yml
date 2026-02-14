@@ -86,3 +86,4 @@ nav:
     - Command Reference: reference/commands.md
     - Quick Reference: reference/refcard.md
     - Architecture: reference/architecture.md
+    - Changelog: changelog.md

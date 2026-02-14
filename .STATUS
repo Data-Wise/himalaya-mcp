@@ -22,19 +22,32 @@
 
 ## Current State
 
-- Branch: `dev` (PR #10 merged)
-- v1.1.0 on dev (pending release to main)
+- Branch: `dev` (synced with main)
+- v1.1.0 released on GitHub
 - GitHub Pages: https://data-wise.github.io/himalaya-mcp/
 - CI: passing
 - Tests: 160 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 47 dogfood + 22 e2e + 18 setup)
+
+## Install
+
+```bash
+# Homebrew (recommended)
+brew tap data-wise/tap
+brew install himalaya-mcp
+
+# Claude Code plugin (from GitHub)
+claude plugin marketplace add Data-Wise/himalaya-mcp
+claude plugin install himalaya-mcp
+
+# Claude Desktop
+himalaya-mcp setup
+```
 
 ---
 
 ## Next Action
 
-1. Release v1.1.0: PR from dev → main, tag, compute sha256 for Homebrew formula
-2. Test `brew install data-wise/tap/himalaya-mcp` end-to-end
-3. Submit to official Claude Code plugin directory
+None — stable release. Monitor for issues.
 
 ## Future
 
@@ -44,4 +57,4 @@
 ---
 
 **Last Updated:** 2026-02-14
-**Status:** v1.1.0 ready on dev, pending release to main
+**Status:** v1.1.0 released, Homebrew + GitHub marketplace install verified
