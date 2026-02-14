@@ -21,7 +21,7 @@ import { registerDigestPrompt } from "./prompts/digest.js";
 import { registerComposeTools } from "./tools/compose.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
 
-export const VERSION = "0.1.0";
+export const VERSION = "1.1.0";
 export const NAME = "himalaya-mcp";
 
 const server = new McpServer({
