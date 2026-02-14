@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: All phases complete — ready for PR to dev
-## Phase: Development
-## Priority: 3
-## Progress: 95
+## Focus: v1.0.0 released — all phases complete
+## Phase: Maintenance
+## Priority: 4
+## Progress: 100
 
 ## Completed
 
@@ -22,7 +22,9 @@
 
 ## Current State
 
-- Branch: `feature/core-read` (all phases implemented)
+- Branch: `dev` (1 docs commit ahead of main)
+- v1.0.0 released (2026-02-13)
+- GitHub Pages: https://data-wise.github.io/himalaya-mcp/
 - CI: passing
 - Tests: 122 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 29 dogfood + 20 e2e)
 
@@ -30,10 +32,11 @@
 
 ## Next Action
 
-1. Create PR from feature/core-read -> dev
-2. Future: Obsidian adapter, Apple Notes/Reminders, MCPB packaging
+A) Obsidian adapter — export emails to vault as markdown notes
+B) Apple ecosystem — Notes/Reminders integration via AppleScript
+C) MCPB packaging — distribute as standalone MCP package
 
 ---
 
-**Last Updated:** 2026-02-13
-**Status:** All phases complete — PR to dev next
+**Last Updated:** 2026-02-14
+**Status:** v1.0.0 released — all phases complete
