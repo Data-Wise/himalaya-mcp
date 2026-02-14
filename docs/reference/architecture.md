@@ -70,6 +70,29 @@ src/index.ts (16 files)
       Inlines: @modelcontextprotocol/sdk, zod, content-type, raw-body
 ```
 
+### CI/CD Workflows
+
+```
+.github/workflows/
+├── ci.yml                 Push/PR to main|dev — lint, typecheck, build, test, bundle, validate plugin
+├── docs.yml               Push to main — deploy GitHub Pages
+└── homebrew-release.yml   Release published — validate → compute SHA → update homebrew-tap formula
+```
+
+**Release flow:**
+
+```
+git tag v1.2.0 → gh release create
+  │
+  ├─ ci.yml (PR checks)
+  │
+  └─ homebrew-release.yml
+      ├─ validate    npm ci → version check → build → test → bundle
+      ├─ prepare     curl tarball (5 retries) → shasum -a 256
+      └─ update      → Data-Wise/homebrew-tap/update-formula.yml@main
+                        → PR: bump himalaya-mcp to v1.2.0
+```
+
 ## Module Map
 
 ```
