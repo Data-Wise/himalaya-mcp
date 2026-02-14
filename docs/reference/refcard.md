@@ -1,5 +1,15 @@
 # himalaya-mcp Quick Reference
 
+## Install
+
+```
+brew tap data-wise/tap && brew install himalaya-mcp   # Homebrew (recommended)
+claude plugin add github:Data-Wise/himalaya-mcp       # GitHub
+himalaya-mcp setup                                     # Claude Desktop config
+himalaya-mcp setup --check                             # Verify Desktop config
+himalaya-mcp setup --remove                            # Remove Desktop config
+```
+
 ## Tools
 
 ```
@@ -77,4 +87,21 @@ Reply:      read_email -> draft_reply -> [review] -> send_email(confirm=true)
 Export:     read_email -> export_to_markdown -> copy_to_clipboard
 Digest:     triage_inbox prompt -> daily_email_digest prompt
 Multi-acct: Any tool + account="work" | account="personal"
+```
+
+## Build & Distribution
+
+```
+npm run build           TypeScript compilation (development)
+npm run build:bundle    esbuild single-file bundle (583KB, production)
+npm test                Run 160 tests (vitest)
+node dist/index.js      Start MCP server standalone
+```
+
+## Distribution Channels
+
+```
+Homebrew:    brew install data-wise/tap/himalaya-mcp
+GitHub:      claude plugin add github:Data-Wise/himalaya-mcp
+Source:      git clone + npm install + npm run build
 ```

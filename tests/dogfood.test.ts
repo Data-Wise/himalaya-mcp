@@ -7,13 +7,21 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { readFileSync, existsSync } from "node:fs";
+import { resolve, dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
+import { VERSION, NAME } from "../src/index.js";
 import { registerInboxTools } from "../src/tools/inbox.js";
 import { registerReadTools } from "../src/tools/read.js";
 import { registerManageTools } from "../src/tools/manage.js";
 import { registerActionTools } from "../src/tools/actions.js";
 import { registerComposeTools } from "../src/tools/compose.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = resolve(__dirname, "..");
 
 // --- Sample data matching real himalaya output ---
 
@@ -510,5 +518,143 @@ describe("Dogfooding: output quality", () => {
       const result = await readTool.handler({ id, folder: undefined, account: undefined }, {} as any);
       expect(result.content[0].text).toBeTruthy();
     }
+  });
+});
+
+// ========================================================================
+// Packaging & Distribution Validation
+// ========================================================================
+
+describe("Packaging: version consistency", () => {
+  const pkgJson = JSON.parse(readFileSync(join(PROJECT_ROOT, "package.json"), "utf-8"));
+  const pluginJson = JSON.parse(
+    readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+  );
+
+  it("src/index.ts VERSION matches package.json", () => {
+    expect(VERSION).toBe(pkgJson.version);
+  });
+
+  it("plugin.json version matches package.json", () => {
+    expect(pluginJson.version).toBe(pkgJson.version);
+  });
+
+  it("src/index.ts NAME is himalaya-mcp", () => {
+    expect(NAME).toBe("himalaya-mcp");
+  });
+
+  it("all three versions are in sync", () => {
+    expect(VERSION).toBe(pluginJson.version);
+    expect(VERSION).toBe(pkgJson.version);
+  });
+});
+
+describe("Packaging: plugin manifest structure", () => {
+  const pluginJson = JSON.parse(
+    readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+  );
+
+  it("has required top-level fields", () => {
+    expect(pluginJson.name).toBe("himalaya-mcp");
+    expect(pluginJson.version).toBeTruthy();
+    expect(pluginJson.description).toBeTruthy();
+  });
+
+  it("declares skills with valid paths", () => {
+    expect(pluginJson.skills).toBeDefined();
+    expect(pluginJson.skills.length).toBeGreaterThanOrEqual(4);
+    for (const skillPath of pluginJson.skills) {
+      const fullPath = resolve(PROJECT_ROOT, skillPath);
+      expect(existsSync(fullPath)).toBe(true);
+    }
+  });
+
+  it("declares agents with valid paths", () => {
+    expect(pluginJson.agents).toBeDefined();
+    expect(pluginJson.agents.length).toBeGreaterThanOrEqual(1);
+    for (const agentPath of pluginJson.agents) {
+      const fullPath = resolve(PROJECT_ROOT, agentPath);
+      expect(existsSync(fullPath)).toBe(true);
+    }
+  });
+
+  it("declares MCP server with CLAUDE_PLUGIN_ROOT variable", () => {
+    expect(pluginJson.mcpServers).toBeDefined();
+    expect(pluginJson.mcpServers.himalaya).toBeDefined();
+    expect(pluginJson.mcpServers.himalaya.command).toBe("node");
+    expect(pluginJson.mcpServers.himalaya.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
+    expect(pluginJson.mcpServers.himalaya.args[0]).toContain("dist/index.js");
+  });
+});
+
+describe("Packaging: marketplace.json", () => {
+  const marketplacePath = join(PROJECT_ROOT, ".claude-plugin", "marketplace.json");
+
+  it("exists in .claude-plugin/", () => {
+    expect(existsSync(marketplacePath)).toBe(true);
+  });
+
+  it("has valid structure for GitHub plugin discovery", () => {
+    const marketplace = JSON.parse(readFileSync(marketplacePath, "utf-8"));
+    expect(marketplace.name).toBeTruthy();
+    expect(marketplace.owner).toBeDefined();
+    expect(marketplace.owner.name).toBe("Data-Wise");
+    expect(marketplace.plugins).toBeDefined();
+    expect(marketplace.plugins.length).toBe(1);
+    expect(marketplace.plugins[0].name).toBe("himalaya-mcp");
+    expect(marketplace.plugins[0].source).toBe(".");
+    expect(marketplace.plugins[0].description).toBeTruthy();
+  });
+});
+
+describe("Packaging: .mcp.json", () => {
+  const mcpJsonPath = join(PROJECT_ROOT, ".mcp.json");
+
+  it("exists at project root", () => {
+    expect(existsSync(mcpJsonPath)).toBe(true);
+  });
+
+  it("declares himalaya server with CLAUDE_PLUGIN_ROOT", () => {
+    const mcpJson = JSON.parse(readFileSync(mcpJsonPath, "utf-8"));
+    expect(mcpJson.mcpServers?.himalaya).toBeDefined();
+    expect(mcpJson.mcpServers.himalaya.command).toBe("node");
+    expect(mcpJson.mcpServers.himalaya.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
+  });
+
+  it("matches plugin.json MCP server declaration", () => {
+    const mcpJson = JSON.parse(readFileSync(mcpJsonPath, "utf-8"));
+    const pluginJson = JSON.parse(
+      readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+    );
+    expect(mcpJson.mcpServers.himalaya.command).toBe(pluginJson.mcpServers.himalaya.command);
+    expect(mcpJson.mcpServers.himalaya.args).toEqual(pluginJson.mcpServers.himalaya.args);
+  });
+});
+
+describe("Packaging: package.json distribution fields", () => {
+  const pkgJson = JSON.parse(readFileSync(join(PROJECT_ROOT, "package.json"), "utf-8"));
+
+  it("has bin entry for CLI", () => {
+    expect(pkgJson.bin).toBeDefined();
+    expect(pkgJson.bin["himalaya-mcp"]).toBe("dist/cli/setup.js");
+  });
+
+  it("has build:bundle script for production bundling", () => {
+    expect(pkgJson.scripts["build:bundle"]).toBeDefined();
+    expect(pkgJson.scripts["build:bundle"]).toContain("esbuild");
+    expect(pkgJson.scripts["build:bundle"]).toContain("--bundle");
+    expect(pkgJson.scripts["build:bundle"]).toContain("--minify");
+  });
+
+  it("has esbuild as dev dependency", () => {
+    expect(pkgJson.devDependencies.esbuild).toBeDefined();
+  });
+
+  it("declares ESM module type", () => {
+    expect(pkgJson.type).toBe("module");
+  });
+
+  it("main entry points to dist/index.js", () => {
+    expect(pkgJson.main).toBe("dist/index.js");
   });
 });

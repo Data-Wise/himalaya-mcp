@@ -160,6 +160,7 @@ describe("E2E: MCP Server Headless", () => {
 
     expect(initResult.result).toBeDefined();
     expect(initResult.result.serverInfo.name).toBe("himalaya-mcp");
+    expect(initResult.result.serverInfo.version).toBe("1.1.0");
 
     // Send initialized notification
     sendNotification("notifications/initialized");
@@ -411,5 +412,207 @@ describe("E2E: MCP Server Headless", () => {
     expect(text).toContain("INBOX");
     expect(text).toContain("Sent");
     expect(text).toContain("Archive");
+  });
+
+  // --- Error path tests ---
+
+  describe("E2E: Error Paths", () => {
+    it(
+      "server handles missing himalaya binary gracefully",
+      async () => {
+        let errorServerProcess: ReturnType<typeof spawn> | null = null;
+        let errorResponseBuffer = "";
+        const errorPendingResolvers: Map<number, (value: any) => void> =
+          new Map();
+        let errorRequestId = 0;
+
+        try {
+          // Spawn a separate server with nonexistent himalaya binary
+          errorServerProcess = spawn("node", ["dist/index.js"], {
+            cwd: PROJECT_ROOT,
+            env: {
+              ...process.env,
+              HIMALAYA_BINARY: `/tmp/nonexistent-himalaya-${Date.now()}`,
+            },
+            stdio: ["pipe", "pipe", "pipe"],
+          });
+
+          // Create a separate sendRequest for this server
+          function sendErrorRequest(method: string, params?: any): Promise<any> {
+            const id = ++errorRequestId;
+            const msg = JSON.stringify({
+              jsonrpc: "2.0",
+              id,
+              method,
+              params: params || {},
+            });
+            errorServerProcess!.stdin!.write(msg + "\n");
+
+            return new Promise((resolve) => {
+              errorPendingResolvers.set(id, resolve);
+            });
+          }
+
+          // Parse responses
+          errorServerProcess.stdout!.on("data", (chunk) => {
+            errorResponseBuffer += chunk.toString();
+            const lines = errorResponseBuffer.split("\n");
+            errorResponseBuffer = lines.pop() || "";
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              try {
+                const msg = JSON.parse(line);
+                if (msg.id && errorPendingResolvers.has(msg.id)) {
+                  errorPendingResolvers.get(msg.id)!(msg);
+                  errorPendingResolvers.delete(msg.id);
+                }
+              } catch {
+                // Not JSON, skip
+              }
+            }
+          });
+
+          // Initialize
+          const initResult = await sendErrorRequest("initialize", {
+            protocolVersion: "2025-03-26",
+            capabilities: {},
+            clientInfo: { name: "error-test", version: "1.0.0" },
+          });
+
+          expect(initResult.result).toBeDefined();
+
+          // Try to call list_emails with missing binary
+          const listResult = await sendErrorRequest("tools/call", {
+            name: "list_emails",
+            arguments: {},
+          });
+
+          // Expect error in the response
+          const hasError =
+            listResult.error ||
+            listResult.result?.isError ||
+            (listResult.result?.content?.[0]?.text &&
+              (listResult.result.content[0].text.includes("error") ||
+                listResult.result.content[0].text.includes("Error") ||
+                listResult.result.content[0].text.includes("ENOENT") ||
+                listResult.result.content[0].text.includes("not found")));
+
+          expect(hasError).toBeTruthy();
+        } finally {
+          if (errorServerProcess) {
+            errorServerProcess.kill("SIGTERM");
+          }
+        }
+      },
+      10_000
+    );
+
+    it(
+      "server handles himalaya returning invalid JSON",
+      async () => {
+        let invalidJsonServerProcess: ReturnType<typeof spawn> | null = null;
+        let invalidJsonResponseBuffer = "";
+        const invalidJsonPendingResolvers: Map<number, (value: any) => void> =
+          new Map();
+        let invalidJsonRequestId = 0;
+
+        // Create fake binary that returns invalid JSON
+        const invalidJsonBinDir = join(
+          tmpdir(),
+          `himalaya-invalid-json-${Date.now()}`
+        );
+        await mkdir(invalidJsonBinDir, { recursive: true });
+
+        const invalidJsonScript = `#!/bin/bash
+# Fake himalaya that outputs invalid JSON
+echo "NOT_JSON_AT_ALL"
+`;
+        const invalidJsonBinPath = join(invalidJsonBinDir, "himalaya");
+        await writeFile(invalidJsonBinPath, invalidJsonScript);
+        await chmod(invalidJsonBinPath, 0o755);
+
+        try {
+          // Spawn server with invalid-JSON binary
+          invalidJsonServerProcess = spawn("node", ["dist/index.js"], {
+            cwd: PROJECT_ROOT,
+            env: {
+              ...process.env,
+              HIMALAYA_BINARY: invalidJsonBinPath,
+            },
+            stdio: ["pipe", "pipe", "pipe"],
+          });
+
+          // Create a separate sendRequest for this server
+          function sendInvalidJsonRequest(
+            method: string,
+            params?: any
+          ): Promise<any> {
+            const id = ++invalidJsonRequestId;
+            const msg = JSON.stringify({
+              jsonrpc: "2.0",
+              id,
+              method,
+              params: params || {},
+            });
+            invalidJsonServerProcess!.stdin!.write(msg + "\n");
+
+            return new Promise((resolve) => {
+              invalidJsonPendingResolvers.set(id, resolve);
+            });
+          }
+
+          // Parse responses
+          invalidJsonServerProcess.stdout!.on("data", (chunk) => {
+            invalidJsonResponseBuffer += chunk.toString();
+            const lines = invalidJsonResponseBuffer.split("\n");
+            invalidJsonResponseBuffer = lines.pop() || "";
+            for (const line of lines) {
+              if (!line.trim()) continue;
+              try {
+                const msg = JSON.parse(line);
+                if (msg.id && invalidJsonPendingResolvers.has(msg.id)) {
+                  invalidJsonPendingResolvers.get(msg.id)!(msg);
+                  invalidJsonPendingResolvers.delete(msg.id);
+                }
+              } catch {
+                // Not JSON, skip
+              }
+            }
+          });
+
+          // Initialize
+          const initResult = await sendInvalidJsonRequest("initialize", {
+            protocolVersion: "2025-03-26",
+            capabilities: {},
+            clientInfo: { name: "invalid-json-test", version: "1.0.0" },
+          });
+
+          expect(initResult.result).toBeDefined();
+
+          // Try to call list_emails
+          const listResult = await sendInvalidJsonRequest("tools/call", {
+            name: "list_emails",
+            arguments: {},
+          });
+
+          // Expect error mentioning JSON or parse
+          const hasParseError =
+            listResult.error ||
+            listResult.result?.isError ||
+            (listResult.result?.content?.[0]?.text &&
+              (listResult.result.content[0].text.includes("JSON") ||
+                listResult.result.content[0].text.includes("parse") ||
+                listResult.result.content[0].text.includes("invalid")));
+
+          expect(hasParseError).toBeTruthy();
+        } finally {
+          if (invalidJsonServerProcess) {
+            invalidJsonServerProcess.kill("SIGTERM");
+          }
+          await rm(invalidJsonBinDir, { recursive: true, force: true });
+        }
+      },
+      10_000
+    );
   });
 });

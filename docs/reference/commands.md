@@ -1,6 +1,6 @@
 # Command Reference
 
-Complete reference for all 11 MCP tools, 4 prompts, and 3 resources.
+Complete reference for all 11 MCP tools, 4 prompts, 3 resources, and CLI commands.
 
 ---
 
@@ -521,3 +521,27 @@ These parameters appear on most tools:
 
 !!! tip "Multi-account usage"
     Every tool accepts an optional `account` parameter. If omitted, himalaya uses your default account. Set up multiple accounts in `~/.config/himalaya/config.toml`.
+
+---
+
+## CLI Commands
+
+### `himalaya-mcp setup`
+
+Configure himalaya-mcp as an MCP server for Claude Desktop.
+
+```bash
+himalaya-mcp setup           # Add MCP server to Claude Desktop config
+himalaya-mcp setup --check   # Verify configuration exists and paths are valid
+himalaya-mcp setup --remove  # Remove the server entry
+```
+
+**Config path (per platform):**
+
+| Platform | Path |
+|----------|------|
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+| Windows | `%APPDATA%/Claude/claude_desktop_config.json` |
+
+The setup command preserves all existing MCP servers in the config file. Only the `himalaya` entry is added, updated, or removed.

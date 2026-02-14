@@ -31,26 +31,40 @@ himalaya --output json envelope list     # Should print JSON envelopes
 
 ## Installation
 
-### As Claude Code Plugin (recommended)
+### Homebrew (recommended)
 
 ```bash
-cd ~/projects/dev-tools/himalaya-mcp
+brew tap data-wise/tap
+brew install himalaya-mcp
+```
+
+Zero-config: installs dependencies, builds the bundle, symlinks the plugin, and auto-enables in Claude Code. See the [detailed installation guide](../getting-started/installation.md) for all options.
+
+### From Source
+
+```bash
+git clone https://github.com/Data-Wise/himalaya-mcp.git
+cd himalaya-mcp
 npm install && npm run build
-ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
+ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ```
 
 Restart Claude Code. The plugin provides `/email:inbox`, `/email:triage`, `/email:digest`, and `/email:reply` skills.
 
-### As Standalone MCP Server
+### Claude Desktop
 
-Add to `~/.claude/settings.json` (or Claude Desktop config):
+```bash
+himalaya-mcp setup    # Auto-configure MCP server
+```
+
+Or manually add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "himalaya": {
       "command": "node",
-      "args": ["/path/to/himalaya-mcp/dist/index.js"]
+      "args": ["~/.claude/plugins/himalaya-mcp/dist/index.js"]
     }
   }
 }
@@ -162,7 +176,7 @@ No emails are ever deleted -- only flagged or moved.
 ## Testing
 
 ```bash
-npm test    # 65 tests across 10 files (vitest)
+npm test    # 160 tests across 11 files (vitest)
 ```
 
 Test breakdown:
@@ -177,5 +191,6 @@ Test breakdown:
 | `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
 | `config.test.ts` | 7 | Env var loading, edge cases |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 29 | Realistic Claude usage scenarios |
-| `e2e.test.ts` | 20 | Full MCP server pipeline with fake himalaya |
+| `dogfood.test.ts` | 47 | Realistic Claude usage scenarios + packaging validation |
+| `e2e.test.ts` | 22 | Full MCP server pipeline with fake himalaya + error paths |
+| `setup.test.ts` | 18 | CLI setup/check/remove (unit + E2E subprocess) |

@@ -94,18 +94,29 @@ When installed as a Claude Code plugin, these slash commands are available:
 
 ## Quick Start
 
-```bash
-# Prerequisites
-brew install himalaya          # Email CLI
-node --version                 # Node.js 22+
+### Homebrew (recommended)
 
-# Install
+```bash
+brew tap data-wise/tap
+brew install himalaya-mcp
+```
+
+That's it. Homebrew installs himalaya CLI + Node.js, bundles the server, symlinks the plugin, and auto-enables it in Claude Code.
+
+### From Source
+
+```bash
+brew install himalaya          # Email CLI
 git clone https://github.com/Data-Wise/himalaya-mcp.git
 cd himalaya-mcp
 npm install && npm run build
-
-# Use as Claude Code plugin
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
+```
+
+### Claude Desktop
+
+```bash
+himalaya-mcp setup             # Auto-configure MCP server
 ```
 
 Then in Claude Code:
@@ -125,5 +136,6 @@ You: "/email:help"
 - **[Command Reference](reference/commands.md)** -- all tools, prompts, and resources
 - **[User Guide](guide/guide.md)** -- complete walkthrough
 - **[Workflows](guide/workflows.md)** -- common email patterns
+- **[Packaging](guide/packaging.md)** -- distribution, bundling, Homebrew
 - **[Quick Reference](reference/refcard.md)** -- one-page cheat sheet
 - **[Architecture](reference/architecture.md)** -- system design and security
