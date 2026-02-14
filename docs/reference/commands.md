@@ -2,6 +2,9 @@
 
 Complete reference for all 11 MCP tools, 4 prompts, 3 resources, and CLI commands.
 
+!!! tip "See also"
+    **[Tutorials](../tutorials/index.md)** for step-by-step walkthroughs | **[Workflows](../guide/workflows.md)** for common email patterns
+
 ---
 
 ## Tools

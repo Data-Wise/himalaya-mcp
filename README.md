@@ -56,7 +56,12 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 npm test              # 160 tests across 11 test files (vitest)
 ```
 
-Tests include unit tests, dogfooding tests (realistic Claude usage patterns), and headless E2E tests (full MCP server pipeline with fake himalaya binary).
+| Category | Tests | Coverage |
+|----------|-------|----------|
+| Unit (parser, config, clipboard) | 36 | Core parsing and config |
+| Integration (tools, prompts) | 57 | All 11 tools + 4 prompts |
+| Dogfooding | 47 | Realistic Claude usage patterns |
+| E2E | 20 | Full MCP server pipeline with fake himalaya binary |
 
 ## Documentation
 
@@ -64,6 +69,7 @@ Full documentation at **[data-wise.github.io/himalaya-mcp](https://data-wise.git
 
 - [Installation](https://data-wise.github.io/himalaya-mcp/getting-started/installation/)
 - [Quick Start](https://data-wise.github.io/himalaya-mcp/getting-started/quickstart/)
+- [Tutorials](https://data-wise.github.io/himalaya-mcp/tutorials/)
 - [User Guide](https://data-wise.github.io/himalaya-mcp/guide/guide/)
 - [Command Reference](https://data-wise.github.io/himalaya-mcp/reference/commands/)
 - [Quick Reference Card](https://data-wise.github.io/himalaya-mcp/reference/refcard/)

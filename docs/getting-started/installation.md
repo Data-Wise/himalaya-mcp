@@ -177,3 +177,7 @@ echo '{}' | node ~/.claude/plugins/himalaya-mcp/dist/index.js
 ```
 
 If you see a JSON-RPC response, the server is working. Check your MCP configuration paths.
+
+## What's Next?
+
+Ready to use himalaya-mcp? Start with the [Tutorials](../tutorials/index.md) -- read your first email in 2 minutes, then work up to full inbox automation.
