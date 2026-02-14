@@ -14,12 +14,20 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 
-const CONFIG_DIR = join(
-  homedir(),
-  "Library",
-  "Application Support",
-  "Claude"
-);
+function getConfigDir(): string {
+  switch (process.platform) {
+    case "darwin":
+      return join(homedir(), "Library", "Application Support", "Claude");
+    case "win32": {
+      const appData = process.env.APPDATA || join(homedir(), "AppData", "Roaming");
+      return join(appData, "Claude");
+    }
+    default:
+      return join(homedir(), ".config", "Claude");
+  }
+}
+
+const CONFIG_DIR = getConfigDir();
 const CONFIG_PATH = join(CONFIG_DIR, "claude_desktop_config.json");
 
 const SERVER_KEY = "himalaya";
