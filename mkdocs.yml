@@ -77,7 +77,10 @@ nav:
     - Quick Start: getting-started/quickstart.md
   - Guide:
     - User Guide: guide/guide.md
+    - Tutorials: guide/tutorials.md
     - Workflows: guide/workflows.md
+    - Plugin Skills & Agent: guide/skills.md
+    - Troubleshooting: guide/troubleshooting.md
   - Reference:
     - Command Reference: reference/commands.md
     - Quick Reference: reference/refcard.md
