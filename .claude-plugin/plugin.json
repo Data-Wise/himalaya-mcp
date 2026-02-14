@@ -4,22 +4,5 @@
   "description": "Privacy-first email access for Claude via himalaya CLI",
   "author": {
     "name": "Data-Wise"
-  },
-  "homepage": "https://github.com/Data-Wise/himalaya-mcp",
-  "skills": [
-    "./plugin/skills/inbox.md",
-    "./plugin/skills/triage.md",
-    "./plugin/skills/digest.md",
-    "./plugin/skills/reply.md",
-    "./plugin/skills/help.md"
-  ],
-  "agents": [
-    "./plugin/agents/email-assistant.md"
-  ],
-  "mcpServers": {
-    "himalaya": {
-      "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/index.js"]
-    }
   }
 }

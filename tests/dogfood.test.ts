@@ -560,30 +560,26 @@ describe("Packaging: plugin manifest structure", () => {
     expect(pluginJson.description).toBeTruthy();
   });
 
-  it("declares skills with valid paths", () => {
-    expect(pluginJson.skills).toBeDefined();
-    expect(pluginJson.skills.length).toBeGreaterThanOrEqual(4);
-    for (const skillPath of pluginJson.skills) {
-      const fullPath = resolve(PROJECT_ROOT, skillPath);
-      expect(existsSync(fullPath)).toBe(true);
+  it("has skills directory with valid skill files", () => {
+    const skillsDir = join(PROJECT_ROOT, "plugin", "skills");
+    expect(existsSync(skillsDir)).toBe(true);
+    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md"];
+    for (const skill of expectedSkills) {
+      expect(existsSync(join(skillsDir, skill))).toBe(true);
     }
   });
 
-  it("declares agents with valid paths", () => {
-    expect(pluginJson.agents).toBeDefined();
-    expect(pluginJson.agents.length).toBeGreaterThanOrEqual(1);
-    for (const agentPath of pluginJson.agents) {
-      const fullPath = resolve(PROJECT_ROOT, agentPath);
-      expect(existsSync(fullPath)).toBe(true);
-    }
+  it("has agents directory with valid agent files", () => {
+    const agentsDir = join(PROJECT_ROOT, "plugin", "agents");
+    expect(existsSync(agentsDir)).toBe(true);
+    expect(existsSync(join(agentsDir, "email-assistant.md"))).toBe(true);
   });
 
-  it("declares MCP server with CLAUDE_PLUGIN_ROOT variable", () => {
-    expect(pluginJson.mcpServers).toBeDefined();
-    expect(pluginJson.mcpServers.himalaya).toBeDefined();
-    expect(pluginJson.mcpServers.himalaya.command).toBe("node");
-    expect(pluginJson.mcpServers.himalaya.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
-    expect(pluginJson.mcpServers.himalaya.args[0]).toContain("dist/index.js");
+  it("only contains allowed schema fields", () => {
+    const allowedKeys = ["name", "version", "description", "author"];
+    for (const key of Object.keys(pluginJson)) {
+      expect(allowedKeys).toContain(key);
+    }
   });
 });
 
@@ -621,13 +617,11 @@ describe("Packaging: .mcp.json", () => {
     expect(mcpJson.mcpServers.himalaya.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
   });
 
-  it("matches plugin.json MCP server declaration", () => {
-    const mcpJson = JSON.parse(readFileSync(mcpJsonPath, "utf-8"));
+  it("is the sole MCP server declaration (not duplicated in plugin.json)", () => {
     const pluginJson = JSON.parse(
       readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
     );
-    expect(mcpJson.mcpServers.himalaya.command).toBe(pluginJson.mcpServers.himalaya.command);
-    expect(mcpJson.mcpServers.himalaya.args).toEqual(pluginJson.mcpServers.himalaya.args);
+    expect(pluginJson.mcpServers).toBeUndefined();
   });
 });
 
