@@ -79,6 +79,7 @@ nav:
     - User Guide: guide/guide.md
     - Tutorials: guide/tutorials.md
     - Workflows: guide/workflows.md
+    - Packaging: guide/packaging.md
     - Plugin Skills & Agent: guide/skills.md
     - Troubleshooting: guide/troubleshooting.md
   - Reference:
