@@ -24,6 +24,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Removed stale `lint` script referencing uninstalled eslint
 - Homebrew install script scope mismatch: migrates `himalaya-mcp@himalaya-mcp-marketplace` → `himalaya-mcp@local-plugins` in settings.json, cleans up stale marketplace cache
 - Removed unreliable `claude plugin update` from Homebrew `post_install` (fails due to nested session detection); install script handles settings.json directly via jq
+- Homebrew install script uses `ln -sfh` to prevent circular `libexec/libexec` symlinks on reinstall
+- Homebrew install script uses full paths (`/bin/ln`, `/bin/mkdir`, `/bin/rm`) and `HOMEBREW_PREFIX` env var for restricted PATH contexts
+- Removed Homebrew `post_install` symlink attempt: macOS `sandbox-exec` blocks all writes outside Homebrew-managed paths; users run `himalaya-mcp-install` manually instead
 
 ### Documentation
 
