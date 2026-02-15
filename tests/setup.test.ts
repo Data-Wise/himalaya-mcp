@@ -254,12 +254,15 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { mkdtemp, rm, mkdir, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { existsSync as realExistsSync } from "node:fs";
+import { accessSync } from "node:fs";
 
 const execFileAsync = promisify(execFile);
 const PROJECT_ROOT = resolve(__dirname, "..");
 const SETUP_CLI = join(PROJECT_ROOT, "dist", "cli", "setup.js");
-const hasBuild = realExistsSync(SETUP_CLI);
+// Use accessSync (not mocked) instead of existsSync (mocked by vi.mock)
+const hasBuild = (() => {
+  try { accessSync(SETUP_CLI); return true; } catch { return false; }
+})();
 
 describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   let tempHome: string;

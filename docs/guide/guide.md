@@ -262,7 +262,7 @@ No emails are ever deleted -- only flagged or moved.
 ## Testing
 
 ```bash
-npm test    # 177 tests across 11 files (vitest)
+npm test    # 181 tests across 11 files (vitest)
 ```
 
 Test breakdown:
@@ -279,4 +279,4 @@ Test breakdown:
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
 | `dogfood.test.ts` | 68 | Realistic Claude usage scenarios + packaging validation |
 | `e2e.test.ts` | 22 | Full MCP server pipeline with fake himalaya + error paths |
-| `setup.test.ts` | 14 | CLI setup/check/remove (unit + E2E subprocess) |
+| `setup.test.ts` | 18 | CLI setup/check/remove (unit + E2E subprocess) |
