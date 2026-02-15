@@ -28,7 +28,7 @@ Expand himalaya-mcp from 11 to 19 MCP tools by adding four feature areas: attach
 - [ ] Calendar event extraction parses ICS from downloaded attachments
 - [ ] Calendar event creation uses AppleScript (macOS only, mocked in tests)
 - [ ] All new tools support multi-account via `account` parameter
-- [ ] ~36 new tests pass, bringing total from 181 to ~217
+- [x] 64 new tests passed, bringing total from 181 to 245
 
 ---
 

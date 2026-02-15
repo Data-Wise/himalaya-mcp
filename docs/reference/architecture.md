@@ -12,7 +12,7 @@
 │   ┌─────────────┐   MCP Protocol   ┌──────────────────────┐    │
 │   │ MCP Client  │◄────────────────►│ himalaya-mcp         │    │
 │   └─────────────┘   (JSON-RPC)     │                      │    │
-│                                     │  Tools (11)          │    │
+│                                     │  Tools (19)          │    │
 │                                     │  Prompts (4)         │    │
 │                                     │  Resources (3)       │    │
 │                                     └──────────┬───────────┘    │
@@ -189,7 +189,7 @@ plugin/
     reply.md          /email:reply — draft with safety gate
 
   agents/
-    email-assistant.md  Autonomous triage agent (all 11 tools)
+    email-assistant.md  Autonomous triage agent (all 19 tools)
 
 .mcp.json             MCP server config (node dist/index.js)
 ```

@@ -14,17 +14,25 @@ himalaya-mcp setup --remove                            # Remove Desktop config
 ## Tools
 
 ```
-list_emails      [folder] [page_size] [page] [account]     List envelopes
-search_emails    query [folder] [account]                   Search emails
-read_email       id [folder] [account]                      Read plain text
-read_email_html  id [folder] [account]                      Read HTML
-flag_email       id flags action("add"|"remove") [folder]   Set/clear flags
-move_email       id target_folder [folder] [account]        Move to folder
-draft_reply      id [body] [reply_all] [folder] [account]   Generate draft (no send)
-send_email       template [confirm] [account]               Send (confirm=true required)
-export_to_markdown  id [folder] [account]                   Email -> markdown + YAML
-create_action_item  id [folder] [account]                   Extract todos/deadlines
-copy_to_clipboard   text                                    Copy to system clipboard
+list_emails         [folder] [page_size] [page] [account]     List envelopes
+search_emails       query [folder] [account]                   Search emails
+read_email          id [folder] [account]                      Read plain text
+read_email_html     id [folder] [account]                      Read HTML
+list_folders        [account]                                  List all folders
+create_folder       name [account]                             Create new folder
+delete_folder       name [account]                             Delete folder
+flag_email          id flags action("add"|"remove") [folder]   Set/clear flags
+move_email          id target_folder [folder] [account]        Move to folder
+compose_email       to subject body [account]                  Compose new email
+draft_reply         id [body] [reply_all] [folder] [account]   Generate draft (no send)
+send_email          template [confirm] [account]               Send (confirm=true required)
+list_attachments    id [folder] [account]                      List email attachments
+download_attachment id attachment_name [folder] [account]      Download attachment
+extract_calendar_event  id [folder] [account]                  Extract calendar from email
+create_calendar_event   event_data                             Create calendar event
+export_to_markdown  id [folder] [account]                      Email -> markdown + YAML
+create_action_item  id [folder] [account]                      Extract todos/deadlines
+copy_to_clipboard   text                                       Copy to system clipboard
 ```
 
 ## Prompts
@@ -95,7 +103,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 ```
 npm run build           TypeScript compilation (development)
 npm run build:bundle    esbuild single-file bundle (583KB, production)
-npm test                Run 181 tests (vitest)
+npm test                Run 245 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 

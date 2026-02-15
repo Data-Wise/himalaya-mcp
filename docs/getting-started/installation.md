@@ -145,7 +145,7 @@ All optional. Set via environment variables in your MCP server config:
 # Run the MCP server directly
 node dist/index.js
 
-# Run tests (181 tests)
+# Run tests (245 tests)
 npm test
 
 # Check Claude Desktop config
