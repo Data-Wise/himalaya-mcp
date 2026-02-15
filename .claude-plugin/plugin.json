@@ -1,6 +1,6 @@
 {
   "name": "himalaya-mcp",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Privacy-first email access for Claude via himalaya CLI",
   "author": {
     "name": "Data-Wise"
