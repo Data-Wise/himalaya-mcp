@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: Stable — all features shipped
-## Phase: Maintenance
-## Priority: 3
-## Progress: 100
+## Focus: v1.2.0 planning — 8 new tools (attachments, compose, folders, calendar)
+## Phase: Planning → Implementation
+## Priority: 2
+## Progress: 5
 
 ## Completed
 
@@ -23,19 +23,24 @@
 
 ## Just Completed
 
-- 2026-02-14: Fixed cross-repo push auth in homebrew-tap reusable workflow (persist-credentials: false + unset GITHUB_TOKEN)
-- 2026-02-14: Fixed Homebrew post-install hang when Claude Code is running (pgrep guard on all JSON writes)
-- 2026-02-14: Verified full release pipeline end-to-end (release → formula update → brew upgrade)
-- 2026-02-14: Deployed docs site with updated changelog
+- 2026-02-15: Brainstormed v1.2.0 features (max depth, 8 expert questions, 2 agents)
+- 2026-02-15: Created formal spec: SPEC-v1.2.0-features-2026-02-15.md (8 new tools)
+- 2026-02-15: Created worktree feature/v1.2.0 for implementation
+- 2026-02-14: Fixed cross-repo push auth in homebrew-tap reusable workflow
+- 2026-02-14: Fixed Homebrew post-install hang when Claude Code is running
+- 2026-02-14: Verified full release pipeline end-to-end
 
 ## Current State
 
-- Branch: `dev` (ahead of main by changelog commit)
-- v1.1.1 released on GitHub + Homebrew
-- GitHub Pages: https://data-wise.github.io/himalaya-mcp/
-- CI: passing
-- Tests: 181 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 68 dogfood + 22 e2e + 18 setup)
-- Homebrew release pipeline: fully automated and verified
+- Branch: `dev` (main repo), `feature/v1.2.0` (worktree)
+- v1.1.1 released, planning v1.2.0
+- Worktree: `~/.git-worktrees/himalaya-mcp/feature-v1.2.0`
+- Tests: 181 (target: ~217 after v1.2.0)
+- v1.2.0 scope: 8 new tools (11 → 19), 4 features
+  - Phase 6a: Folders (create_folder, delete_folder, list_folders)
+  - Phase 6b: Compose (compose_email)
+  - Phase 6c: Attachments (list_attachments, download_attachment)
+  - Phase 6d: Calendar (extract_calendar_event, create_calendar_event)
 
 ## Install
 
@@ -56,15 +61,15 @@ himalaya-mcp setup
 
 ## Next Action
 
-- No active work — project is stable and fully shipped
-- Merge dev → main when ready (changelog commit)
+A) Start Phase 6a (Folders) in worktree — simplest feature, 3 tools
+B) Review/refine spec before implementing
 
-## Future
+## Future (post v1.2.0)
 
 - Obsidian adapter — export emails to vault as markdown notes
 - Apple ecosystem — Notes/Reminders integration via AppleScript
 
 ---
 
-**Last Updated:** 2026-02-14
-**Status:** v1.1.1 released, Homebrew pipeline fully automated
+**Last Updated:** 2026-02-15
+**Status:** v1.2.0 planned, worktree created, spec ready
