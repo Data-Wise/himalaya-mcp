@@ -11,7 +11,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { mkdir, readdir, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, extname } from "node:path";
+import { join, extname, basename } from "node:path";
 import { randomUUID } from "node:crypto";
 
 /** Body parts himalaya dumps alongside real attachments. */
@@ -131,6 +131,17 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
+    // Guard against path traversal in user-provided filename
+    if (basename(args.filename) !== args.filename) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Invalid filename "${args.filename}". Filename must not contain path separators.`,
+        }],
+        isError: true,
+      };
+    }
+
     try {
       const { destDir, files } = await downloadAndList(client, args.id, args.folder, args.account);
 

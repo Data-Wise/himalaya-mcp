@@ -120,9 +120,14 @@ export async function createAppleCalendarEvent(event: CalendarEvent): Promise<vo
   }
 }
 
-/** Escape special characters for AppleScript strings. */
+/** Escape special characters for AppleScript strings.
+ * Strips control characters and non-printable ASCII to prevent injection. */
 function escapeAppleScript(str: string): string {
-  return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return str
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/[\r\n\t]/g, " ")
+    .replace(/[^\x20-\x7E]/g, "");
 }
 
 /** Format Date for AppleScript date string. */
