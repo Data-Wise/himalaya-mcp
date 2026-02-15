@@ -4,8 +4,8 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: Homebrew release automation
-## Phase: Maintenance + CI/CD
+## Focus: Stable — all features shipped
+## Phase: Maintenance
 ## Priority: 3
 ## Progress: 100
 
@@ -18,21 +18,24 @@
 - Phase 4: Clipboard + Config — copy_to_clipboard adapter, env-based config
 - Phase 5: Plugin Skills — /email:reply skill, agent updates, skill updates
 - Plugin Packaging: esbuild bundle (583KB), Homebrew formula, marketplace.json, CLI setup, cross-platform support
-- Total: 11 tools, 4 prompts, 3 resources, 160 tests (11 test files)
+- Homebrew Release Automation: homebrew-release.yml (validate → prepare → update-homebrew)
+- Total: 11 tools, 4 prompts, 3 resources, 177 tests (11 test files)
 
-## Active Worktrees
+## Just Completed
 
-| Worktree | Branch | Task |
-|----------|--------|------|
-| `~/.git-worktrees/himalaya-mcp/feature-homebrew-release` | `feature/homebrew-release` | Add homebrew-release.yml workflow |
+- 2026-02-14: Fixed cross-repo push auth in homebrew-tap reusable workflow (persist-credentials: false + unset GITHUB_TOKEN)
+- 2026-02-14: Fixed Homebrew post-install hang when Claude Code is running (pgrep guard on all JSON writes)
+- 2026-02-14: Verified full release pipeline end-to-end (release → formula update → brew upgrade)
+- 2026-02-14: Deployed docs site with updated changelog
 
 ## Current State
 
-- Branch: `dev` (synced with main)
-- v1.1.1 released on GitHub
+- Branch: `dev` (ahead of main by changelog commit)
+- v1.1.1 released on GitHub + Homebrew
 - GitHub Pages: https://data-wise.github.io/himalaya-mcp/
 - CI: passing
-- Tests: 160 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 47 dogfood + 22 e2e + 18 setup)
+- Tests: 177 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 68 dogfood + 22 e2e + 14 setup)
+- Homebrew release pipeline: fully automated and verified
 
 ## Install
 
@@ -53,7 +56,8 @@ himalaya-mcp setup
 
 ## Next Action
 
-- WIP: `feature/homebrew-release` — Add automated Homebrew formula update workflow (matches craft/scholar/atlas pattern)
+- No active work — project is stable and fully shipped
+- Merge dev → main when ready (changelog commit)
 
 ## Future
 
@@ -63,4 +67,4 @@ himalaya-mcp setup
 ---
 
 **Last Updated:** 2026-02-14
-**Status:** v1.1.1 released, adding Homebrew release automation
+**Status:** v1.1.1 released, Homebrew pipeline fully automated

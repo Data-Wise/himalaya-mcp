@@ -18,6 +18,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Hardened homebrew-release tarball download: `mktemp` for temp files, `--max-time 30` on curl, `sha256sum` (native on Ubuntu runners)
 - Setup E2E tests skip gracefully when `dist/` not built (`describe.skipIf`)
 - marketplace.json source path `"./"` back to canonical `"."` (fixes dogfood test)
+- Homebrew post-install script hangs when Claude Code is running: guard all JSON file writes (`marketplace.json`, `settings.json`) behind `pgrep` check, replaced slow `lsof` with `pgrep -x "claude"`
+- Homebrew reusable workflow cross-repo push auth: `persist-credentials: false` + `unset GITHUB_TOKEN` to prevent runner credential helper override
 
 ### Documentation
 

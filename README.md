@@ -53,15 +53,16 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 ## Testing
 
 ```bash
-npm test              # 160 tests across 11 test files (vitest)
+npm test              # 177 tests across 11 test files (vitest)
 ```
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
-| Unit (parser, config, clipboard) | 36 | Core parsing and config |
-| Integration (tools, prompts) | 57 | All 11 tools + 4 prompts |
-| Dogfooding | 47 | Realistic Claude usage patterns |
-| E2E | 20 | Full MCP server pipeline with fake himalaya binary |
+| Unit (parser, config, clipboard) | 34 | Core parsing and config |
+| Integration (tools, prompts) | 47 | All 11 tools + 4 prompts |
+| Dogfooding | 68 | Realistic Claude usage patterns |
+| E2E | 22 | Full MCP server pipeline with fake himalaya binary |
+| Setup CLI | 14 | Setup command + plugin validation |
 
 ## Documentation
 

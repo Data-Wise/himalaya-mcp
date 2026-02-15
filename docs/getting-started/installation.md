@@ -145,7 +145,7 @@ All optional. Set via environment variables in your MCP server config:
 # Run the MCP server directly
 node dist/index.js
 
-# Run tests (160 tests)
+# Run tests (177 tests)
 npm test
 
 # Check Claude Desktop config
@@ -153,6 +153,17 @@ himalaya-mcp setup --check
 ```
 
 ## Troubleshooting
+
+### Homebrew install hangs during post-install
+
+If `brew install` or `brew upgrade` takes a very long time, Claude Code may be holding file locks. Kill the stuck process and complete manually:
+
+```bash
+# If brew hangs, press Ctrl+C then:
+claude plugin install himalaya-mcp@local-plugins
+```
+
+This is fixed in the latest formula -- JSON file writes are skipped when Claude is running.
 
 ### Homebrew install fails on symlink
 

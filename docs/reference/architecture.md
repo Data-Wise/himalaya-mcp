@@ -90,7 +90,9 @@ git tag v1.2.0 → gh release create
       ├─ validate    npm ci → version check → build → test → bundle
       ├─ prepare     curl tarball (5 retries, 30s timeout) → sha256sum
       └─ update      → Data-Wise/homebrew-tap/update-formula.yml@main
-                        → PR: bump himalaya-mcp to v1.2.0
+                        ├─ checkout with persist-credentials: false
+                        ├─ unset GITHUB_TOKEN (bypass runner credential helper)
+                        └─ direct push to main (auto_merge=true)
 ```
 
 ## Module Map

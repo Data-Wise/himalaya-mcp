@@ -60,10 +60,13 @@ The formula lives in the [homebrew-tap](https://github.com/Data-Wise/homebrew-ta
 
 The `himalaya-mcp-install` script (created by the formula):
 
-1. Symlinks `libexec` to `~/.claude/plugins/himalaya-mcp`
-2. Registers in `~/.claude/local-marketplace/marketplace.json`
-3. Auto-enables in `~/.claude/settings.json` (skipped if Claude is running)
-4. Uses stable `$(brew --prefix)/opt/himalaya-mcp/libexec` path (survives upgrades)
+1. Detects if Claude Code is running (`pgrep -x "claude"`)
+2. Symlinks `libexec` to `~/.claude/plugins/himalaya-mcp`
+3. Registers in `~/.claude/local-marketplace/marketplace.json` (skipped if Claude is running)
+4. Auto-enables in `~/.claude/settings.json` (skipped if Claude is running)
+5. Uses stable `$(brew --prefix)/opt/himalaya-mcp/libexec` path (survives upgrades)
+
+All JSON file writes (`marketplace.json`, `settings.json`) are guarded behind the Claude detection check because `mv` blocks indefinitely on files locked by Claude Code. If Claude is running during install, run `claude plugin install himalaya-mcp@local-plugins` manually afterward.
 
 ### Uninstall
 
@@ -112,11 +115,15 @@ gh workflow run homebrew-release.yml \
 
 ### Required secret
 
-`HOMEBREW_TAP_GITHUB_TOKEN` — a PAT with repo access to `Data-Wise/homebrew-tap`. Set via:
+`HOMEBREW_TAP_GITHUB_TOKEN` — a fine-grained PAT with **Contents: Read and write** permission for `Data-Wise/homebrew-tap`. Set via:
 
 ```bash
 gh secret set HOMEBREW_TAP_GITHUB_TOKEN --repo Data-Wise/himalaya-mcp
 ```
+
+### Cross-repo authentication
+
+The reusable workflow uses `persist-credentials: false` on `actions/checkout` and `unset GITHUB_TOKEN` before pushing. This prevents the GitHub Actions runner's credential helper from intercepting the push with the caller workflow's token (which only has access to himalaya-mcp, not homebrew-tap). Authentication is handled via the PAT embedded in the git remote URL.
 
 ## Marketplace Registration
 

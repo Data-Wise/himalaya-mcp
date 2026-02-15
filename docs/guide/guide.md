@@ -176,7 +176,7 @@ No emails are ever deleted -- only flagged or moved.
 ## Testing
 
 ```bash
-npm test    # 160 tests across 11 files (vitest)
+npm test    # 177 tests across 11 files (vitest)
 ```
 
 Test breakdown:
