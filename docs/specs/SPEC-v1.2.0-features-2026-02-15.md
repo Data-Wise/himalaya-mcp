@@ -1,6 +1,6 @@
 # SPEC: himalaya-mcp v1.2.0 Features
 
-**Status:** draft
+**Status:** complete
 **Created:** 2026-02-15
 **From Brainstorm:** BRAINSTORM-v1.2.0-features-2026-02-15.md
 **Version:** v1.2.0
@@ -21,13 +21,13 @@ Expand himalaya-mcp from 11 to 19 MCP tools by adding four feature areas: attach
 
 ### Acceptance Criteria
 
-- [ ] All 8 new tools register and appear in MCP tool listing
-- [ ] Attachment download saves to temp directory and returns file path
-- [ ] Compose email uses the same two-phase safety gate as send_email
-- [ ] Folder create/delete/list wrap himalaya CLI commands directly
-- [ ] Calendar event extraction parses ICS from downloaded attachments
-- [ ] Calendar event creation uses AppleScript (macOS only, mocked in tests)
-- [ ] All new tools support multi-account via `account` parameter
+- [x] All 8 new tools register and appear in MCP tool listing
+- [x] Attachment download saves to temp directory and returns file path
+- [x] Compose email uses the same two-phase safety gate as send_email
+- [x] Folder create/delete/list wrap himalaya CLI commands directly
+- [x] Calendar event extraction parses ICS from downloaded attachments
+- [x] Calendar event creation uses AppleScript (macOS only, mocked in tests)
+- [x] All new tools support multi-account via `account` parameter
 - [x] 64 new tests passed, bringing total from 181 to 245
 
 ---
@@ -258,16 +258,16 @@ N/A - CLI tool, no visual UI.
 
 ## Review Checklist
 
-- [ ] All 8 new tools have input validation
-- [ ] Safety gates prevent accidental sends/deletes
-- [ ] Multi-account parameter works on all new tools
-- [ ] Error messages are clear and actionable
-- [ ] No new npm dependencies introduced
-- [ ] ICS parser handles malformed input gracefully
-- [ ] AppleScript integration gracefully skips on non-macOS
-- [ ] Temp file paths use secure random names
-- [ ] All tools documented in plugin agent awareness
-- [ ] Plugin skills updated for new capabilities
+- [x] All 8 new tools have input validation
+- [x] Safety gates prevent accidental sends/deletes
+- [x] Multi-account parameter works on all new tools
+- [x] Error messages are clear and actionable
+- [x] No new npm dependencies introduced
+- [x] ICS parser handles malformed input gracefully
+- [x] AppleScript integration gracefully skips on non-macOS
+- [x] Temp file paths use secure random names
+- [x] All tools documented in plugin agent awareness
+- [x] Plugin skills updated for new capabilities
 
 ---
 
