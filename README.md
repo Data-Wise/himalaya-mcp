@@ -4,10 +4,10 @@ Privacy-first email MCP server and Claude Code plugin wrapping the [himalaya](ht
 
 ## Features
 
-- **11 MCP tools**: list, search, read, flag, move, draft reply, send (with safety gate), export, action items, clipboard
+- **19 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar
 - **4 MCP prompts**: triage inbox, summarize email, daily digest, draft reply
 - **3 MCP resources**: inbox, message by ID, folders
-- **5 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:help`
+- **7 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:help`
 - **Multi-account**: per-call account switching via `--account`
 - **Safe subprocess**: uses `execFile` (no shell injection)
 - **Two-phase send**: `send_email` returns preview first, requires explicit `confirm=true`
@@ -53,15 +53,15 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 ## Testing
 
 ```bash
-npm test              # 181 tests across 11 test files (vitest)
+npm test              # 256 tests across 15 test files (vitest)
 ```
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
 | Unit (parser, config, clipboard) | 34 | Core parsing and config |
-| Integration (tools, prompts) | 47 | All 11 tools + 4 prompts |
-| Dogfooding | 68 | Realistic Claude usage patterns |
-| E2E | 22 | Full MCP server pipeline with fake himalaya binary |
+| Integration (tools, prompts) | 80 | All 19 tools + 4 prompts |
+| Dogfooding | 91 | Realistic Claude usage patterns |
+| E2E | 32 | Full MCP server pipeline with fake himalaya binary |
 | Setup CLI | 18 | Setup command + plugin validation |
 
 ## Documentation

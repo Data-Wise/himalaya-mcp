@@ -135,3 +135,65 @@ export interface CreateActionItemParams {
   folder?: string;
   account?: string;
 }
+
+export interface ComposeEmailParams {
+  to: string;
+  subject: string;
+  body: string;
+  cc?: string;
+  bcc?: string;
+  confirm?: boolean;
+  account?: string;
+}
+
+// --- Folder management parameters ---
+
+export interface ListFoldersParams {
+  account?: string;
+}
+
+export interface CreateFolderParams {
+  name: string;
+  account?: string;
+}
+
+export interface DeleteFolderParams {
+  name: string;
+  confirm?: boolean;
+  account?: string;
+}
+
+// --- Attachment types ---
+
+export interface DownloadAttachmentsParams {
+  id: string;
+  folder?: string;
+  account?: string;
+}
+
+// --- Calendar types ---
+
+export interface CalendarEvent {
+  summary: string;
+  dtstart: string;
+  dtend: string;
+  location?: string;
+  organizer?: string;
+  description?: string;
+  uid?: string;
+}
+
+export interface ExtractCalendarEventParams {
+  id: string;
+  folder?: string;
+  account?: string;
+}
+
+export interface CreateCalendarEventParams {
+  summary: string;
+  dtstart: string;
+  dtend: string;
+  location?: string;
+  description?: string;
+  confirm?: boolean;
+}

@@ -19,9 +19,13 @@ import { registerTriagePrompt } from "./prompts/triage.js";
 import { registerSummarizePrompt } from "./prompts/summarize.js";
 import { registerDigestPrompt } from "./prompts/digest.js";
 import { registerComposeTools } from "./tools/compose.js";
+import { registerComposeNewTools } from "./tools/compose-new.js";
+import { registerFolderTools } from "./tools/folders.js";
+import { registerAttachmentTools } from "./tools/attachments.js";
+import { registerCalendarTools } from "./tools/calendar.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
 
-export const VERSION = "1.1.2";
+export const VERSION = "1.2.0";
 export const NAME = "himalaya-mcp";
 
 const server = new McpServer({
@@ -37,6 +41,10 @@ registerReadTools(server, client);
 registerManageTools(server, client);
 registerActionTools(server, client);
 registerComposeTools(server, client);
+registerComposeNewTools(server, client);
+registerFolderTools(server, client);
+registerAttachmentTools(server, client);
+registerCalendarTools(server, client);
 registerClipboardTools(server);
 
 // Register resources

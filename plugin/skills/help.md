@@ -16,7 +16,7 @@ Single entry point for discovering all email commands, tools, prompts, and workf
 
 ```
 /email:help                  # Overview of all capabilities
-/email:help tools            # All 11 MCP tools with usage
+/email:help tools            # All 19 MCP tools with usage
 /email:help prompts          # All 4 MCP prompts
 /email:help resources        # All 3 MCP resources
 /email:help <command>        # Detail for a specific tool (e.g. "search_emails")
@@ -32,17 +32,22 @@ Display the hub overview:
 +-----------------------------------------------------------+
 | HIMALAYA-MCP HELP HUB                                     |
 +-----------------------------------------------------------+
-| Privacy-first email for Claude — 11 tools, 4 prompts,     |
+| Privacy-first email for Claude — 19 tools, 4 prompts,     |
 | 3 resources                                               |
 +===========================================================+
 |                                                           |
-| TOOLS (11)                                                |
-|   Inbox ..... list_emails, search_emails                  |
-|   Read ...... read_email, read_email_html                 |
-|   Manage .... flag_email, move_email                      |
-|   Actions ... export_to_markdown, create_action_item      |
-|   Compose ... draft_reply, send_email                     |
-|   Adapters .. copy_to_clipboard                           |
+| TOOLS (19)                                                |
+|   Inbox ....... list_emails, search_emails                |
+|   Read ........ read_email, read_email_html               |
+|   Folders ..... list_folders, create_folder,              |
+|                 delete_folder                              |
+|   Manage ...... flag_email, move_email                    |
+|   Compose ..... compose_email, draft_reply, send_email    |
+|   Attachments . list_attachments, download_attachment      |
+|   Calendar .... extract_calendar_event,                   |
+|                 create_calendar_event                      |
+|   Actions ..... export_to_markdown, create_action_item    |
+|   Adapters .... copy_to_clipboard                         |
 |                                                           |
 | PROMPTS (4)                                               |
 |   triage_inbox, summarize_email, daily_email_digest,      |
@@ -51,9 +56,9 @@ Display the hub overview:
 | RESOURCES (3)                                             |
 |   email://inbox, email://folders, email://message/{id}    |
 |                                                           |
-| SKILLS (4)                                                |
+| SKILLS (6)                                                |
 |   /email:inbox, /email:triage, /email:digest,             |
-|   /email:reply                                            |
+|   /email:reply, /email:compose, /email:attachments        |
 |                                                           |
 +-----------------------------------------------------------+
 | /email:help tools        Detailed tool reference          |
@@ -65,7 +70,7 @@ Display the hub overview:
 
 ## When Invoked with "tools"
 
-Display all 11 tools grouped by category:
+Display all 19 tools grouped by category:
 
 ```
 +-----------------------------------------------------------+
@@ -97,6 +102,20 @@ Display all 11 tools grouped by category:
 |     Params: id (required), folder?, account?              |
 |     Use for: newsletters, formatted emails                |
 |                                                           |
+| FOLDERS                                                   |
+|                                                           |
+|   list_folders                                            |
+|     List all email folders/mailboxes                      |
+|     Params: account?                                      |
+|                                                           |
+|   create_folder                                           |
+|     Create a new folder                                   |
+|     Params: name (required), account?                     |
+|                                                           |
+|   delete_folder                                           |
+|     Delete folder (safety gate: confirm=true)             |
+|     Params: name (required), confirm?, account?           |
+|                                                           |
 | MANAGING                                                  |
 |                                                           |
 |   flag_email                                              |
@@ -110,17 +129,12 @@ Display all 11 tools grouped by category:
 |     Params: id, target_folder (required),                 |
 |             folder?, account?                             |
 |                                                           |
-| ACTIONS                                                   |
-|                                                           |
-|   export_to_markdown                                      |
-|     Export as markdown with YAML frontmatter              |
-|     Params: id (required), folder?, account?              |
-|                                                           |
-|   create_action_item                                      |
-|     Extract todos, deadlines, commitments                 |
-|     Params: id (required), folder?, account?              |
-|                                                           |
 | COMPOSE                                                   |
+|                                                           |
+|   compose_email                                           |
+|     Compose new email (safety gate: confirm=true)         |
+|     Params: to, subject, body (required),                 |
+|             cc?, bcc?, confirm?, account?                 |
 |                                                           |
 |   draft_reply                                             |
 |     Generate reply template (does NOT send)               |
@@ -131,6 +145,37 @@ Display all 11 tools grouped by category:
 |     Params: template, confirm? (must be true to send),    |
 |             account?                                      |
 |     SAFETY: without confirm=true, shows preview only      |
+|                                                           |
+| ATTACHMENTS                                               |
+|                                                           |
+|   list_attachments                                        |
+|     List attachments (filename, MIME, size)                |
+|     Params: id (required), folder?, account?              |
+|                                                           |
+|   download_attachment                                     |
+|     Download specific attachment to temp dir              |
+|     Params: id, filename (required), folder?, account?    |
+|                                                           |
+| CALENDAR                                                  |
+|                                                           |
+|   extract_calendar_event                                  |
+|     Parse ICS calendar invite from email                  |
+|     Params: id (required), folder?, account?              |
+|                                                           |
+|   create_calendar_event                                   |
+|     Create Apple Calendar event (macOS, confirm=true)     |
+|     Params: summary, dtstart, dtend (required),           |
+|             location?, description?, confirm?             |
+|                                                           |
+| ACTIONS                                                   |
+|                                                           |
+|   export_to_markdown                                      |
+|     Export as markdown with YAML frontmatter              |
+|     Params: id (required), folder?, account?              |
+|                                                           |
+|   create_action_item                                      |
+|     Extract todos, deadlines, commitments                 |
+|     Params: id (required), folder?, account?              |
 |                                                           |
 | ADAPTERS                                                  |
 |                                                           |
@@ -224,6 +269,26 @@ Display all 4 prompts:
 |   → export_to_markdown(id: 42)                            |
 |   → copy_to_clipboard(text: result)                       |
 |                                                           |
+| COMPOSE NEW EMAIL                                         |
+|   "Email Alice about the meeting"                         |
+|   → compose_email(to, subject, body)                      |
+|   → Review preview → confirm send                         |
+|                                                           |
+| DOWNLOAD ATTACHMENTS                                      |
+|   "What attachments does email 42 have?"                  |
+|   → list_attachments(id: 42)                              |
+|   → download_attachment(id: 42, filename: "report.pdf")   |
+|                                                           |
+| CALENDAR INVITE                                           |
+|   "Check the meeting invite in email 42"                  |
+|   → extract_calendar_event(id: 42)                        |
+|   → Review event → create_calendar_event(confirm: true)   |
+|                                                           |
+| FOLDER MANAGEMENT                                         |
+|   "Create a Projects folder"                              |
+|   → create_folder(name: "Projects")                       |
+|   → list_folders() to verify                              |
+|                                                           |
 | SEARCH + ACTION                                           |
 |   "Find invoices from last month and flag them"           |
 |   → search_emails(query: "subject invoice and             |
@@ -246,20 +311,28 @@ One-line cheat sheet:
 +-----------------------------------------------------------+
 | QUICK REFERENCE                                           |
 +===========================================================+
-| Tool              | What it does                          |
-|-------------------+---------------------------------------|
-| list_emails       | List inbox (paginated)                |
-| search_emails     | Search by subject/from/body/date      |
-| read_email        | Read plain text body                  |
-| read_email_html   | Read HTML body                        |
-| flag_email        | Star, mark read, etc.                 |
-| move_email        | Archive, trash, move to folder        |
-| export_to_markdown| Email → markdown with frontmatter     |
-| create_action_item| Extract todos and deadlines           |
-| draft_reply       | Generate reply template               |
-| send_email        | Send (requires confirm=true)          |
-| copy_to_clipboard | Copy text to clipboard                |
-+-------------------+---------------------------------------+
+| Tool                  | What it does                      |
+|-----------------------+-----------------------------------|
+| list_emails           | List inbox (paginated)            |
+| search_emails         | Search by subject/from/body/date  |
+| read_email            | Read plain text body              |
+| read_email_html       | Read HTML body                    |
+| list_folders          | List all email folders            |
+| create_folder         | Create new folder                 |
+| delete_folder         | Delete folder (confirm=true)      |
+| flag_email            | Star, mark read, etc.             |
+| move_email            | Archive, trash, move to folder    |
+| compose_email         | Compose new email (confirm=true)  |
+| draft_reply           | Generate reply template           |
+| send_email            | Send (requires confirm=true)      |
+| list_attachments      | List email attachments            |
+| download_attachment   | Download specific attachment      |
+| extract_calendar_event| Parse ICS calendar invite         |
+| create_calendar_event | Add to Apple Calendar (macOS)     |
+| export_to_markdown    | Email → markdown + frontmatter    |
+| create_action_item    | Extract todos and deadlines       |
+| copy_to_clipboard     | Copy text to clipboard            |
++-----------------------+-----------------------------------+
 | Prompt            | What it does                          |
 |-------------------+---------------------------------------|
 | triage_inbox      | Classify inbox emails                 |
@@ -267,13 +340,15 @@ One-line cheat sheet:
 | daily_email_digest| Priority-grouped digest               |
 | draft_reply       | Guided reply composition              |
 +-------------------+---------------------------------------+
-| Skill             | What it does                          |
-|-------------------+---------------------------------------|
-| /email:inbox      | Check inbox interactively             |
-| /email:triage     | AI-powered triage                     |
-| /email:digest     | Generate daily digest                 |
-| /email:reply      | Draft and send replies                |
-| /email:help       | This help hub                         |
+| Skill               | What it does                    |
+|-----------------------+-----------------------------------|
+| /email:inbox        | Check inbox interactively         |
+| /email:triage       | AI-powered triage                 |
+| /email:digest       | Generate daily digest             |
+| /email:reply        | Draft and send replies            |
+| /email:compose      | Compose new email                 |
+| /email:attachments  | List/download/calendar            |
+| /email:help         | This help hub                     |
 +-----------------------------------------------------------+
 ```
 

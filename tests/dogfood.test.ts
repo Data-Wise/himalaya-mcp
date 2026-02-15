@@ -18,6 +18,44 @@ import { registerReadTools } from "../src/tools/read.js";
 import { registerManageTools } from "../src/tools/manage.js";
 import { registerActionTools } from "../src/tools/actions.js";
 import { registerComposeTools } from "../src/tools/compose.js";
+import { registerFolderTools } from "../src/tools/folders.js";
+import { registerComposeNewTools } from "../src/tools/compose-new.js";
+import { registerAttachmentTools } from "../src/tools/attachments.js";
+import { registerCalendarTools } from "../src/tools/calendar.js";
+
+// --- Module mocks (for attachment + calendar tools that use fs/os/crypto) ---
+
+vi.mock("node:fs/promises", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs/promises")>();
+  return {
+    ...actual,
+    mkdir: vi.fn().mockResolvedValue(undefined),
+    readFile: vi.fn(),
+    readdir: vi.fn().mockResolvedValue(["report.pdf", "photo.jpg", "plain.txt", "index.html"]),
+    stat: vi.fn().mockImplementation((path: string) => {
+      if (path.includes("report.pdf")) return Promise.resolve({ isFile: () => true, size: 245760 });
+      if (path.includes("photo.jpg")) return Promise.resolve({ isFile: () => true, size: 1048576 });
+      if (path.includes("invite.ics")) return Promise.resolve({ isFile: () => true, size: 2048 });
+      if (path.includes("agenda.pdf")) return Promise.resolve({ isFile: () => true, size: 51200 });
+      if (path.includes("plain.txt")) return Promise.resolve({ isFile: () => true, size: 150 });
+      if (path.includes("index.html")) return Promise.resolve({ isFile: () => true, size: 300 });
+      return Promise.resolve({ isFile: () => false, size: 0 });
+    }),
+  };
+});
+vi.mock("node:os", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:os")>();
+  return { ...actual, tmpdir: vi.fn().mockReturnValue("/tmp") };
+});
+vi.mock("node:crypto", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:crypto")>();
+  return { ...actual, randomUUID: vi.fn().mockReturnValue("test-uuid-1234") };
+});
+vi.mock("../src/adapters/calendar.js", () => ({
+  parseICS: vi.fn(),
+  parseICSFile: vi.fn(),
+  createAppleCalendarEvent: vi.fn().mockResolvedValue(undefined),
+}));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -61,6 +99,18 @@ const SAMPLE_MESSAGE = JSON.stringify(
 
 const EMPTY_SEARCH = JSON.stringify([]);
 
+const SAMPLE_FOLDERS = JSON.stringify([
+  { name: "INBOX", desc: null },
+  { name: "Sent", desc: null },
+  { name: "Drafts", desc: null },
+  { name: "Trash", desc: null },
+  { name: "Archive", desc: null },
+]);
+
+// File lists for readdir mock (set per-test via vi.mocked(readdir).mockResolvedValueOnce)
+const ATTACHMENT_FILES = ["report.pdf", "photo.jpg", "plain.txt", "index.html"];
+const ATTACHMENT_FILES_WITH_ICS = ["invite.ics", "agenda.pdf", "plain.txt"];
+
 // --- Mock client ---
 
 function createMockClient(): HimalayaClient {
@@ -77,6 +127,10 @@ function createMockClient(): HimalayaClient {
     JSON.stringify("From: user@example.com\nTo: mmckay@unm.edu\nSubject: Re: Reminder - Seminar Today\n\nThank you for the reminder.\n\n> Dear colleague,\n> Seminar at 3:30pm.")
   );
   vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
+  vi.spyOn(client, "listFolders").mockResolvedValue(SAMPLE_FOLDERS);
+  vi.spyOn(client, "createFolder").mockResolvedValue("{}");
+  vi.spyOn(client, "deleteFolder").mockResolvedValue("{}");
+  vi.spyOn(client, "downloadAttachments").mockResolvedValue("{}");
   return client;
 }
 
@@ -521,6 +575,369 @@ describe("Dogfooding: output quality", () => {
   });
 });
 
+describe("Dogfooding: list_folders", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerFolderTools(server, client);
+  });
+
+  it("Scenario: 'Show me my folders' — returns bullet list of folder names", async () => {
+    const tool = getToolHandler(server, "list_folders");
+    const result = await tool.handler({ account: undefined }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("INBOX");
+    expect(text).toContain("Sent");
+    expect(text).toContain("Archive");
+    expect(text).toContain("Trash");
+    expect(result.isError).toBeUndefined();
+  });
+
+  it("Scenario: list folders for work account — passes account param", async () => {
+    const tool = getToolHandler(server, "list_folders");
+    await tool.handler({ account: "work" }, {} as any);
+
+    expect(client.listFolders).toHaveBeenCalledWith("work");
+  });
+
+  it("Scenario: list folders error — returns isError", async () => {
+    vi.spyOn(client, "listFolders").mockRejectedValue(new Error("auth expired"));
+    const tool = getToolHandler(server, "list_folders");
+    const result = await tool.handler({ account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error listing folders");
+  });
+});
+
+describe("Dogfooding: create_folder", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerFolderTools(server, client);
+  });
+
+  it("Scenario: 'Create a Projects folder' — creates and confirms", async () => {
+    const tool = getToolHandler(server, "create_folder");
+    const result = await tool.handler({ name: "Projects", account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("Projects");
+    expect(result.content[0].text).toContain("created successfully");
+    expect(client.createFolder).toHaveBeenCalledWith("Projects", undefined);
+  });
+
+  it("Scenario: create folder error — returns isError", async () => {
+    vi.spyOn(client, "createFolder").mockRejectedValue(new Error("folder already exists"));
+    const tool = getToolHandler(server, "create_folder");
+    const result = await tool.handler({ name: "Existing", account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error creating folder");
+  });
+});
+
+describe("Dogfooding: delete_folder safety gate", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerFolderTools(server, client);
+  });
+
+  it("Scenario: preview before delete — shows warning, does NOT delete", async () => {
+    const tool = getToolHandler(server, "delete_folder");
+    const result = await tool.handler({ name: "OldStuff", confirm: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("DELETE FOLDER PREVIEW");
+    expect(result.content[0].text).toContain("OldStuff");
+    expect(result.content[0].text).toContain("NOT been deleted");
+    expect(client.deleteFolder).not.toHaveBeenCalled();
+  });
+
+  it("Scenario: user confirms — deletes folder", async () => {
+    const tool = getToolHandler(server, "delete_folder");
+    const result = await tool.handler({ name: "OldStuff", confirm: true, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("deleted successfully");
+    expect(client.deleteFolder).toHaveBeenCalledWith("OldStuff", undefined);
+  });
+
+  it("Scenario: delete error — returns isError", async () => {
+    vi.spyOn(client, "deleteFolder").mockRejectedValue(new Error("permission denied"));
+    const tool = getToolHandler(server, "delete_folder");
+    const result = await tool.handler({ name: "Protected", confirm: true, account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error deleting folder");
+  });
+});
+
+describe("Dogfooding: compose_email safety gate", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerComposeNewTools(server, client);
+  });
+
+  it("Scenario: 'Email alice about meeting' — preview without sending", async () => {
+    const tool = getToolHandler(server, "compose_email");
+    const result = await tool.handler({
+      to: "alice@example.com", subject: "Meeting Request",
+      body: "Can we meet Thursday at 2pm?", cc: undefined, bcc: undefined,
+      confirm: undefined, account: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("EMAIL PREVIEW");
+    expect(text).toContain("alice@example.com");
+    expect(text).toContain("Meeting Request");
+    expect(text).toContain("Can we meet Thursday at 2pm?");
+    expect(text).toContain("NOT been sent");
+    expect(client.sendTemplate).not.toHaveBeenCalled();
+  });
+
+  it("Scenario: user confirms compose — sends email", async () => {
+    const tool = getToolHandler(server, "compose_email");
+    const result = await tool.handler({
+      to: "alice@example.com", subject: "Meeting Request",
+      body: "Can we meet Thursday at 2pm?", cc: undefined, bcc: undefined,
+      confirm: true, account: undefined,
+    }, {} as any);
+
+    expect(result.content[0].text).toContain("sent successfully");
+    expect(result.content[0].text).toContain("alice@example.com");
+    expect(client.sendTemplate).toHaveBeenCalled();
+  });
+
+  it("Scenario: compose with CC and BCC — includes all recipients", async () => {
+    const tool = getToolHandler(server, "compose_email");
+    const result = await tool.handler({
+      to: "alice@example.com", subject: "Team Update",
+      body: "Weekly status update.", cc: "bob@example.com", bcc: "manager@example.com",
+      confirm: undefined, account: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("alice@example.com");
+    expect(text).toContain("Cc: bob@example.com");
+    expect(text).toContain("Bcc: manager@example.com");
+  });
+
+  it("Scenario: compose send error — returns isError", async () => {
+    vi.spyOn(client, "sendTemplate").mockRejectedValue(new Error("SMTP connection refused"));
+    const tool = getToolHandler(server, "compose_email");
+    const result = await tool.handler({
+      to: "alice@example.com", subject: "Test",
+      body: "Hello", cc: undefined, bcc: undefined,
+      confirm: true, account: undefined,
+    }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error sending email");
+  });
+});
+
+describe("Dogfooding: list_attachments", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerAttachmentTools(server, client);
+  });
+
+  it("Scenario: 'What attachments does email 249064 have?' — lists files with sizes", async () => {
+    const tool = getToolHandler(server, "list_attachments");
+    const result = await tool.handler({ id: "249064", folder: undefined, account: undefined }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("report.pdf");
+    expect(text).toContain("photo.jpg");
+    expect(text).toContain("KB");
+    expect(text).toContain("249064");
+    expect(result.isError).toBeUndefined();
+  });
+
+  it("Scenario: no attachments — shows helpful message", async () => {
+    const { readdir } = await import("node:fs/promises");
+    vi.mocked(readdir).mockResolvedValueOnce(["plain.txt", "index.html"] as any);
+    const tool = getToolHandler(server, "list_attachments");
+    const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("No attachments found");
+  });
+
+  it("Scenario: list attachments error — returns isError", async () => {
+    vi.spyOn(client, "downloadAttachments").mockRejectedValue(new Error("timeout"));
+    const tool = getToolHandler(server, "list_attachments");
+    const result = await tool.handler({ id: "249064", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error listing attachments");
+  });
+});
+
+describe("Dogfooding: download_attachment", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerAttachmentTools(server, client);
+  });
+
+  it("Scenario: 'Download the PDF from that email' — returns file path", async () => {
+    const tool = getToolHandler(server, "download_attachment");
+    const result = await tool.handler({
+      id: "249064", filename: "report.pdf",
+      folder: undefined, account: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("Downloaded");
+    expect(text).toContain("report.pdf");
+    expect(text).toContain("/tmp/himalaya-mcp-test-uuid-1234");
+    expect(client.downloadAttachments).toHaveBeenCalled();
+  });
+
+  it("Scenario: download error — returns isError", async () => {
+    vi.spyOn(client, "downloadAttachments").mockRejectedValue(new Error("attachment not found"));
+    const tool = getToolHandler(server, "download_attachment");
+    const result = await tool.handler({
+      id: "249064", filename: "missing.pdf",
+      folder: undefined, account: undefined,
+    }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error downloading attachment");
+  });
+});
+
+describe("Dogfooding: extract_calendar_event", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(async () => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerCalendarTools(server, client);
+
+    // Mock readdir to return files including .ics
+    const { readdir } = await import("node:fs/promises");
+    vi.mocked(readdir).mockResolvedValue(ATTACHMENT_FILES_WITH_ICS as any);
+
+    // Mock parseICSFile to return a structured event
+    const { parseICSFile } = await import("../src/adapters/calendar.js");
+    vi.mocked(parseICSFile).mockResolvedValue({
+      summary: "Team Standup",
+      dtstart: "2026-02-16T09:00:00",
+      dtend: "2026-02-16T09:30:00",
+      location: "Zoom",
+      organizer: "boss@example.com",
+      description: "Daily standup meeting",
+    });
+  });
+
+  it("Scenario: 'Check the calendar invite in email 12345' — extracts event details", async () => {
+    const tool = getToolHandler(server, "extract_calendar_event");
+    const result = await tool.handler({ id: "12345", folder: undefined, account: undefined }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("Team Standup");
+    expect(text).toContain("2026-02-16T09:00:00");
+    expect(text).toContain("2026-02-16T09:30:00");
+    expect(text).toContain("Zoom");
+    expect(text).toContain("boss@example.com");
+    expect(text).toContain("create_calendar_event");
+    expect(result.isError).toBeUndefined();
+  });
+
+  it("Scenario: no ICS attachment — shows helpful message", async () => {
+    const { readdir } = await import("node:fs/promises");
+    vi.mocked(readdir).mockResolvedValueOnce(ATTACHMENT_FILES as any);
+    const tool = getToolHandler(server, "extract_calendar_event");
+    const result = await tool.handler({ id: "249064", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("No calendar attachment");
+  });
+
+  it("Scenario: ICS parse fails — returns isError", async () => {
+    const { parseICSFile } = await import("../src/adapters/calendar.js");
+    vi.mocked(parseICSFile).mockResolvedValue(null);
+    const tool = getToolHandler(server, "extract_calendar_event");
+    const result = await tool.handler({ id: "12345", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Could not parse calendar event");
+  });
+});
+
+describe("Dogfooding: create_calendar_event safety gate", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerCalendarTools(server, client);
+  });
+
+  it("Scenario: preview before creating — shows event details, does NOT create", async () => {
+    const tool = getToolHandler(server, "create_calendar_event");
+    const result = await tool.handler({
+      summary: "Team Standup", dtstart: "2026-02-16T09:00:00",
+      dtend: "2026-02-16T09:30:00", location: "Zoom",
+      description: undefined, confirm: undefined,
+    }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("CALENDAR EVENT PREVIEW");
+    expect(text).toContain("Team Standup");
+    expect(text).toContain("Zoom");
+    expect(text).toContain("NOT been created");
+  });
+
+  it("Scenario: user confirms — creates calendar event", async () => {
+    const tool = getToolHandler(server, "create_calendar_event");
+    const result = await tool.handler({
+      summary: "Team Standup", dtstart: "2026-02-16T09:00:00",
+      dtend: "2026-02-16T09:30:00", location: "Zoom",
+      description: undefined, confirm: true,
+    }, {} as any);
+
+    expect(result.content[0].text).toContain("created successfully");
+    expect(result.content[0].text).toContain("Team Standup");
+  });
+
+  it("Scenario: create error — returns isError", async () => {
+    const { createAppleCalendarEvent } = await import("../src/adapters/calendar.js");
+    vi.mocked(createAppleCalendarEvent).mockRejectedValue(new Error("Calendar access denied"));
+    const tool = getToolHandler(server, "create_calendar_event");
+    const result = await tool.handler({
+      summary: "Test Event", dtstart: "2026-02-16T09:00:00",
+      dtend: "2026-02-16T10:00:00", location: undefined,
+      description: undefined, confirm: true,
+    }, {} as any);
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error creating calendar event");
+  });
+});
+
 // ========================================================================
 // Packaging & Distribution Validation
 // ========================================================================
@@ -563,7 +980,7 @@ describe("Packaging: plugin manifest structure", () => {
   it("has skills directory with valid skill files", () => {
     const skillsDir = join(PROJECT_ROOT, "plugin", "skills");
     expect(existsSync(skillsDir)).toBe(true);
-    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md"];
+    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md"];
     for (const skill of expectedSkills) {
       expect(existsSync(join(skillsDir, skill))).toBe(true);
     }

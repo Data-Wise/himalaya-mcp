@@ -266,9 +266,127 @@ date: "2026-02-13"
 Copied to clipboard.
 ```
 
-## 12. End-of-Day Email Sweep
+## 12. Compose a New Email
 
-Quick cleanup before signing off.
+Send a new email (not a reply) with safety confirmation.
+
+**Natural language:** "Email alice@example.com about the project deadline"
+
+**What happens:**
+
+1. `compose_email(to, subject, body)` -- generates preview (not sent)
+2. Show full preview for review
+3. Wait for approval or edits
+4. `compose_email(..., confirm: true)` only after explicit approval
+
+**Example interaction:**
+
+```
+You: "Email the team about moving the deadline to Friday"
+
+Claude:
+--- EMAIL PREVIEW (not sent) ---
+
+To: team@work.com
+Subject: Deadline Moved to Friday
+
+Hi team,
+
+Quick update -- the project deadline has been moved to Friday.
+Please adjust your timelines accordingly.
+
+Let me know if you have any questions.
+
+--- END PREVIEW ---
+
+Send this, edit it, or cancel?
+```
+
+**Tip:** Add CC/BCC: "Email Alice, CC Bob about the meeting change"
+
+## 13. Download and Process Attachments
+
+View and download email attachments.
+
+**Natural language:** "What attachments does email 42 have?"
+
+**What happens:**
+
+1. `list_attachments(id: "42")` -- shows files with MIME types and sizes
+2. Choose which to download
+3. `download_attachment(id: "42", filename: "report.pdf")` -- saves to temp dir
+
+```
+You: "Download the report from email 42"
+
+Claude:
+Attachments for email 42:
+- report.pdf (application/pdf, 245 KB)
+- invite.ics (text/calendar, 2 KB)
+
+Downloaded "report.pdf" to: /tmp/himalaya-mcp-abc123/report.pdf
+```
+
+**Note:** Body parts (`plain.txt`, `index.html`) are automatically filtered out.
+
+## 14. Process Calendar Invites
+
+Extract meeting details from ICS attachments and add to Apple Calendar.
+
+**Natural language:** "Check the meeting invite in email 42"
+
+**What happens:**
+
+1. `extract_calendar_event(id: "42")` -- downloads attachments, finds `.ics`, parses it
+2. Shows event details: title, dates, location, organizer
+3. If you want to add to calendar:
+4. `create_calendar_event(...)` -- shows preview first (safety gate)
+5. `create_calendar_event(..., confirm: true)` -- creates in Apple Calendar
+
+```
+You: "Add the meeting from email 42 to my calendar"
+
+Claude:
+Event: Q2 Planning Meeting
+Start: 2026-03-01 14:00
+End: 2026-03-01 15:00
+Location: Room 42
+Organizer: alice@example.com
+
+Create this event in Apple Calendar?
+```
+
+**Note:** Calendar creation is macOS only (uses AppleScript).
+
+## 15. Folder Management
+
+Create and organize email folders.
+
+**Natural language:** "Create a Projects folder for my work account"
+
+```
+create_folder(name: "Projects", account: "work")  -- create
+list_folders(account: "work")                       -- verify
+move_email(id: "42", target_folder: "Projects")     -- use it
+```
+
+**Delete with safety gate:**
+
+```
+You: "Delete the OldStuff folder"
+
+Claude:
+--- DELETE FOLDER PREVIEW ---
+Folder to delete: OldStuff
+WARNING: This will permanently delete the folder and all emails in it.
+---
+
+Are you sure? This action cannot be undone.
+```
+
+## 16. End-of-Day Email Sweep
+
+Quick cleanup before signing off. Now includes attachment checks and calendar event extraction.
 
 **Natural language:** "Do an end-of-day email sweep"
 

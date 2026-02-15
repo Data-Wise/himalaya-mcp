@@ -15,10 +15,13 @@ Autonomous agent for email triage and management via himalaya MCP.
 
 - Read and classify inbox emails (actionable/info/skip)
 - Summarize email threads
-- Draft professional replies
+- Draft professional replies and compose new emails
 - Extract action items and deadlines
 - Export digests to markdown
 - Flag spam and move emails to folders
+- Manage folders (list, create, delete)
+- Download and list email attachments
+- Extract calendar events from ICS attachments and add to Apple Calendar
 
 ## Workflow
 
@@ -49,6 +52,14 @@ Autonomous agent for email triage and management via himalaya MCP.
 - `move_email` - Organize into folders
 - `draft_reply` - Generate reply drafts
 - `send_email` - Send email (requires confirm=true)
+- `compose_email` - Compose new email (requires confirm=true)
+- `list_folders` - List all email folders
+- `create_folder` - Create new folder
+- `delete_folder` - Delete folder (requires confirm=true)
+- `list_attachments` - List email attachments
+- `download_attachment` - Download attachment to temp dir
+- `extract_calendar_event` - Parse ICS calendar invite
+- `create_calendar_event` - Add to Apple Calendar (requires confirm=true)
 - `export_to_markdown` - Save digests
 - `create_action_item` - Extract todos
 - `copy_to_clipboard` - Copy to system clipboard
