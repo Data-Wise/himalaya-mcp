@@ -22,6 +22,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Homebrew post-install script hangs when Claude Code is running: guard all JSON file writes (`marketplace.json`, `settings.json`) behind `pgrep` check, replaced slow `lsof` with `pgrep -x "claude"`
 - Homebrew reusable workflow cross-repo push auth: `persist-credentials: false` + `unset GITHUB_TOKEN` to prevent runner credential helper override
 - Removed stale `lint` script referencing uninstalled eslint
+- Homebrew install script scope mismatch: migrates `himalaya-mcp@himalaya-mcp-marketplace` → `himalaya-mcp@local-plugins` in settings.json, cleans up stale marketplace cache
+- Removed unreliable `claude plugin update` from Homebrew `post_install` (fails due to nested session detection); install script handles settings.json directly via jq
 
 ### Documentation
 
