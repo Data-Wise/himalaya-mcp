@@ -12,7 +12,9 @@ flowchart LR
 
     subgraph L2["Level 2: Productivity"]
         B1[Triage Inbox] --> B2[Reply to Email]
-        B2 --> B3[Export & Save]
+        B2 --> B4[Compose Email]
+        B4 --> B5[Attachments & Calendar]
+        B5 --> B3[Export & Save]
     end
 
     subgraph L3["Level 3: Automation"]
@@ -45,6 +47,8 @@ Organize, reply, and export emails efficiently.
 |----------|------|---------------|
 | [Triage Your Inbox](triage-inbox.md) | 5 min | Level 1 |
 | [Reply to an Email](reply-email.md) | 5 min | Level 1 |
+| [Compose and Send Email](compose-email.md) | 5 min | Level 1 |
+| [Attachments and Calendar](attachments-calendar.md) | 5 min | Level 1 |
 | [Export and Save Emails](export-save.md) | 3 min | Level 1 |
 
 ### Level 3: Automation
@@ -57,6 +61,6 @@ Let the email-assistant agent handle your entire inbox workflow.
 
 ---
 
-**Total learning time:** ~28 minutes from zero to full automation.
+**Total learning time:** ~38 minutes from zero to full automation.
 
 **Prerequisites:** [Installation](../getting-started/installation.md) complete and himalaya CLI configured with at least one email account.

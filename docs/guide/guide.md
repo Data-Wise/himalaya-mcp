@@ -285,7 +285,7 @@ No emails are ever deleted -- only flagged or moved.
 ## Testing
 
 ```bash
-npm test    # 245 tests across 15 files (vitest)
+npm test    # 256 tests across 15 files (vitest)
 ```
 
 Test breakdown:
@@ -296,10 +296,14 @@ Test breakdown:
 | `client.test.ts` | 12 | Subprocess wrapper, argument building |
 | `manage.test.ts` | 7 | flag_email, move_email client methods |
 | `compose.test.ts` | 9 | draft_reply, send_email safety gate |
+| `compose-new.test.ts` | 8 | compose_email safety gate |
+| `folders.test.ts` | 12 | Folder tools (list, create, delete) |
+| `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
+| `calendar.test.ts` | 12 | ICS parser + calendar event tools |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
 | `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
 | `config.test.ts` | 7 | Env var loading, edge cases |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 68 | Realistic Claude usage scenarios + packaging validation |
-| `e2e.test.ts` | 22 | Full MCP server pipeline with fake himalaya + error paths |
+| `dogfood.test.ts` | 91 | Realistic Claude usage scenarios + packaging validation |
+| `e2e.test.ts` | 32 | Full MCP server pipeline with fake himalaya + error paths |
 | `setup.test.ts` | 18 | CLI setup/check/remove (unit + E2E subprocess) |

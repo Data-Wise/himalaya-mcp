@@ -83,6 +83,8 @@ nav:
     - "Level 2: Productivity":
       - Triage Your Inbox: tutorials/triage-inbox.md
       - Reply to an Email: tutorials/reply-email.md
+      - Compose & Send Email: tutorials/compose-email.md
+      - Attachments & Calendar: tutorials/attachments-calendar.md
       - Export & Save Emails: tutorials/export-save.md
     - "Level 3: Automation":
       - Automate with the Agent: tutorials/automate-agent.md
