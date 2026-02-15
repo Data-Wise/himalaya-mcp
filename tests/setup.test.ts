@@ -272,7 +272,10 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   beforeEach(async () => {
     // Create a temporary HOME directory
     tempHome = await mkdtemp(join(tmpdir(), "himalaya-cli-test-"));
-    tempClaudeDir = join(tempHome, "Library", "Application Support", "Claude");
+    // Use platform-appropriate config path (matches src/cli/setup.ts getConfigDir)
+    tempClaudeDir = process.platform === "darwin"
+      ? join(tempHome, "Library", "Application Support", "Claude")
+      : join(tempHome, ".config", "Claude");
     tempConfigPath = join(tempClaudeDir, "claude_desktop_config.json");
 
     // Create the Claude config directory structure
