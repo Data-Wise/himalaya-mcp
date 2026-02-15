@@ -1,20 +1,23 @@
 /**
  * MCP tools for calendar integration: extract events from ICS attachments
  * and create Apple Calendar events.
+ *
+ * Uses downloadAttachments (bulk download) then scans for .ics files,
+ * since himalaya CLI has no attachment list command.
  */
 
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseICSFile, createAppleCalendarEvent } from "../adapters/calendar.js";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, extname } from "node:path";
 import { randomUUID } from "node:crypto";
 
 export function registerCalendarTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("extract_calendar_event", {
-    description: "Extract calendar event details from an email's ICS attachment. Downloads the .ics file, parses it, and returns event summary, dates, location, and organizer.",
+    description: "Extract calendar event details from an email's ICS attachment. Downloads all attachments, finds the .ics file, parses it, and returns event summary, dates, location, and organizer.",
     inputSchema: {
       id: z.string().describe("Email message ID containing the calendar invite"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
@@ -22,35 +25,23 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
     },
   }, async (args) => {
     try {
-      // Step 1: List attachments to find .ics file
-      const rawList = await client.listAttachments(args.id, args.folder, args.account);
-      let attachments: Array<{ filename: string; mime: string; size: number }>;
-      try {
-        attachments = JSON.parse(rawList);
-      } catch {
-        return {
-          content: [{ type: "text" as const, text: "Error: Could not parse attachment list." }],
-          isError: true,
-        };
-      }
+      // Step 1: Download all attachments
+      const destDir = join(tmpdir(), `himalaya-mcp-${randomUUID()}`);
+      await mkdir(destDir, { recursive: true });
+      await client.downloadAttachments(args.id, destDir, args.folder, args.account);
 
-      const icsAttachment = attachments.find(
-        (a) => a.filename.endsWith(".ics") || a.mime === "text/calendar"
-      );
+      // Step 2: Scan for .ics files
+      const entries = await readdir(destDir);
+      const icsFile = entries.find((f) => extname(f).toLowerCase() === ".ics");
 
-      if (!icsAttachment) {
+      if (!icsFile) {
         return {
           content: [{ type: "text" as const, text: `No calendar attachment (.ics) found in email ${args.id}.` }],
         };
       }
 
-      // Step 2: Download the ICS file
-      const destDir = join(tmpdir(), `himalaya-mcp-${randomUUID()}`);
-      await mkdir(destDir, { recursive: true });
-      await client.downloadAttachment(args.id, icsAttachment.filename, destDir, args.folder, args.account);
-
       // Step 3: Parse ICS
-      const filePath = join(destDir, icsAttachment.filename);
+      const filePath = join(destDir, icsFile);
       const event = await parseICSFile(filePath);
 
       if (!event) {

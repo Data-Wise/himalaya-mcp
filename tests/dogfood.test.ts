@@ -27,7 +27,21 @@ import { registerCalendarTools } from "../src/tools/calendar.js";
 
 vi.mock("node:fs/promises", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:fs/promises")>();
-  return { ...actual, mkdir: vi.fn().mockResolvedValue(undefined), readFile: vi.fn() };
+  return {
+    ...actual,
+    mkdir: vi.fn().mockResolvedValue(undefined),
+    readFile: vi.fn(),
+    readdir: vi.fn().mockResolvedValue(["report.pdf", "photo.jpg", "plain.txt", "index.html"]),
+    stat: vi.fn().mockImplementation((path: string) => {
+      if (path.includes("report.pdf")) return Promise.resolve({ isFile: () => true, size: 245760 });
+      if (path.includes("photo.jpg")) return Promise.resolve({ isFile: () => true, size: 1048576 });
+      if (path.includes("invite.ics")) return Promise.resolve({ isFile: () => true, size: 2048 });
+      if (path.includes("agenda.pdf")) return Promise.resolve({ isFile: () => true, size: 51200 });
+      if (path.includes("plain.txt")) return Promise.resolve({ isFile: () => true, size: 150 });
+      if (path.includes("index.html")) return Promise.resolve({ isFile: () => true, size: 300 });
+      return Promise.resolve({ isFile: () => false, size: 0 });
+    }),
+  };
 });
 vi.mock("node:os", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:os")>();
@@ -93,15 +107,9 @@ const SAMPLE_FOLDERS = JSON.stringify([
   { name: "Archive", desc: null },
 ]);
 
-const SAMPLE_ATTACHMENTS = JSON.stringify([
-  { filename: "report.pdf", mime: "application/pdf", size: 245760 },
-  { filename: "photo.jpg", mime: "image/jpeg", size: 1048576 },
-]);
-
-const SAMPLE_ATTACHMENTS_WITH_ICS = JSON.stringify([
-  { filename: "invite.ics", mime: "text/calendar", size: 2048 },
-  { filename: "agenda.pdf", mime: "application/pdf", size: 51200 },
-]);
+// File lists for readdir mock (set per-test via vi.mocked(readdir).mockResolvedValueOnce)
+const ATTACHMENT_FILES = ["report.pdf", "photo.jpg", "plain.txt", "index.html"];
+const ATTACHMENT_FILES_WITH_ICS = ["invite.ics", "agenda.pdf", "plain.txt"];
 
 // --- Mock client ---
 
@@ -122,8 +130,7 @@ function createMockClient(): HimalayaClient {
   vi.spyOn(client, "listFolders").mockResolvedValue(SAMPLE_FOLDERS);
   vi.spyOn(client, "createFolder").mockResolvedValue("{}");
   vi.spyOn(client, "deleteFolder").mockResolvedValue("{}");
-  vi.spyOn(client, "listAttachments").mockResolvedValue(SAMPLE_ATTACHMENTS);
-  vi.spyOn(client, "downloadAttachment").mockResolvedValue("{}");
+  vi.spyOn(client, "downloadAttachments").mockResolvedValue("{}");
   return client;
 }
 
@@ -765,7 +772,8 @@ describe("Dogfooding: list_attachments", () => {
   });
 
   it("Scenario: no attachments — shows helpful message", async () => {
-    vi.spyOn(client, "listAttachments").mockResolvedValue(JSON.stringify([]));
+    const { readdir } = await import("node:fs/promises");
+    vi.mocked(readdir).mockResolvedValueOnce(["plain.txt", "index.html"] as any);
     const tool = getToolHandler(server, "list_attachments");
     const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
 
@@ -773,7 +781,7 @@ describe("Dogfooding: list_attachments", () => {
   });
 
   it("Scenario: list attachments error — returns isError", async () => {
-    vi.spyOn(client, "listAttachments").mockRejectedValue(new Error("timeout"));
+    vi.spyOn(client, "downloadAttachments").mockRejectedValue(new Error("timeout"));
     const tool = getToolHandler(server, "list_attachments");
     const result = await tool.handler({ id: "249064", folder: undefined, account: undefined }, {} as any);
 
@@ -803,11 +811,11 @@ describe("Dogfooding: download_attachment", () => {
     expect(text).toContain("Downloaded");
     expect(text).toContain("report.pdf");
     expect(text).toContain("/tmp/himalaya-mcp-test-uuid-1234");
-    expect(client.downloadAttachment).toHaveBeenCalled();
+    expect(client.downloadAttachments).toHaveBeenCalled();
   });
 
   it("Scenario: download error — returns isError", async () => {
-    vi.spyOn(client, "downloadAttachment").mockRejectedValue(new Error("attachment not found"));
+    vi.spyOn(client, "downloadAttachments").mockRejectedValue(new Error("attachment not found"));
     const tool = getToolHandler(server, "download_attachment");
     const result = await tool.handler({
       id: "249064", filename: "missing.pdf",
@@ -826,8 +834,11 @@ describe("Dogfooding: extract_calendar_event", () => {
   beforeEach(async () => {
     server = new McpServer({ name: "test", version: "0.0.1" });
     client = createMockClient();
-    vi.spyOn(client, "listAttachments").mockResolvedValue(SAMPLE_ATTACHMENTS_WITH_ICS);
     registerCalendarTools(server, client);
+
+    // Mock readdir to return files including .ics
+    const { readdir } = await import("node:fs/promises");
+    vi.mocked(readdir).mockResolvedValue(ATTACHMENT_FILES_WITH_ICS as any);
 
     // Mock parseICSFile to return a structured event
     const { parseICSFile } = await import("../src/adapters/calendar.js");
@@ -856,7 +867,8 @@ describe("Dogfooding: extract_calendar_event", () => {
   });
 
   it("Scenario: no ICS attachment — shows helpful message", async () => {
-    vi.spyOn(client, "listAttachments").mockResolvedValue(SAMPLE_ATTACHMENTS);
+    const { readdir } = await import("node:fs/promises");
+    vi.mocked(readdir).mockResolvedValueOnce(ATTACHMENT_FILES as any);
     const tool = getToolHandler(server, "extract_calendar_event");
     const result = await tool.handler({ id: "249064", folder: undefined, account: undefined }, {} as any);
 

@@ -202,19 +202,9 @@ export class HimalayaClient {
     return this.exec(["account", "list"]);
   }
 
-  /** List attachments for a message. */
-  async listAttachments(id: string, folder?: string, account?: string): Promise<string> {
-    const args = ["attachment", "list", id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
-    return this.exec(args, { folder: f, account });
-  }
-
-  /** Download an attachment to a directory. */
-  async downloadAttachment(id: string, filename: string, destDir: string, folder?: string, account?: string): Promise<string> {
-    const args = ["attachment", "download", id, filename];
+  /** Download ALL attachments for a message to a directory. */
+  async downloadAttachments(id: string, destDir: string, folder?: string, account?: string): Promise<string> {
+    const args = ["attachment", "download", id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
       args.push("--folder", f);

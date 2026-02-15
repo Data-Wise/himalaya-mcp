@@ -4,9 +4,11 @@ import { HimalayaClient } from "../src/himalaya/client.js";
 import { parseICS } from "../src/adapters/calendar.js";
 import { registerCalendarTools } from "../src/tools/calendar.js";
 
-// Mock node modules
+// Mock node modules — simulate downloaded files in temp dir
 vi.mock("node:fs/promises", () => ({
   mkdir: vi.fn().mockResolvedValue(undefined),
+  // Default: dir contains invite.ics and notes.txt
+  readdir: vi.fn().mockResolvedValue(["invite.ics", "notes.txt", "plain.txt"]),
   readFile: vi.fn().mockResolvedValue(`BEGIN:VCALENDAR
 BEGIN:VEVENT
 SUMMARY:Team Standup
@@ -45,19 +47,9 @@ vi.mock("node:child_process", async (importOriginal) => {
   };
 });
 
-const SAMPLE_ATTACHMENTS_WITH_ICS = JSON.stringify([
-  { filename: "invite.ics", mime: "text/calendar", size: 1024 },
-  { filename: "notes.txt", mime: "text/plain", size: 512 },
-]);
-
-const SAMPLE_ATTACHMENTS_NO_ICS = JSON.stringify([
-  { filename: "notes.txt", mime: "text/plain", size: 512 },
-]);
-
 function createMockClient(): HimalayaClient {
   const client = new HimalayaClient();
-  vi.spyOn(client, "listAttachments").mockResolvedValue(SAMPLE_ATTACHMENTS_WITH_ICS);
-  vi.spyOn(client, "downloadAttachment").mockResolvedValue("{}");
+  vi.spyOn(client, "downloadAttachments").mockResolvedValue("{}");
   return client;
 }
 
@@ -177,7 +169,9 @@ describe("Calendar tools", () => {
     });
 
     it("returns message when no ICS found", async () => {
-      vi.spyOn(client, "listAttachments").mockResolvedValue(SAMPLE_ATTACHMENTS_NO_ICS);
+      const { readdir } = await import("node:fs/promises");
+      // No .ics file in the downloaded files
+      vi.mocked(readdir).mockResolvedValueOnce(["notes.txt", "plain.txt"] as any);
       const tool = getToolHandler(server, "extract_calendar_event");
       const result = await tool.handler({ id: "55", folder: undefined, account: undefined }, {} as any);
 
@@ -185,7 +179,7 @@ describe("Calendar tools", () => {
     });
 
     it("handles errors", async () => {
-      vi.spyOn(client, "listAttachments").mockRejectedValue(new Error("not found"));
+      vi.spyOn(client, "downloadAttachments").mockRejectedValue(new Error("not found"));
       const tool = getToolHandler(server, "extract_calendar_event");
       const result = await tool.handler({ id: "999", folder: undefined, account: undefined }, {} as any);
 

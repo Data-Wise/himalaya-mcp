@@ -165,21 +165,8 @@ export interface DeleteFolderParams {
 
 // --- Attachment types ---
 
-export interface Attachment {
-  filename: string;
-  mime: string;
-  size: number;
-}
-
-export interface ListAttachmentsParams {
+export interface DownloadAttachmentsParams {
   id: string;
-  folder?: string;
-  account?: string;
-}
-
-export interface DownloadAttachmentParams {
-  id: string;
-  filename: string;
   folder?: string;
   account?: string;
 }
