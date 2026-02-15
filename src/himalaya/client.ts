@@ -34,6 +34,7 @@ export class HimalayaClient {
     folder?: string;
     account?: string;
     timeout?: number;
+    cwd?: string;
   }): Promise<string> {
     const args: string[] = [];
 
@@ -56,6 +57,7 @@ export class HimalayaClient {
         timeout,
         maxBuffer: 10 * 1024 * 1024, // 10MB
         env: { ...process.env },
+        cwd: options?.cwd,
       });
       return stdout;
     } catch (err: unknown) {
@@ -181,13 +183,43 @@ export class HimalayaClient {
   }
 
   /** List folders. */
-  async listFolders(): Promise<string> {
-    return this.exec(["folder", "list"]);
+  async listFolders(account?: string): Promise<string> {
+    return this.exec(["folder", "list"], { account });
+  }
+
+  /** Create a folder. */
+  async createFolder(name: string, account?: string): Promise<string> {
+    return this.exec(["folder", "create", name], { account });
+  }
+
+  /** Delete a folder. */
+  async deleteFolder(name: string, account?: string): Promise<string> {
+    return this.exec(["folder", "delete", name], { account });
   }
 
   /** List accounts. */
   async listAccounts(): Promise<string> {
     return this.exec(["account", "list"]);
+  }
+
+  /** List attachments for a message. */
+  async listAttachments(id: string, folder?: string, account?: string): Promise<string> {
+    const args = ["attachment", "list", id];
+    const f = folder || this.opts.folder;
+    if (f && f !== "INBOX") {
+      args.push("--folder", f);
+    }
+    return this.exec(args, { folder: f, account });
+  }
+
+  /** Download an attachment to a directory. */
+  async downloadAttachment(id: string, filename: string, destDir: string, folder?: string, account?: string): Promise<string> {
+    const args = ["attachment", "download", id, filename];
+    const f = folder || this.opts.folder;
+    if (f && f !== "INBOX") {
+      args.push("--folder", f);
+    }
+    return this.exec(args, { folder: f, account, cwd: destDir });
   }
 
   /** Wrap errors with meaningful messages. */

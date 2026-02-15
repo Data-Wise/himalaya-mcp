@@ -160,7 +160,7 @@ describe("E2E: MCP Server Headless", () => {
 
     expect(initResult.result).toBeDefined();
     expect(initResult.result.serverInfo.name).toBe("himalaya-mcp");
-    expect(initResult.result.serverInfo.version).toBe("1.1.2");
+    expect(initResult.result.serverInfo.version).toBe("1.2.0");
 
     // Send initialized notification
     sendNotification("notifications/initialized");
@@ -177,18 +177,26 @@ describe("E2E: MCP Server Headless", () => {
 
   // --- Tool listing ---
 
-  it("lists all 11 registered tools", async () => {
+  it("lists all 19 registered tools", async () => {
     const result = await sendRequest("tools/list");
     const tools = result.result.tools;
     const toolNames = tools.map((t: any) => t.name).sort();
 
     expect(toolNames).toEqual([
+      "compose_email",
       "copy_to_clipboard",
       "create_action_item",
+      "create_calendar_event",
+      "create_folder",
+      "delete_folder",
+      "download_attachment",
       "draft_reply",
       "export_to_markdown",
+      "extract_calendar_event",
       "flag_email",
+      "list_attachments",
       "list_emails",
+      "list_folders",
       "move_email",
       "read_email",
       "read_email_html",
