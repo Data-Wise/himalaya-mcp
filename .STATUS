@@ -19,7 +19,7 @@
 - Phase 5: Plugin Skills — /email:reply skill, agent updates, skill updates
 - Plugin Packaging: esbuild bundle (583KB), Homebrew formula, marketplace.json, CLI setup, cross-platform support
 - Homebrew Release Automation: homebrew-release.yml (validate → prepare → update-homebrew)
-- Total: 11 tools, 4 prompts, 3 resources, 177 tests (11 test files)
+- Total: 11 tools, 4 prompts, 3 resources, 181 tests (11 test files)
 
 ## Just Completed
 
@@ -34,7 +34,7 @@
 - v1.1.1 released on GitHub + Homebrew
 - GitHub Pages: https://data-wise.github.io/himalaya-mcp/
 - CI: passing
-- Tests: 177 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 68 dogfood + 22 e2e + 14 setup)
+- Tests: 181 (13 parser + 12 client + 7 manage + 9 compose + 6 actions + 15 prompts + 7 config + 4 clipboard + 68 dogfood + 22 e2e + 18 setup)
 - Homebrew release pipeline: fully automated and verified
 
 ## Install

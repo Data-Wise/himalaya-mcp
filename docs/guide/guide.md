@@ -17,6 +17,28 @@ Claude <──MCP──> himalaya-mcp <──execFile──> himalaya CLI <─�
 - **Two-phase send** -- `send_email` returns a preview first; requires `confirm=true` to actually send
 - **Plugin-first** -- ships as a Claude Code plugin; also works as standalone MCP server
 
+## Claude Code vs Claude Desktop
+
+himalaya-mcp works with both Claude Code and Claude Desktop, but the experience differs:
+
+| Feature | Claude Code | Claude Desktop |
+|---------|-------------|----------------|
+| 11 MCP tools | Yes | Yes |
+| 4 MCP prompts | Yes | Yes |
+| 3 MCP resources | Yes | Yes |
+| `/email:*` slash commands | Yes (5 skills) | No |
+| Email assistant agent | Yes | No |
+| Natural language ("check my inbox") | Yes | Yes |
+| Two-phase send safety gate | Yes | Yes |
+| Env var configuration | Yes | Yes |
+
+**In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent. These are Claude Code-only features defined in the plugin manifest.
+
+**In Claude Desktop**, you get the full MCP server -- all 11 tools, 4 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
+
+!!! tip "Which should I use?"
+    Use **Claude Code** if you want the structured skill workflows and the email assistant agent. Use **Claude Desktop** if you prefer the desktop UI or want email access alongside other MCP servers.
+
 ## Prerequisites
 
 1. **Node.js 22+**
@@ -53,11 +75,29 @@ Restart Claude Code. The plugin provides `/email:inbox`, `/email:triage`, `/emai
 
 ### Claude Desktop
 
+After installing himalaya-mcp (via Homebrew or from source), run the setup command:
+
 ```bash
-himalaya-mcp setup    # Auto-configure MCP server
+himalaya-mcp setup           # Add MCP server to Desktop config
+himalaya-mcp setup --check   # Verify configuration is correct
+himalaya-mcp setup --remove  # Remove the server entry
 ```
 
-Or manually add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+Restart Claude Desktop after running setup.
+
+#### What `setup` does
+
+The `setup` command writes a server entry into Claude Desktop's config file. It preserves all existing MCP servers -- only the `himalaya` entry is added or updated.
+
+**Config file location (per platform):**
+
+| Platform | Path |
+|----------|------|
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+| Windows | `%APPDATA%/Claude/claude_desktop_config.json` |
+
+**What gets written:**
 
 ```json
 {
@@ -69,6 +109,52 @@ Or manually add to `~/Library/Application Support/Claude/claude_desktop_config.j
   }
 }
 ```
+
+Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 11 tools, 4 prompts, and 3 resources.
+
+#### Using himalaya-mcp in Claude Desktop
+
+Once configured, just talk naturally:
+
+```
+You: "Check my inbox"
+You: "Triage my last 10 emails"
+You: "Reply to the meeting email"
+You: "Give me today's email digest"
+You: "Find emails from Alice about the budget"
+You: "Export email 42 as markdown"
+```
+
+Claude sees the MCP tools and calls them automatically. There are no slash commands -- everything is natural language.
+
+#### Adding env vars (optional)
+
+To customize the server behavior, add environment variables to the config:
+
+```json
+{
+  "mcpServers": {
+    "himalaya": {
+      "command": "node",
+      "args": ["~/.claude/plugins/himalaya-mcp/dist/index.js"],
+      "env": {
+        "HIMALAYA_ACCOUNT": "work",
+        "HIMALAYA_TIMEOUT": "60000"
+      }
+    }
+  }
+}
+```
+
+#### Verifying the server works
+
+Test the MCP server standalone:
+
+```bash
+echo '{}' | node ~/.claude/plugins/himalaya-mcp/dist/index.js
+```
+
+If you see a JSON-RPC response, the server is working. If Claude Desktop still can't connect, check the config path and restart Desktop.
 
 ## Configuration
 
@@ -176,7 +262,7 @@ No emails are ever deleted -- only flagged or moved.
 ## Testing
 
 ```bash
-npm test    # 177 tests across 11 files (vitest)
+npm test    # 181 tests across 11 files (vitest)
 ```
 
 Test breakdown:
@@ -191,6 +277,6 @@ Test breakdown:
 | `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
 | `config.test.ts` | 7 | Env var loading, edge cases |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 47 | Realistic Claude usage scenarios + packaging validation |
+| `dogfood.test.ts` | 68 | Realistic Claude usage scenarios + packaging validation |
 | `e2e.test.ts` | 22 | Full MCP server pipeline with fake himalaya + error paths |
 | `setup.test.ts` | 18 | CLI setup/check/remove (unit + E2E subprocess) |
