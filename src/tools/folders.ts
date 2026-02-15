@@ -42,6 +42,13 @@ export function registerFolderTools(server: McpServer, client: HimalayaClient) {
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
+    if (!args.name.trim()) {
+      return {
+        content: [{ type: "text" as const, text: "Folder name cannot be empty." }],
+        isError: true,
+      };
+    }
+
     try {
       await client.createFolder(args.name, args.account);
       return {
@@ -63,6 +70,13 @@ export function registerFolderTools(server: McpServer, client: HimalayaClient) {
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
+    if (!args.name.trim()) {
+      return {
+        content: [{ type: "text" as const, text: "Folder name cannot be empty." }],
+        isError: true,
+      };
+    }
+
     // Safety gate: without confirm=true, just show warning
     if (!args.confirm) {
       return {

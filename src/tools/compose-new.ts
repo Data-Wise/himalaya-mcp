@@ -33,6 +33,16 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
+    if (!args.to.includes("@")) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Invalid email address "${args.to}". Must contain @.`,
+        }],
+        isError: true,
+      };
+    }
+
     const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc);
 
     // Safety gate: without confirm=true, just show preview

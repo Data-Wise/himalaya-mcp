@@ -9,7 +9,7 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
-import { mkdir, readdir, stat } from "node:fs/promises";
+import { mkdir, readdir, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, extname, basename } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -48,7 +48,7 @@ function mimeFromExt(filename: string): string {
 }
 
 /** Download all attachments to temp dir and return file info (excluding body parts). */
-async function downloadAndList(
+export async function downloadAndList(
   client: HimalayaClient,
   id: string,
   folder?: string,
@@ -91,8 +91,11 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
+    let destDir: string | undefined;
     try {
-      const { files } = await downloadAndList(client, args.id, args.folder, args.account);
+      const result = await downloadAndList(client, args.id, args.folder, args.account);
+      destDir = result.destDir;
+      const { files } = result;
 
       if (files.length === 0) {
         return {
@@ -119,6 +122,10 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
         }],
         isError: true,
       };
+    } finally {
+      if (destDir) {
+        await rm(destDir, { recursive: true, force: true }).catch(() => {});
+      }
     }
   });
 

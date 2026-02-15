@@ -2,18 +2,15 @@
  * MCP tools for calendar integration: extract events from ICS attachments
  * and create Apple Calendar events.
  *
- * Uses downloadAttachments (bulk download) then scans for .ics files,
- * since himalaya CLI has no attachment list command.
+ * Uses shared downloadAndList helper from attachments module to find .ics files.
  */
 
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseICSFile, createAppleCalendarEvent } from "../adapters/calendar.js";
-import { mkdir, readdir } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join, extname } from "node:path";
-import { randomUUID } from "node:crypto";
+import { downloadAndList } from "./attachments.js";
+import { join } from "node:path";
 
 export function registerCalendarTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("extract_calendar_event", {
@@ -25,14 +22,11 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
     },
   }, async (args) => {
     try {
-      // Step 1: Download all attachments
-      const destDir = join(tmpdir(), `himalaya-mcp-${randomUUID()}`);
-      await mkdir(destDir, { recursive: true });
-      await client.downloadAttachments(args.id, destDir, args.folder, args.account);
+      // Step 1: Download all attachments using shared helper
+      const { destDir, files } = await downloadAndList(client, args.id, args.folder, args.account);
 
-      // Step 2: Scan for .ics files
-      const entries = await readdir(destDir);
-      const icsFile = entries.find((f) => extname(f).toLowerCase() === ".ics");
+      // Step 2: Find .ics file among attachments
+      const icsFile = files.find((f) => f.filename.toLowerCase().endsWith(".ics"));
 
       if (!icsFile) {
         return {
@@ -41,7 +35,7 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
       }
 
       // Step 3: Parse ICS
-      const filePath = join(destDir, icsFile);
+      const filePath = join(destDir, icsFile.filename);
       const event = await parseICSFile(filePath);
 
       if (!event) {

@@ -122,7 +122,7 @@ export async function createAppleCalendarEvent(event: CalendarEvent): Promise<vo
 
 /** Escape special characters for AppleScript strings.
  * Strips control characters and non-printable ASCII to prevent injection. */
-function escapeAppleScript(str: string): string {
+export function escapeAppleScript(str: string): string {
   return str
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
@@ -130,7 +130,10 @@ function escapeAppleScript(str: string): string {
     .replace(/[^\x20-\x7E]/g, "");
 }
 
-/** Format Date for AppleScript date string. */
+/** Format Date for AppleScript date string.
+ * Note: Uses en-US locale. AppleScript date parsing depends on system locale,
+ * so this may fail on non-English macOS. A future improvement could use
+ * AppleScript date arithmetic instead of string parsing. */
 function formatAppleScriptDate(date: Date): string {
   return date.toLocaleString("en-US", {
     year: "numeric",

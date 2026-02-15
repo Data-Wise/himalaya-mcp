@@ -5,6 +5,7 @@ import { registerAttachmentTools } from "../src/tools/attachments.js";
 
 // Mock node modules — simulate downloaded files in temp dir
 vi.mock("node:fs/promises", () => ({
+  rm: vi.fn().mockResolvedValue(undefined),
   mkdir: vi.fn().mockResolvedValue(undefined),
   readdir: vi.fn().mockResolvedValue(["report.pdf", "photo.jpg", "plain.txt", "index.html"]),
   stat: vi.fn().mockImplementation((path: string) => {
