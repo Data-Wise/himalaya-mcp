@@ -15,6 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Removed unreliable `claude plugin update` from Homebrew `post_install`
 - Unblocked 4 skipped setup E2E tests (`vi.mock` interference with `existsSync`)
 - Removed stale `lint` script referencing uninstalled eslint
+- Setup E2E tests use platform-appropriate config path (fixes 2 test failures on Ubuntu CI runners)
 
 ### Added
 
