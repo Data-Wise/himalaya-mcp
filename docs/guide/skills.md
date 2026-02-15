@@ -219,7 +219,7 @@ Help hub for himalaya-mcp. Browse all available tools, prompts, resources, and w
 | Command | Shows |
 |---------|-------|
 | `/email:help` | Overview of all capabilities |
-| `/email:help tools` | All 11 MCP tools with parameters |
+| `/email:help tools` | All 19 MCP tools with parameters |
 | `/email:help prompts` | All 4 MCP prompts |
 | `/email:help resources` | All 3 MCP resources |
 | `/email:help workflows` | Common email workflow patterns |

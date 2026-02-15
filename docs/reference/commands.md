@@ -1,6 +1,6 @@
 # Command Reference
 
-Complete reference for all 11 MCP tools, 4 prompts, 3 resources, and CLI commands.
+Complete reference for all 19 MCP tools, 4 prompts, 3 resources, and CLI commands.
 
 !!! tip "See also"
     **[Tutorials](../tutorials/index.md)** for step-by-step walkthroughs | **[Workflows](../guide/workflows.md)** for common email patterns
@@ -223,6 +223,122 @@ Move an email to a different folder.
 
 ---
 
+### Folders
+
+#### `list_folders`
+
+List all email folders/mailboxes for an account.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Show my email folders"
+→ list_folders()
+
+"List folders on my work account"
+→ list_folders(account: "work")
+```
+
+**Output:** One line per folder with the folder name and optional description.
+
+**Related:** [create_folder](#create_folder), [delete_folder](#delete_folder), [move_email](#move_email)
+
+---
+
+#### `create_folder`
+
+Create a new email folder/mailbox.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `name` | string | **Yes** | — | Name for the new folder |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Create a folder called Projects"
+→ create_folder(name: "Projects")
+
+"Make a Receipts folder on my work account"
+→ create_folder(name: "Receipts", account: "work")
+```
+
+**Related:** [list_folders](#list_folders), [delete_folder](#delete_folder)
+
+---
+
+#### `delete_folder`
+
+Delete an email folder/mailbox. **Safety gate:** requires `confirm=true` to actually delete.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `name` | string | **Yes** | — | Folder name to delete |
+| `confirm` | boolean | No | `false` | Set `true` to actually delete |
+| `account` | string | No | default | Account name |
+
+**Safety flow:**
+
+```
+1. delete_folder(name: "OldStuff")            → PREVIEW warning (not deleted)
+2. User reviews and approves
+3. delete_folder(name: "OldStuff", confirm: true)  → DELETES
+```
+
+!!! danger "Permanent deletion"
+    Deleting a folder permanently removes the folder and all emails in it. Always review the preview before confirming.
+
+**Related:** [list_folders](#list_folders), [create_folder](#create_folder)
+
+---
+
+### Compose
+
+#### `compose_email`
+
+Compose and send a new email (not a reply). **Two-phase safety gate:** requires explicit `confirm=true`.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `to` | string | **Yes** | — | Recipient email address |
+| `subject` | string | **Yes** | — | Email subject line |
+| `body` | string | **Yes** | — | Email body text |
+| `cc` | string | No | — | CC recipient(s) |
+| `bcc` | string | No | — | BCC recipient(s) |
+| `confirm` | boolean | No | `false` | Set `true` to actually send |
+| `account` | string | No | default | Account name |
+
+**Safety flow:**
+
+```
+1. compose_email(to: "alice@example.com", subject: "Meeting", body: "...")
+   → shows PREVIEW (not sent)
+2. User reviews and approves
+3. compose_email(..., confirm: true)  → SENDS
+```
+
+**Examples:**
+
+```
+"Send Alice an email about the meeting"
+→ compose_email(to: "alice@example.com", subject: "Meeting Request", body: "Hi Alice...")
+
+"Email the team about the deadline"
+→ compose_email(to: "team@example.com", subject: "Q2 Deadline Reminder", body: "...")
+```
+
+!!! danger "Never skip the preview step"
+    Always call `compose_email` without `confirm` first to show the preview. Only set `confirm=true` after the user explicitly approves.
+
+**Related:** [draft_reply](#draft_reply), [send_email](#send_email)
+
+---
+
 ### Actions
 
 #### `export_to_markdown`
@@ -300,7 +416,7 @@ Extract action items, todos, deadlines, and commitments from an email.
 
 ---
 
-### Compose
+### Replies & Sending
 
 #### `draft_reply`
 
@@ -377,6 +493,140 @@ Copy text to the system clipboard (macOS `pbcopy`).
 "Copy the sender's email address"
 → copy_to_clipboard(text: "alice@example.com")
 ```
+
+---
+
+### Attachments
+
+#### `list_attachments`
+
+List all attachments in an email message. Downloads all attachments to inspect them, returning filename, MIME type (inferred from extension), and file size for each.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | — | Email message ID |
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"What attachments does email 42 have?"
+→ list_attachments(id: "42")
+
+"Check attachments in the project email"
+→ list_attachments(id: "88")
+```
+
+**Output:** One line per attachment with filename, MIME type, and size in KB.
+
+!!! note "Body parts are filtered"
+    himalaya downloads all message parts including `plain.txt` and `index.html` body parts. These are automatically excluded from the attachment list.
+
+**Related:** [download_attachment](#download_attachment), [extract_calendar_event](#extract_calendar_event)
+
+---
+
+#### `download_attachment`
+
+Download a specific attachment from an email to a temporary directory.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | — | Email message ID |
+| `filename` | string | **Yes** | — | Attachment filename to download |
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Download the PDF from email 42"
+→ download_attachment(id: "42", filename: "report.pdf")
+
+"Get the spreadsheet attachment"
+→ download_attachment(id: "88", filename: "budget.xlsx")
+```
+
+**Output:** File path where the attachment was saved (temp directory).
+
+**Typical workflow:**
+
+```
+1. list_attachments(id: "42")    → see available files
+2. download_attachment(id: "42", filename: "report.pdf")  → get file path
+```
+
+**Related:** [list_attachments](#list_attachments)
+
+---
+
+### Calendar
+
+#### `extract_calendar_event`
+
+Extract calendar event details from an email's ICS attachment. Downloads all attachments, finds the `.ics` file, parses it, and returns event summary, dates, location, and organizer.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | — | Email message ID containing the calendar invite |
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"What's in the meeting invite in email 42?"
+→ extract_calendar_event(id: "42")
+
+"Parse the calendar attachment"
+→ extract_calendar_event(id: "88")
+```
+
+**Output:** Event title, start/end times, location, organizer, and description.
+
+**Related:** [create_calendar_event](#create_calendar_event), [list_attachments](#list_attachments)
+
+---
+
+#### `create_calendar_event`
+
+Create an event in Apple Calendar. **Safety gate:** requires `confirm=true` to actually create. macOS only.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `summary` | string | **Yes** | — | Event title/summary |
+| `dtstart` | string | **Yes** | — | Start date/time (ISO format) |
+| `dtend` | string | **Yes** | — | End date/time (ISO format) |
+| `location` | string | No | — | Event location |
+| `description` | string | No | — | Event description/notes |
+| `confirm` | boolean | No | `false` | Set `true` to actually create |
+
+**Safety flow:**
+
+```
+1. extract_calendar_event(id: "42")    → parse ICS attachment
+2. create_calendar_event(summary: "...", dtstart: "...", dtend: "...")
+   → shows PREVIEW (not created)
+3. User reviews and approves
+4. create_calendar_event(..., confirm: true)  → CREATES in Apple Calendar
+```
+
+**Examples:**
+
+```
+"Add that meeting to my calendar"
+→ extract_calendar_event(id: "42")
+   then create_calendar_event(summary: "Team Standup", dtstart: "2026-03-01T09:00:00", ...)
+
+"Create a calendar event for Friday at 2pm"
+→ create_calendar_event(summary: "Project Review", dtstart: "2026-02-20T14:00:00", dtend: "2026-02-20T15:00:00")
+```
+
+!!! warning "macOS only"
+    Calendar event creation uses AppleScript to interact with Apple Calendar. This tool is only available on macOS.
+
+**Related:** [extract_calendar_event](#extract_calendar_event)
 
 ---
 

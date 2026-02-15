@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.1.2 (released)
-- **Current Phase:** 5 — All phases complete (11 tools, 4 prompts, 3 resources, 181 tests)
+- **Version:** 1.2.0 (in development)
+- **Current Phase:** 6 — Feature expansion (19 tools, 4 prompts, 3 resources, 256 tests)
 
 ### What It Does
 
@@ -43,6 +43,10 @@ himalaya-mcp/
 │   │   ├── read.ts              # read_email, read_email_html
 │   │   ├── manage.ts            # flag_email, move_email
 │   │   ├── compose.ts           # draft_reply, send_email (two-phase safety gate)
+│   │   ├── compose-new.ts       # compose_email (new messages, safety gate)
+│   │   ├── folders.ts           # list_folders, create_folder, delete_folder
+│   │   ├── attachments.ts       # list_attachments, download_attachment
+│   │   ├── calendar.ts          # extract_calendar_event, create_calendar_event
 │   │   └── actions.ts           # export_to_markdown, create_action_item
 │   ├── prompts/
 │   │   ├── triage.ts            # triage_inbox prompt
@@ -52,7 +56,8 @@ himalaya-mcp/
 │   ├── resources/
 │   │   └── index.ts             # email://inbox, email://message/{id}, email://folders
 │   └── adapters/
-│       └── clipboard.ts         # copy_to_clipboard (pbcopy/xclip)
+│       ├── clipboard.ts         # copy_to_clipboard (pbcopy/xclip)
+│       └── calendar.ts          # ICS parser + Apple Calendar (osascript)
 ├── plugin/
 │   ├── skills/                  # Claude Code plugin skills (inbox, triage, digest, reply)
 │   ├── agents/                  # Plugin agents (email-assistant)
@@ -71,17 +76,22 @@ himalaya-mcp/
 │   ├── client.test.ts           # 12 client tests (subprocess mock)
 │   ├── manage.test.ts           # 7 manage tools tests
 │   ├── compose.test.ts          # 9 compose tools tests
+│   ├── compose-new.test.ts      # 8 compose_email tests
+│   ├── folders.test.ts          # 12 folder tools tests
+│   ├── attachments.test.ts      # 9 attachment tools tests
+│   ├── calendar.test.ts         # 12 calendar tests (ICS parser + tools)
 │   ├── actions.test.ts          # 6 export/action tests
 │   ├── prompts.test.ts          # 15 prompt registration tests
 │   ├── config.test.ts           # 7 config tests
 │   ├── clipboard.test.ts        # 4 clipboard tests
-│   ├── dogfood.test.ts          # 29 dogfooding tests (realistic Claude usage)
-│   └── e2e.test.ts              # 20 E2E tests (headless MCP server pipeline)
+│   ├── dogfood.test.ts          # 91 dogfooding tests (realistic Claude usage)
+│   ├── setup.test.ts            # 18 setup CLI tests
+│   └── e2e.test.ts              # 32 E2E tests (headless MCP server pipeline)
 ├── package.json
 └── tsconfig.json
 ```
 
-### Implemented MCP Tools (11)
+### Implemented MCP Tools (19)
 
 | Tool | Description |
 |------|-------------|
@@ -93,6 +103,14 @@ himalaya-mcp/
 | `move_email` | Move email to target folder |
 | `draft_reply` | Generate reply template with DRAFT markers |
 | `send_email` | Send email with two-phase safety gate (preview then confirm) |
+| `compose_email` | Compose and send new email with two-phase safety gate |
+| `list_folders` | List all email folders/mailboxes |
+| `create_folder` | Create a new email folder |
+| `delete_folder` | Delete folder with two-phase safety gate |
+| `list_attachments` | List attachments for an email (filename, MIME, size) |
+| `download_attachment` | Download attachment to temp directory |
+| `extract_calendar_event` | Parse ICS calendar invite from email attachment |
+| `create_calendar_event` | Add event to Apple Calendar with safety gate (macOS) |
 | `export_to_markdown` | Convert email to markdown with YAML frontmatter |
 | `create_action_item` | Extract action items and context from email |
 | `copy_to_clipboard` | Copy text to system clipboard (pbcopy/xclip) |
@@ -181,7 +199,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (181 tests across 11 test files)
+npm test                         # Run vitest (256 tests across 15 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~583KB)
 node dist/index.js               # Run MCP server directly
 ```
@@ -219,6 +237,10 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 | 3. Compose + Actions | draft_reply, send_email (safety gate), create_action_item | Done |
 | 4. Clipboard + Config | copy_to_clipboard adapter, env-based config | Done |
 | 5. Plugin Skills | /email:* skills, agent updates, reply skill | Done |
+| 6a. Folders | list_folders, create_folder, delete_folder | Done |
+| 6b. Compose New | compose_email (new messages, safety gate) | Done |
+| 6c. Attachments | list_attachments, download_attachment | Done |
+| 6d. Calendar | extract_calendar_event, create_calendar_event (ICS + Apple Calendar) | Done |
 
 ---
 
@@ -242,4 +264,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-02-14
+**Last Updated:** 2026-02-15

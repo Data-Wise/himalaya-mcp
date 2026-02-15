@@ -4,28 +4,26 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [1.1.2] - 2026-02-15
-
-### Fixed
-
-- Homebrew install script uses `ln -sfh` to prevent circular `libexec/libexec` symlinks on reinstall
-- Homebrew install script uses full paths (`/bin/ln`, `/bin/mkdir`, `/bin/rm`) and `HOMEBREW_PREFIX` env var for restricted PATH contexts
-- Removed Homebrew `post_install` symlink attempt: macOS `sandbox-exec` blocks writes outside Homebrew-managed paths; users run `himalaya-mcp-install` manually
-- Homebrew install script migrates plugin scope from `himalaya-mcp-marketplace` to `local-plugins` and cleans stale cache
-- Removed unreliable `claude plugin update` from Homebrew `post_install`
-- Unblocked 4 skipped setup E2E tests (`vi.mock` interference with `existsSync`)
-- Removed stale `lint` script referencing uninstalled eslint
+## [1.2.0] - 2026-02-15
 
 ### Added
 
-- Automated Homebrew formula update workflow (`homebrew-release.yml`) with 3-stage pipeline
-- Bundle, plugin validation, and lint checks in CI workflow
+- **Folder management** (3 tools): `list_folders`, `create_folder`, `delete_folder` (with safety gate)
+- **Compose new emails**: `compose_email` tool with two-phase safety gate (preview then confirm)
+- **Attachments** (2 tools): `list_attachments` (with body part filtering and MIME inference), `download_attachment`
+- **Calendar integration** (2 tools): `extract_calendar_event` (ICS parser), `create_calendar_event` (Apple Calendar via AppleScript, with safety gate)
+- Plugin skills: `/email:compose` (new email composition), `/email:attachments` (list, download, calendar invites)
+- 91 dogfood tests covering v1.2.0 tools (folders, compose, attachments, calendar)
+- 32 E2E tests (up from 22) — fake himalaya binary now creates real files on disk for attachment pipeline testing
+- 256 total tests across 15 test files
 
 ### Documentation
 
-- Added Claude Desktop section to user guide with platform comparison table
-- Updated test counts across site and project files (160 → 181)
-- Synced changelog with all Homebrew fixes and sandbox limitation discovery
+- Full command reference for all 8 new tools with parameters, examples, and safety flows
+- New tutorials: Compose & Send Email, Attachments & Calendar
+- Updated workflows: compose, attachment download, calendar invite, folder management patterns
+- Updated refcard, guide, and help skill with all 19 tools
+- CHANGELOG v1.2.0 entry
 
 ## [1.1.1] - 2026-02-14
 
@@ -45,11 +43,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Homebrew post-install script hangs when Claude Code is running: guard all JSON file writes (`marketplace.json`, `settings.json`) behind `pgrep` check, replaced slow `lsof` with `pgrep -x "claude"`
 - Homebrew reusable workflow cross-repo push auth: `persist-credentials: false` + `unset GITHUB_TOKEN` to prevent runner credential helper override
 - Removed stale `lint` script referencing uninstalled eslint
-- Homebrew install script scope mismatch: migrates `himalaya-mcp@himalaya-mcp-marketplace` → `himalaya-mcp@local-plugins` in settings.json, cleans up stale marketplace cache
-- Removed unreliable `claude plugin update` from Homebrew `post_install` (fails due to nested session detection); install script handles settings.json directly via jq
-- Homebrew install script uses `ln -sfh` to prevent circular `libexec/libexec` symlinks on reinstall
-- Homebrew install script uses full paths (`/bin/ln`, `/bin/mkdir`, `/bin/rm`) and `HOMEBREW_PREFIX` env var for restricted PATH contexts
-- Removed Homebrew `post_install` symlink attempt: macOS `sandbox-exec` blocks all writes outside Homebrew-managed paths; users run `himalaya-mcp-install` manually instead
 
 ### Documentation
 

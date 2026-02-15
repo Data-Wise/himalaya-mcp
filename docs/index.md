@@ -12,11 +12,11 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
 <div class="grid cards" markdown>
 
-- :envelope: **11 MCP Tools**
+- :envelope: **19 MCP Tools**
 
     ---
 
-    List, search, read, flag, move, draft reply, send, export, action items, clipboard
+    List, search, read, flag, move, draft reply, send, export, action items, clipboard, folders, attachments, calendar
 
     [:octicons-arrow-right-24: Command Reference](reference/commands.md)
 
@@ -48,7 +48,7 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     ---
 
-    Use as a Claude Code plugin (5 skills) or standalone MCP server
+    Use as a Claude Code plugin (7 skills) or standalone MCP server
 
     [:octicons-arrow-right-24: Installation](getting-started/installation.md)
 
@@ -68,7 +68,7 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 flowchart LR
     A["`**Claude**
     Code / Desktop`"] -->|MCP JSON-RPC| B["`**himalaya-mcp**
-    11 tools · 4 prompts`"]
+    19 tools · 4 prompts`"]
     B -->|execFile| C["`**himalaya CLI**
     --output json`"]
     C -->|IMAP/SMTP| D["`**Mail Server**
