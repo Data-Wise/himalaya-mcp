@@ -81,6 +81,29 @@ elif echo "$clean" | grep -q "template reply"; then
   echo '${FAKE_RESPONSES["template reply"].replace(/'/g, "'\"'\"'")}'
 elif echo "$clean" | grep -q "template send"; then
   echo '{}'
+elif echo "$clean" | grep -q "folder create"; then
+  echo '{}'
+elif echo "$clean" | grep -q "folder delete"; then
+  echo '{}'
+elif echo "$clean" | grep -q "attachment download"; then
+  # Create fake attachment files in cwd (our tools do readdir+stat on real files)
+  echo "fake pdf content for e2e testing" > "$PWD/report.pdf"
+  cat > "$PWD/invite.ics" << 'ICSEOF'
+BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY:E2E Test Meeting
+DTSTART:20260301T140000
+DTEND:20260301T150000
+LOCATION:Room 42
+ORGANIZER;CN=Alice:mailto:alice@test.com
+DESCRIPTION:E2E test calendar event
+UID:e2e-test-uid@example.com
+END:VEVENT
+END:VCALENDAR
+ICSEOF
+  echo "body text" > "$PWD/plain.txt"
+  echo "<html>body</html>" > "$PWD/index.html"
+  echo '{}'
 else
   echo '[]'
 fi
@@ -420,6 +443,148 @@ describe("E2E: MCP Server Headless", () => {
     expect(text).toContain("INBOX");
     expect(text).toContain("Sent");
     expect(text).toContain("Archive");
+  });
+
+  // --- Folder tools ---
+
+  it("list_folders returns folder list", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "list_folders",
+      arguments: {},
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("INBOX");
+    expect(text).toContain("Sent");
+    expect(text).toContain("Archive");
+  });
+
+  it("create_folder succeeds", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "create_folder",
+      arguments: { name: "Projects" },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("Projects");
+    expect(text).toContain("created");
+  });
+
+  it("delete_folder without confirm returns preview", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "delete_folder",
+      arguments: { name: "OldStuff" },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("PREVIEW");
+    expect(text).toContain("NOT been deleted");
+    expect(text).toContain("OldStuff");
+  });
+
+  // --- Compose ---
+
+  it("compose_email without confirm returns preview", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "compose_email",
+      arguments: {
+        to: "bob@example.com",
+        subject: "Hello from E2E",
+        body: "This is an E2E compose test.",
+      },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("PREVIEW");
+    expect(text).toContain("NOT been sent");
+    expect(text).toContain("bob@example.com");
+    expect(text).toContain("Hello from E2E");
+  });
+
+  it("compose_email with confirm=true sends", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "compose_email",
+      arguments: {
+        to: "bob@example.com",
+        subject: "Hello from E2E",
+        body: "This is an E2E compose test.",
+        confirm: true,
+      },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("sent successfully");
+    expect(text).toContain("bob@example.com");
+  });
+
+  // --- Attachment tools ---
+
+  it("list_attachments returns files with sizes (filters body parts)", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "list_attachments",
+      arguments: { id: "100" },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("report.pdf");
+    expect(text).toContain("invite.ics");
+    // Body parts should be filtered out
+    expect(text).not.toContain("plain.txt");
+    expect(text).not.toContain("index.html");
+  });
+
+  it("list_attachments shows MIME types inferred from extension", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "list_attachments",
+      arguments: { id: "100" },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("application/pdf");
+    expect(text).toContain("text/calendar");
+  });
+
+  it("download_attachment returns file path", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "download_attachment",
+      arguments: { id: "100", filename: "report.pdf" },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("report.pdf");
+    expect(text).toContain("Downloaded");
+  });
+
+  // --- Calendar tools ---
+
+  it("extract_calendar_event parses ICS from downloaded attachments", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "extract_calendar_event",
+      arguments: { id: "100" },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("E2E Test Meeting");
+    expect(text).toContain("Room 42");
+    expect(text).toContain("alice@test.com");
+  });
+
+  it("create_calendar_event without confirm returns preview", async () => {
+    const result = await sendRequest("tools/call", {
+      name: "create_calendar_event",
+      arguments: {
+        summary: "E2E Meeting",
+        dtstart: "2026-03-01T14:00:00",
+        dtend: "2026-03-01T15:00:00",
+        location: "Room 42",
+      },
+    });
+
+    const text = result.result.content[0].text;
+    expect(text).toContain("PREVIEW");
+    expect(text).toContain("NOT been created");
+    expect(text).toContain("E2E Meeting");
+    expect(text).toContain("Room 42");
   });
 
   // --- Error path tests ---

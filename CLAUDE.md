@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 1.2.0 (in development)
-- **Current Phase:** 6 — Feature expansion (19 tools, 4 prompts, 3 resources, 245 tests)
+- **Current Phase:** 6 — Feature expansion (19 tools, 4 prompts, 3 resources, 256 tests)
 
 ### What It Does
 
@@ -86,7 +86,7 @@ himalaya-mcp/
 │   ├── clipboard.test.ts        # 4 clipboard tests
 │   ├── dogfood.test.ts          # 91 dogfooding tests (realistic Claude usage)
 │   ├── setup.test.ts            # 18 setup CLI tests
-│   └── e2e.test.ts              # 22 E2E tests (headless MCP server pipeline)
+│   └── e2e.test.ts              # 32 E2E tests (headless MCP server pipeline)
 ├── package.json
 └── tsconfig.json
 ```
@@ -199,7 +199,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (245 tests across 15 test files)
+npm test                         # Run vitest (256 tests across 15 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~583KB)
 node dist/index.js               # Run MCP server directly
 ```
