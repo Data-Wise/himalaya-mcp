@@ -10,7 +10,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 - Homebrew install script uses `ln -sfh` to prevent circular `libexec/libexec` symlinks on reinstall
 - Homebrew install script uses full paths (`/bin/ln`, `/bin/mkdir`, `/bin/rm`) and `HOMEBREW_PREFIX` env var for restricted PATH contexts
-- Removed Homebrew `post_install` symlink attempt: macOS `sandbox-exec` blocks writes outside Homebrew-managed paths; users run `himalaya-mcp-install` manually
+- Removed Homebrew `post_install` symlink attempt: macOS `sandbox-exec` blocks ALL `post_install` writes to `$HOME` regardless of formula build steps (verified across both craft and himalaya-mcp formulas); users run `himalaya-mcp-install` after `brew install`
 - Homebrew install script migrates plugin scope from `himalaya-mcp-marketplace` to `local-plugins` and cleans stale cache
 - Removed unreliable `claude plugin update` from Homebrew `post_install`
 - Unblocked 4 skipped setup E2E tests (`vi.mock` interference with `existsSync`)
