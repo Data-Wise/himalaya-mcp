@@ -17,12 +17,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 - Hardened homebrew-release tarball download: `mktemp` for temp files, `--max-time 30` on curl, `sha256sum` (native on Ubuntu runners)
 - Setup E2E tests skip gracefully when `dist/` not built (`describe.skipIf`)
+- Setup E2E tests actually run when build exists: use `accessSync` (unmocked) instead of `existsSync` (mocked by `vi.mock`), fixing `vi.mock` interference that silently skipped 4 tests
 - marketplace.json source path `"./"` back to canonical `"."` (fixes dogfood test)
 - Homebrew post-install script hangs when Claude Code is running: guard all JSON file writes (`marketplace.json`, `settings.json`) behind `pgrep` check, replaced slow `lsof` with `pgrep -x "claude"`
 - Homebrew reusable workflow cross-repo push auth: `persist-credentials: false` + `unset GITHUB_TOKEN` to prevent runner credential helper override
+- Removed stale `lint` script referencing uninstalled eslint
 
 ### Documentation
 
+- Added Claude Desktop section to user guide: platform comparison table, setup command details, config file paths, usage examples
 - Split tutorials into 6 individual pages with learning path diagram (#15)
   - Level 1: Read First Email, Multi-Account
   - Level 2: Triage Inbox, Reply to Email, Export & Save
