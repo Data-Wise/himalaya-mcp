@@ -7,7 +7,7 @@ Privacy-first email MCP server and Claude Code plugin wrapping the [himalaya](ht
 - **19 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar
 - **4 MCP prompts**: triage inbox, summarize email, daily digest, draft reply
 - **3 MCP resources**: inbox, message by ID, folders
-- **5 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:help`
+- **7 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:help`
 - **Multi-account**: per-call account switching via `--account`
 - **Safe subprocess**: uses `execFile` (no shell injection)
 - **Two-phase send**: `send_email` returns preview first, requires explicit `confirm=true`

@@ -48,7 +48,7 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     ---
 
-    Use as a Claude Code plugin (5 skills) or standalone MCP server
+    Use as a Claude Code plugin (7 skills) or standalone MCP server
 
     [:octicons-arrow-right-24: Installation](getting-started/installation.md)
 
