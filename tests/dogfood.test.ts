@@ -945,7 +945,7 @@ describe("Dogfooding: create_calendar_event safety gate", () => {
 describe("Packaging: version consistency", () => {
   const pkgJson = JSON.parse(readFileSync(join(PROJECT_ROOT, "package.json"), "utf-8"));
   const pluginJson = JSON.parse(
-    readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+    readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
   );
 
   it("src/index.ts VERSION matches package.json", () => {
@@ -968,7 +968,7 @@ describe("Packaging: version consistency", () => {
 
 describe("Packaging: plugin manifest structure", () => {
   const pluginJson = JSON.parse(
-    readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+    readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
   );
 
   it("has required top-level fields", () => {
@@ -978,7 +978,7 @@ describe("Packaging: plugin manifest structure", () => {
   });
 
   it("has skills directory with valid skill files", () => {
-    const skillsDir = join(PROJECT_ROOT, "plugin", "skills");
+    const skillsDir = join(PROJECT_ROOT, "himalaya-mcp-plugin", "skills");
     expect(existsSync(skillsDir)).toBe(true);
     const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md"];
     for (const skill of expectedSkills) {
@@ -987,7 +987,7 @@ describe("Packaging: plugin manifest structure", () => {
   });
 
   it("has agents directory with valid agent files", () => {
-    const agentsDir = join(PROJECT_ROOT, "plugin", "agents");
+    const agentsDir = join(PROJECT_ROOT, "himalaya-mcp-plugin", "agents");
     expect(existsSync(agentsDir)).toBe(true);
     expect(existsSync(join(agentsDir, "email-assistant.md"))).toBe(true);
   });
@@ -1015,7 +1015,7 @@ describe("Packaging: marketplace.json", () => {
     expect(marketplace.plugins).toBeDefined();
     expect(marketplace.plugins.length).toBe(1);
     expect(marketplace.plugins[0].name).toBe("himalaya-mcp");
-    expect(marketplace.plugins[0].source).toBe(".");
+    expect(marketplace.plugins[0].source).toBe("./himalaya-mcp-plugin");
     expect(marketplace.plugins[0].description).toBeTruthy();
   });
 });
@@ -1036,7 +1036,7 @@ describe("Packaging: .mcp.json", () => {
 
   it("is the sole MCP server declaration (not duplicated in plugin.json)", () => {
     const pluginJson = JSON.parse(
-      readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+      readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
     );
     expect(pluginJson.mcpServers).toBeUndefined();
   });
