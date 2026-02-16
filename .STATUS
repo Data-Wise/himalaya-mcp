@@ -27,11 +27,11 @@
 
 ## Just Completed
 
-- 2026-02-15: Fixed marketplace schema — restructured plugin into `himalaya-mcp-plugin/` subdirectory
-- 2026-02-15: Merged PR #26 (release v1.2.0 + marketplace fix) and PR #27 (cleanup)
+- 2026-02-15: Fixed CI and dogfood tests for plugin restructure (PRs #29, #30)
+- 2026-02-15: Synced marketplace.json version to 1.2.0
+- 2026-02-15: Fixed marketplace schema — restructured plugin into `himalaya-mcp-plugin/` subdirectory (PRs #26, #27)
 - 2026-02-15: Removed stale planning files (BRAINSTORM, ORCHESTRATE)
 - 2026-02-14: Released v1.2.0 (GitHub release + Homebrew upgrade)
-- 2026-02-14: Merged PR #24 (feature/v1.2.0 → dev) — 8 new tools
 
 ## Current State
 
@@ -73,4 +73,4 @@ B) Work on something else
 ---
 
 **Last Updated:** 2026-02-15
-**Status:** v1.2.0 released, marketplace fix deployed
+**Status:** v1.2.0 released, marketplace + CI fully green
