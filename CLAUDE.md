@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.2.0 (in development)
-- **Current Phase:** 6 — Feature expansion (19 tools, 4 prompts, 3 resources, 256 tests)
+- **Version:** 1.2.0 (released)
+- **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 262 tests)
 
 ### What It Does
 
@@ -59,7 +59,7 @@ himalaya-mcp/
 │       ├── clipboard.ts         # copy_to_clipboard (pbcopy/xclip)
 │       └── calendar.ts          # ICS parser + Apple Calendar (osascript)
 ├── plugin/
-│   ├── skills/                  # Claude Code plugin skills (inbox, triage, digest, reply)
+│   ├── skills/                  # Claude Code plugin skills (7: inbox, triage, digest, reply, compose, attachments, help)
 │   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks
 ├── .claude-plugin/
@@ -78,8 +78,8 @@ himalaya-mcp/
 │   ├── compose.test.ts          # 9 compose tools tests
 │   ├── compose-new.test.ts      # 8 compose_email tests
 │   ├── folders.test.ts          # 12 folder tools tests
-│   ├── attachments.test.ts      # 9 attachment tools tests
-│   ├── calendar.test.ts         # 12 calendar tests (ICS parser + tools)
+│   ├── attachments.test.ts      # 10 attachment tools tests
+│   ├── calendar.test.ts         # 18 calendar tests (ICS parser + tools + escaping)
 │   ├── actions.test.ts          # 6 export/action tests
 │   ├── prompts.test.ts          # 15 prompt registration tests
 │   ├── config.test.ts           # 7 config tests
@@ -199,8 +199,8 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (256 tests across 15 test files)
-npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~583KB)
+npm test                         # Run vitest (262 tests across 15 test files)
+npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~595KB)
 node dist/index.js               # Run MCP server directly
 ```
 
@@ -264,4 +264,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-02-14

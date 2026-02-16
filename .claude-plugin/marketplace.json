@@ -9,7 +9,7 @@
   },
   "plugins": [{
     "name": "himalaya-mcp",
-    "source": ".",
+    "source": "./himalaya-mcp-plugin",
     "description": "Privacy-first email MCP server wrapping himalaya CLI",
     "category": "productivity",
     "tags": ["email", "mcp", "himalaya", "privacy"]
