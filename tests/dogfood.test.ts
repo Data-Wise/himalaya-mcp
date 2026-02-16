@@ -978,7 +978,7 @@ describe("Packaging: plugin manifest structure", () => {
   });
 
   it("has skills directory with valid skill files", () => {
-    const skillsDir = join(PROJECT_ROOT, "plugin", "skills");
+    const skillsDir = join(PROJECT_ROOT, "himalaya-mcp-plugin", "skills");
     expect(existsSync(skillsDir)).toBe(true);
     const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md"];
     for (const skill of expectedSkills) {
@@ -987,7 +987,7 @@ describe("Packaging: plugin manifest structure", () => {
   });
 
   it("has agents directory with valid agent files", () => {
-    const agentsDir = join(PROJECT_ROOT, "plugin", "agents");
+    const agentsDir = join(PROJECT_ROOT, "himalaya-mcp-plugin", "agents");
     expect(existsSync(agentsDir)).toBe(true);
     expect(existsSync(join(agentsDir, "email-assistant.md"))).toBe(true);
   });
@@ -1015,7 +1015,7 @@ describe("Packaging: marketplace.json", () => {
     expect(marketplace.plugins).toBeDefined();
     expect(marketplace.plugins.length).toBe(1);
     expect(marketplace.plugins[0].name).toBe("himalaya-mcp");
-    expect(marketplace.plugins[0].source).toBe(".");
+    expect(marketplace.plugins[0].source).toBe("./himalaya-mcp-plugin");
     expect(marketplace.plugins[0].description).toBeTruthy();
   });
 });
