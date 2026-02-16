@@ -945,7 +945,7 @@ describe("Dogfooding: create_calendar_event safety gate", () => {
 describe("Packaging: version consistency", () => {
   const pkgJson = JSON.parse(readFileSync(join(PROJECT_ROOT, "package.json"), "utf-8"));
   const pluginJson = JSON.parse(
-    readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+    readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
   );
 
   it("src/index.ts VERSION matches package.json", () => {
@@ -968,7 +968,7 @@ describe("Packaging: version consistency", () => {
 
 describe("Packaging: plugin manifest structure", () => {
   const pluginJson = JSON.parse(
-    readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+    readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
   );
 
   it("has required top-level fields", () => {
@@ -1036,7 +1036,7 @@ describe("Packaging: .mcp.json", () => {
 
   it("is the sole MCP server declaration (not duplicated in plugin.json)", () => {
     const pluginJson = JSON.parse(
-      readFileSync(join(PROJECT_ROOT, ".claude-plugin", "plugin.json"), "utf-8")
+      readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
     );
     expect(pluginJson.mcpServers).toBeUndefined();
   });
