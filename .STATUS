@@ -27,16 +27,16 @@
 
 ## Just Completed
 
+- 2026-02-17: Docs site sync for v1.2.2 — CHANGELOG, test counts, skill list, VERSION fix
+- 2026-02-17: Fixed VERSION constant and E2E test (was still 1.2.1)
+- 2026-02-17: Deployed to GitHub Pages, merged PR #35 to main
 - 2026-02-17: Brainstorm + spec for .mcpb packaging (max depth, 2 agents)
 - 2026-02-17: Shortened marketplace name (himalaya-mcp-marketplace → himalaya-mcp)
 - 2026-02-17: Created worktree for feature/mcpb-packaging
-- 2026-02-16: Added E2E tests for install/upgrade/config (275 tests)
-- 2026-02-16: Fixed setup CLI dynamic path resolution
-- 2026-02-16: Generated CLI test suites (automated + interactive)
 
 ## Current State
 
-- Branch: `dev` (synced with main after v1.2.1)
+- Branch: `dev` (synced with main after v1.2.2)
 - v1.2.2 released on GitHub and Homebrew
 - All phases complete, clean working tree
 - Tests: 275 across 15 test files
@@ -99,5 +99,5 @@ claude
 
 ---
 
-**Last Updated:** 2026-02-17
+**Last Updated:** 2026-02-16
 **Status:** v1.2.2 released, .mcpb packaging in progress (worktree)
