@@ -31,7 +31,11 @@ claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install email
 ```
 
-### Claude Desktop
+### Claude Desktop (.mcpb -- one-click install)
+
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and open it in Claude Desktop. Requires `brew install himalaya` separately.
+
+### Claude Desktop (CLI setup)
 
 ```bash
 himalaya-mcp setup
@@ -53,16 +57,16 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 ## Testing
 
 ```bash
-npm test              # 275 tests across 15 test files (vitest)
+npm test              # 314 tests across 15 test files (vitest)
 ```
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
-| Unit (parser, config, clipboard) | 34 | Core parsing and config |
+| Unit (parser, config, clipboard) | 35 | Core parsing, config, template variable guards |
 | Integration (tools, prompts) | 80 | All 19 tools + 4 prompts |
-| Dogfooding | 91 | Realistic Claude usage patterns |
-| E2E | 32 | Full MCP server pipeline with fake himalaya binary |
-| Setup CLI | 31 | Setup command, install/upgrade E2E, plugin structure |
+| Dogfooding | 122 | Realistic Claude usage + .mcpb packaging validation |
+| E2E | 34 | Full MCP server pipeline + .mcpb build pipeline |
+| Setup CLI | 36 | Setup, install/upgrade E2E, doctor command, plugin structure |
 
 ## Documentation
 

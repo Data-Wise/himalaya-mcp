@@ -1185,4 +1185,221 @@ describe("Packaging: package.json distribution fields", () => {
   it("main entry points to dist/index.js", () => {
     expect(pkgJson.main).toBe("dist/index.js");
   });
+
+  it("has build:mcpb script for Desktop Extension packaging", () => {
+    expect(pkgJson.scripts["build:mcpb"]).toBeDefined();
+    expect(pkgJson.scripts["build:mcpb"]).toContain("build-mcpb");
+  });
+});
+
+// =============================================================================
+// .mcpb Desktop Extension packaging
+// =============================================================================
+
+describe("Packaging: mcpb/manifest.json", () => {
+  const manifestPath = join(PROJECT_ROOT, "mcpb", "manifest.json");
+
+  it("exists in mcpb/ directory", () => {
+    expect(existsSync(manifestPath)).toBe(true);
+  });
+
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+
+  it("uses manifest_version 0.3", () => {
+    expect(manifest.manifest_version).toBe("0.3");
+  });
+
+  it("has required top-level fields", () => {
+    expect(manifest.name).toBe("himalaya-mcp");
+    expect(manifest.version).toBeTruthy();
+    expect(manifest.description).toBeTruthy();
+    expect(manifest.author).toBeDefined();
+    expect(manifest.author.name).toBe("Data-Wise");
+    expect(manifest.server).toBeDefined();
+  });
+
+  it("has display_name for Claude Desktop UI", () => {
+    expect(manifest.display_name).toBe("Himalaya Email");
+  });
+
+  it("version matches package.json", () => {
+    const pkgJson = JSON.parse(readFileSync(join(PROJECT_ROOT, "package.json"), "utf-8"));
+    expect(manifest.version).toBe(pkgJson.version);
+  });
+
+  it("server type is node with correct entry point", () => {
+    expect(manifest.server.type).toBe("node");
+    expect(manifest.server.entry_point).toBe("dist/index.js");
+  });
+
+  it("mcp_config uses __dirname template variable", () => {
+    expect(manifest.server.mcp_config.command).toBe("node");
+    expect(manifest.server.mcp_config.args[0]).toContain("${__dirname}");
+    expect(manifest.server.mcp_config.args[0]).toContain("dist/index.js");
+  });
+
+  it("mcp_config.env maps user_config to HIMALAYA_ env vars", () => {
+    const env = manifest.server.mcp_config.env;
+    expect(env.HIMALAYA_BINARY).toBe("${user_config.himalaya_binary}");
+    expect(env.HIMALAYA_ACCOUNT).toBe("${user_config.himalaya_account}");
+    expect(env.HIMALAYA_FOLDER).toBe("${user_config.himalaya_folder}");
+  });
+
+  it("declares all 3 user_config fields with correct types", () => {
+    expect(manifest.user_config.himalaya_binary.type).toBe("file");
+    expect(manifest.user_config.himalaya_binary.required).toBe(false);
+
+    expect(manifest.user_config.himalaya_account.type).toBe("string");
+    expect(manifest.user_config.himalaya_account.required).toBe(false);
+
+    expect(manifest.user_config.himalaya_folder.type).toBe("string");
+    expect(manifest.user_config.himalaya_folder.default).toBe("INBOX");
+    expect(manifest.user_config.himalaya_folder.required).toBe(false);
+  });
+
+  it("compatibility targets macOS with Node 22+", () => {
+    expect(manifest.compatibility.platforms).toEqual(["darwin"]);
+    expect(manifest.compatibility.runtimes.node).toBe(">=22.0.0");
+  });
+
+  it("lists exactly 19 tools", () => {
+    expect(manifest.tools).toHaveLength(19);
+  });
+
+  it("lists exactly 4 prompts", () => {
+    expect(manifest.prompts).toHaveLength(4);
+  });
+
+  it("every tool has name and description", () => {
+    for (const tool of manifest.tools) {
+      expect(tool.name).toBeTruthy();
+      expect(tool.description).toBeTruthy();
+    }
+  });
+
+  it("every prompt has name, description, and text", () => {
+    for (const prompt of manifest.prompts) {
+      expect(prompt.name).toBeTruthy();
+      expect(prompt.description).toBeTruthy();
+      expect(prompt.text).toBeTruthy();
+    }
+  });
+
+  it("manifest tool names match server-registered tools (no drift)", () => {
+    const manifestToolNames = manifest.tools.map((t: any) => t.name).sort();
+    expect(manifestToolNames).toEqual([
+      "compose_email",
+      "copy_to_clipboard",
+      "create_action_item",
+      "create_calendar_event",
+      "create_folder",
+      "delete_folder",
+      "download_attachment",
+      "draft_reply",
+      "export_to_markdown",
+      "extract_calendar_event",
+      "flag_email",
+      "list_attachments",
+      "list_emails",
+      "list_folders",
+      "move_email",
+      "read_email",
+      "read_email_html",
+      "search_emails",
+      "send_email",
+    ]);
+  });
+
+  it("manifest prompt names match server-registered prompts (no drift)", () => {
+    const manifestPromptNames = manifest.prompts.map((p: any) => p.name).sort();
+    expect(manifestPromptNames).toEqual([
+      "daily_email_digest",
+      "draft_reply",
+      "summarize_email",
+      "triage_inbox",
+    ]);
+  });
+
+  it("has license and repository metadata", () => {
+    expect(manifest.license).toBe("MIT");
+    expect(manifest.repository.type).toBe("git");
+    expect(manifest.repository.url).toContain("Data-Wise/himalaya-mcp");
+  });
+});
+
+describe("Packaging: mcpb build infrastructure", () => {
+  it("build script exists and is executable", () => {
+    const scriptPath = join(PROJECT_ROOT, "scripts", "build-mcpb.sh");
+    expect(existsSync(scriptPath)).toBe(true);
+  });
+
+  it(".mcpbignore exists in mcpb/ directory", () => {
+    const ignorePath = join(PROJECT_ROOT, "mcpb", ".mcpbignore");
+    expect(existsSync(ignorePath)).toBe(true);
+  });
+
+  it(".mcpbignore excludes dev files from bundle", () => {
+    const ignoreContent = readFileSync(join(PROJECT_ROOT, "mcpb", ".mcpbignore"), "utf-8");
+    expect(ignoreContent).toContain("node_modules/");
+    expect(ignoreContent).toContain("src/");
+    expect(ignoreContent).toContain("tests/");
+    expect(ignoreContent).toContain("*.ts");
+    expect(ignoreContent).toContain("*.md");
+  });
+
+  it(".gitignore excludes .mcpb build artifacts", () => {
+    const gitignore = readFileSync(join(PROJECT_ROOT, ".gitignore"), "utf-8");
+    expect(gitignore).toContain("*.mcpb");
+    expect(gitignore).toContain("mcpb/dist/");
+  });
+});
+
+describe("Packaging: CI validates mcpb", () => {
+  const ciContent = readFileSync(join(PROJECT_ROOT, ".github", "workflows", "ci.yml"), "utf-8");
+
+  it("ci.yml has validate-mcpb job", () => {
+    expect(ciContent).toContain("validate-mcpb:");
+  });
+
+  it("validate-mcpb runs mcpb validate", () => {
+    expect(ciContent).toContain("@anthropic-ai/mcpb validate mcpb/");
+  });
+
+  it("validate-mcpb runs build:mcpb", () => {
+    expect(ciContent).toContain("npm run build:mcpb");
+  });
+
+  it("validate-mcpb verifies bundle output", () => {
+    expect(ciContent).toContain("himalaya-mcp-v*.mcpb");
+  });
+});
+
+describe("Packaging: release includes mcpb", () => {
+  const releaseContent = readFileSync(
+    join(PROJECT_ROOT, ".github", "workflows", "homebrew-release.yml"),
+    "utf-8"
+  );
+
+  it("release workflow builds mcpb bundle", () => {
+    expect(releaseContent).toContain("npm run build:mcpb");
+  });
+
+  it("release workflow uploads mcpb artifact", () => {
+    expect(releaseContent).toContain("upload-artifact@v4");
+    expect(releaseContent).toContain("mcpb-bundle");
+  });
+
+  it("release workflow has upload-mcpb job", () => {
+    expect(releaseContent).toContain("upload-mcpb:");
+    expect(releaseContent).toContain("Upload MCPB to Release");
+  });
+
+  it("upload-mcpb uses gh release upload", () => {
+    expect(releaseContent).toContain("gh release upload");
+  });
+
+  it("upload-mcpb uses env vars for GitHub context (injection safe)", () => {
+    expect(releaseContent).toContain("GH_TOKEN: ${{ github.token }}");
+    expect(releaseContent).toContain("TAG_NAME: ${{ github.event.release.tag_name }}");
+  });
 });

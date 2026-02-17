@@ -1,0 +1,111 @@
+{
+  "manifest_version": "0.3",
+  "name": "himalaya-mcp",
+  "display_name": "Himalaya Email",
+  "version": "1.3.0",
+  "description": "Privacy-first email for Claude via the himalaya CLI. List, search, read, triage, compose, and manage emails without sending credentials to the cloud.",
+  "author": {
+    "name": "Data-Wise",
+    "url": "https://github.com/Data-Wise"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Data-Wise/himalaya-mcp"
+  },
+  "homepage": "https://github.com/Data-Wise/himalaya-mcp",
+  "keywords": ["email", "imap", "smtp", "himalaya", "privacy", "inbox", "triage"],
+
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:${HOME}/.local/bin:/usr/bin:/bin",
+        "HIMALAYA_BINARY": "${user_config.himalaya_binary}",
+        "HIMALAYA_ACCOUNT": "${user_config.himalaya_account}",
+        "HIMALAYA_FOLDER": "${user_config.himalaya_folder}"
+      }
+    }
+  },
+
+  "user_config": {
+    "himalaya_binary": {
+      "type": "file",
+      "title": "Himalaya Binary",
+      "description": "Path to himalaya CLI binary. Leave empty to use the system PATH (requires: brew install himalaya).",
+      "required": false
+    },
+    "himalaya_account": {
+      "type": "string",
+      "title": "Default Account",
+      "description": "Default email account name (as configured in himalaya). Leave empty to use the default account.",
+      "required": false
+    },
+    "himalaya_folder": {
+      "type": "string",
+      "title": "Default Folder",
+      "description": "Default email folder to operate on.",
+      "default": "INBOX",
+      "required": false
+    }
+  },
+
+  "compatibility": {
+    "platforms": ["darwin"],
+    "runtimes": {
+      "node": ">=22.0.0"
+    }
+  },
+
+  "tools": [
+    {"name": "list_emails", "description": "List emails in a folder. Returns envelope data: subject, from, date, flags."},
+    {"name": "search_emails", "description": "Search emails using himalaya filter syntax. Examples: 'subject invoice', 'from paypal', 'subject meeting and from boss'. Operators: and, or, not. Conditions: subject, from, to, body, date, before, after, flag."},
+    {"name": "read_email", "description": "Read an email message body (plain text). Use the ID from list_emails or search_emails."},
+    {"name": "read_email_html", "description": "Read an email message body as HTML. Useful for formatted emails."},
+    {"name": "flag_email", "description": "Add or remove flags on an email. Common flags: Seen, Flagged, Answered, Deleted, Draft. Use 'add' to set flags, 'remove' to clear them."},
+    {"name": "move_email", "description": "Move an email to a different folder. Common targets: Archive, Trash, Spam, Sent, Drafts."},
+    {"name": "draft_reply", "description": "Generate a reply draft for an email. Returns the reply template with headers and quoted original message. Does NOT send -- use send_email to send after user reviews."},
+    {"name": "send_email", "description": "Send an email template. SAFETY: requires confirm=true to actually send. Without confirm, returns a preview. Always show the user the preview and get their approval before sending with confirm=true."},
+    {"name": "compose_email", "description": "Compose and send a new email (not a reply). SAFETY: requires confirm=true to actually send. Without confirm, returns a preview for user review."},
+    {"name": "list_folders", "description": "List all email folders/mailboxes for an account. Returns folder names."},
+    {"name": "create_folder", "description": "Create a new email folder/mailbox."},
+    {"name": "delete_folder", "description": "Delete an email folder/mailbox. SAFETY: requires confirm=true to actually delete. Without confirm, returns a preview warning."},
+    {"name": "list_attachments", "description": "List attachments for an email message. Downloads all attachments to inspect them, then returns filename, MIME type (inferred from extension), and size for each."},
+    {"name": "download_attachment", "description": "Download an email attachment to a temporary directory. Downloads all attachments, then returns the path to the requested file."},
+    {"name": "extract_calendar_event", "description": "Extract calendar event details from an email's ICS attachment. Downloads all attachments, finds the .ics file, parses it, and returns event summary, dates, location, and organizer."},
+    {"name": "create_calendar_event", "description": "Create an event in Apple Calendar. SAFETY: requires confirm=true to actually create. Without confirm, returns a preview. macOS only."},
+    {"name": "export_to_markdown", "description": "Export an email as formatted markdown with YAML frontmatter (date, from, to, subject, flags). Returns the markdown text."},
+    {"name": "create_action_item", "description": "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events."},
+    {"name": "copy_to_clipboard", "description": "Copy text to the system clipboard (pbcopy on macOS, xclip on Linux). Useful for copying email content, markdown exports, or any text."}
+  ],
+
+  "prompts": [
+    {
+      "name": "triage_inbox",
+      "description": "Classify recent emails as actionable, FYI, or skip. Suggests flags and folder moves.",
+      "arguments": ["count"],
+      "text": "Triage my recent emails. For each email, classify as Actionable, FYI, or Skip, and suggest flags or folder moves."
+    },
+    {
+      "name": "summarize_email",
+      "description": "Produce a one-sentence summary and list action items for a specific email.",
+      "arguments": ["id", "folder"],
+      "text": "Summarize the specified email with a one-sentence summary, action items, and priority level."
+    },
+    {
+      "name": "daily_email_digest",
+      "description": "Create a markdown digest of today's important emails, grouped by priority.",
+      "arguments": [],
+      "text": "Create a daily email digest grouped by priority: Requires Action, FYI/Review, and Low Priority."
+    },
+    {
+      "name": "draft_reply",
+      "description": "Compose a professional reply to an email. Reads the original, generates a draft, and presents for review before sending.",
+      "arguments": ["id", "tone", "instructions"],
+      "text": "Help me compose a professional reply to the specified email. Show the draft for review before sending."
+    }
+  ]
+}

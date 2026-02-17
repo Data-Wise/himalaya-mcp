@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.2.2 (released)
-- **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 275 tests)
+- **Version:** 1.3.0 (released)
+- **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 314 tests)
 
 ### What It Does
 
@@ -87,8 +87,8 @@ himalaya-mcp/
 │   ├── config.test.ts           # 7 config tests
 │   ├── clipboard.test.ts        # 4 clipboard tests
 │   ├── dogfood.test.ts          # 91 dogfooding tests (realistic Claude usage)
-│   ├── setup.test.ts            # 31 setup CLI + install E2E tests
-│   └── e2e.test.ts              # 32 E2E tests (headless MCP server pipeline)
+│   ├── setup.test.ts            # 36 setup CLI + install + doctor E2E tests
+│   └── e2e.test.ts              # 34 E2E tests (headless MCP server pipeline + .mcpb build)
 ├── package.json
 └── tsconfig.json
 ```
@@ -201,7 +201,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (275 tests across 15 test files)
+npm test                         # Run vitest (314 tests across 15 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~595KB)
 node dist/index.js               # Run MCP server directly
 ```
@@ -219,6 +219,10 @@ claude plugin install email
 
 # Claude Desktop (after installing via Homebrew or npm)
 himalaya-mcp setup
+
+# Diagnose installation
+himalaya-mcp doctor              # Check all settings
+himalaya-mcp doctor --fix        # Auto-fix common issues
 ```
 
 ### Dev Setup (local development)

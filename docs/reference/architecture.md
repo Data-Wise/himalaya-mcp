@@ -38,11 +38,13 @@
 ## Distribution Architecture
 
 ```
-Homebrew (Primary)                  GitHub (Fallback)
-  brew install himalaya-mcp           claude plugin marketplace add Data-Wise/himalaya-mcp
-  │                                   claude plugin install email
-  ├─ depends_on "himalaya"            │
-  ├─ depends_on "node"                └─ Copies plugin to cache, uses ${CLAUDE_PLUGIN_ROOT}
+Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (Claude Desktop)
+  brew install himalaya-mcp           claude plugin marketplace add ...     Download .mcpb from GitHub Releases
+  │                                   claude plugin install email           Double-click to install in Desktop
+  ├─ depends_on "himalaya"            │                                     │
+  ├─ depends_on "node"                └─ Copies plugin to cache             ├─ ~150 KB package (bundled server)
+                                                                            ├─ Configurable: binary path, account, folder
+                                                                            └─ Requires: brew install himalaya
   │
   ├─ libexec/
   │   ├─ .claude-plugin/plugin.json
@@ -129,7 +131,7 @@ src/
 │   └── clipboard.ts      copy_to_clipboard — pbcopy (macOS) / xclip (Linux)
 │
 └── cli/
-    └── setup.ts          Claude Desktop setup (add/check/remove MCP config, dynamic path resolution)
+    └── setup.ts          Claude Desktop setup (setup/check/remove MCP config + install-ext/remove-ext)
 ```
 
 ## Data Flow

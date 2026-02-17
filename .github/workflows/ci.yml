@@ -49,6 +49,29 @@ jobs:
       - name: Verify bundle exists
         run: test -f dist/index.js && echo "Bundle OK ($(wc -c < dist/index.js) bytes)"
 
+  validate-mcpb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validate MCPB manifest
+        run: npx --yes @anthropic-ai/mcpb validate mcpb/
+
+      - name: Build MCPB bundle
+        run: npm run build:mcpb
+
+      - name: Verify MCPB bundle
+        run: |
+          MCPB_FILE=$(ls himalaya-mcp-v*.mcpb 2>/dev/null | head -1)
+          test -f "$MCPB_FILE" && echo "MCPB OK: $MCPB_FILE ($(wc -c < "$MCPB_FILE" | tr -d ' ') bytes)"
+
   validate-plugin:
     runs-on: ubuntu-latest
     steps:

@@ -206,6 +206,44 @@ list_emails(page_size: 10, page: 2)   -- next 10
 
 ---
 
+## Desktop Extension Issues
+
+### "himalaya CLI not found" in Claude Desktop
+
+Claude Desktop doesn't inherit your shell's PATH. The himalaya binary at `/opt/homebrew/bin/himalaya` isn't visible to the extension.
+
+**Fix:**
+
+1. Run `himalaya-mcp doctor --fix` -- this auto-sets `himalaya_binary` in Desktop settings
+2. Or manually set the binary path in the extension settings:
+   - Open `~/Library/Application Support/Claude/Claude Extensions Settings/himalaya-mcp.json`
+   - Set `"himalaya_binary": "/opt/homebrew/bin/himalaya"` in `userConfig`
+
+### Unresolved `${user_config.*}` template variables
+
+If optional fields (himalaya_binary, himalaya_account, himalaya_folder) are left empty during install, Claude Desktop passes literal `${user_config.himalaya_binary}` strings instead of empty values.
+
+**Fix:** This is handled automatically since v1.2.1 -- the config loader ignores any value starting with `${`. If you're on an older version, upgrade the extension.
+
+### Extension not showing tools
+
+1. Run `himalaya-mcp doctor` to check extension status
+2. Verify the extension is enabled in Claude Desktop settings
+3. Restart Claude Desktop after installing or updating the extension
+
+### Extension install path
+
+Extensions are stored at:
+
+```
+~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/
+```
+
+Registry: `~/Library/Application Support/Claude/extensions-installations.json`
+Settings: `~/Library/Application Support/Claude/Claude Extensions Settings/himalaya-mcp.json`
+
+---
+
 ## Common Error Messages
 
 | Error | Cause | Fix |
@@ -224,6 +262,18 @@ list_emails(page_size: 10, page: 2)   -- next 10
 - **himalaya-mcp:** [github.com/Data-Wise/himalaya-mcp/issues](https://github.com/Data-Wise/himalaya-mcp/issues)
 - **MCP Protocol:** [modelcontextprotocol.io](https://modelcontextprotocol.io/)
 
+### Run doctor
+
+The fastest way to diagnose issues:
+
+```bash
+himalaya-mcp doctor          # Check everything
+himalaya-mcp doctor --fix    # Auto-fix what it can
+himalaya-mcp doctor --json   # Machine-readable output
+```
+
+Doctor checks: Node.js, himalaya binary, himalaya config, MCP server bundle, email connectivity, Desktop extension (install, registry, settings, user_config), Claude Code plugin (symlink, marketplace), and environment variables.
+
 ### Debug mode
 
 Run the MCP server with debug output:
@@ -235,6 +285,5 @@ DEBUG=* node dist/index.js
 ### Run tests to verify installation
 
 ```bash
-npm test              # 65 unit/integration tests
-npm run test:e2e      # E2E tests (requires live himalaya)
+npm test    # 314 tests
 ```

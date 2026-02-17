@@ -44,11 +44,11 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     [:octicons-arrow-right-24: Multi-Account Guide](guide/workflows.md#6-multi-account-workflow)
 
-- :electric_plug: **Plugin + Server**
+- :electric_plug: **Plugin + Server + Extension**
 
     ---
 
-    Use as a Claude Code plugin (7 skills) or standalone MCP server
+    Claude Code plugin (7 skills), MCP server, or `.mcpb` Desktop Extension
 
     [:octicons-arrow-right-24: Installation](getting-started/installation.md)
 
@@ -125,7 +125,20 @@ ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ### Claude Desktop
 
 ```bash
-himalaya-mcp setup             # Auto-configure MCP server
+# Desktop Extension (.mcpb) — recommended
+# Download .mcpb from GitHub Releases, double-click to install
+# Or via CLI:
+himalaya-mcp install-ext
+
+# Legacy MCP server config
+himalaya-mcp setup
+```
+
+### Verify Installation
+
+```bash
+himalaya-mcp doctor            # Check all settings across the stack
+himalaya-mcp doctor --fix      # Auto-fix common issues
 ```
 
 Then in Claude Code:
@@ -148,3 +161,5 @@ You: "/email:help"
 - **[Workflows](guide/workflows.md)** -- common email patterns
 - **[Quick Reference](reference/refcard.md)** -- one-page cheat sheet
 - **[Architecture](reference/architecture.md)** -- system design and security
+- **[Desktop Extension](tutorials/desktop-extension.md)** -- install `.mcpb` in Claude Desktop
+- **[Desktop Extensions Reference](reference/desktop-extensions.md)** -- `.mcpb` format details

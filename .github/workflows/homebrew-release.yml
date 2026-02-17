@@ -74,6 +74,39 @@ jobs:
       - name: Verify bundle
         run: test -f dist/index.js && echo "Bundle OK ($(wc -c < dist/index.js) bytes)"
 
+      - name: Build MCPB bundle
+        run: npm run build:mcpb
+
+      - name: Upload MCPB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcpb-bundle
+          path: himalaya-mcp-v*.mcpb
+
+  upload-mcpb:
+    name: Upload MCPB to Release
+    needs: [validate]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    permissions:
+      contents: write
+    steps:
+      - name: Download MCPB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mcpb-bundle
+
+      - name: Upload to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: |
+          MCPB_FILE=$(ls himalaya-mcp-v*.mcpb 2>/dev/null | head -1)
+          if [ -n "$MCPB_FILE" ]; then
+            gh release upload "$TAG_NAME" "$MCPB_FILE" --repo "$GITHUB_REPOSITORY"
+            echo "Uploaded $MCPB_FILE to release $TAG_NAME"
+          fi
+
   prepare:
     name: Prepare Release Info
     needs: validate

@@ -150,9 +150,62 @@ claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install email
 ```
 
-## Claude Desktop Setup CLI
+## .mcpb Desktop Extension
 
-The `himalaya-mcp` CLI provides a setup command for Claude Desktop users:
+The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a lightweight ZIP archive (~147 KB) containing the esbuild bundle and a `manifest.json` descriptor.
+
+### Build
+
+```bash
+npm run build:mcpb
+# Output: himalaya-mcp-v1.3.0.mcpb (147 KB)
+```
+
+This runs `scripts/build-mcpb.sh` which:
+
+1. Builds the esbuild bundle (`dist/index.js`)
+2. Copies the bundle to `mcpb/dist/`
+3. Validates the manifest (`npx @anthropic-ai/mcpb validate mcpb/`)
+4. Packs the archive (`npx @anthropic-ai/mcpb pack mcpb/`)
+5. Renames to `himalaya-mcp-v{version}.mcpb`
+
+### Install (GUI)
+
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop.
+
+### Install (CLI)
+
+```bash
+himalaya-mcp install-ext himalaya-mcp-v1.3.0.mcpb   # Install from file
+himalaya-mcp install-ext                              # Auto-find in project root
+himalaya-mcp remove-ext                               # Uninstall
+```
+
+The CLI install unpacks to `~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/`, registers in `extensions-installations.json`, and creates a default settings file. Restart Claude Desktop after install.
+
+### User Configuration
+
+During install (or via Settings > Extensions in Claude Desktop), users can configure:
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| Himalaya Binary | file | `himalaya` | Path to himalaya CLI binary |
+| Default Account | string | (system default) | Email account from himalaya config |
+| Default Folder | string | `INBOX` | Default folder for operations |
+
+### What's in the .mcpb
+
+| File | Size | Purpose |
+|------|------|---------|
+| `manifest.json` | 6.3 KB | Extension manifest (metadata, tools, prompts, config) |
+| `dist/index.js` | 595 KB | esbuild bundle (all deps inlined) |
+
+!!! note "See also"
+    **[Desktop Extensions Reference](../reference/desktop-extensions.md)** for the full `.mcpb` format specification, manifest schema, and installation internals.
+
+## Claude Desktop Setup CLI (Legacy)
+
+The `himalaya-mcp` CLI provides a setup command for Claude Desktop users who prefer the legacy `mcpServers` approach:
 
 ```bash
 himalaya-mcp setup           # Add MCP server to claude_desktop_config.json
@@ -168,6 +221,9 @@ The setup command:
 - Adds the `himalaya` MCP server entry
 - Preserves all other existing servers
 - Points to the plugin's `dist/index.js` via the standard plugin path
+
+!!! tip "Prefer .mcpb for new installations"
+    The `.mcpb` extension approach provides a GUI settings panel and automatic updates. Use `himalaya-mcp setup` only if you need manual control over the MCP server configuration.
 
 ## What Ships in Each Channel
 
