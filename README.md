@@ -1,6 +1,6 @@
 # himalaya-mcp
 
-Privacy-first email MCP server and Claude Code plugin wrapping the [himalaya](https://github.com/pimalaya/himalaya) CLI.
+Privacy-first email for Claude -- MCP server and Claude Code plugin (`email`) wrapping the [himalaya](https://github.com/pimalaya/himalaya) CLI.
 
 ## Features
 
@@ -53,7 +53,7 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 ## Testing
 
 ```bash
-npm test              # 256 tests across 15 test files (vitest)
+npm test              # 262 tests across 15 test files (vitest)
 ```
 
 | Category | Tests | Coverage |

@@ -1,4 +1,4 @@
-# himalaya-mcp Quick Reference
+# Quick Reference
 
 ## Install
 

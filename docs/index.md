@@ -1,12 +1,12 @@
 # himalaya-mcp
 
-**Privacy-first email MCP server and Claude Code plugin wrapping the [himalaya](https://github.com/pimalaya/himalaya) CLI.**
+**Privacy-first email for Claude** -- an MCP server and Claude Code plugin (`email`) wrapping the [himalaya](https://github.com/pimalaya/himalaya) CLI.
 
 ---
 
 ## What is himalaya-mcp?
 
-himalaya-mcp gives Claude the ability to read, triage, compose, and manage email -- all without sending your credentials to the cloud. It wraps the local himalaya CLI as a subprocess, exposing email operations through the [Model Context Protocol](https://modelcontextprotocol.io/).
+himalaya-mcp gives Claude the ability to read, triage, compose, and manage email -- all without sending your credentials to the cloud. It wraps the local himalaya CLI as a subprocess, exposing email operations through the [Model Context Protocol](https://modelcontextprotocol.io/). Install as the **`email`** plugin in Claude Code for `/email:*` slash commands.
 
 ## Key Features
 
@@ -90,6 +90,8 @@ When installed as a Claude Code plugin, these slash commands are available:
 | `/email:triage` | AI-powered email classification |
 | `/email:digest` | Generate daily priority digest |
 | `/email:reply` | Draft and send with safety gate |
+| `/email:compose` | Compose new emails with safety gate |
+| `/email:attachments` | List, download, and calendar invites |
 | `/email:help` | Help hub -- browse all tools, prompts, workflows |
 
 ## Quick Start
