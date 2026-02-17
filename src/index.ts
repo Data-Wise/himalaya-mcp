@@ -25,7 +25,7 @@ import { registerAttachmentTools } from "./tools/attachments.js";
 import { registerCalendarTools } from "./tools/calendar.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
 
-export const VERSION = "1.2.0";
+export const VERSION = "1.2.1";
 export const NAME = "himalaya-mcp";
 
 const server = new McpServer({

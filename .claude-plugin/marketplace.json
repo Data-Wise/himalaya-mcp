@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
-    "version": "1.2.0"
+    "version": "1.2.1"
   },
   "plugins": [{
     "name": "email",
