@@ -7,7 +7,7 @@
 ## Focus: .mcpb Desktop Extension packaging
 ## Phase: v1.3.0 development
 ## Priority: 2
-## Progress: 100 (v1.2.1 released) + WIP (mcpb packaging)
+## Progress: 100 (v1.2.2 released) + WIP (mcpb packaging)
 
 ## Completed
 
@@ -37,7 +37,7 @@
 ## Current State
 
 - Branch: `dev` (synced with main after v1.2.1)
-- v1.2.1 released on GitHub and Homebrew
+- v1.2.2 released on GitHub and Homebrew
 - All phases complete, clean working tree
 - Tests: 275 across 15 test files
 - Bundle: 595KB (esbuild)
@@ -100,4 +100,4 @@ claude
 ---
 
 **Last Updated:** 2026-02-17
-**Status:** v1.2.1 released, .mcpb packaging in progress (worktree)
+**Status:** v1.2.2 released, .mcpb packaging in progress (worktree)
