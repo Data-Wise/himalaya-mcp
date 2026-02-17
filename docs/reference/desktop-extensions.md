@@ -217,7 +217,7 @@ Double-click a `.mcpb` file or use File > Install Extension in Claude Desktop.
 ### CLI (himalaya-mcp)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v1.2.2.mcpb   # Install
+himalaya-mcp install-ext himalaya-mcp-v1.3.0.mcpb   # Install
 himalaya-mcp remove-ext                               # Uninstall
 ```
 
@@ -244,7 +244,7 @@ himalaya-mcp remove-ext                               # Uninstall
   "extensions": {
     "himalaya-mcp": {
       "id": "himalaya-mcp",
-      "version": "1.2.2",
+      "version": "1.3.0",
       "hash": "f099...",
       "installedAt": "2026-02-17T06:33:25.366Z",
       "manifest": { /* full manifest.json content */ },
@@ -280,7 +280,7 @@ src/index.ts (16 source files)
     │
     ├── mcpb validate mcpb/     →  Schema check
     │
-    └── mcpb pack mcpb/         →  himalaya-mcp-v1.2.2.mcpb (147 KB)
+    └── mcpb pack mcpb/         →  himalaya-mcp-v1.3.0.mcpb (147 KB)
 ```
 
 Run: `npm run build:mcpb`
@@ -298,8 +298,8 @@ Run: `npm run build:mcpb`
 Extensions can be signed for authenticity verification. himalaya-mcp is currently unsigned (open source, distributed via GitHub Releases).
 
 ```bash
-mcpb sign himalaya-mcp-v1.2.2.mcpb --key private.pem
-mcpb verify himalaya-mcp-v1.2.2.mcpb --key public.pem
+mcpb sign himalaya-mcp-v1.3.0.mcpb --key private.pem
+mcpb verify himalaya-mcp-v1.3.0.mcpb --key public.pem
 ```
 
 ## CI/CD Integration
