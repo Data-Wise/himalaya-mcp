@@ -1,5 +1,6 @@
 /**
- * CLI setup tests — verify Claude Desktop configuration management.
+ * CLI setup tests — verify Claude Desktop configuration management,
+ * plugin installation, and upgrade workflows.
  *
  * Tests the setup/check/remove CLI commands by mocking the filesystem.
  * No real Claude Desktop config is touched.
@@ -252,7 +253,7 @@ describe("CLI setup: remove command", () => {
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { mkdtemp, rm, mkdir, readFile } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { accessSync } from "node:fs";
 
@@ -383,4 +384,229 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     const configAfter = JSON.parse(await readFile(tempConfigPath, "utf-8"));
     expect(configAfter.mcpServers?.himalaya).toBeUndefined();
   }, 10_000);
+
+  it("setup resolves dist/index.js path relative to script", async () => {
+    // Run setup — the path should resolve to this project's dist/index.js
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+
+    const config = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    const serverArgs = config.mcpServers?.himalaya?.args;
+    expect(serverArgs).toBeDefined();
+    expect(serverArgs.length).toBeGreaterThan(0);
+
+    // Path should end with dist/index.js
+    expect(serverArgs[0]).toMatch(/dist\/index\.js$/);
+    // Path should be absolute
+    expect(serverArgs[0]).toMatch(/^\//);
+  }, 10_000);
+
+  it("setup preserves non-himalaya entries across re-setup", async () => {
+    // Create config with another server
+    const initialConfig = {
+      mcpServers: {
+        "other-server": { command: "python", args: ["server.py"] },
+      },
+      globalShortcut: "Ctrl+Space",
+    };
+    await writeFile(tempConfigPath, JSON.stringify(initialConfig, null, 2), "utf-8");
+
+    // Run setup twice (simulates install then upgrade)
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+
+    const config = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    // Other server and top-level keys preserved
+    expect(config.mcpServers["other-server"]).toBeDefined();
+    expect(config.mcpServers["other-server"].command).toBe("python");
+    expect(config.globalShortcut).toBe("Ctrl+Space");
+    // Himalaya added
+    expect(config.mcpServers.himalaya).toBeDefined();
+  }, 10_000);
+
+  it("setup --remove then re-setup works (reinstall flow)", async () => {
+    // Install
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+    let config = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    expect(config.mcpServers?.himalaya).toBeDefined();
+
+    // Uninstall
+    await execFileAsync("node", ["dist/cli/setup.js", "--remove"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+    config = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    expect(config.mcpServers?.himalaya).toBeUndefined();
+
+    // Reinstall
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+    config = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    expect(config.mcpServers?.himalaya).toBeDefined();
+    expect(config.mcpServers.himalaya.command).toBe("node");
+  }, 15_000);
+
+  it("setup --check reports correct entry point path", async () => {
+    // Setup first
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+
+    // Check — should show command and args
+    try {
+      const { stdout } = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "--check"],
+        {
+          cwd: PROJECT_ROOT,
+          env: { ...process.env, HOME: tempHome },
+        }
+      );
+      expect(stdout).toContain("Command: node");
+      expect(stdout).toContain("dist/index.js");
+    } catch (error: any) {
+      // May exit 1 if dist/index.js not at resolved path, but still shows info
+      expect(error.stdout).toContain("Command: node");
+      expect(error.stdout).toContain("dist/index.js");
+    }
+  }, 10_000);
+
+  it("setup --remove is idempotent", async () => {
+    // Remove when nothing exists — should not error
+    const { stdout: stdout1 } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "--remove"],
+      {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, HOME: tempHome },
+      }
+    );
+    expect(stdout1).toContain("Nothing to remove");
+
+    // Setup then remove twice
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+    await execFileAsync("node", ["dist/cli/setup.js", "--remove"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+    const { stdout: stdout2 } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "--remove"],
+      {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, HOME: tempHome },
+      }
+    );
+    expect(stdout2).toContain("Nothing to remove");
+  }, 15_000);
+
+  it("setup creates config directory when it doesn't exist", async () => {
+    // Remove the Claude config dir entirely
+    await rm(tempClaudeDir, { recursive: true, force: true });
+
+    // Setup should create it
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "setup"],
+      {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, HOME: tempHome },
+      }
+    );
+    expect(stdout).toContain("Added");
+
+    // Verify directory and file created
+    const config = JSON.parse(await readFile(tempConfigPath, "utf-8"));
+    expect(config.mcpServers?.himalaya).toBeDefined();
+  }, 10_000);
+
+  it("setup writes valid JSON with proper formatting", async () => {
+    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+
+    const raw = await readFile(tempConfigPath, "utf-8");
+    // Should end with newline
+    expect(raw.endsWith("\n")).toBe(true);
+    // Should be indented (pretty-printed)
+    expect(raw).toContain("  ");
+    // Should be valid JSON
+    expect(() => JSON.parse(raw)).not.toThrow();
+  }, 10_000);
+});
+
+// ==============================================================================
+// E2E: Plugin structure validation
+// Tests that the plugin directory contains everything Claude Code expects.
+// ==============================================================================
+
+describe("Plugin structure validation", () => {
+  const pluginRoot = resolve(__dirname, "..", "himalaya-mcp-plugin");
+  const pluginJson = join(pluginRoot, ".claude-plugin", "plugin.json");
+  const marketplaceJson = resolve(__dirname, "..", ".claude-plugin", "marketplace.json");
+
+  it("plugin.json has required fields", async () => {
+    const data = JSON.parse(await readFile(pluginJson, "utf-8"));
+    expect(data.name).toBe("email");
+    expect(data.version).toBeDefined();
+    expect(data.description).toBeDefined();
+    expect(data.author).toBeDefined();
+  });
+
+  it("marketplace.json references correct plugin name", async () => {
+    const data = JSON.parse(await readFile(marketplaceJson, "utf-8"));
+    expect(data.plugins).toBeDefined();
+    expect(data.plugins.length).toBeGreaterThan(0);
+    expect(data.plugins[0].name).toBe("email");
+  });
+
+  it("all 7 skills exist and are non-empty", async () => {
+    const skillsDir = join(pluginRoot, "skills");
+    const expected = ["inbox.md", "triage.md", "digest.md", "reply.md", "compose.md", "attachments.md", "help.md"];
+    for (const skill of expected) {
+      const content = await readFile(join(skillsDir, skill), "utf-8");
+      expect(content.length).toBeGreaterThan(100);
+    }
+  });
+
+  it("email-assistant agent exists", async () => {
+    const agentFile = join(pluginRoot, "agents", "email-assistant.md");
+    const content = await readFile(agentFile, "utf-8");
+    expect(content.length).toBeGreaterThan(50);
+  });
+
+  it(".mcp.json references dist/index.js", async () => {
+    const mcpJson = JSON.parse(
+      await readFile(resolve(__dirname, "..", ".mcp.json"), "utf-8")
+    );
+    expect(mcpJson.mcpServers?.himalaya).toBeDefined();
+    expect(mcpJson.mcpServers.himalaya.args[0]).toContain("dist/index.js");
+  });
+
+  it("version consistency across all manifests", async () => {
+    const pkg = JSON.parse(await readFile(resolve(__dirname, "..", "package.json"), "utf-8"));
+    const plugin = JSON.parse(await readFile(pluginJson, "utf-8"));
+    const marketplace = JSON.parse(await readFile(marketplaceJson, "utf-8"));
+
+    expect(plugin.version).toBe(pkg.version);
+    expect(marketplace.metadata.version).toBe(pkg.version);
+  });
 });

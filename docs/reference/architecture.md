@@ -129,7 +129,7 @@ src/
 │   └── clipboard.ts      copy_to_clipboard — pbcopy (macOS) / xclip (Linux)
 │
 └── cli/
-    └── setup.ts          Claude Desktop setup (add/check/remove MCP config)
+    └── setup.ts          Claude Desktop setup (add/check/remove MCP config, dynamic path resolution)
 ```
 
 ## Data Flow

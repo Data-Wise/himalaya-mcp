@@ -1,11 +1,11 @@
 {
-  "name": "himalaya-mcp-marketplace",
+  "name": "himalaya-mcp",
   "owner": {
     "name": "Data-Wise"
   },
   "metadata": {
     "description": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
-    "version": "1.2.1"
+    "version": "1.2.2"
   },
   "plugins": [{
     "name": "email",
