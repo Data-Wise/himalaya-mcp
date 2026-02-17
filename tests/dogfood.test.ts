@@ -956,7 +956,7 @@ describe("Packaging: version consistency", () => {
     expect(pluginJson.version).toBe(pkgJson.version);
   });
 
-  it("src/index.ts NAME is himalaya-mcp", () => {
+  it("src/index.ts NAME is himalaya-mcp (MCP server identity)", () => {
     expect(NAME).toBe("himalaya-mcp");
   });
 
@@ -972,7 +972,7 @@ describe("Packaging: plugin manifest structure", () => {
   );
 
   it("has required top-level fields", () => {
-    expect(pluginJson.name).toBe("himalaya-mcp");
+    expect(pluginJson.name).toBe("email");
     expect(pluginJson.version).toBeTruthy();
     expect(pluginJson.description).toBeTruthy();
   });
@@ -1014,7 +1014,7 @@ describe("Packaging: marketplace.json", () => {
     expect(marketplace.owner.name).toBe("Data-Wise");
     expect(marketplace.plugins).toBeDefined();
     expect(marketplace.plugins.length).toBe(1);
-    expect(marketplace.plugins[0].name).toBe("himalaya-mcp");
+    expect(marketplace.plugins[0].name).toBe("email");
     expect(marketplace.plugins[0].source).toBe("./himalaya-mcp-plugin");
     expect(marketplace.plugins[0].description).toBeTruthy();
   });

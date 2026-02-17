@@ -66,7 +66,7 @@ The `himalaya-mcp-install` script (created by the formula):
 4. Auto-enables in `~/.claude/settings.json` (skipped if Claude is running)
 5. Uses stable `$(brew --prefix)/opt/himalaya-mcp/libexec` path (survives upgrades)
 
-All JSON file writes (`marketplace.json`, `settings.json`) are guarded behind the Claude detection check because `mv` blocks indefinitely on files locked by Claude Code. If Claude is running during install, run `claude plugin install himalaya-mcp@local-plugins` manually afterward.
+All JSON file writes (`marketplace.json`, `settings.json`) are guarded behind the Claude detection check because `mv` blocks indefinitely on files locked by Claude Code. If Claude is running during install, run `claude plugin install email@local-plugins` manually afterward.
 
 ### Uninstall
 
@@ -134,8 +134,8 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
   "name": "himalaya-mcp-marketplace",
   "owner": { "name": "Data-Wise" },
   "plugins": [{
-    "name": "himalaya-mcp",
-    "source": "./",
+    "name": "email",
+    "source": "./himalaya-mcp-plugin",
     "description": "Privacy-first email MCP server wrapping himalaya CLI",
     "category": "productivity",
     "tags": ["email", "mcp", "himalaya", "privacy"]
@@ -147,7 +147,7 @@ This enables the GitHub install flow:
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install himalaya-mcp
+claude plugin install email
 ```
 
 ## Claude Desktop Setup CLI

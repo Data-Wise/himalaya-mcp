@@ -1,6 +1,6 @@
 # Plugin Skills & Agent
 
-When installed as a Claude Code plugin, himalaya-mcp provides 5 slash commands (skills) and 1 autonomous agent.
+When installed as a Claude Code plugin, the email plugin provides 7 slash commands (skills) and 1 autonomous agent.
 
 ## Skills vs Tools
 
@@ -210,7 +210,7 @@ Want me to:
 
 ## /email:help
 
-Help hub for himalaya-mcp. Browse all available tools, prompts, resources, and workflows.
+Help hub for the email plugin. Browse all available tools, prompts, resources, and workflows.
 
 **Triggers:** "email help", "himalaya help", "email commands", "what can you do with email"
 
@@ -233,7 +233,7 @@ You: /email:help
 
 Claude:
 ┌──────────────────────────────────────────────┐
-│  himalaya-mcp Help                           │
+│  Email Help                                  │
 │  Privacy-first email for Claude              │
 ├──────────────────────────────────────────────┤
 │                                              │

@@ -7,7 +7,7 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.2.0 (released)
+- **Version:** 1.2.1 (released)
 - **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 262 tests)
 
 ### What It Does
@@ -58,12 +58,14 @@ himalaya-mcp/
 │   └── adapters/
 │       ├── clipboard.ts         # copy_to_clipboard (pbcopy/xclip)
 │       └── calendar.ts          # ICS parser + Apple Calendar (osascript)
-├── plugin/
+├── himalaya-mcp-plugin/
+│   ├── .claude-plugin/
+│   │   └── plugin.json          # Claude Code plugin manifest
 │   ├── skills/                  # Claude Code plugin skills (7: inbox, triage, digest, reply, compose, attachments, help)
 │   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks
 ├── .claude-plugin/
-│   └── plugin.json              # Claude Code plugin manifest
+│   └── marketplace.json         # Marketplace manifest (source: ./himalaya-mcp-plugin)
 ├── .mcp.json                    # MCP server config (uses ${CLAUDE_PLUGIN_ROOT})
 ├── docs/
 │   ├── guide.md                 # User guide (setup, tools, prompts, resources)
@@ -213,7 +215,7 @@ brew install himalaya-mcp
 
 # Claude Code plugin (from GitHub marketplace)
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install himalaya-mcp
+claude plugin install email
 
 # Claude Desktop (after installing via Homebrew or npm)
 himalaya-mcp setup
@@ -264,4 +266,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-02-14
+**Last Updated:** 2026-02-15

@@ -4,7 +4,7 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.2.0 released — 19 tools, 262 tests
+## Focus: v1.2.1 released — 19 tools, 262 tests
 ## Phase: Released
 ## Priority: 2
 ## Progress: 100
@@ -50,7 +50,7 @@ brew install himalaya-mcp
 
 # Claude Code plugin (from GitHub)
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install himalaya-mcp
+claude plugin install email
 
 # Claude Desktop
 himalaya-mcp setup

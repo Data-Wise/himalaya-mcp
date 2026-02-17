@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.1] - 2026-02-16
+
+### Changed
+
+- **Plugin namespace renamed** from `himalaya-mcp` to `email` — skills are now `/email:inbox`, `/email:triage`, etc. (5-char prefix instead of 13)
+- Updated all documentation, tests, and marketplace manifest to reflect new namespace
+- MCP server name, npm package, Homebrew formula, and GitHub repo remain `himalaya-mcp`
+
 ## [1.2.0] - 2026-02-15
 
 ### Added

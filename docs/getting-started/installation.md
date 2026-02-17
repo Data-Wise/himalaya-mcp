@@ -58,7 +58,7 @@ brew uninstall himalaya-mcp
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install himalaya-mcp
+claude plugin install email
 ```
 
 ### Option 3: From Source (development)
@@ -160,7 +160,7 @@ If `brew install` or `brew upgrade` takes a very long time, Claude Code may be h
 
 ```bash
 # If brew hangs, press Ctrl+C then:
-claude plugin install himalaya-mcp@local-plugins
+claude plugin install email@local-plugins
 ```
 
 This is fixed in the latest formula -- JSON file writes are skipped when Claude is running.
@@ -177,7 +177,7 @@ ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
 
 1. Restart Claude Code
 2. Check if plugin is enabled: `claude plugin list`
-3. Manually enable: `claude plugin install himalaya-mcp@local-plugins`
+3. Manually enable: `claude plugin install email@local-plugins`
 
 ### MCP server not starting
 

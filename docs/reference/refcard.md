@@ -5,7 +5,7 @@
 ```
 brew tap data-wise/tap && brew install himalaya-mcp   # Homebrew (recommended)
 claude plugin marketplace add Data-Wise/himalaya-mcp  # GitHub (step 1: add marketplace)
-claude plugin install himalaya-mcp                     # GitHub (step 2: install plugin)
+claude plugin install email                     # GitHub (step 2: install plugin)
 himalaya-mcp setup                                     # Claude Desktop config
 himalaya-mcp setup --check                             # Verify Desktop config
 himalaya-mcp setup --remove                            # Remove Desktop config
@@ -117,6 +117,6 @@ node dist/index.js      Start MCP server standalone
 
 ```
 Homebrew:    brew install data-wise/tap/himalaya-mcp
-GitHub:      claude plugin marketplace add Data-Wise/himalaya-mcp && claude plugin install himalaya-mcp
+GitHub:      claude plugin marketplace add Data-Wise/himalaya-mcp && claude plugin install email
 Source:      git clone + npm install + npm run build
 ```

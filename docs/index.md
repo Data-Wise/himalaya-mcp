@@ -107,7 +107,7 @@ That's it. Homebrew installs himalaya CLI + Node.js, bundles the server, symlink
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install himalaya-mcp
+claude plugin install email
 ```
 
 ### From Source
