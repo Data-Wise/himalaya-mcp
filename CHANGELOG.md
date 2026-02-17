@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+
+- `.mcpb` Desktop Extension packaging for Claude Desktop/Cowork (manifest, build script, CI workflows)
+- `install-ext` / `remove-ext` CLI commands for local extension management
+- `doctor` diagnostic command with `--fix` and `--json` flags (checks 6 layers: prereqs, MCP server, email, Desktop extension, Code plugin, env)
+- Desktop Extension tutorial, troubleshooting guide, and `.mcpb` format reference docs
+- 39 new tests (314 total): .mcpb packaging validation, doctor E2E, config template guards
+
+### Fixed
+
+- himalaya v1.1.0 argument ordering (`--account`/`--output` flags now placed after subcommand)
+- Unresolved `${user_config.*}` template variables from Desktop Extension config (config loader ignores `${` prefixed values)
+- PATH environment variable included in `.mcpb` manifest for Claude Desktop compatibility
+
+### Changed
+
+- Default timeout changed from 30s to unlimited (0) for better large-mailbox support
+
 ## [1.2.2] - 2026-02-16
 
 ### Fixed

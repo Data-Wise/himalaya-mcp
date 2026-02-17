@@ -80,6 +80,7 @@ nav:
     - "Level 1: Getting Started":
       - Read Your First Email: tutorials/read-first-email.md
       - Multi-Account Email: tutorials/multi-account.md
+      - Desktop Extension: tutorials/desktop-extension.md
     - "Level 2: Productivity":
       - Triage Your Inbox: tutorials/triage-inbox.md
       - Reply to an Email: tutorials/reply-email.md
@@ -98,4 +99,6 @@ nav:
     - Command Reference: reference/commands.md
     - Quick Reference: reference/refcard.md
     - Architecture: reference/architecture.md
+    - Desktop Extensions: reference/desktop-extensions.md
+    - ".mcpb Format": reference/mcpb-format-reference.md
     - Changelog: changelog.md

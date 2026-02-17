@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: .mcpb Desktop Extension packaging
-## Phase: v1.3.0 development
+## Focus: Post-merge documentation sync
+## Phase: v1.2.2 + .mcpb packaging
 ## Priority: 2
-## Progress: 100 (v1.2.2 released) + WIP (mcpb packaging)
+## Progress: 100 (v1.2.2 released + .mcpb packaging merged to dev)
 
 ## Completed
 
@@ -23,45 +23,26 @@
 - Phase 6d: Calendar — extract_calendar_event, create_calendar_event (ICS + Apple Calendar)
 - Plugin Packaging: esbuild bundle (595KB), Homebrew formula, marketplace.json, CLI setup
 - Homebrew Release: formula updated to v1.2.2, 7 skills, 19 tools in caveats
-- Total: 19 tools, 4 prompts, 3 resources, 7 skills, 275 tests (15 test files)
+- .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
+- Total: 19 tools, 4 prompts, 3 resources, 7 skills, 314 tests (15 test files)
 
 ## Just Completed
 
-- 2026-02-17: Homebrew formula bumped to v1.2.2, brew test + audit --strict pass
-- 2026-02-17: Docs site sync for v1.2.2 — CHANGELOG, test counts, skill list, VERSION fix
-- 2026-02-17: Fixed VERSION constant and E2E test (was still 1.2.1)
-- 2026-02-17: Deployed to GitHub Pages, merged PR #35 to main
-- 2026-02-17: Brainstorm + spec for .mcpb packaging (max depth, 2 agents)
-- 2026-02-17: Shortened marketplace name (himalaya-mcp-marketplace → himalaya-mcp)
-- 2026-02-17: Created worktree for feature/mcpb-packaging
+- 2026-02-17: Merged PR #36 — .mcpb Desktop Extension packaging + doctor command
+- 2026-02-17: install-ext / remove-ext CLI commands for local extension management
+- 2026-02-17: doctor diagnostic command (--fix, --json) — checks 6 layers
+- 2026-02-17: Fixed himalaya v1.1.0 arg ordering (--account/--output after subcommand)
+- 2026-02-17: Fixed unresolved ${user_config.*} template variables in config
+- 2026-02-17: Changed default timeout from 30s to unlimited
+- 2026-02-17: 275 → 314 tests (+39: .mcpb packaging, doctor E2E, config guards)
 
 ## Current State
 
-- Branch: `dev` (synced with main after v1.2.2)
+- Branch: `dev` (PR #36 merged, ahead of main)
 - v1.2.2 released on GitHub and Homebrew
-- All phases complete, clean working tree
-- Tests: 275 across 15 test files
-- Bundle: 595KB (esbuild)
-
-## Active Worktrees
-
-| Worktree | Branch | Status |
-|----------|--------|--------|
-| `~/.git-worktrees/himalaya-mcp/feature-mcpb-packaging` | `feature/mcpb-packaging` | WIP — Phase 1 next |
-
-## Current Work: .mcpb Packaging
-
-Spec: `docs/specs/SPEC-mcpb-packaging-2026-02-17.md`
-Orchestrate: `ORCHESTRATE-mcpb-packaging.md` (in worktree)
-
-| Phase | Task | Status |
-|-------|------|--------|
-| 1 | Create manifest.json | Next |
-| 2 | Build script (npm run build:mcpb) | Pending |
-| 3 | CI validation | Pending |
-| 4 | Test in Claude Desktop | Pending |
-| 5 | Documentation updates | Pending |
-| 6 | Release integration | Pending |
+- All phases complete, .mcpb packaging on dev
+- Tests: 314 across 15 test files
+- Bundle: 595KB (esbuild), .mcpb: ~147KB
 
 ## Install
 
@@ -74,21 +55,26 @@ brew install himalaya-mcp
 claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install email
 
-# Claude Desktop
+# Claude Desktop (.mcpb extension)
+# Download .mcpb from GitHub Releases, double-click to install
+himalaya-mcp install-ext
+
+# Claude Desktop (legacy CLI setup)
 himalaya-mcp setup
+
+# Diagnose installation
+himalaya-mcp doctor
+himalaya-mcp doctor --fix
 ```
 
 ---
 
 ## Next Action
 
-Start Phase 1 in worktree:
-```bash
-cd ~/.git-worktrees/himalaya-mcp/feature-mcpb-packaging
-claude
-```
+- Create release PR from dev to main for v1.3.0
+- Update Homebrew formula after release
 
-## Future (post v1.3.0)
+## Future
 
 - Bundled .mcpb variant with universal himalaya binary (~19 MB)
 - Code signing + notarization (Apple Developer, $99/yr)
@@ -101,4 +87,4 @@ claude
 ---
 
 **Last Updated:** 2026-02-17
-**Status:** v1.2.2 released (GitHub + Homebrew), .mcpb packaging in progress (worktree)
+**Status:** v1.2.2 released (GitHub + Homebrew), .mcpb packaging merged to dev
