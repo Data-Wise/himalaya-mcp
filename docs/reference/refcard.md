@@ -6,14 +6,22 @@
 brew tap data-wise/tap && brew install himalaya-mcp   # Homebrew (recommended)
 claude plugin marketplace add Data-Wise/himalaya-mcp  # GitHub (step 1: add marketplace)
 claude plugin install email                     # GitHub (step 2: install plugin)
-himalaya-mcp setup                                     # Claude Desktop config (CLI)
-himalaya-mcp setup --check                             # Verify Desktop config
-himalaya-mcp setup --remove                            # Remove Desktop config
-# Claude Desktop (.mcpb): Download .mcpb from GitHub Releases, double-click to install
-#   Requires: brew install himalaya (installed separately)
+himalaya-mcp setup                                     # Claude Desktop config (legacy)
+himalaya-mcp install-ext                               # Claude Desktop extension (.mcpb)
+# Or: Download .mcpb from GitHub Releases, double-click to install
 ```
 
-## Tools
+## CLI Commands
+
+```
+himalaya-mcp setup              Add MCP server to Claude Desktop config
+himalaya-mcp setup --check      Verify configuration exists and paths valid
+himalaya-mcp setup --remove     Remove MCP server entry
+himalaya-mcp install-ext [file] Install .mcpb as Desktop extension
+himalaya-mcp remove-ext         Remove Desktop extension
+```
+
+## Tools (19)
 
 ```
 list_emails         [folder] [page_size] [page] [account]     List envelopes
@@ -37,7 +45,7 @@ create_action_item  id [folder] [account]                      Extract todos/dea
 copy_to_clipboard   text                                       Copy to system clipboard
 ```
 
-## Prompts
+## Prompts (4)
 
 ```
 triage_inbox         [count=10]              Classify emails: actionable/FYI/skip
@@ -46,7 +54,7 @@ daily_email_digest   (none)                  Priority-grouped markdown digest
 draft_reply          id [tone] [instructions] Guided reply composition
 ```
 
-## Resources
+## Resources (3)
 
 ```
 email://inbox           Recent inbox envelopes
@@ -64,7 +72,7 @@ Deleted    Marked for deletion
 Draft      Draft message
 ```
 
-## Plugin Skills
+## Plugin Skills (Claude Code only)
 
 ```
 /email:inbox        List recent emails, offer to read/triage/reply
@@ -85,11 +93,17 @@ HIMALAYA_FOLDER    Default folder                (default: INBOX)
 HIMALAYA_TIMEOUT   Command timeout in ms         (default: 30000)
 ```
 
-## Safety Gate (send_email)
+## Safety Gates
 
 ```
-send_email(template, confirm=false)  ->  PREVIEW only (not sent)
-send_email(template, confirm=true)   ->  Actually sends
+send_email(template, confirm=false)           ->  PREVIEW only (not sent)
+send_email(template, confirm=true)            ->  Actually sends
+compose_email(..., confirm=false)             ->  PREVIEW only (not sent)
+compose_email(..., confirm=true)              ->  Actually sends
+delete_folder(name, confirm=false)            ->  Warning (not deleted)
+delete_folder(name, confirm=true)             ->  Deletes
+create_calendar_event(..., confirm=false)     ->  Preview (not created)
+create_calendar_event(..., confirm=true)      ->  Creates in Apple Calendar
 ```
 
 ## Common Workflows
@@ -110,8 +124,9 @@ Multi-acct: Any tool + account="work" | account="personal"
 
 ```
 npm run build           TypeScript compilation (development)
-npm run build:bundle    esbuild single-file bundle (583KB, production)
-npm test                Run 275 tests (vitest)
+npm run build:bundle    esbuild single-file bundle (~595KB, production)
+npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
+npm test                Run 308 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 
@@ -120,6 +135,6 @@ node dist/index.js      Start MCP server standalone
 ```
 Homebrew:    brew install data-wise/tap/himalaya-mcp
 GitHub:      claude plugin marketplace add Data-Wise/himalaya-mcp && claude plugin install email
-Desktop:     Download .mcpb from GitHub Releases, double-click to install
+Desktop:     himalaya-mcp install-ext (or double-click .mcpb from GitHub Releases)
 Source:      git clone + npm install + npm run build
 ```

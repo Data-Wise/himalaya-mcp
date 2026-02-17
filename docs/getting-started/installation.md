@@ -93,7 +93,7 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 
 ### Option A: .mcpb Package (one-click)
 
-Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` is a lightweight (~150 KB) package that bundles the MCP server and configures it automatically.
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` is a lightweight (~147 KB) package that bundles the MCP server and configures it automatically.
 
 **Prerequisite:** himalaya CLI must be installed separately:
 
@@ -107,7 +107,20 @@ During install, you can configure:
 - **Default account** -- email account name (default: system default)
 - **Default folder** -- folder for operations (default: `INBOX`)
 
-### Option B: CLI Setup
+### Option A2: .mcpb via CLI
+
+If you have himalaya-mcp installed (Homebrew or source), you can install the extension from the command line:
+
+```bash
+npm run build:mcpb                                     # Build .mcpb (dev only)
+himalaya-mcp install-ext himalaya-mcp-v1.2.1.mcpb      # Install from file
+himalaya-mcp install-ext                                # Auto-find in project root
+himalaya-mcp remove-ext                                 # Uninstall extension
+```
+
+This unpacks the extension to Claude Desktop's extensions directory and registers it. Restart Claude Desktop after install.
+
+### Option B: CLI Setup (Legacy)
 
 After installing himalaya-mcp via Homebrew or from source, configure it as an MCP server for Claude Desktop:
 
@@ -166,7 +179,7 @@ All optional. Set via environment variables in your MCP server config:
 # Run the MCP server directly
 node dist/index.js
 
-# Run tests (275 tests)
+# Run tests (308 tests)
 npm test
 
 # Check Claude Desktop config
