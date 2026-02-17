@@ -28,7 +28,7 @@ Installs himalaya CLI + Node.js as dependencies, auto-symlinks plugin to `~/.cla
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install himalaya-mcp
+claude plugin install email
 ```
 
 ### Claude Desktop

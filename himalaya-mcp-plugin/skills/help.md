@@ -1,6 +1,6 @@
 ---
 name: email:help
-description: Help hub for himalaya-mcp - browse all commands, tools, prompts, and workflows
+description: Help hub for himalaya email plugin - browse all commands, tools, prompts, and workflows
 triggers:
   - email help
   - himalaya help
@@ -8,7 +8,7 @@ triggers:
   - what can you do with email
 ---
 
-# /email:help - himalaya-mcp Help Hub
+# /email:help - Email Help Hub
 
 Single entry point for discovering all email commands, tools, prompts, and workflows.
 
@@ -30,7 +30,7 @@ Display the hub overview:
 
 ```
 +-----------------------------------------------------------+
-| HIMALAYA-MCP HELP HUB                                     |
+| EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
 | Privacy-first email for Claude — 19 tools, 4 prompts,     |
 | 3 resources                                               |

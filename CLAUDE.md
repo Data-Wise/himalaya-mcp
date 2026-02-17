@@ -215,7 +215,7 @@ brew install himalaya-mcp
 
 # Claude Code plugin (from GitHub marketplace)
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install himalaya-mcp
+claude plugin install email
 
 # Claude Desktop (after installing via Homebrew or npm)
 himalaya-mcp setup

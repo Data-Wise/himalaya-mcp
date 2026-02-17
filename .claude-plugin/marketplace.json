@@ -8,7 +8,7 @@
     "version": "1.2.0"
   },
   "plugins": [{
-    "name": "himalaya-mcp",
+    "name": "email",
     "source": "./himalaya-mcp-plugin",
     "description": "Privacy-first email MCP server wrapping himalaya CLI",
     "category": "productivity",
