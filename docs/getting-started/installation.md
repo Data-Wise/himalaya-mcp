@@ -35,12 +35,15 @@ brew install himalaya-mcp
 4. Registers in local marketplace
 5. Auto-enables in Claude Code settings (if Claude not running)
 
-After install, restart Claude Code. You'll get:
+After install, run `himalaya-mcp-install` and restart Claude Code. The **`email`** plugin gives you:
 
 - `/email:inbox` -- list recent emails
 - `/email:triage` -- classify and organize
 - `/email:digest` -- daily priority digest
 - `/email:reply` -- draft with safety gate
+- `/email:compose` -- compose new emails
+- `/email:attachments` -- list, download, calendar invites
+- `/email:help` -- help hub
 
 **Upgrade:**
 
@@ -145,7 +148,7 @@ All optional. Set via environment variables in your MCP server config:
 # Run the MCP server directly
 node dist/index.js
 
-# Run tests (256 tests)
+# Run tests (262 tests)
 npm test
 
 # Check Claude Desktop config
