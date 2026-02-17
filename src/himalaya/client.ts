@@ -38,7 +38,10 @@ export class HimalayaClient {
   }): Promise<string> {
     const args: string[] = [];
 
-    // Global flags
+    // Subcommand first (himalaya v1.1.0 expects flags after subcommand)
+    args.push(...subcommand);
+
+    // Subcommand flags
     const account = options?.account || this.opts.account;
     if (account) {
       args.push("--account", account);
@@ -46,9 +49,6 @@ export class HimalayaClient {
 
     // Output format
     args.push("--output", "json");
-
-    // Subcommand and its args
-    args.push(...subcommand);
 
     const timeout = options?.timeout ?? this.opts.timeout;
 
