@@ -842,3 +842,87 @@ Restart Claude Desktop after removal.
 
 !!! note "See also"
     **[Desktop Extensions Reference](desktop-extensions.md)** for full details on the `.mcpb` format, manifest schema, and installation mechanism.
+
+---
+
+### `himalaya-mcp doctor`
+
+Diagnose your himalaya-mcp installation across the full stack: prerequisites, MCP server, email connectivity, Claude Desktop extension, and Claude Code plugin.
+
+```bash
+himalaya-mcp doctor          # Run all checks
+himalaya-mcp doctor --fix    # Auto-fix what can be fixed
+himalaya-mcp doctor --json   # Machine-readable output
+```
+
+**Check categories:**
+
+| Category | What it checks |
+|----------|---------------|
+| Prerequisites | Node.js version, himalaya binary, himalaya config |
+| MCP Server | `dist/index.js` exists and is non-empty |
+| Email Connectivity | Account list, folder list, envelope fetch |
+| Claude Desktop Extension | Extension dir, manifest, registry, settings, user_config |
+| Claude Code Plugin | Symlink, plugin.json, marketplace registration |
+| Environment | `HIMALAYA_*` env vars, unresolved template variables |
+
+**Auto-fixable issues (`--fix`):**
+
+| Issue | Fix applied |
+|-------|------------|
+| `himalaya_binary` empty in Desktop settings | Set to `which himalaya` result |
+| Settings file missing | Create default settings (enabled, empty config) |
+
+**Sample output:**
+
+```
+himalaya-mcp doctor v1.2.1
+
+  Prerequisites
+  ✓ Node.js 22.14.0
+  ✓ himalaya found at /opt/homebrew/bin/himalaya
+  ✓ himalaya config exists
+
+  MCP Server
+  ✓ dist/index.js exists (595 KB)
+
+  Email Connectivity
+  ✓ Accounts: personal, work
+  ✓ Folders accessible (14 folders)
+  ✓ Envelopes accessible
+
+  Claude Desktop Extension
+  ✓ Extension installed
+  ✓ manifest.json valid
+  ✓ Registry entry exists
+  ✓ Settings: enabled
+  ✗ user_config.himalaya_binary is empty
+    → Fix with: himalaya-mcp doctor --fix
+
+  Summary: 11 passed, 0 warnings, 1 failed
+```
+
+**JSON output (`--json`):**
+
+Returns an array of `CheckResult` objects:
+
+```json
+[
+  {
+    "name": "Node.js installed",
+    "category": "Prerequisites",
+    "status": "pass",
+    "message": "Node.js v22.14.0"
+  },
+  {
+    "name": "himalaya_binary configured",
+    "category": "Desktop Extension",
+    "status": "fail",
+    "message": "user_config.himalaya_binary is empty",
+    "fix": { "description": "Set to /opt/homebrew/bin/himalaya" }
+  }
+]
+```
+
+!!! tip "Run after installation"
+    Run `himalaya-mcp doctor` after any installation method to verify everything is connected correctly. Use `--fix` to resolve common issues automatically.

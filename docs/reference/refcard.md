@@ -19,6 +19,9 @@ himalaya-mcp setup --check      Verify configuration exists and paths valid
 himalaya-mcp setup --remove     Remove MCP server entry
 himalaya-mcp install-ext [file] Install .mcpb as Desktop extension
 himalaya-mcp remove-ext         Remove Desktop extension
+himalaya-mcp doctor             Diagnose full stack (prereqs, email, extension, plugin)
+himalaya-mcp doctor --fix       Auto-fix common issues
+himalaya-mcp doctor --json      Machine-readable diagnostic output
 ```
 
 ## Tools (19)
@@ -126,7 +129,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 npm run build           TypeScript compilation (development)
 npm run build:bundle    esbuild single-file bundle (~595KB, production)
 npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
-npm test                Run 308 tests (vitest)
+npm test                Run 314 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 
