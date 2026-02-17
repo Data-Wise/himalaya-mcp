@@ -91,7 +91,38 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 
 ## Claude Desktop Setup
 
-After installing himalaya-mcp, configure it as an MCP server for Claude Desktop:
+### Option A: .mcpb Package (one-click)
+
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` is a lightweight (~147 KB) package that bundles the MCP server and configures it automatically.
+
+**Prerequisite:** himalaya CLI must be installed separately:
+
+```bash
+brew install himalaya
+```
+
+During install, you can configure:
+
+- **himalaya binary path** -- path to himalaya binary (default: `himalaya`)
+- **Default account** -- email account name (default: system default)
+- **Default folder** -- folder for operations (default: `INBOX`)
+
+### Option A2: .mcpb via CLI
+
+If you have himalaya-mcp installed (Homebrew or source), you can install the extension from the command line:
+
+```bash
+npm run build:mcpb                                     # Build .mcpb (dev only)
+himalaya-mcp install-ext himalaya-mcp-v1.2.1.mcpb      # Install from file
+himalaya-mcp install-ext                                # Auto-find in project root
+himalaya-mcp remove-ext                                 # Uninstall extension
+```
+
+This unpacks the extension to Claude Desktop's extensions directory and registers it. Restart Claude Desktop after install.
+
+### Option B: CLI Setup (Legacy)
+
+After installing himalaya-mcp via Homebrew or from source, configure it as an MCP server for Claude Desktop:
 
 ```bash
 himalaya-mcp setup           # Add to Claude Desktop config
@@ -123,7 +154,7 @@ All optional. Set via environment variables in your MCP server config:
 | `HIMALAYA_BINARY` | `himalaya` | Path to himalaya binary |
 | `HIMALAYA_ACCOUNT` | (system default) | Default email account name |
 | `HIMALAYA_FOLDER` | `INBOX` | Default folder for operations |
-| `HIMALAYA_TIMEOUT` | `30000` | Command timeout in milliseconds |
+| `HIMALAYA_TIMEOUT` | `0` (no limit) | Command timeout in milliseconds (0 = unlimited) |
 
 ### Example with env vars
 
@@ -145,13 +176,16 @@ All optional. Set via environment variables in your MCP server config:
 ## Verify Installation
 
 ```bash
-# Run the MCP server directly
-node dist/index.js
+# Full diagnostic (checks prereqs, MCP server, email, Desktop extension, plugin)
+himalaya-mcp doctor
 
-# Run tests (275 tests)
+# Auto-fix common issues
+himalaya-mcp doctor --fix
+
+# Run tests (314 tests)
 npm test
 
-# Check Claude Desktop config
+# Check Claude Desktop config (legacy)
 himalaya-mcp setup --check
 ```
 
@@ -191,6 +225,21 @@ echo '{}' | node ~/.claude/plugins/himalaya-mcp/dist/index.js
 ```
 
 If you see a JSON-RPC response, the server is working. Check your MCP configuration paths.
+
+### Desktop Extension not working
+
+Run the doctor command to diagnose:
+
+```bash
+himalaya-mcp doctor
+```
+
+Common issues it catches:
+- himalaya binary not found (PATH not inherited by Desktop)
+- Unresolved `${user_config.*}` template variables
+- Missing extension registry or settings files
+
+Use `--fix` to auto-resolve what it can, or see the [Troubleshooting Guide](../guide/troubleshooting.md) for manual fixes.
 
 ## What's Next?
 

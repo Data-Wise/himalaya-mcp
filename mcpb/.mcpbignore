@@ -1,0 +1,31 @@
+# Development files
+.git/
+.github/
+node_modules/
+src/
+tests/
+docs/
+scripts/
+
+# Config files
+*.ts
+tsconfig.json
+package.json
+package-lock.json
+.eslintrc*
+.prettier*
+.editorconfig
+
+# Build artifacts (we only need dist/index.js)
+dist/cli/
+
+# Plugin files (separate distribution channel)
+himalaya-mcp-plugin/
+.claude-plugin/
+.mcp.json
+
+# Other
+*.mcpb
+*.md
+.STATUS
+ORCHESTRATE-*.md

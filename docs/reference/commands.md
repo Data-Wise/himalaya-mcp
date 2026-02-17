@@ -781,7 +781,7 @@ These parameters appear on most tools:
 
 ### `himalaya-mcp setup`
 
-Configure himalaya-mcp as an MCP server for Claude Desktop.
+Configure himalaya-mcp as an MCP server for Claude Desktop (legacy `mcpServers` approach).
 
 ```bash
 himalaya-mcp setup           # Add MCP server to Claude Desktop config
@@ -798,3 +798,131 @@ himalaya-mcp setup --remove  # Remove the server entry
 | Windows | `%APPDATA%/Claude/claude_desktop_config.json` |
 
 The setup command preserves all existing MCP servers in the config file. Only the `himalaya` entry is added, updated, or removed.
+
+---
+
+### `himalaya-mcp install-ext`
+
+Install a `.mcpb` Desktop Extension into Claude Desktop.
+
+```bash
+himalaya-mcp install-ext                              # Auto-find .mcpb in project root
+himalaya-mcp install-ext himalaya-mcp-v1.2.1.mcpb     # Install specific file
+```
+
+**What it does:**
+
+1. Unpacks the `.mcpb` to `~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/`
+2. Registers the extension in `extensions-installations.json` with SHA256 hash
+3. Creates default settings (enabled, empty user config)
+4. Restart Claude Desktop to activate
+
+**Auto-discovery:** If no file path is given, searches the project root for `himalaya-mcp-v*.mcpb` and picks the latest version.
+
+!!! tip "When to use"
+    Use `install-ext` for local development and testing. For production installs, download the `.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install via Claude Desktop's GUI.
+
+---
+
+### `himalaya-mcp remove-ext`
+
+Remove the himalaya-mcp Desktop Extension from Claude Desktop.
+
+```bash
+himalaya-mcp remove-ext
+```
+
+**What it removes:**
+
+- Extension directory (`Claude Extensions/himalaya-mcp/`)
+- Registry entry from `extensions-installations.json`
+- Settings file (`Claude Extensions Settings/himalaya-mcp.json`)
+
+Restart Claude Desktop after removal.
+
+!!! note "See also"
+    **[Desktop Extensions Reference](desktop-extensions.md)** for full details on the `.mcpb` format, manifest schema, and installation mechanism.
+
+---
+
+### `himalaya-mcp doctor`
+
+Diagnose your himalaya-mcp installation across the full stack: prerequisites, MCP server, email connectivity, Claude Desktop extension, and Claude Code plugin.
+
+```bash
+himalaya-mcp doctor          # Run all checks
+himalaya-mcp doctor --fix    # Auto-fix what can be fixed
+himalaya-mcp doctor --json   # Machine-readable output
+```
+
+**Check categories:**
+
+| Category | What it checks |
+|----------|---------------|
+| Prerequisites | Node.js version, himalaya binary, himalaya config |
+| MCP Server | `dist/index.js` exists and is non-empty |
+| Email Connectivity | Account list, folder list, envelope fetch |
+| Claude Desktop Extension | Extension dir, manifest, registry, settings, user_config |
+| Claude Code Plugin | Symlink, plugin.json, marketplace registration |
+| Environment | `HIMALAYA_*` env vars, unresolved template variables |
+
+**Auto-fixable issues (`--fix`):**
+
+| Issue | Fix applied |
+|-------|------------|
+| `himalaya_binary` empty in Desktop settings | Set to `which himalaya` result |
+| Settings file missing | Create default settings (enabled, empty config) |
+
+**Sample output:**
+
+```
+himalaya-mcp doctor v1.2.1
+
+  Prerequisites
+  ✓ Node.js 22.14.0
+  ✓ himalaya found at /opt/homebrew/bin/himalaya
+  ✓ himalaya config exists
+
+  MCP Server
+  ✓ dist/index.js exists (595 KB)
+
+  Email Connectivity
+  ✓ Accounts: personal, work
+  ✓ Folders accessible (14 folders)
+  ✓ Envelopes accessible
+
+  Claude Desktop Extension
+  ✓ Extension installed
+  ✓ manifest.json valid
+  ✓ Registry entry exists
+  ✓ Settings: enabled
+  ✗ user_config.himalaya_binary is empty
+    → Fix with: himalaya-mcp doctor --fix
+
+  Summary: 11 passed, 0 warnings, 1 failed
+```
+
+**JSON output (`--json`):**
+
+Returns an array of `CheckResult` objects:
+
+```json
+[
+  {
+    "name": "Node.js installed",
+    "category": "Prerequisites",
+    "status": "pass",
+    "message": "Node.js v22.14.0"
+  },
+  {
+    "name": "himalaya_binary configured",
+    "category": "Desktop Extension",
+    "status": "fail",
+    "message": "user_config.himalaya_binary is empty",
+    "fix": { "description": "Set to /opt/homebrew/bin/himalaya" }
+  }
+]
+```
+
+!!! tip "Run after installation"
+    Run `himalaya-mcp doctor` after any installation method to verify everything is connected correctly. Use `--fix` to resolve common issues automatically.

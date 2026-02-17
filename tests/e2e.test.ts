@@ -789,3 +789,74 @@ echo "NOT_JSON_AT_ALL"
     );
   });
 });
+
+// =============================================================================
+// E2E: .mcpb Build Pipeline
+// =============================================================================
+
+describe("E2E: MCPB Build Pipeline", () => {
+  it(
+    "npm run build:mcpb produces a valid .mcpb file",
+    async () => {
+      // Clean any previous .mcpb output
+      const { readdirSync, unlinkSync, statSync } = await import("node:fs");
+      for (const f of readdirSync(PROJECT_ROOT)) {
+        if (f.endsWith(".mcpb")) {
+          unlinkSync(join(PROJECT_ROOT, f));
+        }
+      }
+
+      // Run the build
+      const { stdout, stderr } = await execFileAsync("npm", ["run", "build:mcpb"], {
+        cwd: PROJECT_ROOT,
+        timeout: 60_000,
+      });
+
+      const output = stdout + stderr;
+
+      // Verify build succeeded
+      expect(output).toContain("Manifest schema validation passes");
+      expect(output).toContain("Building esbuild bundle");
+
+      // Find the output file
+      const mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
+        f.match(/^himalaya-mcp-v.*\.mcpb$/)
+      );
+      expect(mcpbFiles.length).toBe(1);
+
+      const mcpbFile = join(PROJECT_ROOT, mcpbFiles[0]);
+      const stats = statSync(mcpbFile);
+
+      // Verify size is reasonable (< 1 MB, > 100 KB)
+      expect(stats.size).toBeGreaterThan(100 * 1024);
+      expect(stats.size).toBeLessThan(1024 * 1024);
+
+      // Verify mcpb info works on the output
+      const { stdout: infoOut } = await execFileAsync(
+        "npx",
+        ["--yes", "@anthropic-ai/mcpb", "info", mcpbFile],
+        { cwd: PROJECT_ROOT, timeout: 30_000 }
+      );
+
+      expect(infoOut).toContain("himalaya-mcp");
+
+      // Clean up
+      unlinkSync(mcpbFile);
+    },
+    90_000
+  );
+
+  it(
+    "mcpb validate passes on manifest",
+    async () => {
+      const { stdout } = await execFileAsync(
+        "npx",
+        ["--yes", "@anthropic-ai/mcpb", "validate", "mcpb/"],
+        { cwd: PROJECT_ROOT, timeout: 30_000 }
+      );
+
+      expect(stdout).toContain("validation passes");
+    },
+    45_000
+  );
+});

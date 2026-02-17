@@ -554,6 +554,83 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 });
 
 // ==============================================================================
+// E2E: doctor command
+// ==============================================================================
+
+describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
+  it("doctor runs and outputs check results", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "doctor"],
+      { cwd: PROJECT_ROOT }
+    );
+
+    expect(stdout).toContain("himalaya-mcp doctor");
+    expect(stdout).toContain("Prerequisites");
+    expect(stdout).toContain("Node.js");
+    expect(stdout).toContain("Summary:");
+    expect(stdout).toMatch(/\d+ passed/);
+  }, 30_000);
+
+  it("doctor --json outputs valid JSON array", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "doctor", "--json"],
+      { cwd: PROJECT_ROOT }
+    );
+
+    const results = JSON.parse(stdout) as Array<{ name: string; category: string; status: string }>;
+    expect(Array.isArray(results)).toBe(true);
+    expect(results.length).toBeGreaterThan(5);
+
+    // Every result has required fields
+    for (const r of results) {
+      expect(r.name).toBeDefined();
+      expect(r.category).toBeDefined();
+      expect(["pass", "warn", "fail"]).toContain(r.status);
+    }
+  }, 30_000);
+
+  it("doctor checks all categories", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "doctor", "--json"],
+      { cwd: PROJECT_ROOT }
+    );
+
+    const results = JSON.parse(stdout) as Array<{ category: string }>;
+    const categories = new Set(results.map(r => r.category));
+
+    expect(categories.has("Prerequisites")).toBe(true);
+    expect(categories.has("MCP Server")).toBe(true);
+  }, 30_000);
+
+  it("doctor detects Node.js as passing", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "doctor", "--json"],
+      { cwd: PROJECT_ROOT }
+    );
+
+    const results = JSON.parse(stdout) as Array<{ name: string; status: string }>;
+    const nodeCheck = results.find(r => r.name === "Node.js");
+    expect(nodeCheck).toBeDefined();
+    expect(nodeCheck!.status).toBe("pass");
+  }, 30_000);
+
+  it("displays usage including doctor command", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "unknown-command"],
+      { cwd: PROJECT_ROOT }
+    );
+
+    expect(stdout).toContain("doctor");
+    expect(stdout).toContain("Diagnose");
+  }, 10_000);
+});
+
+// ==============================================================================
 // E2E: Plugin structure validation
 // Tests that the plugin directory contains everything Claude Code expects.
 // ==============================================================================

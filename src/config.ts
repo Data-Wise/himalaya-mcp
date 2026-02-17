@@ -11,26 +11,29 @@
 
 import type { HimalayaClientOptions } from "./himalaya/types.js";
 
+/** Return the value only if it's a real string (not an unresolved template variable). */
+function resolvedEnv(key: string): string | undefined {
+  const val = process.env[key];
+  if (!val || val.startsWith("${")) return undefined;
+  return val;
+}
+
 export function loadConfig(): HimalayaClientOptions {
   const config: HimalayaClientOptions = {};
 
-  if (process.env.HIMALAYA_BINARY) {
-    config.binary = process.env.HIMALAYA_BINARY;
-  }
+  const binary = resolvedEnv("HIMALAYA_BINARY");
+  if (binary) config.binary = binary;
 
-  if (process.env.HIMALAYA_ACCOUNT) {
-    config.account = process.env.HIMALAYA_ACCOUNT;
-  }
+  const account = resolvedEnv("HIMALAYA_ACCOUNT");
+  if (account) config.account = account;
 
-  if (process.env.HIMALAYA_FOLDER) {
-    config.folder = process.env.HIMALAYA_FOLDER;
-  }
+  const folder = resolvedEnv("HIMALAYA_FOLDER");
+  if (folder) config.folder = folder;
 
-  if (process.env.HIMALAYA_TIMEOUT) {
-    const timeout = parseInt(process.env.HIMALAYA_TIMEOUT, 10);
-    if (!isNaN(timeout) && timeout > 0) {
-      config.timeout = timeout;
-    }
+  const timeoutStr = resolvedEnv("HIMALAYA_TIMEOUT");
+  if (timeoutStr) {
+    const timeout = parseInt(timeoutStr, 10);
+    if (!isNaN(timeout) && timeout > 0) config.timeout = timeout;
   }
 
   return config;

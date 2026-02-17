@@ -53,4 +53,14 @@ describe("loadConfig", () => {
     const config = loadConfig();
     expect(config.timeout).toBeUndefined();
   });
+
+  it("ignores unresolved template variables from .mcpb", () => {
+    process.env.HIMALAYA_BINARY = "${user_config.himalaya_binary}";
+    process.env.HIMALAYA_ACCOUNT = "${user_config.himalaya_account}";
+    process.env.HIMALAYA_FOLDER = "${user_config.himalaya_folder}";
+    process.env.HIMALAYA_TIMEOUT = "${user_config.himalaya_timeout}";
+
+    const config = loadConfig();
+    expect(config).toEqual({});
+  });
 });
