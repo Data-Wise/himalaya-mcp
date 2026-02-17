@@ -10,9 +10,10 @@
  *   himalaya-mcp setup --remove # Remove MCP server entry
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, realpathSync } from "node:fs";
+import { join, dirname } from "node:path";
 import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
 
 function getConfigDir(): string {
   switch (process.platform) {
@@ -27,13 +28,39 @@ function getConfigDir(): string {
   }
 }
 
+/**
+ * Find dist/index.js — the MCP server entry point.
+ *
+ * Resolution order:
+ *   1. Relative to this script (works for Homebrew, source, and symlinked installs)
+ *   2. Claude Code plugin path (~/.claude/plugins/himalaya-mcp/dist/index.js)
+ */
+function findServerEntry(): string {
+  // This script is at dist/cli/setup.js — index.js is at dist/index.js
+  const thisFile = fileURLToPath(import.meta.url);
+  const distDir = dirname(dirname(realpathSync(thisFile)));
+  const relativeEntry = join(distDir, "index.js");
+  if (existsSync(relativeEntry)) {
+    return relativeEntry;
+  }
+
+  // Fallback: Claude Code plugin symlink
+  const pluginEntry = join(homedir(), ".claude", "plugins", "himalaya-mcp", "dist", "index.js");
+  if (existsSync(pluginEntry)) {
+    return pluginEntry;
+  }
+
+  // Last resort: return the relative path (setup --check will warn if missing)
+  return relativeEntry;
+}
+
 const CONFIG_DIR = getConfigDir();
 const CONFIG_PATH = join(CONFIG_DIR, "claude_desktop_config.json");
 
 const SERVER_KEY = "himalaya";
 const SERVER_CONFIG = {
   command: "node",
-  args: [join(homedir(), ".claude", "plugins", "himalaya-mcp", "dist", "index.js")],
+  args: [findServerEntry()],
 };
 
 interface DesktopConfig {
