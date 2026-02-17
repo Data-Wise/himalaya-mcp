@@ -31,7 +31,11 @@ claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install email
 ```
 
-### Claude Desktop
+### Claude Desktop (.mcpb -- one-click install)
+
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and open it in Claude Desktop. Requires `brew install himalaya` separately.
+
+### Claude Desktop (CLI setup)
 
 ```bash
 himalaya-mcp setup

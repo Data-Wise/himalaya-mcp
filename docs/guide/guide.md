@@ -73,9 +73,27 @@ ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 
 Restart Claude Code. The plugin provides `/email:inbox`, `/email:triage`, `/email:digest`, and `/email:reply` skills.
 
-### Claude Desktop
+### Claude Desktop (.mcpb)
 
-After installing himalaya-mcp (via Homebrew or from source), run the setup command:
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` package is lightweight (~150 KB) and configures the MCP server automatically.
+
+**Prerequisites:** himalaya CLI must be installed separately:
+
+```bash
+brew install himalaya
+```
+
+**User-configurable fields (set during install):**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| himalaya binary path | `himalaya` | Path to himalaya binary (optional) |
+| Default account | (system default) | Email account name (optional) |
+| Default folder | `INBOX` | Folder for operations |
+
+### Claude Desktop (CLI setup)
+
+Alternatively, if you installed himalaya-mcp via Homebrew or from source, run the setup command:
 
 ```bash
 himalaya-mcp setup           # Add MCP server to Desktop config

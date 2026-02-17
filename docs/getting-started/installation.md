@@ -91,7 +91,25 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 
 ## Claude Desktop Setup
 
-After installing himalaya-mcp, configure it as an MCP server for Claude Desktop:
+### Option A: .mcpb Package (one-click)
+
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` is a lightweight (~150 KB) package that bundles the MCP server and configures it automatically.
+
+**Prerequisite:** himalaya CLI must be installed separately:
+
+```bash
+brew install himalaya
+```
+
+During install, you can configure:
+
+- **himalaya binary path** -- path to himalaya binary (default: `himalaya`)
+- **Default account** -- email account name (default: system default)
+- **Default folder** -- folder for operations (default: `INBOX`)
+
+### Option B: CLI Setup
+
+After installing himalaya-mcp via Homebrew or from source, configure it as an MCP server for Claude Desktop:
 
 ```bash
 himalaya-mcp setup           # Add to Claude Desktop config
