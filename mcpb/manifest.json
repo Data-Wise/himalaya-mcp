@@ -23,6 +23,7 @@
       "command": "node",
       "args": ["${__dirname}/dist/index.js"],
       "env": {
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:${HOME}/.local/bin:/usr/bin:/bin",
         "HIMALAYA_BINARY": "${user_config.himalaya_binary}",
         "HIMALAYA_ACCOUNT": "${user_config.himalaya_account}",
         "HIMALAYA_FOLDER": "${user_config.himalaya_folder}"
