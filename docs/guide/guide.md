@@ -183,7 +183,7 @@ All settings are optional. Set via environment variables in your MCP server conf
 | `HIMALAYA_BINARY` | `himalaya` | Path to himalaya binary |
 | `HIMALAYA_ACCOUNT` | (system default) | Default email account name |
 | `HIMALAYA_FOLDER` | `INBOX` | Default folder for operations |
-| `HIMALAYA_TIMEOUT` | `30000` | Command timeout in milliseconds |
+| `HIMALAYA_TIMEOUT` | `0` (no limit) | Command timeout in milliseconds (0 = unlimited) |
 
 Example with env vars:
 
@@ -300,10 +300,20 @@ himalaya-mcp is designed so Claude cannot accidentally send email:
 
 No emails are ever deleted -- only flagged or moved.
 
+## Diagnostics
+
+```bash
+himalaya-mcp doctor          # Check all settings across the full stack
+himalaya-mcp doctor --fix    # Auto-fix common issues
+himalaya-mcp doctor --json   # Machine-readable output
+```
+
+The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health, email connectivity, Claude Desktop extension state, Claude Code plugin registration, and environment variables. See the [Command Reference](../reference/commands.md#himalaya-mcp-doctor) for full details.
+
 ## Testing
 
 ```bash
-npm test    # 275 tests across 15 files (vitest)
+npm test    # 314 tests across 15 files (vitest)
 ```
 
 Test breakdown:
@@ -317,11 +327,11 @@ Test breakdown:
 | `compose-new.test.ts` | 8 | compose_email safety gate |
 | `folders.test.ts` | 12 | Folder tools (list, create, delete) |
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
-| `calendar.test.ts` | 12 | ICS parser + calendar event tools |
+| `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
 | `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
-| `config.test.ts` | 7 | Env var loading, edge cases |
+| `config.test.ts` | 7 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 91 | Realistic Claude usage scenarios + packaging validation |
-| `e2e.test.ts` | 32 | Full MCP server pipeline with fake himalaya + error paths |
-| `setup.test.ts` | 31 | CLI setup/check/remove, install/upgrade E2E, plugin structure |
+| `dogfood.test.ts` | 122 | Realistic Claude usage scenarios + packaging validation |
+| `e2e.test.ts` | 34 | Full MCP server pipeline + .mcpb build pipeline |
+| `setup.test.ts` | 36 | CLI setup/check/remove, install/upgrade E2E, doctor command |

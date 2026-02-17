@@ -125,7 +125,20 @@ ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ### Claude Desktop
 
 ```bash
-himalaya-mcp setup             # Auto-configure MCP server
+# Desktop Extension (.mcpb) — recommended
+# Download .mcpb from GitHub Releases, double-click to install
+# Or via CLI:
+himalaya-mcp install-ext
+
+# Legacy MCP server config
+himalaya-mcp setup
+```
+
+### Verify Installation
+
+```bash
+himalaya-mcp doctor            # Check all settings across the stack
+himalaya-mcp doctor --fix      # Auto-fix common issues
 ```
 
 Then in Claude Code:

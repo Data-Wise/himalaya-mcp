@@ -18,7 +18,13 @@ ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 
 Restart Claude Code.
 
-## 3. Try It
+## 3. Verify
+
+```bash
+himalaya-mcp doctor    # Check all settings
+```
+
+## 4. Try It
 
 ```
 You: "Check my inbox"
@@ -38,7 +44,7 @@ Found 5 emails in INBOX:
 | 249015 | hr@company.com    | Benefits Enrollment      | 2026-02-11 |       |
 ```
 
-## 4. Common Commands
+## 5. Common Commands
 
 | What you say | What happens |
 |-------------|--------------|
@@ -51,7 +57,7 @@ Found 5 emails in INBOX:
 | "Flag 249088 as important" | Adds Flagged flag |
 | "Archive email 249064" | Moves to Archive folder |
 
-## 5. Safety
+## 6. Safety
 
 - Claude **never sends email** without your explicit "yes" / "send it"
 - `send_email` shows a preview first -- you approve before it sends

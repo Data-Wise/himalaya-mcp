@@ -154,7 +154,7 @@ All optional. Set via environment variables in your MCP server config:
 | `HIMALAYA_BINARY` | `himalaya` | Path to himalaya binary |
 | `HIMALAYA_ACCOUNT` | (system default) | Default email account name |
 | `HIMALAYA_FOLDER` | `INBOX` | Default folder for operations |
-| `HIMALAYA_TIMEOUT` | `30000` | Command timeout in milliseconds |
+| `HIMALAYA_TIMEOUT` | `0` (no limit) | Command timeout in milliseconds (0 = unlimited) |
 
 ### Example with env vars
 
@@ -176,13 +176,16 @@ All optional. Set via environment variables in your MCP server config:
 ## Verify Installation
 
 ```bash
-# Run the MCP server directly
-node dist/index.js
+# Full diagnostic (checks prereqs, MCP server, email, Desktop extension, plugin)
+himalaya-mcp doctor
 
-# Run tests (308 tests)
+# Auto-fix common issues
+himalaya-mcp doctor --fix
+
+# Run tests (314 tests)
 npm test
 
-# Check Claude Desktop config
+# Check Claude Desktop config (legacy)
 himalaya-mcp setup --check
 ```
 
@@ -222,6 +225,21 @@ echo '{}' | node ~/.claude/plugins/himalaya-mcp/dist/index.js
 ```
 
 If you see a JSON-RPC response, the server is working. Check your MCP configuration paths.
+
+### Desktop Extension not working
+
+Run the doctor command to diagnose:
+
+```bash
+himalaya-mcp doctor
+```
+
+Common issues it catches:
+- himalaya binary not found (PATH not inherited by Desktop)
+- Unresolved `${user_config.*}` template variables
+- Missing extension registry or settings files
+
+Use `--fix` to auto-resolve what it can, or see the [Troubleshooting Guide](../guide/troubleshooting.md) for manual fixes.
 
 ## What's Next?
 
