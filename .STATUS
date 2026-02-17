@@ -22,11 +22,12 @@
 - Phase 6c: Attachments — list_attachments, download_attachment
 - Phase 6d: Calendar — extract_calendar_event, create_calendar_event (ICS + Apple Calendar)
 - Plugin Packaging: esbuild bundle (595KB), Homebrew formula, marketplace.json, CLI setup
-- Homebrew Release: formula updated to v1.2.1, 7 skills, 19 tools in caveats
+- Homebrew Release: formula updated to v1.2.2, 7 skills, 19 tools in caveats
 - Total: 19 tools, 4 prompts, 3 resources, 7 skills, 275 tests (15 test files)
 
 ## Just Completed
 
+- 2026-02-17: Homebrew formula bumped to v1.2.2, brew test + audit --strict pass
 - 2026-02-17: Docs site sync for v1.2.2 — CHANGELOG, test counts, skill list, VERSION fix
 - 2026-02-17: Fixed VERSION constant and E2E test (was still 1.2.1)
 - 2026-02-17: Deployed to GitHub Pages, merged PR #35 to main
@@ -99,5 +100,5 @@ claude
 
 ---
 
-**Last Updated:** 2026-02-16
-**Status:** v1.2.2 released, .mcpb packaging in progress (worktree)
+**Last Updated:** 2026-02-17
+**Status:** v1.2.2 released (GitHub + Homebrew), .mcpb packaging in progress (worktree)
