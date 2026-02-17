@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.2] - 2026-02-16
+
+### Fixed
+
+- Setup CLI resolves MCP server path dynamically instead of hardcoding (works across install methods)
+
+### Added
+
+- Install/upgrade E2E tests and CLI test suites (275 total tests across 15 files)
+
 ## [1.2.1] - 2026-02-16
 
 ### Changed

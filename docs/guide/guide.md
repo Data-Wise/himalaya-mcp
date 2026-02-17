@@ -299,7 +299,7 @@ Test breakdown:
 | `compose-new.test.ts` | 8 | compose_email safety gate |
 | `folders.test.ts` | 12 | Folder tools (list, create, delete) |
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
-| `calendar.test.ts` | 12 | ICS parser + calendar event tools |
+| `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
 | `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
 | `config.test.ts` | 7 | Env var loading, edge cases |

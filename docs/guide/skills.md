@@ -238,11 +238,13 @@ Claude:
 ├──────────────────────────────────────────────┤
 │                                              │
 │  Skills:                                     │
-│    /email:inbox    Check your inbox          │
-│    /email:triage   Classify emails           │
-│    /email:digest   Daily summary             │
-│    /email:reply    Draft & send safely       │
-│    /email:help     This help                 │
+│    /email:inbox        Check your inbox      │
+│    /email:triage       Classify emails       │
+│    /email:digest       Daily summary         │
+│    /email:reply        Draft & send safely   │
+│    /email:compose      Compose new emails    │
+│    /email:attachments  Files & calendar      │
+│    /email:help         This help             │
 │                                              │
 │  Quick actions:                              │
 │    "Check my inbox"                          │
