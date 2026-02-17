@@ -799,9 +799,6 @@ describe("E2E: MCPB Build Pipeline", () => {
     "npm run build:mcpb produces a valid .mcpb file",
     async () => {
       // Clean any previous .mcpb output
-      const globPattern = join(PROJECT_ROOT, "himalaya-mcp-v*.mcpb");
-      const { glob } = await import("node:fs");
-      // Simple cleanup - remove any existing .mcpb files
       const { readdirSync, unlinkSync, statSync } = await import("node:fs");
       for (const f of readdirSync(PROJECT_ROOT)) {
         if (f.endsWith(".mcpb")) {

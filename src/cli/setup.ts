@@ -459,7 +459,7 @@ function checkEmailConnectivity(): CheckResult[] {
   return results;
 }
 
-function checkDesktopExtension(fix: boolean): CheckResult[] {
+function checkDesktopExtension(): CheckResult[] {
   const results: CheckResult[] = [];
 
   const extDir = join(EXTENSIONS_DIR, EXTENSION_ID);
@@ -544,7 +544,7 @@ function checkDesktopExtension(fix: boolean): CheckResult[] {
   return results;
 }
 
-function checkCodePlugin(fix: boolean): CheckResult[] {
+function checkCodePlugin(): CheckResult[] {
   const results: CheckResult[] = [];
 
   const symlinkPath = join(homedir(), ".claude", "plugins", "himalaya-mcp");
@@ -622,8 +622,8 @@ function doctor(flags: { fix: boolean; json: boolean }): void {
     ...checkPrerequisites(),
     ...checkMcpServer(),
     ...checkEmailConnectivity(),
-    ...checkDesktopExtension(flags.fix),
-    ...checkCodePlugin(flags.fix),
+    ...checkDesktopExtension(),
+    ...checkCodePlugin(),
     ...checkEnvironment(),
   ];
 
