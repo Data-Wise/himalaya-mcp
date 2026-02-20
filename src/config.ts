@@ -6,7 +6,7 @@
  *   HIMALAYA_BINARY  — path to himalaya binary (default: "himalaya")
  *   HIMALAYA_ACCOUNT — default account name
  *   HIMALAYA_FOLDER  — default folder (default: "INBOX")
- *   HIMALAYA_TIMEOUT — command timeout in ms (default: 30000)
+ *   HIMALAYA_TIMEOUT — command timeout in ms (default: 120000; 0 = unlimited)
  */
 
 import type { HimalayaClientOptions } from "./himalaya/types.js";
@@ -33,7 +33,7 @@ export function loadConfig(): HimalayaClientOptions {
   const timeoutStr = resolvedEnv("HIMALAYA_TIMEOUT");
   if (timeoutStr) {
     const timeout = parseInt(timeoutStr, 10);
-    if (!isNaN(timeout) && timeout > 0) config.timeout = timeout;
+    if (!isNaN(timeout) && timeout >= 0) config.timeout = timeout;
   }
 
   return config;

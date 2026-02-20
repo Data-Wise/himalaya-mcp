@@ -101,11 +101,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
-          MCPB_FILE=$(ls himalaya-mcp-v*.mcpb 2>/dev/null | head -1)
-          if [ -n "$MCPB_FILE" ]; then
-            gh release upload "$TAG_NAME" "$MCPB_FILE" --repo "$GITHUB_REPOSITORY"
-            echo "Uploaded $MCPB_FILE to release $TAG_NAME"
+          shopt -s nullglob
+          MCPB_FILES=(himalaya-mcp-v*.mcpb)
+          if [ ${#MCPB_FILES[@]} -eq 0 ]; then
+            echo "ERROR: No .mcpb file found — build may have failed"
+            exit 1
           fi
+          MCPB_FILE="${MCPB_FILES[0]}"
+          gh release upload "$TAG_NAME" "$MCPB_FILE" --repo "$GITHUB_REPOSITORY"
+          echo "Uploaded $MCPB_FILE to release $TAG_NAME"
 
   prepare:
     name: Prepare Release Info

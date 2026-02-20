@@ -4,6 +4,9 @@
 **Spec Version:** manifest_version 0.3
 **CLI Version:** @anthropic-ai/mcpb 2.1.2
 
+!!! warning "Point-in-time snapshot"
+    This is a snapshot of the `.mcpb` format as of the date above. The canonical spec lives in the [modelcontextprotocol/mcpb](https://github.com/modelcontextprotocol/mcpb) repository. Check upstream for the latest schema changes.
+
 ---
 
 ## Table of Contents

@@ -53,7 +53,7 @@ export interface HimalayaClientOptions {
   account?: string;
   /** Default folder (default: "INBOX") */
   folder?: string;
-  /** Timeout in milliseconds (default: 30000) */
+  /** Timeout in milliseconds (default: 120000; 0 = unlimited) */
   timeout?: number;
 }
 
