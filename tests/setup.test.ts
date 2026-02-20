@@ -559,11 +559,19 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 
 describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   it("doctor runs and outputs check results", async () => {
-    const { stdout } = await execFileAsync(
-      "node",
-      ["dist/cli/setup.js", "doctor"],
-      { cwd: PROJECT_ROOT }
-    );
+    // doctor exits non-zero when checks fail (e.g. himalaya not installed in CI)
+    // so we capture stdout from the error object
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "doctor"],
+        { cwd: PROJECT_ROOT }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
 
     expect(stdout).toContain("himalaya-mcp doctor");
     expect(stdout).toContain("Prerequisites");
