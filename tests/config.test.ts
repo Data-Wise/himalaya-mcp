@@ -48,6 +48,12 @@ describe("loadConfig", () => {
     expect(config.timeout).toBeUndefined();
   });
 
+  it("accepts HIMALAYA_TIMEOUT of 0 (unlimited)", () => {
+    process.env.HIMALAYA_TIMEOUT = "0";
+    const config = loadConfig();
+    expect(config.timeout).toBe(0);
+  });
+
   it("ignores negative HIMALAYA_TIMEOUT", () => {
     process.env.HIMALAYA_TIMEOUT = "-1000";
     const config = loadConfig();

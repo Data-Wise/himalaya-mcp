@@ -13,7 +13,7 @@ const DEFAULT_OPTIONS: Required<HimalayaClientOptions> = {
   binary: "himalaya",
   account: "",
   folder: "INBOX",
-  timeout: 0,
+  timeout: 120_000,
 };
 
 export class HimalayaClient {

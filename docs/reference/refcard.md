@@ -93,7 +93,7 @@ Draft      Draft message
 HIMALAYA_BINARY    Path to himalaya binary       (default: himalaya)
 HIMALAYA_ACCOUNT   Default account name          (default: system default)
 HIMALAYA_FOLDER    Default folder                (default: INBOX)
-HIMALAYA_TIMEOUT   Command timeout in ms         (default: 0, unlimited)
+HIMALAYA_TIMEOUT   Command timeout in ms         (default: 120000, 2 min; 0 = unlimited)
 ```
 
 ## Safety Gates

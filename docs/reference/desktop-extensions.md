@@ -75,6 +75,9 @@ The format was renamed from `.dxt` to `.mcpb` in early 2026. The `dxt_version` m
 | `mcp_config.args` | Command arguments (supports template variables) |
 | `mcp_config.env` | Environment variables (supports template variables) |
 
+!!! note "Why PATH is set explicitly"
+    Claude Desktop does not inherit the user's shell PATH. The himalaya-mcp manifest sets `PATH` to standard binary locations (`/opt/homebrew/bin`, `/usr/local/bin`, etc.) so the server can find the `himalaya` binary. This is scoped to common installation paths rather than passing through the full system PATH.
+
 ### user_config
 
 User-configurable settings that appear in Claude Desktop's extension settings UI.

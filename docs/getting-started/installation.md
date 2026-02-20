@@ -154,7 +154,7 @@ All optional. Set via environment variables in your MCP server config:
 | `HIMALAYA_BINARY` | `himalaya` | Path to himalaya binary |
 | `HIMALAYA_ACCOUNT` | (system default) | Default email account name |
 | `HIMALAYA_FOLDER` | `INBOX` | Default folder for operations |
-| `HIMALAYA_TIMEOUT` | `0` (no limit) | Command timeout in milliseconds (0 = unlimited) |
+| `HIMALAYA_TIMEOUT` | `120000` (2 min) | Command timeout in milliseconds (0 = unlimited) |
 
 ### Example with env vars
 

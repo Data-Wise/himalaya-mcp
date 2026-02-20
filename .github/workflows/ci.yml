@@ -69,8 +69,14 @@ jobs:
 
       - name: Verify MCPB bundle
         run: |
-          MCPB_FILE=$(ls himalaya-mcp-v*.mcpb 2>/dev/null | head -1)
-          test -f "$MCPB_FILE" && echo "MCPB OK: $MCPB_FILE ($(wc -c < "$MCPB_FILE" | tr -d ' ') bytes)"
+          shopt -s nullglob
+          MCPB_FILES=(himalaya-mcp-v*.mcpb)
+          if [ ${#MCPB_FILES[@]} -eq 0 ]; then
+            echo "ERROR: No .mcpb file produced"
+            exit 1
+          fi
+          MCPB_FILE="${MCPB_FILES[0]}"
+          echo "MCPB OK: $MCPB_FILE ($(wc -c < "$MCPB_FILE" | tr -d ' ') bytes)"
 
   validate-plugin:
     runs-on: ubuntu-latest

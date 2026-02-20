@@ -22,7 +22,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Changed
 
-- Default timeout changed from 30s to unlimited (0) for better large-mailbox support
+- Default timeout changed from 30s to 120s (was briefly set to unlimited in v1.3.0; now 2 min for safety, set `HIMALAYA_TIMEOUT=0` for unlimited)
 
 ## [1.2.2] - 2026-02-16
 

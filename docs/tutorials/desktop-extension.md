@@ -222,7 +222,7 @@ Or run `himalaya-mcp doctor --fix` to set it automatically.
 
 ### Slow responses
 
-Large mailboxes or slow IMAP servers can take time. The default timeout is unlimited, so commands won't time out. If you want to set a limit:
+Large mailboxes or slow IMAP servers can take time. The default timeout is 2 minutes (120s). For very large mailboxes, you can increase it or set to 0 for unlimited:
 
 ```json
 {
