@@ -1,0 +1,4318 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Privacy-first email MCP server and Claude Code plugin wrapping the himalaya CLI">
+      
+      
+      
+        <link rel="canonical" href="https://data-wise.github.io/himalaya-mcp/reference/commands/">
+      
+      
+        <link rel="prev" href="../../guide/troubleshooting/">
+      
+      
+        <link rel="next" href="../refcard/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Command Reference - himalaya-mcp</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,700,700i%7CSource+Code+Pro:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Source Sans Pro";--md-code-font:"Source Code Pro"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#command-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="himalaya-mcp" class="md-header__button md-logo" aria-label="himalaya-mcp" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            himalaya-mcp
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Command Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Data-Wise/himalaya-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Data-Wise/himalaya-mcp
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tutorials/" class="md-tabs__link">
+          
+  
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guide/guide/" class="md-tabs__link">
+          
+  
+  
+  Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="himalaya-mcp" class="md-nav__button md-logo" aria-label="himalaya-mcp" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    himalaya-mcp
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Data-Wise/himalaya-mcp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Data-Wise/himalaya-mcp
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Level 1: Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Level 1: Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/read-first-email/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Read Your First Email
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/multi-account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Account Email
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/desktop-extension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop Extension
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Level 2: Productivity
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Level 2: Productivity
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/triage-inbox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Triage Your Inbox
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/reply-email/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reply to an Email
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/compose-email/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compose & Send Email
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/attachments-calendar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attachments & Calendar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/export-save/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Export & Save Emails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Level 3: Automation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Level 3: Automation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/automate-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automate with the Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/packaging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packaging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/skills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Skills & Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tools
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inbox-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbox &amp; Search
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inbox &amp; Search">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_emails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_emails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search_emails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        search_emails
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_email_html" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_email_html
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#managing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flag_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flag_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#move_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        move_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#folders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Folders
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Folders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_folders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_folders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete_folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compose
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compose">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compose_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compose_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#export_to_markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        export_to_markdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_action_item" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_action_item
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replies-sending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replies &amp; Sending
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Replies &amp; Sending">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#draft_reply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        draft_reply
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#send_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        send_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adapters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adapters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adapters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copy_to_clipboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        copy_to_clipboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attachments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attachments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attachments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_attachments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_attachments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download_attachment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        download_attachment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calendar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calendar
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Calendar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extract_calendar_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_calendar_event
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_calendar_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_calendar_event
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prompts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#triage_inbox-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        triage_inbox
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarize_email-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarize_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#daily_email_digest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        daily_email_digest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#draft_reply-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        draft_reply (prompt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resources
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emailinbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        email://inbox
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emailfolders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        email://folders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emailmessageid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        email://message/{id}
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-install-ext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp install-ext
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-remove-ext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp remove-ext
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-doctor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp doctor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../refcard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../desktop-extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop Extensions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcpb-format-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    .mcpb Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tools
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inbox-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inbox &amp; Search
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inbox &amp; Search">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_emails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_emails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search_emails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        search_emails
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_email_html" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_email_html
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#managing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Managing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flag_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flag_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#move_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        move_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#folders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Folders
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Folders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_folders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_folders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete_folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compose
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compose">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compose_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compose_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#export_to_markdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        export_to_markdown
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_action_item" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_action_item
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#replies-sending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replies &amp; Sending
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Replies &amp; Sending">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#draft_reply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        draft_reply
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#send_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        send_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adapters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adapters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adapters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copy_to_clipboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        copy_to_clipboard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attachments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attachments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attachments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list_attachments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        list_attachments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#download_attachment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        download_attachment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#calendar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calendar
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Calendar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extract_calendar_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_calendar_event
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_calendar_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_calendar_event
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prompts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#triage_inbox-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        triage_inbox
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarize_email-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarize_email
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#daily_email_digest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        daily_email_digest
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#draft_reply-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        draft_reply (prompt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resources
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emailinbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        email://inbox
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emailfolders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        email://folders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emailmessageid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        email://message/{id}
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-install-ext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp install-ext
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-remove-ext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp remove-ext
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#himalaya-mcp-doctor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        himalaya-mcp doctor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/Data-Wise/himalaya-mcp/edit/main/docs/reference/commands.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="command-reference">Command Reference<a class="headerlink" href="#command-reference" title="Permanent link">&para;</a></h1>
+<p>Complete reference for all 19 MCP tools, 4 prompts, 3 resources, and CLI commands.</p>
+<div class="admonition tip">
+<p class="admonition-title">See also</p>
+<p><strong><a href="../../tutorials/">Tutorials</a></strong> for step-by-step walkthroughs | <strong><a href="../../guide/workflows/">Workflows</a></strong> for common email patterns</p>
+</div>
+<hr />
+<h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
+<h3 id="inbox-search">Inbox &amp; Search<a class="headerlink" href="#inbox-search" title="Permanent link">&para;</a></h3>
+<h4 id="list_emails"><code>list_emails</code><a class="headerlink" href="#list_emails" title="Permanent link">&para;</a></h4>
+<p>List emails in a folder. Returns envelope data: subject, from, date, flags.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>page_size</code></td>
+<td>number</td>
+<td>No</td>
+<td><code>25</code></td>
+<td>Number of emails to return</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td>number</td>
+<td>No</td>
+<td><code>1</code></td>
+<td>Page number for pagination</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name from himalaya config</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&quot;List my last 10 emails&quot;
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>→ list_emails(page_size: 10)
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>&quot;Show emails in Archive&quot;
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>→ list_emails(folder: &quot;Archive&quot;)
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>&quot;Page 2 of my work inbox&quot;
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>→ list_emails(page: 2, account: &quot;work&quot;)
+</span></code></pre></div>
+<p><strong>Output:</strong> One line per email with ID, flags, date, sender, and subject.</p>
+<p><strong>Related:</strong> <a href="#search_emails">search_emails</a>, <a href="#read_email">read_email</a></p>
+<hr />
+<h4 id="search_emails"><code>search_emails</code><a class="headerlink" href="#search_emails" title="Permanent link">&para;</a></h4>
+<p>Search emails using himalaya filter syntax.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>query</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Search query in himalaya filter syntax</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder to search in</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Filter syntax:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Example</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>subject</code></td>
+<td><code>subject invoice</code></td>
+<td>Subject contains "invoice"</td>
+</tr>
+<tr>
+<td><code>from</code></td>
+<td><code>from alice</code></td>
+<td>Sender contains "alice"</td>
+</tr>
+<tr>
+<td><code>to</code></td>
+<td><code>to team</code></td>
+<td>Recipient contains "team"</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td><code>body deadline</code></td>
+<td>Body contains "deadline"</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td><code>date 2026-02-13</code></td>
+<td>Sent on date</td>
+</tr>
+<tr>
+<td><code>before</code></td>
+<td><code>before 2026-02-01</code></td>
+<td>Sent before date</td>
+</tr>
+<tr>
+<td><code>after</code></td>
+<td><code>after 2026-01-01</code></td>
+<td>Sent after date</td>
+</tr>
+<tr>
+<td><code>flag</code></td>
+<td><code>flag Flagged</code></td>
+<td>Has specific flag</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Operators:</strong> <code>and</code>, <code>or</code>, <code>not</code></p>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>&quot;Find emails about invoices&quot;
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>→ search_emails(query: &quot;subject invoice&quot;)
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>&quot;Emails from Alice about the meeting&quot;
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>→ search_emails(query: &quot;from alice and subject meeting&quot;)
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>&quot;Unread emails from last week&quot;
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>→ search_emails(query: &quot;not flag Seen and after 2026-02-06&quot;)
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>&quot;Search Sent folder for budget emails&quot;
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>→ search_emails(query: &quot;subject budget&quot;, folder: &quot;Sent&quot;)
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#list_emails">list_emails</a>, <a href="#read_email">read_email</a></p>
+<hr />
+<h3 id="reading">Reading<a class="headerlink" href="#reading" title="Permanent link">&para;</a></h3>
+<h4 id="read_email"><code>read_email</code><a class="headerlink" href="#read_email" title="Permanent link">&para;</a></h4>
+<p>Read an email message body as plain text.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID (from list or search)</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>&quot;Read email 42&quot;
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>→ read_email(id: &quot;42&quot;)
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>&quot;Read that email from Sent&quot;
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>→ read_email(id: &quot;15&quot;, folder: &quot;Sent&quot;)
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#read_email_html">read_email_html</a>, <a href="#list_emails">list_emails</a></p>
+<hr />
+<h4 id="read_email_html"><code>read_email_html</code><a class="headerlink" href="#read_email_html" title="Permanent link">&para;</a></h4>
+<p>Read an email message body as HTML. Useful for formatted emails with tables, images, or rich text.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&quot;Show the HTML version of email 42&quot;
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>→ read_email_html(id: &quot;42&quot;)
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>&quot;Read the formatted newsletter&quot;
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>→ read_email_html(id: &quot;88&quot;)
+</span></code></pre></div>
+<p><strong>When to use:</strong> Prefer <code>read_email</code> for most messages. Use <code>read_email_html</code> when the plain text version is empty or poorly formatted (newsletters, marketing emails, HTML-only senders).</p>
+<p><strong>Related:</strong> <a href="#read_email">read_email</a></p>
+<hr />
+<h3 id="managing">Managing<a class="headerlink" href="#managing" title="Permanent link">&para;</a></h3>
+<h4 id="flag_email"><code>flag_email</code><a class="headerlink" href="#flag_email" title="Permanent link">&para;</a></h4>
+<p>Add or remove flags on an email.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>flags</code></td>
+<td>string[]</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Flags to add/remove</td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td><code>"add"</code> | <code>"remove"</code></td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Whether to add or remove flags</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Available flags:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Seen</code></td>
+<td>Email has been read</td>
+</tr>
+<tr>
+<td><code>Flagged</code></td>
+<td>Starred / important</td>
+</tr>
+<tr>
+<td><code>Answered</code></td>
+<td>Has been replied to</td>
+</tr>
+<tr>
+<td><code>Deleted</code></td>
+<td>Marked for deletion</td>
+</tr>
+<tr>
+<td><code>Draft</code></td>
+<td>Is a draft message</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>&quot;Star email 42&quot;
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>→ flag_email(id: &quot;42&quot;, flags: [&quot;Flagged&quot;], action: &quot;add&quot;)
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>&quot;Mark emails 10-15 as read&quot;
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>→ flag_email(id: &quot;10&quot;, flags: [&quot;Seen&quot;], action: &quot;add&quot;)
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>   (repeat for each ID)
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>&quot;Unstar email 42&quot;
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>→ flag_email(id: &quot;42&quot;, flags: [&quot;Flagged&quot;], action: &quot;remove&quot;)
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>&quot;Mark as read and flag important&quot;
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>→ flag_email(id: &quot;42&quot;, flags: [&quot;Seen&quot;, &quot;Flagged&quot;], action: &quot;add&quot;)
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#move_email">move_email</a>, <a href="#triage_inbox-prompt">triage_inbox</a></p>
+<hr />
+<h4 id="move_email"><code>move_email</code><a class="headerlink" href="#move_email" title="Permanent link">&para;</a></h4>
+<p>Move an email to a different folder.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>target_folder</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Destination folder name</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Source folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Common target folders:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Archive</code></td>
+<td>Reviewed, no action needed</td>
+</tr>
+<tr>
+<td><code>Trash</code></td>
+<td>Delete</td>
+</tr>
+<tr>
+<td><code>Spam</code></td>
+<td>Junk mail</td>
+</tr>
+<tr>
+<td><code>Drafts</code></td>
+<td>Saved drafts</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Folder names are provider-specific</p>
+<p>Gmail uses <code>[Gmail]/Trash</code>, <code>[Gmail]/Spam</code>, etc. Fastmail uses <code>Trash</code>, <code>Spam</code>. Check your folders with the <code>email://folders</code> resource.</p>
+</div>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>&quot;Archive email 42&quot;
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>→ move_email(id: &quot;42&quot;, target_folder: &quot;Archive&quot;)
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>&quot;Delete email 10&quot;
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>→ move_email(id: &quot;10&quot;, target_folder: &quot;Trash&quot;)
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>&quot;Move to project folder&quot;
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>→ move_email(id: &quot;42&quot;, target_folder: &quot;Projects/Launch&quot;)
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#flag_email">flag_email</a>, <a href="#triage_inbox-prompt">triage_inbox</a></p>
+<hr />
+<h3 id="folders">Folders<a class="headerlink" href="#folders" title="Permanent link">&para;</a></h3>
+<h4 id="list_folders"><code>list_folders</code><a class="headerlink" href="#list_folders" title="Permanent link">&para;</a></h4>
+<p>List all email folders/mailboxes for an account.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>&quot;Show my email folders&quot;
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>→ list_folders()
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>&quot;List folders on my work account&quot;
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>→ list_folders(account: &quot;work&quot;)
+</span></code></pre></div>
+<p><strong>Output:</strong> One line per folder with the folder name and optional description.</p>
+<p><strong>Related:</strong> <a href="#create_folder">create_folder</a>, <a href="#delete_folder">delete_folder</a>, <a href="#move_email">move_email</a></p>
+<hr />
+<h4 id="create_folder"><code>create_folder</code><a class="headerlink" href="#create_folder" title="Permanent link">&para;</a></h4>
+<p>Create a new email folder/mailbox.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Name for the new folder</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>&quot;Create a folder called Projects&quot;
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>→ create_folder(name: &quot;Projects&quot;)
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>&quot;Make a Receipts folder on my work account&quot;
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>→ create_folder(name: &quot;Receipts&quot;, account: &quot;work&quot;)
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#list_folders">list_folders</a>, <a href="#delete_folder">delete_folder</a></p>
+<hr />
+<h4 id="delete_folder"><code>delete_folder</code><a class="headerlink" href="#delete_folder" title="Permanent link">&para;</a></h4>
+<p>Delete an email folder/mailbox. <strong>Safety gate:</strong> requires <code>confirm=true</code> to actually delete.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Folder name to delete</td>
+</tr>
+<tr>
+<td><code>confirm</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Set <code>true</code> to actually delete</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Safety flow:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>1. delete_folder(name: &quot;OldStuff&quot;)            → PREVIEW warning (not deleted)
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>2. User reviews and approves
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>3. delete_folder(name: &quot;OldStuff&quot;, confirm: true)  → DELETES
+</span></code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Permanent deletion</p>
+<p>Deleting a folder permanently removes the folder and all emails in it. Always review the preview before confirming.</p>
+</div>
+<p><strong>Related:</strong> <a href="#list_folders">list_folders</a>, <a href="#create_folder">create_folder</a></p>
+<hr />
+<h3 id="compose">Compose<a class="headerlink" href="#compose" title="Permanent link">&para;</a></h3>
+<h4 id="compose_email"><code>compose_email</code><a class="headerlink" href="#compose_email" title="Permanent link">&para;</a></h4>
+<p>Compose and send a new email (not a reply). <strong>Two-phase safety gate:</strong> requires explicit <code>confirm=true</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>to</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Recipient email address</td>
+</tr>
+<tr>
+<td><code>subject</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email subject line</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email body text</td>
+</tr>
+<tr>
+<td><code>cc</code></td>
+<td>string</td>
+<td>No</td>
+<td>—</td>
+<td>CC recipient(s)</td>
+</tr>
+<tr>
+<td><code>bcc</code></td>
+<td>string</td>
+<td>No</td>
+<td>—</td>
+<td>BCC recipient(s)</td>
+</tr>
+<tr>
+<td><code>confirm</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Set <code>true</code> to actually send</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Safety flow:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>1. compose_email(to: &quot;alice@example.com&quot;, subject: &quot;Meeting&quot;, body: &quot;...&quot;)
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>   → shows PREVIEW (not sent)
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>2. User reviews and approves
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>3. compose_email(..., confirm: true)  → SENDS
+</span></code></pre></div>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>&quot;Send Alice an email about the meeting&quot;
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>→ compose_email(to: &quot;alice@example.com&quot;, subject: &quot;Meeting Request&quot;, body: &quot;Hi Alice...&quot;)
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>&quot;Email the team about the deadline&quot;
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>→ compose_email(to: &quot;team@example.com&quot;, subject: &quot;Q2 Deadline Reminder&quot;, body: &quot;...&quot;)
+</span></code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Never skip the preview step</p>
+<p>Always call <code>compose_email</code> without <code>confirm</code> first to show the preview. Only set <code>confirm=true</code> after the user explicitly approves.</p>
+</div>
+<p><strong>Related:</strong> <a href="#draft_reply">draft_reply</a>, <a href="#send_email">send_email</a></p>
+<hr />
+<h3 id="actions">Actions<a class="headerlink" href="#actions" title="Permanent link">&para;</a></h3>
+<h4 id="export_to_markdown"><code>export_to_markdown</code><a class="headerlink" href="#export_to_markdown" title="Permanent link">&para;</a></h4>
+<p>Export an email as formatted markdown with YAML frontmatter.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output format:</strong></p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nn">---</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nt">subject</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Meeting</span><span class="nv"> </span><span class="s">Notes</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">Q1</span><span class="nv"> </span><span class="s">Review&quot;</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Alice</span><span class="nv"> </span><span class="s">&lt;alice@example.com&gt;&quot;</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="nt">to</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Team</span><span class="nv"> </span><span class="s">&lt;team@example.com&gt;&quot;</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2026-02-13&quot;</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;42&quot;</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="nt">flags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Seen</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">Flagged</span><span class="p p-Indicator">]</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="nt">has_attachment</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="nn">---</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="c1"># Meeting Notes - Q1 Review</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="p p-Indicator">[</span><span class="nv">email body in plain text</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>&quot;Export email 42 to markdown&quot;
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>→ export_to_markdown(id: &quot;42&quot;)
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>&quot;Save this email for my notes&quot;
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>→ export_to_markdown(id: &quot;42&quot;)
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>   then copy_to_clipboard or save to file
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#copy_to_clipboard">copy_to_clipboard</a>, <a href="#read_email">read_email</a></p>
+<hr />
+<h4 id="create_action_item"><code>create_action_item</code><a class="headerlink" href="#create_action_item" title="Permanent link">&para;</a></h4>
+<p>Extract action items, todos, deadlines, and commitments from an email.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output identifies:</strong></p>
+<ul>
+<li>Action items / tasks</li>
+<li>Deadlines or due dates</li>
+<li>Commitments made by sender</li>
+<li>Questions that need answers</li>
+<li>Meetings or events mentioned</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>&quot;What do I need to do from email 42?&quot;
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>→ create_action_item(id: &quot;42&quot;)
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>&quot;Extract todos from the project update&quot;
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>→ create_action_item(id: &quot;88&quot;)
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#triage_inbox-prompt">triage_inbox</a>, <a href="#summarize_email-prompt">summarize_email</a></p>
+<hr />
+<h3 id="replies-sending">Replies &amp; Sending<a class="headerlink" href="#replies-sending" title="Permanent link">&para;</a></h3>
+<h4 id="draft_reply"><code>draft_reply</code><a class="headerlink" href="#draft_reply" title="Permanent link">&para;</a></h4>
+<p>Generate a reply template for an email. Does <strong>not</strong> send.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID to reply to</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td>string</td>
+<td>No</td>
+<td>—</td>
+<td>Custom reply body text</td>
+</tr>
+<tr>
+<td><code>reply_all</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Reply to all recipients</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>&quot;Draft a reply to email 42&quot;
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>→ draft_reply(id: &quot;42&quot;)
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>&quot;Reply all with my availability&quot;
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>→ draft_reply(id: &quot;42&quot;, body: &quot;I&#39;m available Tuesday afternoon.&quot;, reply_all: true)
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">This tool creates a draft only</p>
+<p>The reply is <strong>not sent</strong>. Use <a href="#send_email">send_email</a> with <code>confirm=true</code> after reviewing.</p>
+</div>
+<p><strong>Related:</strong> <a href="#send_email">send_email</a>, <a href="#draft_reply-prompt">draft_reply prompt</a></p>
+<hr />
+<h4 id="send_email"><code>send_email</code><a class="headerlink" href="#send_email" title="Permanent link">&para;</a></h4>
+<p>Send an email template. <strong>Two-phase safety gate:</strong> requires explicit <code>confirm=true</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>template</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Full email template (MML format from draft_reply)</td>
+</tr>
+<tr>
+<td><code>confirm</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Set <code>true</code> to actually send</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Safety flow:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>1. draft_reply(id: &quot;42&quot;)           → generates template
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>2. send_email(template: &quot;...&quot;)     → shows PREVIEW (not sent)
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>3. User reviews and approves
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>4. send_email(template: &quot;...&quot;, confirm: true)  → SENDS
+</span></code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Never skip the preview step</p>
+<p>Always call <code>send_email</code> without <code>confirm</code> first to show the preview. Only set <code>confirm=true</code> after the user explicitly approves.</p>
+</div>
+<p><strong>Related:</strong> <a href="#draft_reply">draft_reply</a></p>
+<hr />
+<h3 id="adapters">Adapters<a class="headerlink" href="#adapters" title="Permanent link">&para;</a></h3>
+<h4 id="copy_to_clipboard"><code>copy_to_clipboard</code><a class="headerlink" href="#copy_to_clipboard" title="Permanent link">&para;</a></h4>
+<p>Copy text to the system clipboard (macOS <code>pbcopy</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Text to copy</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>&quot;Copy that email to my clipboard&quot;
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>→ export_to_markdown(id: &quot;42&quot;)
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>   then copy_to_clipboard(text: &lt;markdown output&gt;)
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>&quot;Copy the sender&#39;s email address&quot;
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>→ copy_to_clipboard(text: &quot;alice@example.com&quot;)
+</span></code></pre></div>
+<hr />
+<h3 id="attachments">Attachments<a class="headerlink" href="#attachments" title="Permanent link">&para;</a></h3>
+<h4 id="list_attachments"><code>list_attachments</code><a class="headerlink" href="#list_attachments" title="Permanent link">&para;</a></h4>
+<p>List all attachments in an email message. Downloads all attachments to inspect them, returning filename, MIME type (inferred from extension), and file size for each.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>&quot;What attachments does email 42 have?&quot;
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>→ list_attachments(id: &quot;42&quot;)
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>&quot;Check attachments in the project email&quot;
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>→ list_attachments(id: &quot;88&quot;)
+</span></code></pre></div>
+<p><strong>Output:</strong> One line per attachment with filename, MIME type, and size in KB.</p>
+<div class="admonition note">
+<p class="admonition-title">Body parts are filtered</p>
+<p>himalaya downloads all message parts including <code>plain.txt</code> and <code>index.html</code> body parts. These are automatically excluded from the attachment list.</p>
+</div>
+<p><strong>Related:</strong> <a href="#download_attachment">download_attachment</a>, <a href="#extract_calendar_event">extract_calendar_event</a></p>
+<hr />
+<h4 id="download_attachment"><code>download_attachment</code><a class="headerlink" href="#download_attachment" title="Permanent link">&para;</a></h4>
+<p>Download a specific attachment from an email to a temporary directory.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>filename</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Attachment filename to download</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>&quot;Download the PDF from email 42&quot;
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>→ download_attachment(id: &quot;42&quot;, filename: &quot;report.pdf&quot;)
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>&quot;Get the spreadsheet attachment&quot;
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>→ download_attachment(id: &quot;88&quot;, filename: &quot;budget.xlsx&quot;)
+</span></code></pre></div>
+<p><strong>Output:</strong> File path where the attachment was saved (temp directory).</p>
+<p><strong>Typical workflow:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>1. list_attachments(id: &quot;42&quot;)    → see available files
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>2. download_attachment(id: &quot;42&quot;, filename: &quot;report.pdf&quot;)  → get file path
+</span></code></pre></div>
+<p><strong>Related:</strong> <a href="#list_attachments">list_attachments</a></p>
+<hr />
+<h3 id="calendar">Calendar<a class="headerlink" href="#calendar" title="Permanent link">&para;</a></h3>
+<h4 id="extract_calendar_event"><code>extract_calendar_event</code><a class="headerlink" href="#extract_calendar_event" title="Permanent link">&para;</a></h4>
+<p>Extract calendar event details from an email's ICS attachment. Downloads all attachments, finds the <code>.ics</code> file, parses it, and returns event summary, dates, location, and organizer.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID containing the calendar invite</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>string</td>
+<td>No</td>
+<td>default</td>
+<td>Account name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>&quot;What&#39;s in the meeting invite in email 42?&quot;
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>→ extract_calendar_event(id: &quot;42&quot;)
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>&quot;Parse the calendar attachment&quot;
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>→ extract_calendar_event(id: &quot;88&quot;)
+</span></code></pre></div>
+<p><strong>Output:</strong> Event title, start/end times, location, organizer, and description.</p>
+<p><strong>Related:</strong> <a href="#create_calendar_event">create_calendar_event</a>, <a href="#list_attachments">list_attachments</a></p>
+<hr />
+<h4 id="create_calendar_event"><code>create_calendar_event</code><a class="headerlink" href="#create_calendar_event" title="Permanent link">&para;</a></h4>
+<p>Create an event in Apple Calendar. <strong>Safety gate:</strong> requires <code>confirm=true</code> to actually create. macOS only.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>summary</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Event title/summary</td>
+</tr>
+<tr>
+<td><code>dtstart</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Start date/time (ISO format)</td>
+</tr>
+<tr>
+<td><code>dtend</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>End date/time (ISO format)</td>
+</tr>
+<tr>
+<td><code>location</code></td>
+<td>string</td>
+<td>No</td>
+<td>—</td>
+<td>Event location</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>string</td>
+<td>No</td>
+<td>—</td>
+<td>Event description/notes</td>
+</tr>
+<tr>
+<td><code>confirm</code></td>
+<td>boolean</td>
+<td>No</td>
+<td><code>false</code></td>
+<td>Set <code>true</code> to actually create</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Safety flow:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>1. extract_calendar_event(id: &quot;42&quot;)    → parse ICS attachment
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>2. create_calendar_event(summary: &quot;...&quot;, dtstart: &quot;...&quot;, dtend: &quot;...&quot;)
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>   → shows PREVIEW (not created)
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>3. User reviews and approves
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>4. create_calendar_event(..., confirm: true)  → CREATES in Apple Calendar
+</span></code></pre></div>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>&quot;Add that meeting to my calendar&quot;
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>→ extract_calendar_event(id: &quot;42&quot;)
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>   then create_calendar_event(summary: &quot;Team Standup&quot;, dtstart: &quot;2026-03-01T09:00:00&quot;, ...)
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>&quot;Create a calendar event for Friday at 2pm&quot;
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>→ create_calendar_event(summary: &quot;Project Review&quot;, dtstart: &quot;2026-02-20T14:00:00&quot;, dtend: &quot;2026-02-20T15:00:00&quot;)
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">macOS only</p>
+<p>Calendar event creation uses AppleScript to interact with Apple Calendar. This tool is only available on macOS.</p>
+</div>
+<p><strong>Related:</strong> <a href="#extract_calendar_event">extract_calendar_event</a></p>
+<hr />
+<h2 id="prompts">Prompts<a class="headerlink" href="#prompts" title="Permanent link">&para;</a></h2>
+<h3 id="triage_inbox-prompt"><code>triage_inbox</code><a class="headerlink" href="#triage_inbox-prompt" title="Permanent link">&para;</a></h3>
+<p>Classify recent emails as actionable, FYI, or skip.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>"10"</code></td>
+<td>Number of recent emails to triage</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Fetches recent emails with <code>list_emails</code></li>
+<li>Reads each with <code>read_email</code></li>
+<li>Classifies as <strong>Actionable</strong> / <strong>FYI</strong> / <strong>Skip</strong></li>
+<li>Suggests flags and folder moves</li>
+<li>Presents a table for your approval</li>
+<li>Executes only actions you confirm</li>
+</ol>
+<p><strong>Example output:</strong></p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>From</th>
+<th>Subject</th>
+<th>Class</th>
+<th>Suggested Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>42</td>
+<td>Alice</td>
+<td>Q1 Review</td>
+<td>Actionable</td>
+<td>Flag, reply needed</td>
+</tr>
+<tr>
+<td>43</td>
+<td>Newsletter</td>
+<td>Weekly digest</td>
+<td>Skip</td>
+<td>Archive</td>
+</tr>
+<tr>
+<td>44</td>
+<td>Bob</td>
+<td>FYI: server update</td>
+<td>FYI</td>
+<td>Mark read</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="summarize_email-prompt"><code>summarize_email</code><a class="headerlink" href="#summarize_email-prompt" title="Permanent link">&para;</a></h3>
+<p>One-sentence summary with action items for a specific email.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID</td>
+</tr>
+<tr>
+<td><code>folder</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>INBOX</code></td>
+<td>Folder name</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output includes:</strong></p>
+<ul>
+<li>One-sentence summary</li>
+<li>Action items (or "None")</li>
+<li>Priority: High / Medium / Low</li>
+<li>Suggested response (if actionable)</li>
+</ul>
+<hr />
+<h3 id="daily_email_digest"><code>daily_email_digest</code><a class="headerlink" href="#daily_email_digest" title="Permanent link">&para;</a></h3>
+<p>Create a markdown digest of today's emails grouped by priority.</p>
+<p><em>No parameters.</em></p>
+<p><strong>Output format:</strong></p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="gh"># Email Digest - 2026-02-13</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="gu">## Requires Action</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="k">-</span><span class="w"> </span><span class="gs">**Q1 Review**</span> from Alice - needs response by Friday
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="gu">## FYI / Review</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="k">-</span><span class="w"> </span><span class="gs">**Server Update**</span> from Bob - maintenance window tonight
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="gu">## Low Priority</span>
+</span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="k">-</span><span class="w"> </span><span class="gs">**Weekly Newsletter**</span> from Devtools - new releases
+</span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a>
+</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="gu">## Stats</span>
+</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="k">-</span><span class="w"> </span>Total: 15 emails
+</span><span id="__span-23-14"><a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a><span class="k">-</span><span class="w"> </span>Action needed: 3
+</span><span id="__span-23-15"><a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a><span class="k">-</span><span class="w"> </span>FYI: 7
+</span><span id="__span-23-16"><a id="__codelineno-23-16" name="__codelineno-23-16" href="#__codelineno-23-16"></a><span class="k">-</span><span class="w"> </span>Low priority: 5
+</span></code></pre></div>
+<hr />
+<h3 id="draft_reply-prompt"><code>draft_reply</code> (prompt)<a class="headerlink" href="#draft_reply-prompt" title="Permanent link">&para;</a></h3>
+<p>Guided reply composition with tone control.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>string</td>
+<td><strong>Yes</strong></td>
+<td>—</td>
+<td>Email message ID to reply to</td>
+</tr>
+<tr>
+<td><code>tone</code></td>
+<td>string</td>
+<td>No</td>
+<td><code>"professional"</code></td>
+<td>Tone: professional, casual, brief, detailed</td>
+</tr>
+<tr>
+<td><code>instructions</code></td>
+<td>string</td>
+<td>No</td>
+<td>—</td>
+<td>Specific instructions for reply content</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>&quot;Reply professionally to email 42&quot;
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>→ draft_reply prompt (id: &quot;42&quot;, tone: &quot;professional&quot;)
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>&quot;Send a brief casual reply declining the meeting&quot;
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>→ draft_reply prompt (id: &quot;42&quot;, tone: &quot;casual&quot;, instructions: &quot;Decline politely, suggest next week&quot;)
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Prompt vs Tool</p>
+<p>The <strong>prompt</strong> <code>draft_reply</code> guides the full workflow (read, draft, review, send). The <strong>tool</strong> <code>draft_reply</code> just generates the template. Use the prompt for interactive reply sessions.</p>
+</div>
+<hr />
+<h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h2>
+<h3 id="emailinbox"><code>email://inbox</code><a class="headerlink" href="#emailinbox" title="Permanent link">&para;</a></h3>
+<p>Browse current inbox listing. Returns recent emails as a read-only resource.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>URI: email://inbox
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>Type: text/plain
+</span></code></pre></div>
+<h3 id="emailfolders"><code>email://folders</code><a class="headerlink" href="#emailfolders" title="Permanent link">&para;</a></h3>
+<p>List available email folders for the current account.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>URI: email://folders
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>Type: text/plain
+</span></code></pre></div>
+<h3 id="emailmessageid"><code>email://message/{id}</code><a class="headerlink" href="#emailmessageid" title="Permanent link">&para;</a></h3>
+<p>Read a specific email message by ID.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>URI: email://message/42
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>Type: text/plain
+</span></code></pre></div>
+<hr />
+<h2 id="common-parameters">Common Parameters<a class="headerlink" href="#common-parameters" title="Permanent link">&para;</a></h2>
+<p>These parameters appear on most tools:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>folder</code></td>
+<td>Email folder (default: INBOX)</td>
+<td><code>"Archive"</code>, <code>"Sent"</code>, <code>"[Gmail]/Trash"</code></td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>himalaya account name</td>
+<td><code>"personal"</code>, <code>"work"</code></td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>Email message ID from list/search results</td>
+<td><code>"42"</code>, <code>"1337"</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Multi-account usage</p>
+<p>Every tool accepts an optional <code>account</code> parameter. If omitted, himalaya uses your default account. Set up multiple accounts in <code>~/.config/himalaya/config.toml</code>.</p>
+</div>
+<hr />
+<h2 id="cli-commands">CLI Commands<a class="headerlink" href="#cli-commands" title="Permanent link">&para;</a></h2>
+<h3 id="himalaya-mcp-setup"><code>himalaya-mcp setup</code><a class="headerlink" href="#himalaya-mcp-setup" title="Permanent link">&para;</a></h3>
+<p>Configure himalaya-mcp as an MCP server for Claude Desktop (legacy <code>mcpServers</code> approach).</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>himalaya-mcp<span class="w"> </span>setup<span class="w">           </span><span class="c1"># Add MCP server to Claude Desktop config</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--check<span class="w">   </span><span class="c1"># Verify configuration exists and paths are valid</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--remove<span class="w">  </span><span class="c1"># Remove the server entry</span>
+</span></code></pre></div>
+<p><strong>Config path (per platform):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS</td>
+<td><code>~/Library/Application Support/Claude/claude_desktop_config.json</code></td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>~/.config/Claude/claude_desktop_config.json</code></td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>%APPDATA%/Claude/claude_desktop_config.json</code></td>
+</tr>
+</tbody>
+</table>
+<p>The setup command preserves all existing MCP servers in the config file. Only the <code>himalaya</code> entry is added, updated, or removed.</p>
+<hr />
+<h3 id="himalaya-mcp-install-ext"><code>himalaya-mcp install-ext</code><a class="headerlink" href="#himalaya-mcp-install-ext" title="Permanent link">&para;</a></h3>
+<p>Install a <code>.mcpb</code> Desktop Extension into Claude Desktop.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w">                              </span><span class="c1"># Auto-find .mcpb in project root</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w"> </span>himalaya-mcp-v1.3.0.mcpb<span class="w">     </span><span class="c1"># Install specific file</span>
+</span></code></pre></div>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Unpacks the <code>.mcpb</code> to <code>~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/</code></li>
+<li>Registers the extension in <code>extensions-installations.json</code> with SHA256 hash</li>
+<li>Creates default settings (enabled, empty user config)</li>
+<li>Restart Claude Desktop to activate</li>
+</ol>
+<p><strong>Auto-discovery:</strong> If no file path is given, searches the project root for <code>himalaya-mcp-v*.mcpb</code> and picks the latest version.</p>
+<div class="admonition tip">
+<p class="admonition-title">When to use</p>
+<p>Use <code>install-ext</code> for local development and testing. For production installs, download the <code>.mcpb</code> from <a href="https://github.com/Data-Wise/himalaya-mcp/releases">GitHub Releases</a> and double-click to install via Claude Desktop's GUI.</p>
+</div>
+<hr />
+<h3 id="himalaya-mcp-remove-ext"><code>himalaya-mcp remove-ext</code><a class="headerlink" href="#himalaya-mcp-remove-ext" title="Permanent link">&para;</a></h3>
+<p>Remove the himalaya-mcp Desktop Extension from Claude Desktop.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>himalaya-mcp<span class="w"> </span>remove-ext
+</span></code></pre></div>
+<p><strong>What it removes:</strong></p>
+<ul>
+<li>Extension directory (<code>Claude Extensions/himalaya-mcp/</code>)</li>
+<li>Registry entry from <code>extensions-installations.json</code></li>
+<li>Settings file (<code>Claude Extensions Settings/himalaya-mcp.json</code>)</li>
+</ul>
+<p>Restart Claude Desktop after removal.</p>
+<div class="admonition note">
+<p class="admonition-title">See also</p>
+<p><strong><a href="../desktop-extensions/">Desktop Extensions Reference</a></strong> for full details on the <code>.mcpb</code> format, manifest schema, and installation mechanism.</p>
+</div>
+<hr />
+<h3 id="himalaya-mcp-doctor"><code>himalaya-mcp doctor</code><a class="headerlink" href="#himalaya-mcp-doctor" title="Permanent link">&para;</a></h3>
+<p>Diagnose your himalaya-mcp installation across the full stack: prerequisites, MCP server, email connectivity, Claude Desktop extension, and Claude Code plugin.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w">          </span><span class="c1"># Run all checks</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--fix<span class="w">    </span><span class="c1"># Auto-fix what can be fixed</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--json<span class="w">   </span><span class="c1"># Machine-readable output</span>
+</span></code></pre></div>
+<p><strong>Check categories:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>What it checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prerequisites</td>
+<td>Node.js version, himalaya binary, himalaya config</td>
+</tr>
+<tr>
+<td>MCP Server</td>
+<td><code>dist/index.js</code> exists and is non-empty</td>
+</tr>
+<tr>
+<td>Email Connectivity</td>
+<td>Account list, folder list, envelope fetch</td>
+</tr>
+<tr>
+<td>Claude Desktop Extension</td>
+<td>Extension dir, manifest, registry, settings, user_config</td>
+</tr>
+<tr>
+<td>Claude Code Plugin</td>
+<td>Symlink, plugin.json, marketplace registration</td>
+</tr>
+<tr>
+<td>Environment</td>
+<td><code>HIMALAYA_*</code> env vars, unresolved template variables</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Auto-fixable issues (<code>--fix</code>):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Fix applied</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>himalaya_binary</code> empty in Desktop settings</td>
+<td>Set to <code>which himalaya</code> result</td>
+</tr>
+<tr>
+<td>Settings file missing</td>
+<td>Create default settings (enabled, empty config)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sample output:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>himalaya-mcp doctor v1.3.0
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>  Prerequisites
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>  ✓ Node.js 22.14.0
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>  ✓ himalaya found at /opt/homebrew/bin/himalaya
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>  ✓ himalaya config exists
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>  MCP Server
+</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a>  ✓ dist/index.js exists (595 KB)
+</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a>
+</span><span id="__span-32-11"><a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a>  Email Connectivity
+</span><span id="__span-32-12"><a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a>  ✓ Accounts: personal, work
+</span><span id="__span-32-13"><a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a>  ✓ Folders accessible (14 folders)
+</span><span id="__span-32-14"><a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a>  ✓ Envelopes accessible
+</span><span id="__span-32-15"><a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a>
+</span><span id="__span-32-16"><a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a>  Claude Desktop Extension
+</span><span id="__span-32-17"><a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a>  ✓ Extension installed
+</span><span id="__span-32-18"><a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a>  ✓ manifest.json valid
+</span><span id="__span-32-19"><a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a>  ✓ Registry entry exists
+</span><span id="__span-32-20"><a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a>  ✓ Settings: enabled
+</span><span id="__span-32-21"><a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a>  ✗ user_config.himalaya_binary is empty
+</span><span id="__span-32-22"><a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a>    → Fix with: himalaya-mcp doctor --fix
+</span><span id="__span-32-23"><a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a>
+</span><span id="__span-32-24"><a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a>  Summary: 11 passed, 0 warnings, 1 failed
+</span></code></pre></div>
+<p><strong>JSON output (<code>--json</code>):</strong></p>
+<p>Returns an array of <code>CheckResult</code> objects:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">[</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span><span class="p">{</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Node.js installed&quot;</span><span class="p">,</span>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">    </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Prerequisites&quot;</span><span class="p">,</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pass&quot;</span><span class="p">,</span>
+</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Node.js v22.14.0&quot;</span>
+</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-33-8"><a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="w">  </span><span class="p">{</span>
+</span><span id="__span-33-9"><a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;himalaya_binary configured&quot;</span><span class="p">,</span>
+</span><span id="__span-33-10"><a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">    </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Desktop Extension&quot;</span><span class="p">,</span>
+</span><span id="__span-33-11"><a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fail&quot;</span><span class="p">,</span>
+</span><span id="__span-33-12"><a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user_config.himalaya_binary is empty&quot;</span><span class="p">,</span>
+</span><span id="__span-33-13"><a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w">    </span><span class="nt">&quot;fix&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Set to /opt/homebrew/bin/himalaya&quot;</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-33-14"><a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-33-15"><a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a><span class="p">]</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Run after installation</p>
+<p>Run <code>himalaya-mcp doctor</code> after any installation method to verify everything is connected correctly. Use <code>--fix</code> to resolve common issues automatically.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.top", "navigation.sections", "search.suggest", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
