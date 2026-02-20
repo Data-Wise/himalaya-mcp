@@ -23,7 +23,7 @@
 - Phase 6d: Calendar — extract_calendar_event, create_calendar_event (ICS + Apple Calendar)
 - Plugin Packaging: esbuild bundle (595KB), Homebrew formula, marketplace.json, CLI setup
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
-- Total: 19 tools, 4 prompts, 3 resources, 7 skills, 314 tests (15 test files)
+- Total: 19 tools, 4 prompts, 3 resources, 7 skills, 315 tests (15 test files)
 
 ## Just Completed
 
@@ -33,7 +33,7 @@
 - 2026-02-17: doctor diagnostic command (--fix, --json) — checks 6 layers
 - 2026-02-17: Fixed himalaya v1.1.0 arg ordering (--account/--output after subcommand)
 - 2026-02-17: Changed default timeout from 30s to unlimited
-- 2026-02-17: 275 → 314 tests (+39: .mcpb packaging, doctor E2E, config guards)
+- 2026-02-17: 275 → 315 tests (+39: .mcpb packaging, doctor E2E, config guards)
 
 ## Current State
 

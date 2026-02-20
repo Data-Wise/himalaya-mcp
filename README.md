@@ -57,7 +57,7 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 ## Testing
 
 ```bash
-npm test              # 314 tests across 15 test files (vitest)
+npm test              # 315 tests across 15 test files (vitest)
 ```
 
 | Category | Tests | Coverage |
