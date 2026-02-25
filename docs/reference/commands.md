@@ -807,7 +807,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v1.3.0.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v1.3.1.mcpb     # Install specific file
 ```
 
 **What it does:**
@@ -876,7 +876,7 @@ himalaya-mcp doctor --json   # Machine-readable output
 **Sample output:**
 
 ```
-himalaya-mcp doctor v1.3.0
+himalaya-mcp doctor v1.3.1
 
   Prerequisites
   ✓ Node.js 22.14.0

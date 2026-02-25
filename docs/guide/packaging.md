@@ -1,15 +1,40 @@
 # Plugin Packaging & Distribution
 
-himalaya-mcp is distributed as a Claude Code plugin via multiple channels. This guide covers the packaging architecture, build process, and how each distribution method works.
+himalaya-mcp is distributed via multiple channels targeting both Claude Code and Claude Desktop. This guide covers the packaging architecture, build process, and how each distribution method works.
 
 ## Distribution Channels
 
-| Channel | Command | Auto-setup |
-|---------|---------|------------|
-| **Homebrew** (recommended) | `brew install data-wise/tap/himalaya-mcp` | Symlink, marketplace, auto-enable |
-| **GitHub** | `claude plugin marketplace add Data-Wise/himalaya-mcp` | Plugin cache |
-| **Source** | `git clone` + `npm run build` | Manual symlink |
-| **Claude Desktop** | `himalaya-mcp setup` | MCP server config |
+| Channel | Command | Target | Auto-setup |
+|---------|---------|--------|------------|
+| **Homebrew** (recommended) | `brew install data-wise/tap/himalaya-mcp` | Claude Code | Symlink, marketplace, auto-enable |
+| **GitHub Marketplace** | `claude plugin marketplace add Data-Wise/himalaya-mcp` | Claude Code | Plugin cache |
+| **.mcpb Extension** | Download from [Releases](https://github.com/Data-Wise/himalaya-mcp/releases) | Claude Desktop | One-click install, GUI settings |
+| **Source** | `git clone` + `npm run build` | Both | Manual symlink |
+
+### Distribution Architecture
+
+```mermaid
+flowchart TD
+    SRC["`**Source**
+    16 TypeScript files
+    + MCP SDK + zod`"] -->|esbuild| BUNDLE["`**dist/index.js**
+    583KB single file`"]
+
+    BUNDLE --> HB["`**Homebrew**
+    brew install himalaya-mcp`"]
+    BUNDLE --> MCPB["`**.mcpb Extension**
+    ~147KB ZIP archive`"]
+    BUNDLE --> GH["`**GitHub Marketplace**
+    claude plugin marketplace add`"]
+    BUNDLE --> DEV["`**Source Install**
+    git clone + npm run build`"]
+
+    HB --> CC1[Claude Code]
+    GH --> CC2[Claude Code]
+    DEV --> CC3[Claude Code]
+    MCPB --> CD[Claude Desktop]
+    DEV --> CD2[Claude Desktop]
+```
 
 ## esbuild Bundle
 
@@ -53,12 +78,12 @@ The formula lives in the [homebrew-tap](https://github.com/Data-Wise/homebrew-ta
 1. **Downloads** the release tarball from GitHub
 2. **Installs dependencies** -- `himalaya` (email CLI) + `node` (runtime)
 3. **Builds** -- runs `npm install` then `npm run build:bundle`
-4. **Installs to libexec** -- only `.claude-plugin/`, `.mcp.json`, `plugin/`, `dist/`
-5. **Runs post-install** -- `himalaya-mcp-install` script
+4. **Installs to libexec** -- `.claude-plugin/`, `.mcp.json`, `skills/`, `agents/`, `dist/`
+5. **Runs post-install** -- auto-runs install script (symlink, marketplace registration, auto-enable)
 
 ### Post-install script
 
-The `himalaya-mcp-install` script (created by the formula):
+The `himalaya-mcp-install` script (created by the formula) auto-runs during `post_install`:
 
 1. Detects if Claude Code is running (`pgrep -x "claude"`)
 2. Symlinks `libexec` to `~/.claude/plugins/himalaya-mcp`
@@ -158,7 +183,7 @@ The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a li
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v1.3.0.mcpb (147 KB)
+# Output: himalaya-mcp-v1.3.1.mcpb (147 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:
@@ -176,7 +201,7 @@ Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.co
 ### Install (CLI)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v1.3.0.mcpb   # Install from file
+himalaya-mcp install-ext himalaya-mcp-v1.3.1.mcpb   # Install from file
 himalaya-mcp install-ext                              # Auto-find in project root
 himalaya-mcp remove-ext                               # Uninstall
 ```
@@ -233,8 +258,8 @@ The setup command:
 | `.claude-plugin/plugin.json` | Stripped to essentials | Full | Full |
 | `.claude-plugin/marketplace.json` | In libexec | In repo | In repo |
 | `.mcp.json` | In libexec | In repo | In repo |
-| `plugin/skills/*.md` | In libexec | In repo | In repo |
-| `plugin/agents/*.md` | In libexec | In repo | In repo |
+| `skills/*.md` | At libexec root | In repo | In repo |
+| `agents/*.md` | At libexec root | In repo | In repo |
 | `node_modules/` | Not shipped | Not shipped | Local only |
 | `src/` | Not shipped | In repo | In repo |
 | `tests/` | Not shipped | In repo | In repo |
