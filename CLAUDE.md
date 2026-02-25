@@ -210,6 +210,7 @@ node dist/index.js               # Run MCP server directly
 
 ```bash
 # Homebrew (recommended — installs himalaya + Node.js automatically)
+# post_install auto-runs install script (symlink, marketplace, auto-enable)
 brew tap data-wise/tap
 brew install himalaya-mcp
 
@@ -271,4 +272,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-02-25
