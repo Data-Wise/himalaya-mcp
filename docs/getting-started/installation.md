@@ -33,9 +33,9 @@ brew install himalaya-mcp
 2. Builds the esbuild bundle (583KB, no node_modules shipped)
 3. Symlinks plugin to `~/.claude/plugins/himalaya-mcp`
 4. Registers in local marketplace
-5. Auto-enables in Claude Code settings (if Claude not running)
+5. Auto-runs install script (enables in Claude Code settings if Claude not running)
 
-After install, run `himalaya-mcp-install` and restart Claude Code. The **`email`** plugin gives you:
+Restart Claude Code. The **`email`** plugin gives you:
 
 - `/email:inbox` -- list recent emails
 - `/email:triage` -- classify and organize
@@ -44,6 +44,12 @@ After install, run `himalaya-mcp-install` and restart Claude Code. The **`email`
 - `/email:compose` -- compose new emails
 - `/email:attachments` -- list, download, calendar invites
 - `/email:help` -- help hub
+
+**Verify:**
+
+```bash
+himalaya-mcp doctor
+```
 
 **Upgrade:**
 
@@ -59,9 +65,18 @@ brew uninstall himalaya-mcp
 
 ### Option 2: GitHub Plugin Install
 
+!!! warning "Prerequisites"
+    Node.js 22+ and himalaya CLI must be installed separately before using the GitHub marketplace method. Run `brew install node himalaya` first.
+
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install email
+```
+
+**Verify:**
+
+```bash
+himalaya-mcp doctor
 ```
 
 ### Option 3: From Source (development)
@@ -72,6 +87,12 @@ cd himalaya-mcp
 npm install
 npm run build
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
+```
+
+**Verify:**
+
+```bash
+himalaya-mcp doctor
 ```
 
 ### Option 4: Standalone MCP Server
@@ -95,11 +116,12 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 
 Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` is a lightweight (~147 KB) package that bundles the MCP server and configures it automatically.
 
-**Prerequisite:** himalaya CLI must be installed separately:
+!!! warning "Prerequisites"
+    The `.mcpb` package does **not** bundle the himalaya CLI. You must install it separately:
 
-```bash
-brew install himalaya
-```
+    ```bash
+    brew install himalaya
+    ```
 
 During install, you can configure:
 
@@ -215,6 +237,14 @@ ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
 1. Restart Claude Code
 2. Check if plugin is enabled: `claude plugin list`
 3. Manually enable: `claude plugin install email@local-plugins`
+
+### Skills not loading (Homebrew install)
+
+If `/email:*` skills don't appear after Homebrew install:
+
+1. Check skills path: `ls ~/.claude/plugins/himalaya-mcp/skills/`
+2. If missing, upgrade: `brew upgrade himalaya-mcp`
+3. If still broken: `ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp`
 
 ### MCP server not starting
 

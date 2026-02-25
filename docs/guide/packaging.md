@@ -53,12 +53,12 @@ The formula lives in the [homebrew-tap](https://github.com/Data-Wise/homebrew-ta
 1. **Downloads** the release tarball from GitHub
 2. **Installs dependencies** -- `himalaya` (email CLI) + `node` (runtime)
 3. **Builds** -- runs `npm install` then `npm run build:bundle`
-4. **Installs to libexec** -- only `.claude-plugin/`, `.mcp.json`, `plugin/`, `dist/`
-5. **Runs post-install** -- `himalaya-mcp-install` script
+4. **Installs to libexec** -- `.claude-plugin/`, `.mcp.json`, `skills/`, `agents/`, `dist/`
+5. **Runs post-install** -- auto-runs install script (symlink, marketplace registration, auto-enable)
 
 ### Post-install script
 
-The `himalaya-mcp-install` script (created by the formula):
+The `himalaya-mcp-install` script (created by the formula) auto-runs during `post_install`:
 
 1. Detects if Claude Code is running (`pgrep -x "claude"`)
 2. Symlinks `libexec` to `~/.claude/plugins/himalaya-mcp`
@@ -233,8 +233,8 @@ The setup command:
 | `.claude-plugin/plugin.json` | Stripped to essentials | Full | Full |
 | `.claude-plugin/marketplace.json` | In libexec | In repo | In repo |
 | `.mcp.json` | In libexec | In repo | In repo |
-| `plugin/skills/*.md` | In libexec | In repo | In repo |
-| `plugin/agents/*.md` | In libexec | In repo | In repo |
+| `skills/*.md` | At libexec root | In repo | In repo |
+| `agents/*.md` | At libexec root | In repo | In repo |
 | `node_modules/` | Not shipped | Not shipped | Local only |
 | `src/` | Not shipped | In repo | In repo |
 | `tests/` | Not shipped | In repo | In repo |
