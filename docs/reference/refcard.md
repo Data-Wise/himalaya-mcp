@@ -4,11 +4,13 @@
 
 ```
 brew tap data-wise/tap && brew install himalaya-mcp   # Homebrew (recommended)
+# GitHub install (requires: brew install node himalaya)
 claude plugin marketplace add Data-Wise/himalaya-mcp  # GitHub (step 1: add marketplace)
 claude plugin install email                     # GitHub (step 2: install plugin)
 himalaya-mcp setup                                     # Claude Desktop config (legacy)
 himalaya-mcp install-ext                               # Claude Desktop extension (.mcpb)
 # Or: Download .mcpb from GitHub Releases, double-click to install
+himalaya-mcp doctor                                    # Verify any install method
 ```
 
 ## CLI Commands

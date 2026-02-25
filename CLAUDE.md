@@ -209,15 +209,17 @@ node dist/index.js               # Run MCP server directly
 ### Install
 
 ```bash
-# Homebrew (recommended — installs himalaya dependency automatically)
+# Homebrew (recommended — installs himalaya + Node.js automatically)
+# post_install auto-runs install script (symlink, marketplace, auto-enable)
 brew tap data-wise/tap
 brew install himalaya-mcp
 
-# Claude Code plugin (from GitHub marketplace)
+# Claude Code plugin (from GitHub marketplace — requires brew install node himalaya)
 claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install email
 
-# Claude Desktop (after installing via Homebrew or npm)
+# Claude Desktop (.mcpb extension — download from GitHub Releases, double-click)
+# Or legacy MCP server config:
 himalaya-mcp setup
 
 # Diagnose installation
@@ -270,4 +272,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-02-25

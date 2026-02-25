@@ -24,6 +24,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 - Default timeout changed from 30s to 120s (was briefly set to unlimited in v1.3.0; now 2 min for safety, set `HIMALAYA_TIMEOUT=0` for unlimited)
 
+### Documentation
+
+- **Quickstart**: Tabbed multi-method install (Homebrew, GitHub Marketplace, Source)
+- **Installation**: Prerequisites, verification steps, `himalaya-mcp doctor` after each method
+- **README**: Verification blocks and prerequisites for all install methods
+- **Troubleshooting**: New sections for skills nesting, MCP tools missing, symlink verification
+- **Packaging**: Distribution architecture diagram (Mermaid), updated libexec layout
+- **Reference**: Updated refcard with doctor verification
+
 ## [1.2.2] - 2026-02-16
 
 ### Fixed

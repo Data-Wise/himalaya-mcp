@@ -24,16 +24,26 @@ brew install himalaya-mcp
 
 Installs himalaya CLI + Node.js as dependencies, auto-symlinks plugin to `~/.claude/plugins/`.
 
+```bash
+himalaya-mcp doctor    # Verify installation
+```
+
 ### Claude Code Plugin (from GitHub)
+
+**Prerequisites:** Node.js 22+ and himalaya CLI must be installed separately (`brew install node himalaya`).
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install email
 ```
 
+```bash
+himalaya-mcp doctor    # Verify installation
+```
+
 ### Claude Desktop (.mcpb -- one-click install)
 
-Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and open it in Claude Desktop. Requires `brew install himalaya` separately.
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and open it in Claude Desktop. Requires `brew install himalaya` separately -- the `.mcpb` does not bundle the himalaya CLI.
 
 ### Claude Desktop (CLI setup)
 
@@ -47,6 +57,10 @@ himalaya-mcp setup
 npm install
 npm run build
 ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
+```
+
+```bash
+himalaya-mcp doctor    # Verify installation
 ```
 
 ## Prerequisites

@@ -143,6 +143,103 @@ cd ~/projects/dev-tools/himalaya-mcp
 npm run build
 ```
 
+### Skills not loading
+
+If `/email:*` slash commands don't appear after install, the most common cause is a **skills nesting bug** -- the plugin symlink points to a directory that has an extra level of nesting (e.g., `skills/` is inside a subdirectory instead of at the plugin root).
+
+**Diagnose:**
+
+```bash
+# Skills must be at the plugin root, not nested
+ls ~/.claude/plugins/himalaya-mcp/skills/
+# Expected: inbox.md  triage.md  digest.md  reply.md  compose.md  attachments.md  help.md
+```
+
+**Fix (Homebrew):**
+
+The Homebrew formula symlinks `libexec` (which contains `skills/` at its root) to `~/.claude/plugins/himalaya-mcp`. If the symlink target is wrong:
+
+```bash
+# Re-create the symlink pointing to the correct path
+ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
+```
+
+Then restart Claude Code.
+
+**Fix (GitHub Marketplace):**
+
+The marketplace install clones the full repo. Skills live at `himalaya-mcp-plugin/skills/`, but Claude Code expects them at the plugin root. Verify:
+
+```bash
+ls ~/.claude/plugins/himalaya-mcp/skills/
+```
+
+If missing, re-install: `claude plugin install email@himalaya-mcp`
+
+### MCP tools not available (GitHub Marketplace install)
+
+If you installed via `claude plugin marketplace add` and MCP tools (like `list_emails`, `search_emails`) are not available, the `dist/` directory may be missing. The GitHub marketplace method does not pre-build the server bundle.
+
+**Diagnose:**
+
+```bash
+ls ~/.claude/plugins/himalaya-mcp/dist/index.js
+# If "No such file", the bundle wasn't built
+```
+
+**Fix:**
+
+```bash
+cd ~/.claude/plugins/himalaya-mcp
+npm install && npm run build
+```
+
+Then restart Claude Code. The `dist/index.js` bundle is required for the MCP server to start.
+
+### Plugin not found after install
+
+If `claude plugin list` doesn't show the `email` plugin:
+
+**1. Check the symlink exists and is valid:**
+
+```bash
+ls -la ~/.claude/plugins/himalaya-mcp
+# Should be a symlink pointing to a real directory
+```
+
+If the symlink is broken (target doesn't exist):
+
+```bash
+# Homebrew installs
+ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
+
+# Source installs
+ln -sf /path/to/your/himalaya-mcp ~/.claude/plugins/himalaya-mcp
+```
+
+**2. Check the plugin manifest exists:**
+
+```bash
+cat ~/.claude/plugins/himalaya-mcp/.claude-plugin/plugin.json
+```
+
+If this file is missing, the install is corrupt. Re-install via your preferred method.
+
+**3. Check marketplace registration:**
+
+```bash
+cat ~/.claude/local-marketplace/marketplace.json
+# Should contain an entry for "himalaya-mcp"
+```
+
+If missing, register manually:
+
+```bash
+claude plugin install email@local-plugins
+```
+
+**4. Restart Claude Code** -- plugin discovery only runs at startup.
+
 ---
 
 ## Email Issues
