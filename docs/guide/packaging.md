@@ -1,15 +1,40 @@
 # Plugin Packaging & Distribution
 
-himalaya-mcp is distributed as a Claude Code plugin via multiple channels. This guide covers the packaging architecture, build process, and how each distribution method works.
+himalaya-mcp is distributed via multiple channels targeting both Claude Code and Claude Desktop. This guide covers the packaging architecture, build process, and how each distribution method works.
 
 ## Distribution Channels
 
-| Channel | Command | Auto-setup |
-|---------|---------|------------|
-| **Homebrew** (recommended) | `brew install data-wise/tap/himalaya-mcp` | Symlink, marketplace, auto-enable |
-| **GitHub** | `claude plugin marketplace add Data-Wise/himalaya-mcp` | Plugin cache |
-| **Source** | `git clone` + `npm run build` | Manual symlink |
-| **Claude Desktop** | `himalaya-mcp setup` | MCP server config |
+| Channel | Command | Target | Auto-setup |
+|---------|---------|--------|------------|
+| **Homebrew** (recommended) | `brew install data-wise/tap/himalaya-mcp` | Claude Code | Symlink, marketplace, auto-enable |
+| **GitHub Marketplace** | `claude plugin marketplace add Data-Wise/himalaya-mcp` | Claude Code | Plugin cache |
+| **.mcpb Extension** | Download from [Releases](https://github.com/Data-Wise/himalaya-mcp/releases) | Claude Desktop | One-click install, GUI settings |
+| **Source** | `git clone` + `npm run build` | Both | Manual symlink |
+
+### Distribution Architecture
+
+```mermaid
+flowchart TD
+    SRC["`**Source**
+    16 TypeScript files
+    + MCP SDK + zod`"] -->|esbuild| BUNDLE["`**dist/index.js**
+    583KB single file`"]
+
+    BUNDLE --> HB["`**Homebrew**
+    brew install himalaya-mcp`"]
+    BUNDLE --> MCPB["`**.mcpb Extension**
+    ~147KB ZIP archive`"]
+    BUNDLE --> GH["`**GitHub Marketplace**
+    claude plugin marketplace add`"]
+    BUNDLE --> DEV["`**Source Install**
+    git clone + npm run build`"]
+
+    HB --> CC1[Claude Code]
+    GH --> CC2[Claude Code]
+    DEV --> CC3[Claude Code]
+    MCPB --> CD[Claude Desktop]
+    DEV --> CD2[Claude Desktop]
+```
 
 ## esbuild Bundle
 

@@ -4,9 +4,13 @@
 
 | Requirement | Version | Install |
 |-------------|---------|---------|
+| Claude Code | latest | [claude.ai/download](https://claude.ai/download) or `brew install claude` |
 | Node.js | 22+ | [nodejs.org](https://nodejs.org/) or `brew install node` |
 | himalaya CLI | latest | `brew install himalaya` |
 | Email account | -- | Configured in `~/.config/himalaya/config.toml` |
+
+!!! tip "Homebrew installs deps for you"
+    If you use the Homebrew install method, Node.js and himalaya CLI are installed automatically as dependencies. You only need to have an email account configured.
 
 ### Verify himalaya works
 
