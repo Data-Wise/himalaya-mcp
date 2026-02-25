@@ -7,7 +7,7 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.3.0 (released)
+- **Version:** 1.3.1 (released)
 - **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 315 tests)
 
 ### What It Does

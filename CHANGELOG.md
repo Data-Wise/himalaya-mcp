@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.1] - 2026-02-25
+
+### Fixed
+
+- CI glob safety and timeout default handling
+- `doctor` test handles non-zero exit codes in CI environments
+- Consistent plugin install command (`claude plugin install email`) across all docs
+
+### Documentation
+
+- **Quickstart**: Tabbed multi-method install (Homebrew, GitHub Marketplace, Source) with `pymdownx.tabbed`
+- **Installation**: Prerequisites section, verification steps with `himalaya-mcp doctor` after each method
+- **README**: Verification blocks and prerequisites for all install methods
+- **Troubleshooting**: 3 new sections — skills nesting bug, MCP tools not available, plugin not found
+- **Packaging**: Distribution architecture diagram (Mermaid), updated libexec layout paths
+- **Reference**: Updated refcard with doctor verification, desktop-extension with .mcpb prerequisite admonition
+
 ## [1.3.0] - 2026-02-17
 
 ### Added
