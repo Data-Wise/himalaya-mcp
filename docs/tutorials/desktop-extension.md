@@ -15,6 +15,9 @@ Use himalaya-mcp as a Desktop Extension to read, triage, and manage email direct
 - himalaya CLI installed and configured (`brew install himalaya`)
 - At least one email account in `~/.config/himalaya/config.toml`
 
+!!! warning "himalaya CLI is a separate install"
+    The `.mcpb` Desktop Extension does **not** bundle the himalaya CLI. You must install it separately before the extension can access your email. Run `brew install himalaya` and configure at least one account in `~/.config/himalaya/config.toml`.
+
 Verify himalaya works from your terminal first:
 
 ```bash
