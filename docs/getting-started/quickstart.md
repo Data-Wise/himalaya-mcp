@@ -19,7 +19,7 @@ Get from zero to reading email in 2 minutes.
 
     ```bash
     claude plugin marketplace add Data-Wise/himalaya-mcp
-    claude plugin install email@himalaya-mcp
+    claude plugin install email
     ```
 
 === "From Source"
