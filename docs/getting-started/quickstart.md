@@ -2,29 +2,44 @@
 
 Get from zero to reading email in 2 minutes.
 
-## 1. Install and Build
+## 1. Install
 
-```bash
-brew install himalaya
-git clone https://github.com/Data-Wise/himalaya-mcp.git
-cd himalaya-mcp && npm install && npm run build
-```
+=== "Homebrew (recommended)"
 
-## 2. Connect to Claude Code
+    ```bash
+    brew tap data-wise/tap
+    brew install himalaya-mcp
+    ```
 
-```bash
-ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
-```
+    Zero config. Installs deps, builds, symlinks, auto-enables.
 
-Restart Claude Code.
+=== "GitHub Marketplace"
 
-## 3. Verify
+    Requires `brew install node himalaya` separately.
+
+    ```bash
+    claude plugin marketplace add Data-Wise/himalaya-mcp
+    claude plugin install email@himalaya-mcp
+    ```
+
+=== "From Source"
+
+    ```bash
+    brew install himalaya
+    git clone https://github.com/Data-Wise/himalaya-mcp.git
+    cd himalaya-mcp && npm install && npm run build
+    ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
+    ```
+
+Restart Claude Code after install.
+
+## 2. Verify
 
 ```bash
 himalaya-mcp doctor    # Check all settings
 ```
 
-## 4. Try It
+## 3. Try It
 
 ```
 You: "Check my inbox"
@@ -44,7 +59,7 @@ Found 5 emails in INBOX:
 | 249015 | hr@company.com    | Benefits Enrollment      | 2026-02-11 |       |
 ```
 
-## 5. Common Commands
+## 4. Common Commands
 
 | What you say | What happens |
 |-------------|--------------|
@@ -57,7 +72,7 @@ Found 5 emails in INBOX:
 | "Flag 249088 as important" | Adds Flagged flag |
 | "Archive email 249064" | Moves to Archive folder |
 
-## 6. Safety
+## 5. Safety
 
 - Claude **never sends email** without your explicit "yes" / "send it"
 - `send_email` shows a preview first -- you approve before it sends
