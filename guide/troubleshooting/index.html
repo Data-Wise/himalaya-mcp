@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -1369,6 +1369,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#skills-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skills not loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-tools-not-available-github-marketplace-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP tools not available (GitHub Marketplace install)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin-not-found-after-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin not found after install
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1932,6 +1965,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#skills-not-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skills not loading
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-tools-not-available-github-marketplace-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP tools not available (GitHub Marketplace install)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin-not-found-after-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin not found after install
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2245,6 +2311,60 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">cd</span><span class="w"> </span>~/projects/dev-tools/himalaya-mcp
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>npm<span class="w"> </span>run<span class="w"> </span>build
 </span></code></pre></div>
+<h3 id="skills-not-loading">Skills not loading<a class="headerlink" href="#skills-not-loading" title="Permanent link">&para;</a></h3>
+<p>If <code>/email:*</code> slash commands don't appear after install, the most common cause is a <strong>skills nesting bug</strong> -- the plugin symlink points to a directory that has an extra level of nesting (e.g., <code>skills/</code> is inside a subdirectory instead of at the plugin root).</p>
+<p><strong>Diagnose:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Skills must be at the plugin root, not nested</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>ls<span class="w"> </span>~/.claude/plugins/himalaya-mcp/skills/
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># Expected: inbox.md  triage.md  digest.md  reply.md  compose.md  attachments.md  help.md</span>
+</span></code></pre></div>
+<p><strong>Fix (Homebrew):</strong></p>
+<p>The Homebrew formula symlinks <code>libexec</code> (which contains <code>skills/</code> at its root) to <code>~/.claude/plugins/himalaya-mcp</code>. If the symlink target is wrong:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Re-create the symlink pointing to the correct path</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>ln<span class="w"> </span>-sf<span class="w"> </span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span>/opt/himalaya-mcp/libexec<span class="w"> </span>~/.claude/plugins/himalaya-mcp
+</span></code></pre></div>
+<p>Then restart Claude Code.</p>
+<p><strong>Fix (GitHub Marketplace):</strong></p>
+<p>The marketplace install clones the full repo. Skills live at <code>himalaya-mcp-plugin/skills/</code>, but Claude Code expects them at the plugin root. Verify:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>ls<span class="w"> </span>~/.claude/plugins/himalaya-mcp/skills/
+</span></code></pre></div>
+<p>If missing, re-install: <code>claude plugin install email@himalaya-mcp</code></p>
+<h3 id="mcp-tools-not-available-github-marketplace-install">MCP tools not available (GitHub Marketplace install)<a class="headerlink" href="#mcp-tools-not-available-github-marketplace-install" title="Permanent link">&para;</a></h3>
+<p>If you installed via <code>claude plugin marketplace add</code> and MCP tools (like <code>list_emails</code>, <code>search_emails</code>) are not available, the <code>dist/</code> directory may be missing. The GitHub marketplace method does not pre-build the server bundle.</p>
+<p><strong>Diagnose:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>ls<span class="w"> </span>~/.claude/plugins/himalaya-mcp/dist/index.js
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># If &quot;No such file&quot;, the bundle wasn&#39;t built</span>
+</span></code></pre></div>
+<p><strong>Fix:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">cd</span><span class="w"> </span>~/.claude/plugins/himalaya-mcp
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>npm<span class="w"> </span>install<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
+</span></code></pre></div>
+<p>Then restart Claude Code. The <code>dist/index.js</code> bundle is required for the MCP server to start.</p>
+<h3 id="plugin-not-found-after-install">Plugin not found after install<a class="headerlink" href="#plugin-not-found-after-install" title="Permanent link">&para;</a></h3>
+<p>If <code>claude plugin list</code> doesn't show the <code>email</code> plugin:</p>
+<p><strong>1. Check the symlink exists and is valid:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>ls<span class="w"> </span>-la<span class="w"> </span>~/.claude/plugins/himalaya-mcp
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="c1"># Should be a symlink pointing to a real directory</span>
+</span></code></pre></div>
+<p>If the symlink is broken (target doesn't exist):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Homebrew installs</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>ln<span class="w"> </span>-sf<span class="w"> </span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span>/opt/himalaya-mcp/libexec<span class="w"> </span>~/.claude/plugins/himalaya-mcp
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># Source installs</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>ln<span class="w"> </span>-sf<span class="w"> </span>/path/to/your/himalaya-mcp<span class="w"> </span>~/.claude/plugins/himalaya-mcp
+</span></code></pre></div>
+<p><strong>2. Check the plugin manifest exists:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>cat<span class="w"> </span>~/.claude/plugins/himalaya-mcp/.claude-plugin/plugin.json
+</span></code></pre></div>
+<p>If this file is missing, the install is corrupt. Re-install via your preferred method.</p>
+<p><strong>3. Check marketplace registration:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>cat<span class="w"> </span>~/.claude/local-marketplace/marketplace.json
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="c1"># Should contain an entry for &quot;himalaya-mcp&quot;</span>
+</span></code></pre></div>
+<p>If missing, register manually:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>claude<span class="w"> </span>plugin<span class="w"> </span>install<span class="w"> </span>email@local-plugins
+</span></code></pre></div>
+<p><strong>4. Restart Claude Code</strong> -- plugin discovery only runs at startup.</p>
 <hr />
 <h2 id="email-issues">Email Issues<a class="headerlink" href="#email-issues" title="Permanent link">&para;</a></h2>
 <h3 id="empty-search-results">Empty search results<a class="headerlink" href="#empty-search-results" title="Permanent link">&para;</a></h3>
@@ -2276,11 +2396,11 @@
 </tbody>
 </table>
 <p><strong>Correct syntax:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>subject budget                    -- subject contains &quot;budget&quot;
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>from alice                        -- sender contains &quot;alice&quot;
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>from alice and subject budget     -- both conditions
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>not flag Seen                     -- unread emails
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>after 2026-02-01                  -- after a date
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>subject budget                    -- subject contains &quot;budget&quot;
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>from alice                        -- sender contains &quot;alice&quot;
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>from alice and subject budget     -- both conditions
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>not flag Seen                     -- unread emails
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>after 2026-02-01                  -- after a date
 </span></code></pre></div>
 <h3 id="wrong-folder-names">Wrong folder names<a class="headerlink" href="#wrong-folder-names" title="Permanent link">&para;</a></h3>
 <p>Folder names are provider-specific:</p>
@@ -2319,18 +2439,18 @@
 </tbody>
 </table>
 <p><strong>Find your folders:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>You: &quot;List my email folders&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>You: &quot;List my email folders&quot;
 </span></code></pre></div>
 <p>Claude calls the <code>email://folders</code> resource.</p>
 <h3 id="html-emails-show-as-empty">HTML emails show as empty<a class="headerlink" href="#html-emails-show-as-empty" title="Permanent link">&para;</a></h3>
 <p>Some emails are HTML-only with no plain text version.</p>
 <p><strong>Fix:</strong> Use <code>read_email_html</code> instead of <code>read_email</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>You: &quot;Show me the HTML version of email 42&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>You: &quot;Show me the HTML version of email 42&quot;
 </span></code></pre></div>
 <h3 id="pagination-not-working">Pagination not working<a class="headerlink" href="#pagination-not-working" title="Permanent link">&para;</a></h3>
 <p>The <code>page</code> parameter starts at 1, not 0:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>list_emails(page_size: 10, page: 1)   -- first 10
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>list_emails(page_size: 10, page: 2)   -- next 10
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>list_emails(page_size: 10, page: 1)   -- first 10
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>list_emails(page_size: 10, page: 2)   -- next 10
 </span></code></pre></div>
 <hr />
 <h2 id="desktop-extension-issues">Desktop Extension Issues<a class="headerlink" href="#desktop-extension-issues" title="Permanent link">&para;</a></h2>
@@ -2354,7 +2474,7 @@
 </ol>
 <h3 id="extension-install-path">Extension install path<a class="headerlink" href="#extension-install-path" title="Permanent link">&para;</a></h3>
 <p>Extensions are stored at:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/
 </span></code></pre></div>
 <p>Registry: <code>~/Library/Application Support/Claude/extensions-installations.json</code>
 Settings: <code>~/Library/Application Support/Claude/Claude Extensions Settings/himalaya-mcp.json</code></p>
@@ -2405,17 +2525,17 @@ Settings: <code>~/Library/Application Support/Claude/Claude Extensions Settings/
 </ul>
 <h3 id="run-doctor">Run doctor<a class="headerlink" href="#run-doctor" title="Permanent link">&para;</a></h3>
 <p>The fastest way to diagnose issues:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w">          </span><span class="c1"># Check everything</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--fix<span class="w">    </span><span class="c1"># Auto-fix what it can</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--json<span class="w">   </span><span class="c1"># Machine-readable output</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w">          </span><span class="c1"># Check everything</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--fix<span class="w">    </span><span class="c1"># Auto-fix what it can</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--json<span class="w">   </span><span class="c1"># Machine-readable output</span>
 </span></code></pre></div>
 <p>Doctor checks: Node.js, himalaya binary, himalaya config, MCP server bundle, email connectivity, Desktop extension (install, registry, settings, user_config), Claude Code plugin (symlink, marketplace), and environment variables.</p>
 <h3 id="debug-mode">Debug mode<a class="headerlink" href="#debug-mode" title="Permanent link">&para;</a></h3>
 <p>Run the MCP server with debug output:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">DEBUG</span><span class="o">=</span>*<span class="w"> </span>node<span class="w"> </span>dist/index.js
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nv">DEBUG</span><span class="o">=</span>*<span class="w"> </span>node<span class="w"> </span>dist/index.js
 </span></code></pre></div>
 <h3 id="run-tests-to-verify-installation">Run tests to verify installation<a class="headerlink" href="#run-tests-to-verify-installation" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>npm<span class="w"> </span><span class="nb">test</span><span class="w">    </span><span class="c1"># 315 tests</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>npm<span class="w"> </span><span class="nb">test</span><span class="w">    </span><span class="c1"># 315 tests</span>
 </span></code></pre></div>
 
 

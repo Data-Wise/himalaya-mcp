@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -734,6 +734,17 @@
     <span class="md-ellipsis">
       
         Plugin not loading after install
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skills-not-loading-homebrew-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skills not loading (Homebrew install)
       
     </span>
   </a>
@@ -2017,6 +2028,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#skills-not-loading-homebrew-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skills not loading (Homebrew install)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#mcp-server-not-starting" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2091,6 +2113,11 @@
 </thead>
 <tbody>
 <tr>
+<td>Claude Code</td>
+<td>latest</td>
+<td><a href="https://claude.ai/download">claude.ai/download</a> or <code>brew install claude</code></td>
+</tr>
+<tr>
 <td>Node.js</td>
 <td>22+</td>
 <td><a href="https://nodejs.org/">nodejs.org</a> or <code>brew install node</code></td>
@@ -2107,6 +2134,10 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition tip">
+<p class="admonition-title">Homebrew installs deps for you</p>
+<p>If you use the Homebrew install method, Node.js and himalaya CLI are installed automatically as dependencies. You only need to have an email account configured.</p>
+</div>
 <h3 id="verify-himalaya-works">Verify himalaya works<a class="headerlink" href="#verify-himalaya-works" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>himalaya<span class="w"> </span>--output<span class="w"> </span>json<span class="w"> </span>envelope<span class="w"> </span>list
 </span></code></pre></div>
@@ -2123,9 +2154,9 @@
 <li>Builds the esbuild bundle (583KB, no node_modules shipped)</li>
 <li>Symlinks plugin to <code>~/.claude/plugins/himalaya-mcp</code></li>
 <li>Registers in local marketplace</li>
-<li>Auto-enables in Claude Code settings (if Claude not running)</li>
+<li>Auto-runs install script (enables in Claude Code settings if Claude not running)</li>
 </ol>
-<p>After install, run <code>himalaya-mcp-install</code> and restart Claude Code. The <strong><code>email</code></strong> plugin gives you:</p>
+<p>Restart Claude Code. The <strong><code>email</code></strong> plugin gives you:</p>
 <ul>
 <li><code>/email:inbox</code> -- list recent emails</li>
 <li><code>/email:triage</code> -- classify and organize</li>
@@ -2135,40 +2166,56 @@
 <li><code>/email:attachments</code> -- list, download, calendar invites</li>
 <li><code>/email:help</code> -- help hub</li>
 </ul>
+<p><strong>Verify:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>himalaya-mcp<span class="w"> </span>doctor
+</span></code></pre></div>
 <p><strong>Upgrade:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew<span class="w"> </span>upgrade<span class="w"> </span>himalaya-mcp
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew<span class="w"> </span>upgrade<span class="w"> </span>himalaya-mcp
 </span></code></pre></div>
 <p><strong>Uninstall</strong> (cleans up symlinks and marketplace entry):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew<span class="w"> </span>uninstall<span class="w"> </span>himalaya-mcp
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>brew<span class="w"> </span>uninstall<span class="w"> </span>himalaya-mcp
 </span></code></pre></div>
 <h3 id="option-2-github-plugin-install">Option 2: GitHub Plugin Install<a class="headerlink" href="#option-2-github-plugin-install" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>claude<span class="w"> </span>plugin<span class="w"> </span>marketplace<span class="w"> </span>add<span class="w"> </span>Data-Wise/himalaya-mcp
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>claude<span class="w"> </span>plugin<span class="w"> </span>install<span class="w"> </span>email
+<div class="admonition warning">
+<p class="admonition-title">Prerequisites</p>
+<p>Node.js 22+ and himalaya CLI must be installed separately before using the GitHub marketplace method. Run <code>brew install node himalaya</code> first.</p>
+</div>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>claude<span class="w"> </span>plugin<span class="w"> </span>marketplace<span class="w"> </span>add<span class="w"> </span>Data-Wise/himalaya-mcp
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>claude<span class="w"> </span>plugin<span class="w"> </span>install<span class="w"> </span>email
+</span></code></pre></div>
+<p><strong>Verify:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>himalaya-mcp<span class="w"> </span>doctor
 </span></code></pre></div>
 <h3 id="option-3-from-source-development">Option 3: From Source (development)<a class="headerlink" href="#option-3-from-source-development" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/himalaya-mcp.git
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>himalaya-mcp
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>npm<span class="w"> </span>install
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>npm<span class="w"> </span>run<span class="w"> </span>build
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="w"> </span>~/.claude/plugins/himalaya-mcp
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Data-Wise/himalaya-mcp.git
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">cd</span><span class="w"> </span>himalaya-mcp
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>npm<span class="w"> </span>install
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>ln<span class="w"> </span>-s<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="w"> </span>~/.claude/plugins/himalaya-mcp
+</span></code></pre></div>
+<p><strong>Verify:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>himalaya-mcp<span class="w"> </span>doctor
 </span></code></pre></div>
 <h3 id="option-4-standalone-mcp-server">Option 4: Standalone MCP Server<a class="headerlink" href="#option-4-standalone-mcp-server" title="Permanent link">&para;</a></h3>
 <p>Add to your Claude Code settings (<code>~/.claude/settings.json</code>):</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">&quot;himalaya&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node&quot;</span><span class="p">,</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/path/to/himalaya-mcp/dist/index.js&quot;</span><span class="p">]</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">&quot;himalaya&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node&quot;</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/path/to/himalaya-mcp/dist/index.js&quot;</span><span class="p">]</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="claude-desktop-setup">Claude Desktop Setup<a class="headerlink" href="#claude-desktop-setup" title="Permanent link">&para;</a></h2>
 <h3 id="option-a-mcpb-package-one-click">Option A: .mcpb Package (one-click)<a class="headerlink" href="#option-a-mcpb-package-one-click" title="Permanent link">&para;</a></h3>
 <p>Download <code>himalaya-mcp-v{version}.mcpb</code> from <a href="https://github.com/Data-Wise/himalaya-mcp/releases">GitHub Releases</a> and double-click to install in Claude Desktop. The <code>.mcpb</code> is a lightweight (~147 KB) package that bundles the MCP server and configures it automatically.</p>
-<p><strong>Prerequisite:</strong> himalaya CLI must be installed separately:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>brew<span class="w"> </span>install<span class="w"> </span>himalaya
+<div class="admonition warning">
+<p class="admonition-title">Prerequisites</p>
+<p>The <code>.mcpb</code> package does <strong>not</strong> bundle the himalaya CLI. You must install it separately:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>brew<span class="w"> </span>install<span class="w"> </span>himalaya
 </span></code></pre></div>
+</div>
 <p>During install, you can configure:</p>
 <ul>
 <li><strong>himalaya binary path</strong> -- path to himalaya binary (default: <code>himalaya</code>)</li>
@@ -2177,28 +2224,28 @@
 </ul>
 <h3 id="option-a2-mcpb-via-cli">Option A2: .mcpb via CLI<a class="headerlink" href="#option-a2-mcpb-via-cli" title="Permanent link">&para;</a></h3>
 <p>If you have himalaya-mcp installed (Homebrew or source), you can install the extension from the command line:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>npm<span class="w"> </span>run<span class="w"> </span>build:mcpb<span class="w">                                     </span><span class="c1"># Build .mcpb (dev only)</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w"> </span>himalaya-mcp-v1.3.0.mcpb<span class="w">      </span><span class="c1"># Install from file</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w">                                </span><span class="c1"># Auto-find in project root</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>himalaya-mcp<span class="w"> </span>remove-ext<span class="w">                                 </span><span class="c1"># Uninstall extension</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>npm<span class="w"> </span>run<span class="w"> </span>build:mcpb<span class="w">                                     </span><span class="c1"># Build .mcpb (dev only)</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w"> </span>himalaya-mcp-v1.3.1.mcpb<span class="w">      </span><span class="c1"># Install from file</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w">                                </span><span class="c1"># Auto-find in project root</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>himalaya-mcp<span class="w"> </span>remove-ext<span class="w">                                 </span><span class="c1"># Uninstall extension</span>
 </span></code></pre></div>
 <p>This unpacks the extension to Claude Desktop's extensions directory and registers it. Restart Claude Desktop after install.</p>
 <h3 id="option-b-cli-setup-legacy">Option B: CLI Setup (Legacy)<a class="headerlink" href="#option-b-cli-setup-legacy" title="Permanent link">&para;</a></h3>
 <p>After installing himalaya-mcp via Homebrew or from source, configure it as an MCP server for Claude Desktop:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>himalaya-mcp<span class="w"> </span>setup<span class="w">           </span><span class="c1"># Add to Claude Desktop config</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--check<span class="w">   </span><span class="c1"># Verify configuration</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--remove<span class="w">  </span><span class="c1"># Remove server entry</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>himalaya-mcp<span class="w"> </span>setup<span class="w">           </span><span class="c1"># Add to Claude Desktop config</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--check<span class="w">   </span><span class="c1"># Verify configuration</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--remove<span class="w">  </span><span class="c1"># Remove server entry</span>
 </span></code></pre></div>
 <p>This adds the server to <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>. Restart Claude Desktop after running setup.</p>
 <p><strong>Manual configuration</strong> (if you prefer):</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">&quot;himalaya&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node&quot;</span><span class="p">,</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;~/.claude/plugins/himalaya-mcp/dist/index.js&quot;</span><span class="p">]</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">&quot;himalaya&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node&quot;</span><span class="p">,</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;~/.claude/plugins/himalaya-mcp/dist/index.js&quot;</span><span class="p">]</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>All optional. Set via environment variables in your MCP server config:</p>
@@ -2234,42 +2281,42 @@
 </tbody>
 </table>
 <h3 id="example-with-env-vars">Example with env vars<a class="headerlink" href="#example-with-env-vars" title="Permanent link">&para;</a></h3>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="nt">&quot;himalaya&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node&quot;</span><span class="p">,</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/path/to/himalaya-mcp/dist/index.js&quot;</span><span class="p">],</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">      </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">        </span><span class="nt">&quot;HIMALAYA_ACCOUNT&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;work&quot;</span><span class="p">,</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">        </span><span class="nt">&quot;HIMALAYA_TIMEOUT&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;60000&quot;</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">      </span><span class="p">}</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">&quot;himalaya&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node&quot;</span><span class="p">,</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/path/to/himalaya-mcp/dist/index.js&quot;</span><span class="p">],</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">      </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">        </span><span class="nt">&quot;HIMALAYA_ACCOUNT&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;work&quot;</span><span class="p">,</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">        </span><span class="nt">&quot;HIMALAYA_TIMEOUT&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;60000&quot;</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">      </span><span class="p">}</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="verify-installation">Verify Installation<a class="headerlink" href="#verify-installation" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Full diagnostic (checks prereqs, MCP server, email, Desktop extension, plugin)</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>himalaya-mcp<span class="w"> </span>doctor
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Auto-fix common issues</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--fix
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># Run tests (315 tests)</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>npm<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
-</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="c1"># Check Claude Desktop config (legacy)</span>
-</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--check
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Full diagnostic (checks prereqs, MCP server, email, Desktop extension, plugin)</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>himalaya-mcp<span class="w"> </span>doctor
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Auto-fix common issues</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>himalaya-mcp<span class="w"> </span>doctor<span class="w"> </span>--fix
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1"># Run tests (315 tests)</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>npm<span class="w"> </span><span class="nb">test</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="c1"># Check Claude Desktop config (legacy)</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>himalaya-mcp<span class="w"> </span>setup<span class="w"> </span>--check
 </span></code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="homebrew-install-hangs-during-post-install">Homebrew install hangs during post-install<a class="headerlink" href="#homebrew-install-hangs-during-post-install" title="Permanent link">&para;</a></h3>
 <p>If <code>brew install</code> or <code>brew upgrade</code> takes a very long time, Claude Code may be holding file locks. Kill the stuck process and complete manually:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># If brew hangs, press Ctrl+C then:</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>claude<span class="w"> </span>plugin<span class="w"> </span>install<span class="w"> </span>email@local-plugins
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># If brew hangs, press Ctrl+C then:</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>claude<span class="w"> </span>plugin<span class="w"> </span>install<span class="w"> </span>email@local-plugins
 </span></code></pre></div>
 <p>This is fixed in the latest formula -- JSON file writes are skipped when Claude is running.</p>
 <h3 id="homebrew-install-fails-on-symlink">Homebrew install fails on symlink<a class="headerlink" href="#homebrew-install-fails-on-symlink" title="Permanent link">&para;</a></h3>
 <p>If macOS permissions prevent automatic symlinking:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>ln<span class="w"> </span>-sf<span class="w"> </span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span>/opt/himalaya-mcp/libexec<span class="w"> </span>~/.claude/plugins/himalaya-mcp
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>ln<span class="w"> </span>-sf<span class="w"> </span><span class="k">$(</span>brew<span class="w"> </span>--prefix<span class="k">)</span>/opt/himalaya-mcp/libexec<span class="w"> </span>~/.claude/plugins/himalaya-mcp
 </span></code></pre></div>
 <h3 id="plugin-not-loading-after-install">Plugin not loading after install<a class="headerlink" href="#plugin-not-loading-after-install" title="Permanent link">&para;</a></h3>
 <ol>
@@ -2277,14 +2324,21 @@
 <li>Check if plugin is enabled: <code>claude plugin list</code></li>
 <li>Manually enable: <code>claude plugin install email@local-plugins</code></li>
 </ol>
+<h3 id="skills-not-loading-homebrew-install">Skills not loading (Homebrew install)<a class="headerlink" href="#skills-not-loading-homebrew-install" title="Permanent link">&para;</a></h3>
+<p>If <code>/email:*</code> skills don't appear after Homebrew install:</p>
+<ol>
+<li>Check skills path: <code>ls ~/.claude/plugins/himalaya-mcp/skills/</code></li>
+<li>If missing, upgrade: <code>brew upgrade himalaya-mcp</code></li>
+<li>If still broken: <code>ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp</code></li>
+</ol>
 <h3 id="mcp-server-not-starting">MCP server not starting<a class="headerlink" href="#mcp-server-not-starting" title="Permanent link">&para;</a></h3>
 <p>Verify the bundled server works:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;{}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>node<span class="w"> </span>~/.claude/plugins/himalaya-mcp/dist/index.js
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;{}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>node<span class="w"> </span>~/.claude/plugins/himalaya-mcp/dist/index.js
 </span></code></pre></div>
 <p>If you see a JSON-RPC response, the server is working. Check your MCP configuration paths.</p>
 <h3 id="desktop-extension-not-working">Desktop Extension not working<a class="headerlink" href="#desktop-extension-not-working" title="Permanent link">&para;</a></h3>
 <p>Run the doctor command to diagnose:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>himalaya-mcp<span class="w"> </span>doctor
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>himalaya-mcp<span class="w"> </span>doctor
 </span></code></pre></div>
 <p>Common issues it catches:
 - himalaya binary not found (PATH not inherited by Desktop)

@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -2203,6 +2203,10 @@
 <li>himalaya CLI installed and configured (<code>brew install himalaya</code>)</li>
 <li>At least one email account in <code>~/.config/himalaya/config.toml</code></li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">himalaya CLI is a separate install</p>
+<p>The <code>.mcpb</code> Desktop Extension does <strong>not</strong> bundle the himalaya CLI. You must install it separately before the extension can access your email. Run <code>brew install himalaya</code> and configure at least one account in <code>~/.config/himalaya/config.toml</code>.</p>
+</div>
 <p>Verify himalaya works from your terminal first:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>himalaya<span class="w"> </span>envelope<span class="w"> </span>list<span class="w"> </span>--output<span class="w"> </span>json
 </span></code></pre></div>

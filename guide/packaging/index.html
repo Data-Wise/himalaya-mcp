@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -1216,6 +1216,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Distribution Channels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#distribution-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distribution Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1851,6 +1868,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Distribution Channels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#distribution-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distribution Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2178,13 +2212,14 @@
 
 
 <h1 id="plugin-packaging-distribution">Plugin Packaging &amp; Distribution<a class="headerlink" href="#plugin-packaging-distribution" title="Permanent link">&para;</a></h1>
-<p>himalaya-mcp is distributed as a Claude Code plugin via multiple channels. This guide covers the packaging architecture, build process, and how each distribution method works.</p>
+<p>himalaya-mcp is distributed via multiple channels targeting both Claude Code and Claude Desktop. This guide covers the packaging architecture, build process, and how each distribution method works.</p>
 <h2 id="distribution-channels">Distribution Channels<a class="headerlink" href="#distribution-channels" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Channel</th>
 <th>Command</th>
+<th>Target</th>
 <th>Auto-setup</th>
 </tr>
 </thead>
@@ -2192,25 +2227,50 @@
 <tr>
 <td><strong>Homebrew</strong> (recommended)</td>
 <td><code>brew install data-wise/tap/himalaya-mcp</code></td>
+<td>Claude Code</td>
 <td>Symlink, marketplace, auto-enable</td>
 </tr>
 <tr>
-<td><strong>GitHub</strong></td>
+<td><strong>GitHub Marketplace</strong></td>
 <td><code>claude plugin marketplace add Data-Wise/himalaya-mcp</code></td>
+<td>Claude Code</td>
 <td>Plugin cache</td>
+</tr>
+<tr>
+<td><strong>.mcpb Extension</strong></td>
+<td>Download from <a href="https://github.com/Data-Wise/himalaya-mcp/releases">Releases</a></td>
+<td>Claude Desktop</td>
+<td>One-click install, GUI settings</td>
 </tr>
 <tr>
 <td><strong>Source</strong></td>
 <td><code>git clone</code> + <code>npm run build</code></td>
+<td>Both</td>
 <td>Manual symlink</td>
-</tr>
-<tr>
-<td><strong>Claude Desktop</strong></td>
-<td><code>himalaya-mcp setup</code></td>
-<td>MCP server config</td>
 </tr>
 </tbody>
 </table>
+<h3 id="distribution-architecture">Distribution Architecture<a class="headerlink" href="#distribution-architecture" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    SRC["`**Source**
+    16 TypeScript files
+    + MCP SDK + zod`"] --&gt;|esbuild| BUNDLE["`**dist/index.js**
+    583KB single file`"]
+
+    BUNDLE --&gt; HB["`**Homebrew**
+    brew install himalaya-mcp`"]
+    BUNDLE --&gt; MCPB["`**.mcpb Extension**
+    ~147KB ZIP archive`"]
+    BUNDLE --&gt; GH["`**GitHub Marketplace**
+    claude plugin marketplace add`"]
+    BUNDLE --&gt; DEV["`**Source Install**
+    git clone + npm run build`"]
+
+    HB --&gt; CC1[Claude Code]
+    GH --&gt; CC2[Claude Code]
+    DEV --&gt; CC3[Claude Code]
+    MCPB --&gt; CD[Claude Desktop]
+    DEV --&gt; CD2[Claude Desktop]</code></pre>
 <h2 id="esbuild-bundle">esbuild Bundle<a class="headerlink" href="#esbuild-bundle" title="Permanent link">&para;</a></h2>
 <p>The MCP server is bundled into a single file using esbuild, eliminating the 72MB <code>node_modules</code> directory.</p>
 <h3 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
@@ -2258,11 +2318,11 @@
 <li><strong>Downloads</strong> the release tarball from GitHub</li>
 <li><strong>Installs dependencies</strong> -- <code>himalaya</code> (email CLI) + <code>node</code> (runtime)</li>
 <li><strong>Builds</strong> -- runs <code>npm install</code> then <code>npm run build:bundle</code></li>
-<li><strong>Installs to libexec</strong> -- only <code>.claude-plugin/</code>, <code>.mcp.json</code>, <code>plugin/</code>, <code>dist/</code></li>
-<li><strong>Runs post-install</strong> -- <code>himalaya-mcp-install</code> script</li>
+<li><strong>Installs to libexec</strong> -- <code>.claude-plugin/</code>, <code>.mcp.json</code>, <code>skills/</code>, <code>agents/</code>, <code>dist/</code></li>
+<li><strong>Runs post-install</strong> -- auto-runs install script (symlink, marketplace registration, auto-enable)</li>
 </ol>
 <h3 id="post-install-script">Post-install script<a class="headerlink" href="#post-install-script" title="Permanent link">&para;</a></h3>
-<p>The <code>himalaya-mcp-install</code> script (created by the formula):</p>
+<p>The <code>himalaya-mcp-install</code> script (created by the formula) auto-runs during <code>post_install</code>:</p>
 <ol>
 <li>Detects if Claude Code is running (<code>pgrep -x "claude"</code>)</li>
 <li>Symlinks <code>libexec</code> to <code>~/.claude/plugins/himalaya-mcp</code></li>
@@ -2332,7 +2392,7 @@
 <p>The <code>.mcpb</code> format packages the MCP server as a Claude Desktop Extension -- a lightweight ZIP archive (~147 KB) containing the esbuild bundle and a <code>manifest.json</code> descriptor.</p>
 <h3 id="build">Build<a class="headerlink" href="#build" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>npm<span class="w"> </span>run<span class="w"> </span>build:mcpb
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># Output: himalaya-mcp-v1.3.0.mcpb (147 KB)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># Output: himalaya-mcp-v1.3.1.mcpb (147 KB)</span>
 </span></code></pre></div>
 <p>This runs <code>scripts/build-mcpb.sh</code> which:</p>
 <ol>
@@ -2345,7 +2405,7 @@
 <h3 id="install-gui">Install (GUI)<a class="headerlink" href="#install-gui" title="Permanent link">&para;</a></h3>
 <p>Download <code>himalaya-mcp-v{version}.mcpb</code> from <a href="https://github.com/Data-Wise/himalaya-mcp/releases">GitHub Releases</a> and double-click to install in Claude Desktop.</p>
 <h3 id="install-cli">Install (CLI)<a class="headerlink" href="#install-cli" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w"> </span>himalaya-mcp-v1.3.0.mcpb<span class="w">   </span><span class="c1"># Install from file</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w"> </span>himalaya-mcp-v1.3.1.mcpb<span class="w">   </span><span class="c1"># Install from file</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>himalaya-mcp<span class="w"> </span>install-ext<span class="w">                              </span><span class="c1"># Auto-find in project root</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>himalaya-mcp<span class="w"> </span>remove-ext<span class="w">                               </span><span class="c1"># Uninstall</span>
 </span></code></pre></div>
@@ -2462,14 +2522,14 @@
 <td>In repo</td>
 </tr>
 <tr>
-<td><code>plugin/skills/*.md</code></td>
-<td>In libexec</td>
+<td><code>skills/*.md</code></td>
+<td>At libexec root</td>
 <td>In repo</td>
 <td>In repo</td>
 </tr>
 <tr>
-<td><code>plugin/agents/*.md</code></td>
-<td>In libexec</td>
+<td><code>agents/*.md</code></td>
+<td>At libexec root</td>
 <td>In repo</td>
 <td>In repo</td>
 </tr>
