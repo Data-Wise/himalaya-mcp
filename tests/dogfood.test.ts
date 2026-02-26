@@ -1005,9 +1005,9 @@ describe("Packaging: pre-send hook", () => {
 
   it("hook script exists and is executable", () => {
     expect(existsSync(hookPath)).toBe(true);
-    const { execFileSync } = require("node:child_process");
-    const stat = execFileSync("stat", ["-f", "%Lp", hookPath], { encoding: "utf-8" }).trim();
-    expect(parseInt(stat, 8) & 0o111).toBeGreaterThan(0);
+    const fs = require("node:fs");
+    const mode = fs.statSync(hookPath).mode;
+    expect(mode & 0o111).toBeGreaterThan(0);
   });
 
   it("allows non-send tools (exit 0)", () => {
