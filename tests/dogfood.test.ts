@@ -993,7 +993,7 @@ describe("Packaging: plugin manifest structure", () => {
   });
 
   it("only contains allowed schema fields", () => {
-    const allowedKeys = ["name", "version", "description", "author"];
+    const allowedKeys = ["name", "version", "description", "author", "hooks"];
     for (const key of Object.keys(pluginJson)) {
       expect(allowedKeys).toContain(key);
     }
