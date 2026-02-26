@@ -33,7 +33,7 @@ Display the hub overview:
 | EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
 | Privacy-first email for Claude — 19 tools, 4 prompts,     |
-| 3 resources, 10 skills, 1 hook                            |
+| 3 resources, 11 skills, 1 hook                            |
 +===========================================================+
 |                                                           |
 | TOOLS (19)                                                |
@@ -56,11 +56,11 @@ Display the hub overview:
 | RESOURCES (3)                                             |
 |   email://inbox, email://folders, email://message/{id}    |
 |                                                           |
-| SKILLS (10)                                               |
+| SKILLS (11)                                               |
 |   /email:inbox, /email:triage, /email:digest,             |
 |   /email:reply, /email:compose, /email:attachments,       |
 |   /email:search, /email:manage, /email:stats,             |
-|   /email:config                                           |
+|   /email:config, /email:help                              |
 |                                                           |
 | HOOKS (1)                                                 |
 |   pre-send .... Preview gate before send/compose          |

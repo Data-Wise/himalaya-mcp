@@ -17,7 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Changed
 
-- Plugin description updated to reflect 10 skills + 1 hook
+- Plugin description updated to reflect 11 skills + 1 hook
 - `/email:help` hub updated with new skills, hooks section, and quick reference entries
 - `plugin.json` now includes `hooks` registration for PreToolUse
 

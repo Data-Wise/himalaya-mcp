@@ -15,7 +15,7 @@ set -eo pipefail
 #     "matcher": "mcp__plugin_email_himalaya",
 #     "hooks": [{
 #       "type": "command",
-#       "command": "/bin/bash <plugin_path>/.claude-plugin/hooks/pre-send.sh",
+#       "command": "/bin/bash \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/pre-send.sh\"",
 #       "timeout": 5000
 #     }]
 #   }]
@@ -38,7 +38,10 @@ try:
     keys = '$query'.strip('.').split('.')
     for k in keys:
         d = d.get(k, '') if isinstance(d, dict) else ''
-    print(d if d else '')
+    if isinstance(d, dict):
+        print(json.dumps(d))
+    else:
+        print(d if d else '')
 except: pass
 " 2>/dev/null || true
   fi
