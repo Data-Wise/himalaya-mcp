@@ -39,6 +39,7 @@
 - 2026-02-25: Enhancement gaps — 4 new skills, pre-send hook, cookbook (PR #43)
 - 2026-02-26: Pre-send hook test rewrite — 6 → 20 tests, HOME isolation, CI fix
 - 2026-02-26: Released v1.4.0 (4 skills, pre-send hook, cookbook, test rewrite)
+- 2026-02-26: Fixed doctor marketplace check path (16/16 checks, 0 warnings)
 
 ## Current State
 
@@ -75,7 +76,7 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Brainstorm v1.4.0 scope
+- Brainstorm v1.5.0 scope
 
 ## Future
 
