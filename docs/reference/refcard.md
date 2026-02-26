@@ -145,7 +145,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 npm run build           TypeScript compilation (development)
 npm run build:bundle    esbuild single-file bundle (~595KB, production)
 npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
-npm test                Run 315 tests (vitest)
+npm test                Run 335 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 

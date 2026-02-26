@@ -314,7 +314,7 @@ The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health
 ## Testing
 
 ```bash
-npm test    # 315 tests across 15 files (vitest)
+npm test    # 335 tests across 15 files (vitest)
 ```
 
 Test breakdown:

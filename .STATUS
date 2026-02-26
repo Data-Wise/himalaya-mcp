@@ -23,7 +23,7 @@
 - Phase 6d: Calendar — extract_calendar_event, create_calendar_event (ICS + Apple Calendar)
 - Plugin Packaging: esbuild bundle (595KB), Homebrew formula, marketplace.json, CLI setup
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
-- Total: 19 tools, 4 prompts, 3 resources, 7 skills, 315 tests (15 test files)
+- Total: 19 tools, 4 prompts, 3 resources, 11 skills, 335 tests (15 test files)
 
 ## Just Completed
 
@@ -36,13 +36,15 @@
 - 2026-02-17: 275 → 315 tests (+39: .mcpb packaging, doctor E2E, config guards)
 - 2026-02-25: Docs overhaul — tabbed install, troubleshooting, packaging diagram (PR #41)
 - 2026-02-25: Released v1.3.1 (CI fixes + docs overhaul, PR #42)
+- 2026-02-25: Enhancement gaps — 4 new skills, pre-send hook, cookbook (PR #43)
+- 2026-02-26: Pre-send hook test rewrite — 6 → 20 tests, HOME isolation, CI fix
 
 ## Current State
 
 - Branch: `dev` (synced with main after v1.3.1 release)
 - v1.3.1 released on GitHub, Homebrew, and docs site
 - All phases complete
-- Tests: 315 across 15 test files
+- Tests: 335 across 15 test files
 - Bundle: 595KB (esbuild), .mcpb: ~147KB
 
 ## Install
@@ -86,5 +88,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-02-25
+**Last Updated:** 2026-02-26
 **Status:** v1.3.1 released (GitHub + Homebrew + docs site)

@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 1.3.1 (released)
-- **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 315 tests)
+- **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 335 tests)
 
 ### What It Does
 
@@ -201,7 +201,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (315 tests across 15 test files)
+npm test                         # Run vitest (335 tests across 15 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~595KB)
 node dist/index.js               # Run MCP server directly
 ```
