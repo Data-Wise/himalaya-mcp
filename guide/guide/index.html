@@ -1566,6 +1566,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../troubleshooting/" class="md-nav__link">
         
   
@@ -2228,7 +2256,12 @@
 </tr>
 <tr>
 <td><code>/email:*</code> slash commands</td>
-<td>Yes (7 skills)</td>
+<td>Yes (11 skills)</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Plugin hooks</td>
+<td>Yes (1 pre-send hook)</td>
 <td>No</td>
 </tr>
 <tr>
@@ -2253,7 +2286,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>In Claude Code</strong>, the plugin system provides slash-command skills (<code>/email:inbox</code>, <code>/email:triage</code>, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent. These are Claude Code-only features defined in the plugin manifest.</p>
+<p><strong>In Claude Code</strong>, the plugin system provides slash-command skills (<code>/email:inbox</code>, <code>/email:triage</code>, <code>/email:search</code>, <code>/email:manage</code>, <code>/email:stats</code>, <code>/email:config</code>, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.</p>
 <p><strong>In Claude Desktop</strong>, you get the full MCP server -- all 19 tools, 4 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls <code>list_emails</code> directly. The two-phase send safety gate works the same way.</p>
 <div class="admonition tip">
 <p class="admonition-title">Which should I use?</p>
@@ -2696,7 +2729,7 @@
 </span></code></pre></div>
 <p>The <code>doctor</code> command checks prerequisites (Node.js, himalaya), MCP server health, email connectivity, Claude Desktop extension state, Claude Code plugin registration, and environment variables. See the <a href="../../reference/commands/#himalaya-mcp-doctor">Command Reference</a> for full details.</p>
 <h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>npm<span class="w"> </span><span class="nb">test</span><span class="w">    </span><span class="c1"># 315 tests across 15 files (vitest)</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>npm<span class="w"> </span><span class="nb">test</span><span class="w">    </span><span class="c1"># 335 tests across 15 files (vitest)</span>
 </span></code></pre></div>
 <p>Test breakdown:</p>
 <table>

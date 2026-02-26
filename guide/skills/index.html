@@ -16,7 +16,7 @@
         <link rel="prev" href="../packaging/">
       
       
-        <link rel="next" href="../troubleshooting/">
+        <link rel="next" href="../cookbook/">
       
       
         
@@ -1291,6 +1291,50 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#emailsearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:search
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emailmanage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:manage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emailstats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:stats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emailconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:config
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#emailhelp" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1313,6 +1357,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#plugin-hooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin Hooks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugin Hooks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-send-confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Send Confirmation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#choosing-between-skills-and-natural-language" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1327,6 +1399,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1676,6 +1776,50 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#emailsearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:search
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emailmanage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:manage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emailstats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:stats
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emailconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /email:config
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#emailhelp" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1694,6 +1838,34 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-hooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin Hooks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugin Hooks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-send-confirmation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Send Confirmation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1734,7 +1906,7 @@
 
 
 <h1 id="plugin-skills-agent">Plugin Skills &amp; Agent<a class="headerlink" href="#plugin-skills-agent" title="Permanent link">&para;</a></h1>
-<p>When installed as a Claude Code plugin, the email plugin provides 7 slash commands (skills) and 1 autonomous agent.</p>
+<p>When installed as a Claude Code plugin, the email plugin provides 11 slash commands (skills), 1 autonomous agent, and 1 hook.</p>
 <h2 id="skills-vs-tools">Skills vs Tools<a class="headerlink" href="#skills-vs-tools" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1952,6 +2124,160 @@
 <li>"Cancel" stops the workflow entirely</li>
 </ul>
 <hr />
+<h2 id="emailsearch">/email:search<a class="headerlink" href="#emailsearch" title="Permanent link">&para;</a></h2>
+<p>Search emails by keyword, sender, flags, or date.</p>
+<p><strong>Triggers:</strong> "search email", "find email", "look for email", "email from", "email about"</p>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Parses user query into himalaya filter syntax (<code>from:</code>, <code>subject:</code>, <code>--unread</code>, <code>--flagged</code>, dates)</li>
+<li>Calls <code>search_emails</code> MCP tool</li>
+<li>Formats results as a table: ID, From, Subject, Date, Flags</li>
+<li>Offers to read, refine, or triage results</li>
+</ol>
+<p><strong>Example:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>You: /email:search from:alice meeting
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Claude:
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Found 3 emails matching &quot;from:alice meeting&quot;:
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>| ID     | From           | Subject                  | Date       | Flags |
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>|--------|----------------|--------------------------|------------|-------|
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>| 249088 | alice@work.com | Q1 Budget Review Meeting | 2026-02-13 | Seen  |
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>| 248972 | alice@work.com | Meeting Tomorrow         | 2026-02-10 |       |
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>| 248901 | alice@work.com | Re: Weekly Meeting Notes | 2026-02-07 | Seen  |
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>Would you like me to:
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>- Read any of these emails?
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>- Refine the search?
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>- Triage these results?
+</span></code></pre></div>
+<p><strong>Options:</strong></p>
+<ul>
+<li>Combine filters: "emails from alice about budget flagged"</li>
+<li>Unread only: "unread emails from boss"</li>
+<li>Flagged: "flagged emails this week"</li>
+<li>Date hints: "emails about invoices from last month"</li>
+</ul>
+<hr />
+<h2 id="emailmanage">/email:manage<a class="headerlink" href="#emailmanage" title="Permanent link">&para;</a></h2>
+<p>Bulk email operations -- flag, unflag, move, archive.</p>
+<p><strong>Triggers:</strong> "manage email", "bulk email", "move emails", "flag emails", "archive emails"</p>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Parses action (flag / unflag / move / archive) and target list (comma-separated IDs or <code>all-unread</code>)</li>
+<li>Shows a confirmation gate for operations affecting more than 5 emails</li>
+<li>Executes operations in sequence with a progress display</li>
+<li>Reports a summary when complete</li>
+</ol>
+<p><strong>Example:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>You: /email:manage move 1,2,3 Archive
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Claude:
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>Moving 3 emails to Archive...
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>  [1/3] 249088 -- moved
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>  [2/3] 249064 -- moved
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  [3/3] 249051 -- moved
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>Done. 3 emails moved to Archive.
+</span></code></pre></div>
+<p><strong>Safety:</strong></p>
+<ul>
+<li>Confirmation required for operations affecting more than 5 emails</li>
+<li>Never deletes emails -- moves to Trash only</li>
+<li>All moves are reversible (move back from Trash or Archive)</li>
+</ul>
+<hr />
+<h2 id="emailstats">/email:stats<a class="headerlink" href="#emailstats" title="Permanent link">&para;</a></h2>
+<p>Inbox statistics -- unread count, top senders, trends.</p>
+<p><strong>Triggers:</strong> "email stats", "inbox stats", "email analytics", "how many unread"</p>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Calls <code>list_emails</code> and <code>search_emails</code> to gather data</li>
+<li>Computes unread count, today's email count, top senders, and oldest unread email</li>
+<li>Displays a stats block with optional weekly trend comparison</li>
+</ol>
+<p><strong>Example output:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Inbox Stats -- 2026-02-13
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  Unread:        14
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  Today:          5
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>  Oldest unread:  2026-02-01 (from devops@company.com)
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>  Top senders (last 30 days):
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    1. github@github.com      -- 42 emails
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    2. alice@work.com         -- 18 emails
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    3. newsletter@devweekly   -- 12 emails
+</span></code></pre></div>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>--weekly</code> to include a trend comparison vs. last week</li>
+<li><code>--folder Sent</code> to run stats on a specific folder</li>
+</ul>
+<hr />
+<h2 id="emailconfig">/email:config<a class="headerlink" href="#emailconfig" title="Permanent link">&para;</a></h2>
+<p>Setup wizard for email configuration.</p>
+<p><strong>Triggers:</strong> "email config", "email setup", "configure email", "himalaya setup"</p>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Checks that the himalaya CLI is installed</li>
+<li>Checks that a config file exists at <code>~/.config/himalaya/config.toml</code></li>
+<li>Runs an interactive setup with provider templates (Gmail, Outlook, Fastmail, custom IMAP)</li>
+<li>Tests the connection</li>
+<li>Runs <code>himalaya-mcp doctor</code> to verify everything is working</li>
+</ol>
+<p><strong>Modes:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wizard (default)</td>
+<td><code>/email:config</code></td>
+</tr>
+<tr>
+<td>Validate existing config</td>
+<td><code>/email:config --check</code></td>
+</tr>
+<tr>
+<td>Add another account</td>
+<td><code>/email:config --add-account</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>You: /email:config
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Claude:
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>Email Setup Wizard
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>Step 1/5  Checking himalaya CLI...   installed (v1.0.0)
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>Step 2/5  Checking config file...    not found
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>Let&#39;s create one. Which email provider?
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>  1. Gmail
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>  2. Outlook / Microsoft 365
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>  3. Fastmail
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>  4. Custom IMAP/SMTP
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>You: 1
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>Step 3/5  Gmail setup
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>  IMAP host:  imap.gmail.com:993 (SSL)
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>  SMTP host:  smtp.gmail.com:587 (STARTTLS)
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>  Email address: you@gmail.com
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>  Auth:       App password (recommended)
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>Step 4/5  Testing connection...      OK
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>Step 5/5  Running doctor check...    All checks passed
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>Setup complete. Try /email:inbox to check your mail.
+</span></code></pre></div>
+<hr />
 <h2 id="emailhelp">/email:help<a class="headerlink" href="#emailhelp" title="Permanent link">&para;</a></h2>
 <p>Help hub for the email plugin. Browse all available tools, prompts, resources, and workflows.</p>
 <p><strong>Triggers:</strong> "email help", "himalaya help", "email commands", "what can you do with email"</p>
@@ -1995,32 +2321,32 @@
 </tbody>
 </table>
 <p><strong>Example:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>You: /email:help
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Claude:
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>┌──────────────────────────────────────────────┐
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│  Email Help                                  │
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│  Privacy-first email for Claude              │
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>├──────────────────────────────────────────────┤
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>│                                              │
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>│  Skills:                                     │
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>│    /email:inbox        Check your inbox      │
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>│    /email:triage       Classify emails       │
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>│    /email:digest       Daily summary         │
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>│    /email:reply        Draft &amp; send safely   │
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>│    /email:compose      Compose new emails    │
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>│    /email:attachments  Files &amp; calendar      │
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>│    /email:help         This help             │
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>│                                              │
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>│  Quick actions:                              │
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>│    &quot;Check my inbox&quot;                          │
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>│    &quot;Triage my last 20 emails&quot;                │
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>│    &quot;Reply to email 42&quot;                       │
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>│    &quot;Export email 42 as markdown&quot;             │
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>│    &quot;Find emails from alice about budget&quot;     │
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>│                                              │
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>│  Type /email:help [topic] for details        │
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>└──────────────────────────────────────────────┘
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>You: /email:help
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Claude:
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>┌──────────────────────────────────────────────┐
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>│  Email Help                                  │
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>│  Privacy-first email for Claude              │
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>├──────────────────────────────────────────────┤
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>│                                              │
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>│  Skills:                                     │
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>│    /email:inbox        Check your inbox      │
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>│    /email:triage       Classify emails       │
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>│    /email:digest       Daily summary         │
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>│    /email:reply        Draft &amp; send safely   │
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>│    /email:compose      Compose new emails    │
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>│    /email:attachments  Files &amp; calendar      │
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>│    /email:help         This help             │
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>│                                              │
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>│  Quick actions:                              │
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>│    &quot;Check my inbox&quot;                          │
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>│    &quot;Triage my last 20 emails&quot;                │
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>│    &quot;Reply to email 42&quot;                       │
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>│    &quot;Export email 42 as markdown&quot;             │
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>│    &quot;Find emails from alice about budget&quot;     │
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>│                                              │
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>│  Type /email:help [topic] for details        │
+</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>└──────────────────────────────────────────────┘
 </span></code></pre></div>
 <hr />
 <h2 id="email-assistant-agent">Email Assistant Agent<a class="headerlink" href="#email-assistant-agent" title="Permanent link">&para;</a></h2>
@@ -2043,27 +2369,42 @@
 <li>All actions are reversible (unflag, move back)</li>
 </ul>
 <p><strong>Example session:</strong></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>You: &quot;Handle my email&quot;
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Claude (email-assistant agent):
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>Scanning inbox... found 12 unread emails.
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>Reading and classifying...
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>Summary:
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>- 3 emails need replies (Alice, Boss, Client)
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>- 4 are FYI (team updates, CI notifications)
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>- 5 are low priority (newsletters, promotions)
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>Suggested actions:
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>1. Draft replies for the 3 actionable emails
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>2. Mark 4 FYI emails as read
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>3. Archive 5 low-priority emails
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>Shall I proceed with these actions? I&#39;ll show each
-</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>draft before sending.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>You: &quot;Handle my email&quot;
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Claude (email-assistant agent):
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Scanning inbox... found 12 unread emails.
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>Reading and classifying...
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>Summary:
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>- 3 emails need replies (Alice, Boss, Client)
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>- 4 are FYI (team updates, CI notifications)
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>- 5 are low priority (newsletters, promotions)
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>Suggested actions:
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>1. Draft replies for the 3 actionable emails
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>2. Mark 4 FYI emails as read
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>3. Archive 5 low-priority emails
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>Shall I proceed with these actions? I&#39;ll show each
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>draft before sending.
 </span></code></pre></div>
 <p>The agent is best for batch processing when you have many emails to work through. For individual emails, the skills are faster.</p>
+<hr />
+<h2 id="plugin-hooks">Plugin Hooks<a class="headerlink" href="#plugin-hooks" title="Permanent link">&para;</a></h2>
+<p>The plugin includes a pre-send confirmation hook that provides an additional safety layer.</p>
+<h3 id="pre-send-confirmation">Pre-Send Confirmation<a class="headerlink" href="#pre-send-confirmation" title="Permanent link">&para;</a></h3>
+<p><strong>Event:</strong> PreToolUse (on <code>send_email</code> and <code>compose_email</code>)</p>
+<p>When you send an email with <code>confirm=true</code>, the hook shows a preview on stderr before the MCP tool's own safety gate processes the request:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>📧 ─── Email Send Preview ───────────────────────
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  To:      alice@example.com
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>  Subject: Meeting tomorrow
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>  ─────────────────────────────────────────────
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>  Hi Alice,
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>  Just confirming our meeting...
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>  ─────────────────────────────────────────────
+</span></code></pre></div>
+<p>The hook also logs all sends to <code>~/.himalaya-mcp/sent.log</code> for audit purposes.</p>
 <hr />
 <h2 id="choosing-between-skills-and-natural-language">Choosing Between Skills and Natural Language<a class="headerlink" href="#choosing-between-skills-and-natural-language" title="Permanent link">&para;</a></h2>
 <p>Both approaches work. Skills provide structured workflows; natural language is more flexible.</p>
@@ -2098,7 +2439,7 @@
 </tr>
 <tr>
 <td>Search</td>
-<td>(no skill)</td>
+<td><code>/email:search</code></td>
 <td>"Find emails about the project deadline"</td>
 </tr>
 <tr>
@@ -2108,8 +2449,18 @@
 </tr>
 <tr>
 <td>Bulk actions</td>
-<td>(no skill)</td>
+<td><code>/email:manage</code></td>
 <td>"Archive all newsletters"</td>
+</tr>
+<tr>
+<td>Inbox stats</td>
+<td><code>/email:stats</code></td>
+<td>"How many unread emails?"</td>
+</tr>
+<tr>
+<td>Setup email</td>
+<td><code>/email:config</code></td>
+<td>"Configure my email"</td>
 </tr>
 <tr>
 <td>Full processing</td>

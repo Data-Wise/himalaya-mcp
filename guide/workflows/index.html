@@ -1355,6 +1355,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#17-search-and-filter-emails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. Search and Filter Emails
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-bulk-email-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. Bulk Email Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-inbox-statistics-and-trends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19. Inbox Statistics and Trends
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1407,6 +1440,34 @@
     
   
     Plugin Skills & Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
   
 
     
@@ -1884,6 +1945,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#17-search-and-filter-emails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. Search and Filter Emails
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-bulk-email-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. Bulk Email Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-inbox-statistics-and-trends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19. Inbox Statistics and Trends
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2235,6 +2329,124 @@
 </span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>
 </span><span id="__span-15-21"><a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>Mark the other 3 as read and archive?
 </span></code></pre></div>
+<h2 id="17-search-and-filter-emails">17. Search and Filter Emails<a class="headerlink" href="#17-search-and-filter-emails" title="Permanent link">&para;</a></h2>
+<p>Use the <code>/email:search</code> skill for powerful email search with filter combinations.</p>
+<p><strong>Natural language:</strong> "Find unread emails from Alice about the budget"</p>
+<p><strong>What happens:</strong></p>
+<ol>
+<li><code>/email:search</code> parses your query into himalaya filter syntax</li>
+<li><code>search_emails(query: "from alice and subject budget and not flag Seen")</code> -- combined filters</li>
+<li>Results displayed as a table with ID, From, Subject, Date, Flags</li>
+<li>Offers to read, triage, or act on results</li>
+</ol>
+<p><strong>Filter combinations:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Keyword only:     &quot;search meeting&quot;         → subject meeting or body meeting
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>Sender filter:    &quot;search from:alice&quot;      → from alice
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>Flag filter:      &quot;search --unread&quot;        → not flag Seen
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>Date filter:      &quot;find emails from last week&quot; → after 2026-02-19
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>Combined:         &quot;search from:alice --unread meeting&quot; → from alice and not flag Seen and subject meeting
+</span></code></pre></div>
+<p><strong>Example interaction:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>You: &quot;Find unread emails from Alice&quot;
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>Claude:
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>Search: &quot;from alice, unread&quot; (3 results)
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>| # | From              | Subject              | Date       | Flags |
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>|---|-------------------|----------------------|------------|-------|
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>| 1 | alice@work.com    | Q2 Planning          | Feb 25     |       |
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>| 2 | alice@work.com    | Budget Revision      | Feb 24     |       |
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>| 3 | alice@work.com    | Meeting Notes        | Feb 23     |       |
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>→ &quot;Read #1&quot; to view full email
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>→ &quot;Flag all&quot; to star these
+</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>→ &quot;/email:manage archive 1,2,3&quot; to bulk archive
+</span></code></pre></div>
+<h2 id="18-bulk-email-management">18. Bulk Email Management<a class="headerlink" href="#18-bulk-email-management" title="Permanent link">&para;</a></h2>
+<p>Use <code>/email:manage</code> for batch operations on multiple emails.</p>
+<p><strong>Natural language:</strong> "Move emails 1, 2, 5 to Archive"</p>
+<p><strong>What happens:</strong></p>
+<ol>
+<li><code>/email:manage</code> parses the action and target list</li>
+<li>Shows confirmation gate for operations on &gt;5 emails</li>
+<li>Executes operations with progress display</li>
+<li>Shows summary</li>
+</ol>
+<p><strong>Batch patterns:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Flag specific:    /email:manage flag 1,2,5
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>Unflag:           /email:manage unflag 3,7
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>Move to folder:   /email:manage move 1,2,3 Archive
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>Archive shortcut: /email:manage archive 4,5,6
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>All unread:       /email:manage move all-unread Spam
+</span></code></pre></div>
+<p><strong>Example interaction:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>You: &quot;Archive all the newsletter emails&quot;
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>Claude:
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>Found 8 newsletter emails.
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>WARNING: This will move 8 emails to Archive. Continue? (yes/no)
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>You: &quot;yes&quot;
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>[1/8] Moving email #249064 to Archive...
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>[2/8] Moving email #249058 to Archive...
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>...
+</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>[8/8] Moving email #249012 to Archive...
+</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>
+</span><span id="__span-19-15"><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>Moved 8 emails to Archive
+</span><span id="__span-19-16"><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>
+</span><span id="__span-19-17"><a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a>→ &quot;/email:inbox&quot; to check remaining emails
+</span><span id="__span-19-18"><a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a>→ &quot;Undo&quot; to move these back to INBOX
+</span></code></pre></div>
+<p><strong>Tip:</strong> Combine with search for powerful workflows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>You: &quot;Find all emails from newsletter@dev.to and archive them&quot;
+</span></code></pre></div>
+<h2 id="19-inbox-statistics-and-trends">19. Inbox Statistics and Trends<a class="headerlink" href="#19-inbox-statistics-and-trends" title="Permanent link">&para;</a></h2>
+<p>Use <code>/email:stats</code> for a quick overview of your inbox health.</p>
+<p><strong>Natural language:</strong> "How many unread emails do I have?"</p>
+<p><strong>What happens:</strong></p>
+<ol>
+<li><code>/email:stats</code> calls <code>list_emails</code> and <code>search_emails</code> to gather data</li>
+<li>Computes unread count, today's volume, top senders, oldest unread</li>
+<li>Displays formatted statistics</li>
+<li>Optional <code>--weekly</code> for trend comparison</li>
+</ol>
+<p><strong>Example interaction:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>You: &quot;/email:stats&quot;
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>Claude:
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>Inbox Stats
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>Unread: 47 (12 today, 8 yesterday)
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>Total recent: 156 emails (last 7 days)
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>Top senders:
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>  1. boss@company.com -- 6 emails
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>  2. team@company.com -- 4 emails
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>  3. newsletter@dev.to -- 3 emails
+</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>
+</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>Oldest unread: 12 days ago
+</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>  From: hr@company.com
+</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>  Subject: Benefits enrollment deadline
+</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>
+</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>→ &quot;Read oldest unread&quot; to view it
+</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>→ &quot;/email:triage&quot; to classify unread
+</span></code></pre></div>
+<p><strong>Weekly comparison:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>You: &quot;/email:stats --weekly&quot;
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>Claude:
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>Weekly Comparison
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>           This week    Last week    Change
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>Received:  47           52           down 10%
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>Unread:    12           8            up 50%
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>Sent:      23           19           up 21%
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>→ Unread trending up -- consider /email:triage
+</span></code></pre></div>
+<p><strong>Tip:</strong> Great for Monday morning email planning -- check stats before diving in.</p>
 
 
 

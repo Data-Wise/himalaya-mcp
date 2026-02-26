@@ -1199,6 +1199,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guide/cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guide/troubleshooting/" class="md-nav__link">
         
   
@@ -1449,6 +1477,17 @@
     <span class="md-ellipsis">
       
         Plugin Skills (Claude Code only)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-hooks-claude-code-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin Hooks (Claude Code only)
       
     </span>
   </a>
@@ -1742,6 +1781,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#plugin-hooks-claude-code-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin Hooks (Claude Code only)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#environment-variables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1888,47 +1938,58 @@
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>/email:reply        Draft reply with safety gate workflow
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>/email:compose      Compose new email with safety gate
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>/email:attachments  List/download attachments, calendar invites
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>/email:help         Help hub — browse tools, prompts, workflows
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>/email:search       Search by keyword, sender, flags, date filters
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>/email:manage       Bulk flag/unflag/move/archive with confirmation gate
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>/email:stats        Inbox statistics, top senders, oldest unread, trends
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>/email:config       Setup wizard — provider templates, connection test, doctor
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>/email:help         Help hub — browse tools, prompts, workflows
+</span></code></pre></div>
+<h2 id="plugin-hooks-claude-code-only">Plugin Hooks (Claude Code only)<a class="headerlink" href="#plugin-hooks-claude-code-only" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pre-send.sh     PreToolUse on send_email/compose_email — preview gate + audit log
 </span></code></pre></div>
 <h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>HIMALAYA_BINARY    Path to himalaya binary       (default: himalaya)
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>HIMALAYA_ACCOUNT   Default account name          (default: system default)
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>HIMALAYA_FOLDER    Default folder                (default: INBOX)
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>HIMALAYA_TIMEOUT   Command timeout in ms         (default: 120000, 2 min; 0 = unlimited)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>HIMALAYA_BINARY    Path to himalaya binary       (default: himalaya)
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>HIMALAYA_ACCOUNT   Default account name          (default: system default)
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>HIMALAYA_FOLDER    Default folder                (default: INBOX)
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>HIMALAYA_TIMEOUT   Command timeout in ms         (default: 120000, 2 min; 0 = unlimited)
 </span></code></pre></div>
 <h2 id="safety-gates">Safety Gates<a class="headerlink" href="#safety-gates" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>send_email(template, confirm=false)           -&gt;  PREVIEW only (not sent)
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>send_email(template, confirm=true)            -&gt;  Actually sends
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>compose_email(..., confirm=false)             -&gt;  PREVIEW only (not sent)
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>compose_email(..., confirm=true)              -&gt;  Actually sends
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>delete_folder(name, confirm=false)            -&gt;  Warning (not deleted)
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>delete_folder(name, confirm=true)             -&gt;  Deletes
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>create_calendar_event(..., confirm=false)     -&gt;  Preview (not created)
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>create_calendar_event(..., confirm=true)      -&gt;  Creates in Apple Calendar
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>send_email(template, confirm=false)           -&gt;  PREVIEW only (not sent)
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>send_email(template, confirm=true)            -&gt;  Actually sends
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>compose_email(..., confirm=false)             -&gt;  PREVIEW only (not sent)
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>compose_email(..., confirm=true)              -&gt;  Actually sends
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>delete_folder(name, confirm=false)            -&gt;  Warning (not deleted)
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>delete_folder(name, confirm=true)             -&gt;  Deletes
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>create_calendar_event(..., confirm=false)     -&gt;  Preview (not created)
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>create_calendar_event(..., confirm=true)      -&gt;  Creates in Apple Calendar
 </span></code></pre></div>
 <h2 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Triage:     list_emails -&gt; read_email -&gt; flag_email / move_email
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Reply:      read_email -&gt; draft_reply -&gt; [review] -&gt; send_email(confirm=true)
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Compose:    compose_email(preview) -&gt; [review] -&gt; compose_email(confirm=true)
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Export:     read_email -&gt; export_to_markdown -&gt; copy_to_clipboard
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>Attach:     list_attachments -&gt; download_attachment -&gt; [use file]
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>Calendar:   extract_calendar_event -&gt; [review] -&gt; create_calendar_event(confirm=true)
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>Folders:    list_folders -&gt; create_folder / delete_folder(confirm=true)
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>Digest:     triage_inbox prompt -&gt; daily_email_digest prompt
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>Multi-acct: Any tool + account=&quot;work&quot; | account=&quot;personal&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Triage:     list_emails -&gt; read_email -&gt; flag_email / move_email
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Reply:      read_email -&gt; draft_reply -&gt; [review] -&gt; send_email(confirm=true)
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Compose:    compose_email(preview) -&gt; [review] -&gt; compose_email(confirm=true)
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>Export:     read_email -&gt; export_to_markdown -&gt; copy_to_clipboard
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>Attach:     list_attachments -&gt; download_attachment -&gt; [use file]
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>Calendar:   extract_calendar_event -&gt; [review] -&gt; create_calendar_event(confirm=true)
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>Folders:    list_folders -&gt; create_folder / delete_folder(confirm=true)
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>Digest:     triage_inbox prompt -&gt; daily_email_digest prompt
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>Search:     /email:search &quot;query&quot; -&gt; read_email -&gt; [act on results]
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>Bulk:       /email:manage [action] [ids] [destination] -&gt; confirmation -&gt; progress
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>Stats:      /email:stats [--weekly] -&gt; unread count, top senders, trends
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>Setup:      /email:config [--check | --add-account] -&gt; wizard or validate
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>Multi-acct: Any tool + account=&quot;work&quot; | account=&quot;personal&quot;
 </span></code></pre></div>
 <h2 id="build-distribution">Build &amp; Distribution<a class="headerlink" href="#build-distribution" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>npm run build           TypeScript compilation (development)
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>npm run build:bundle    esbuild single-file bundle (~595KB, production)
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>npm test                Run 315 tests (vitest)
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>node dist/index.js      Start MCP server standalone
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>npm run build           TypeScript compilation (development)
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>npm run build:bundle    esbuild single-file bundle (~595KB, production)
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>npm test                Run 335 tests (vitest)
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>node dist/index.js      Start MCP server standalone
 </span></code></pre></div>
 <h2 id="distribution-channels">Distribution Channels<a class="headerlink" href="#distribution-channels" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Homebrew:    brew install data-wise/tap/himalaya-mcp
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>GitHub:      claude plugin marketplace add Data-Wise/himalaya-mcp &amp;&amp; claude plugin install email
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Desktop:     himalaya-mcp install-ext (or double-click .mcpb from GitHub Releases)
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Source:      git clone + npm install + npm run build
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Homebrew:    brew install data-wise/tap/himalaya-mcp
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>GitHub:      claude plugin marketplace add Data-Wise/himalaya-mcp &amp;&amp; claude plugin install email
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>Desktop:     himalaya-mcp install-ext (or double-click .mcpb from GitHub Releases)
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>Source:      git clone + npm install + npm run build
 </span></code></pre></div>
 
 
