@@ -94,6 +94,7 @@ nav:
     - Workflows: guide/workflows.md
     - Packaging: guide/packaging.md
     - Plugin Skills & Agent: guide/skills.md
+    - Cookbook: guide/cookbook.md
     - Troubleshooting: guide/troubleshooting.md
   - Reference:
     - Command Reference: reference/commands.md

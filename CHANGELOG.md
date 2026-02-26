@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+
+- **`/email:search` skill** — Search emails by keyword, sender, flags, or date with himalaya filter syntax
+- **`/email:manage` skill** — Bulk email operations (flag, unflag, move, archive) with confirmation gate for >5 emails
+- **`/email:stats` skill** — Inbox statistics: unread count, top senders, oldest unread, optional weekly trends
+- **`/email:config` skill** — Interactive setup wizard with provider templates (Gmail, Outlook, Fastmail), connection testing, and `--check` validation mode
+- **Pre-send confirmation hook** — PreToolUse hook showing email preview (To, Subject, body snippet) before send/compose operations; logs to `~/.himalaya-mcp/sent.log`
+- **`.craft/homebrew.json`** — Homebrew formula metadata for craft distribution tooling
+
+### Changed
+
+- Plugin description updated to reflect 11 skills + 1 hook
+- `/email:help` hub updated with new skills, hooks section, and quick reference entries
+- `plugin.json` now includes `hooks` registration for PreToolUse
+
 ## [1.3.1] - 2026-02-25
 
 ### Fixed

@@ -1,0 +1,6 @@
+{
+  "formula_name": "himalaya-mcp",
+  "tap": "data-wise/tap",
+  "source_type": "github",
+  "workflow": "homebrew-release.yml"
+}

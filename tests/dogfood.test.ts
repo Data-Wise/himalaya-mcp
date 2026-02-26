@@ -980,7 +980,7 @@ describe("Packaging: plugin manifest structure", () => {
   it("has skills directory with valid skill files", () => {
     const skillsDir = join(PROJECT_ROOT, "himalaya-mcp-plugin", "skills");
     expect(existsSync(skillsDir)).toBe(true);
-    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md"];
+    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md", "search.md", "manage.md", "stats.md", "config.md"];
     for (const skill of expectedSkills) {
       expect(existsSync(join(skillsDir, skill))).toBe(true);
     }
@@ -993,10 +993,99 @@ describe("Packaging: plugin manifest structure", () => {
   });
 
   it("only contains allowed schema fields", () => {
-    const allowedKeys = ["name", "version", "description", "author"];
+    const allowedKeys = ["name", "version", "description", "author", "hooks"];
     for (const key of Object.keys(pluginJson)) {
       expect(allowedKeys).toContain(key);
     }
+  });
+});
+
+describe("Packaging: pre-send hook", () => {
+  const hookPath = join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "hooks", "pre-send.sh");
+
+  it("hook script exists and is executable", () => {
+    expect(existsSync(hookPath)).toBe(true);
+    const fs = require("node:fs");
+    const mode = fs.statSync(hookPath).mode;
+    expect(mode & 0o111).toBeGreaterThan(0);
+  });
+
+  it("allows non-send tools (exit 0)", () => {
+    const { execFileSync } = require("node:child_process");
+    const input = JSON.stringify({ tool_name: "list_emails", tool_input: {} });
+    const result = execFileSync("/bin/bash", [hookPath], {
+      input,
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    // Should exit 0 (no error thrown)
+    expect(result).toBeDefined();
+  });
+
+  it("allows send_email with confirm=false (no preview)", () => {
+    const { execFileSync } = require("node:child_process");
+    const input = JSON.stringify({
+      tool_name: "send_email",
+      tool_input: { to: "test@example.com", subject: "Test", body: "Hello", confirm: false },
+    });
+    const result = execFileSync("/bin/bash", [hookPath], {
+      input,
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    expect(result).toBeDefined();
+  });
+
+  it("shows preview on stderr for send_email with confirm=true", () => {
+    const { execFileSync } = require("node:child_process");
+    const input = JSON.stringify({
+      tool_name: "send_email",
+      tool_input: { to: "alice@example.com", subject: "Meeting", body: "Hi Alice", confirm: "true" },
+    });
+    try {
+      execFileSync("/bin/bash", [hookPath], {
+        input,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+    } catch {
+      // execFileSync captures stderr differently; use spawnSync instead
+    }
+    // Use spawnSync for stderr capture
+    const { spawnSync } = require("node:child_process");
+    const proc = spawnSync("/bin/bash", [hookPath], {
+      input,
+      encoding: "utf-8",
+    });
+    expect(proc.status).toBe(0);
+    expect(proc.stderr).toContain("Email Send Preview");
+    expect(proc.stderr).toContain("alice@example.com");
+    expect(proc.stderr).toContain("Meeting");
+  });
+
+  it("shows preview for compose_email with confirm=true", () => {
+    const { spawnSync } = require("node:child_process");
+    const input = JSON.stringify({
+      tool_name: "compose_email",
+      tool_input: { to: "bob@example.com", subject: "Hello", body: "Line1\nLine2\nLine3\nLine4\nLine5", confirm: "true" },
+    });
+    const proc = spawnSync("/bin/bash", [hookPath], {
+      input,
+      encoding: "utf-8",
+    });
+    expect(proc.status).toBe(0);
+    expect(proc.stderr).toContain("bob@example.com");
+    expect(proc.stderr).toContain("5 lines total");
+  });
+
+  it("plugin.json hooks use CLAUDE_PLUGIN_ROOT for path resolution", () => {
+    const pJson = JSON.parse(
+      readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
+    );
+    expect(pJson.hooks).toBeDefined();
+    expect(pJson.hooks.PreToolUse).toBeDefined();
+    expect(pJson.hooks.PreToolUse[0].hooks[0].command).toContain("${CLAUDE_PLUGIN_ROOT}");
+    expect(pJson.hooks.PreToolUse[0].hooks[0].command).not.toContain("./.");
   });
 });
 

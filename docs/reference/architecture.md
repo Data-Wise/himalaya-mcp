@@ -116,6 +116,10 @@ src/
 │   ├── read.ts           read_email, read_email_html
 │   ├── manage.ts         flag_email, move_email
 │   ├── compose.ts        draft_reply, send_email (safety gate)
+│   ├── compose-new.ts    compose_email (new messages, safety gate)
+│   ├── folders.ts        list_folders, create_folder, delete_folder
+│   ├── attachments.ts    list_attachments, download_attachment
+│   ├── calendar.ts       extract_calendar_event, create_calendar_event
 │   └── actions.ts        export_to_markdown, create_action_item
 │
 ├── prompts/
@@ -128,7 +132,8 @@ src/
 │   └── index.ts          email://inbox, email://message/{id}, email://folders
 │
 ├── adapters/
-│   └── clipboard.ts      copy_to_clipboard — pbcopy (macOS) / xclip (Linux)
+│   ├── clipboard.ts      copy_to_clipboard — pbcopy (macOS) / xclip (Linux)
+│   └── calendar.ts       ICS parser + Apple Calendar (osascript)
 │
 └── cli/
     └── setup.ts          Claude Desktop setup (setup/check/remove MCP config + install-ext/remove-ext)
@@ -182,6 +187,8 @@ triage_inbox prompt
 .claude-plugin/
   plugin.json         Manifest — declares skills, agents, hooks, MCP server
   marketplace.json    GitHub plugin discovery (self-hosted marketplace)
+  hooks/
+    pre-send.sh       PreToolUse hook — email send preview + audit log
 
 plugin/
   skills/
@@ -189,6 +196,13 @@ plugin/
     triage.md         /email:triage — classify and organize
     digest.md         /email:digest — daily summary
     reply.md          /email:reply — draft with safety gate
+    compose.md        /email:compose — compose new emails
+    attachments.md    /email:attachments — files and calendar
+    search.md         /email:search — search with filters
+    manage.md         /email:manage — bulk operations
+    stats.md          /email:stats — inbox statistics
+    config.md         /email:config — setup wizard
+    help.md           /email:help — help hub
 
   agents/
     email-assistant.md  Autonomous triage agent (all 19 tools)
@@ -203,6 +217,7 @@ plugin/
 | Subprocess | `execFile` (not `exec`) — no shell injection |
 | Authentication | Local only — himalaya handles auth, no tokens in MCP |
 | Send gate | `confirm=true` required — preview-first by default |
+| Hook gate | PreToolUse `pre-send.sh` — stderr preview before send, audit log |
 | Delete | Not implemented — only flag/move |
 | Bulk | Agent asks before operating on 5+ emails |
 | Account | Per-call `account` param — no cross-account leaks |
