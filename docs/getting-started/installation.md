@@ -139,7 +139,7 @@ If you have himalaya-mcp installed (Homebrew or source), you can install the ext
 
 ```bash
 npm run build:mcpb                                     # Build .mcpb (dev only)
-himalaya-mcp install-ext himalaya-mcp-v1.3.1.mcpb      # Install from file
+himalaya-mcp install-ext himalaya-mcp-v1.4.0.mcpb      # Install from file
 himalaya-mcp install-ext                                # Auto-find in project root
 himalaya-mcp remove-ext                                 # Uninstall extension
 ```

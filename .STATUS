@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: Released v1.3.1
-## Phase: v1.3.1 stable
+## Focus: Released v1.4.0
+## Phase: v1.4.0 stable
 ## Priority: 2
-## Progress: 100 (v1.3.1 released)
+## Progress: 100 (v1.4.0 released)
 
 ## Completed
 
@@ -38,11 +38,12 @@
 - 2026-02-25: Released v1.3.1 (CI fixes + docs overhaul, PR #42)
 - 2026-02-25: Enhancement gaps — 4 new skills, pre-send hook, cookbook (PR #43)
 - 2026-02-26: Pre-send hook test rewrite — 6 → 20 tests, HOME isolation, CI fix
+- 2026-02-26: Released v1.4.0 (4 skills, pre-send hook, cookbook, test rewrite)
 
 ## Current State
 
-- Branch: `dev` (synced with main after v1.3.1 release)
-- v1.3.1 released on GitHub, Homebrew, and docs site
+- Branch: `dev` (synced with main after v1.4.0 release)
+- v1.4.0 released on GitHub, Homebrew, and docs site
 - All phases complete
 - Tests: 335 across 15 test files
 - Bundle: 595KB (esbuild), .mcpb: ~147KB
@@ -89,4 +90,4 @@ himalaya-mcp doctor --fix
 ---
 
 **Last Updated:** 2026-02-26
-**Status:** v1.3.1 released (GitHub + Homebrew + docs site)
+**Status:** v1.4.0 released (GitHub + Homebrew + docs site)

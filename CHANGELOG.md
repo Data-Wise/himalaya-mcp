@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-02-26
+
 ### Added
 
 - **`/email:search` skill** — Search emails by keyword, sender, flags, or date with himalaya filter syntax
@@ -13,13 +15,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **`/email:stats` skill** — Inbox statistics: unread count, top senders, oldest unread, optional weekly trends
 - **`/email:config` skill** — Interactive setup wizard with provider templates (Gmail, Outlook, Fastmail), connection testing, and `--check` validation mode
 - **Pre-send confirmation hook** — PreToolUse hook showing email preview (To, Subject, body snippet) before send/compose operations; logs to `~/.himalaya-mcp/sent.log`
-- **`.craft/homebrew.json`** — Homebrew formula metadata for craft distribution tooling
+- **Cookbook** — Common email workflow patterns and recipes (`docs/guide/cookbook.md`)
 
 ### Changed
 
 - Plugin description updated to reflect 11 skills + 1 hook
 - `/email:help` hub updated with new skills, hooks section, and quick reference entries
 - `plugin.json` now includes `hooks` registration for PreToolUse
+
+### Fixed
+
+- Pre-send hook tests rewritten with HOME isolation (no audit log pollution)
+- Cross-platform CI fix: use `fs.statSync().mode` instead of macOS-only `stat -f %Lp`
+- Removed dead `execFileSync` try/catch in hook tests (was running hook twice)
 
 ## [1.3.1] - 2026-02-25
 
