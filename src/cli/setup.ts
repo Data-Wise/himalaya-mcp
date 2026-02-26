@@ -571,7 +571,7 @@ function checkCodePlugin(): CheckResult[] {
   }
 
   // Marketplace registration
-  const marketplacePath = join(homedir(), ".claude", "local-marketplace", "marketplace.json");
+  const marketplacePath = join(homedir(), ".claude", "local-marketplace", ".claude-plugin", "marketplace.json");
   if (existsSync(marketplacePath)) {
     try {
       const raw = readFileSync(marketplacePath, "utf-8");
