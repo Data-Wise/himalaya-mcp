@@ -48,7 +48,7 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     ---
 
-    Claude Code plugin (7 skills), MCP server, or `.mcpb` Desktop Extension
+    Claude Code plugin (10 skills, 1 hook), MCP server, or `.mcpb` Desktop Extension
 
     [:octicons-arrow-right-24: Installation](getting-started/installation.md)
 
@@ -92,6 +92,10 @@ When installed as a Claude Code plugin, these slash commands are available:
 | `/email:reply` | Draft and send with safety gate |
 | `/email:compose` | Compose new emails with safety gate |
 | `/email:attachments` | List, download, and calendar invites |
+| `/email:search` | Search by keyword, sender, flags, dates |
+| `/email:manage` | Bulk flag, move, archive with confirmation |
+| `/email:stats` | Inbox statistics, top senders, trends |
+| `/email:config` | Setup wizard with provider templates |
 | `/email:help` | Help hub -- browse all tools, prompts, workflows |
 
 ## Quick Start
@@ -161,6 +165,7 @@ You: "/email:help"
 - **[Command Reference](reference/commands.md)** -- all tools, prompts, and resources
 - **[User Guide](guide/guide.md)** -- complete walkthrough
 - **[Workflows](guide/workflows.md)** -- common email patterns
+- **[Cookbook](guide/cookbook.md)** -- practical recipes combining multiple skills
 - **[Quick Reference](reference/refcard.md)** -- one-page cheat sheet
 - **[Architecture](reference/architecture.md)** -- system design and security
 - **[Desktop Extension](tutorials/desktop-extension.md)** -- install `.mcpb` in Claude Desktop
