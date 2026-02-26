@@ -6,8 +6,8 @@
  * are useful and well-formatted for Claude.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { readFileSync, existsSync, readdirSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -980,7 +980,7 @@ describe("Packaging: plugin manifest structure", () => {
   it("has skills directory with valid skill files", () => {
     const skillsDir = join(PROJECT_ROOT, "himalaya-mcp-plugin", "skills");
     expect(existsSync(skillsDir)).toBe(true);
-    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md"];
+    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md", "search.md", "manage.md", "stats.md", "config.md"];
     for (const skill of expectedSkills) {
       expect(existsSync(join(skillsDir, skill))).toBe(true);
     }
@@ -993,10 +993,232 @@ describe("Packaging: plugin manifest structure", () => {
   });
 
   it("only contains allowed schema fields", () => {
-    const allowedKeys = ["name", "version", "description", "author"];
+    const allowedKeys = ["name", "version", "description", "author", "hooks"];
     for (const key of Object.keys(pluginJson)) {
       expect(allowedKeys).toContain(key);
     }
+  });
+});
+
+describe("Packaging: pre-send hook", () => {
+  const hookPath = join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "hooks", "pre-send.sh");
+  let tempHome: string;
+
+  /** Run the hook with isolated HOME to prevent audit log pollution */
+  function runHook(input: object): { status: number | null; stdout: string; stderr: string } {
+    const { spawnSync } = require("node:child_process");
+    const proc = spawnSync("/bin/bash", [hookPath], {
+      input: JSON.stringify(input),
+      encoding: "utf-8",
+      env: { ...process.env, HOME: tempHome },
+    });
+    return { status: proc.status, stdout: proc.stdout, stderr: proc.stderr };
+  }
+
+  beforeEach(() => {
+    const { mkdtempSync: mkd } = require("node:fs");
+    const { tmpdir } = require("node:os");
+    tempHome = mkd(join(tmpdir(), "hook-test-"));
+  });
+
+  afterEach(() => {
+    rmSync(tempHome, { recursive: true, force: true });
+  });
+
+  // ── Static analysis ──────────────────────────────────────────────
+
+  it("hook script exists and is executable", () => {
+    expect(existsSync(hookPath)).toBe(true);
+    const mode = statSync(hookPath).mode;
+    expect(mode & 0o111).toBeGreaterThan(0);
+  });
+
+  it("plugin.json hooks use CLAUDE_PLUGIN_ROOT for path resolution", () => {
+    const pJson = JSON.parse(
+      readFileSync(join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "plugin.json"), "utf-8")
+    );
+    expect(pJson.hooks).toBeDefined();
+    expect(pJson.hooks.PreToolUse).toBeDefined();
+    const cmd = pJson.hooks.PreToolUse[0].hooks[0].command;
+    expect(cmd).toContain("${CLAUDE_PLUGIN_ROOT}");
+    expect(cmd).not.toContain("./.");
+  });
+
+  // ── Passthrough: non-send tools ──────────────────────────────────
+
+  it("allows list_emails through (exit 0, no preview)", () => {
+    const r = runHook({ tool_name: "list_emails", tool_input: {} });
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toContain("Email Send Preview");
+  });
+
+  it("allows read_email through (exit 0, no preview)", () => {
+    const r = runHook({ tool_name: "read_email", tool_input: { id: "1" } });
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toContain("Email Send Preview");
+  });
+
+  it("allows flag_email through (exit 0, no preview)", () => {
+    const r = runHook({ tool_name: "flag_email", tool_input: { id: "1", flag: "Seen" } });
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toContain("Email Send Preview");
+  });
+
+  // ── Passthrough: send tools without confirm ──────────────────────
+
+  it("send_email with confirm=false → no preview, no audit log", () => {
+    const r = runHook({
+      tool_name: "send_email",
+      tool_input: { to: "a@b.com", subject: "Test", body: "Hi", confirm: false },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toContain("Email Send Preview");
+    expect(existsSync(join(tempHome, ".himalaya-mcp", "sent.log"))).toBe(false);
+  });
+
+  it("compose_email with confirm='false' (string) → no preview", () => {
+    const r = runHook({
+      tool_name: "compose_email",
+      tool_input: { to: "a@b.com", subject: "Test", body: "Hi", confirm: "false" },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toContain("Email Send Preview");
+  });
+
+  it("send_email with no confirm field → no preview", () => {
+    const r = runHook({
+      tool_name: "send_email",
+      tool_input: { to: "a@b.com", subject: "Test", body: "Hi" },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toContain("Email Send Preview");
+  });
+
+  // ── Preview: confirm=true ────────────────────────────────────────
+
+  it("fully-qualified send_email with confirm='true' → shows preview", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_input: { to: "alice@example.com", subject: "Meeting", body: "Hi Alice", confirm: "true" },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stderr).toContain("Email Send Preview");
+    expect(r.stderr).toContain("alice@example.com");
+    expect(r.stderr).toContain("Meeting");
+    expect(r.stderr).toContain("Hi Alice");
+  });
+
+  it("fully-qualified compose_email with confirm='true' → shows preview", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__compose_email",
+      tool_input: { to: "bob@example.com", subject: "Hello", body: "Line1\nLine2\nLine3", confirm: "true" },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stderr).toContain("Email Send Preview");
+    expect(r.stderr).toContain("bob@example.com");
+    expect(r.stderr).toContain("Hello");
+  });
+
+  it("short name send_email with confirm='true' → also works (backward compat)", () => {
+    const r = runHook({
+      tool_name: "send_email",
+      tool_input: { to: "c@d.com", subject: "Compat", body: "Test", confirm: "true" },
+    });
+    expect(r.status).toBe(0);
+    expect(r.stderr).toContain("Email Send Preview");
+  });
+
+  // ── Preview content accuracy ─────────────────────────────────────
+
+  it("shows CC line when CC field present", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_input: { to: "a@b.com", cc: "cc@b.com", subject: "S", body: "B", confirm: "true" },
+    });
+    expect(r.stderr).toContain("CC:");
+    expect(r.stderr).toContain("cc@b.com");
+  });
+
+  it("omits CC line when CC field absent", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_input: { to: "a@b.com", subject: "S", body: "B", confirm: "true" },
+    });
+    expect(r.stderr).not.toContain("CC:");
+  });
+
+  it("body >3 lines → shows first 3 lines + truncation notice", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__compose_email",
+      tool_input: {
+        to: "a@b.com", subject: "S", confirm: "true",
+        body: "Line1\nLine2\nLine3\nLine4\nLine5",
+      },
+    });
+    expect(r.stderr).toContain("Line1");
+    expect(r.stderr).toContain("Line3");
+    expect(r.stderr).toContain("5 lines total");
+    expect(r.stderr).not.toContain("Line4");
+  });
+
+  it("body <=3 lines → shows full body, no truncation notice", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_input: { to: "a@b.com", subject: "S", body: "Only two\nlines", confirm: "true" },
+    });
+    expect(r.stderr).toContain("Only two");
+    expect(r.stderr).toContain("lines");
+    expect(r.stderr).not.toContain("lines total");
+  });
+
+  it("empty body → no body lines in preview", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_input: { to: "a@b.com", subject: "S", body: "", confirm: "true" },
+    });
+    expect(r.stderr).toContain("Email Send Preview");
+    expect(r.stderr).not.toContain("lines total");
+  });
+
+  it("missing to/subject → shows '<not set>' placeholders", () => {
+    const r = runHook({
+      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_input: { confirm: "true" },
+    });
+    expect(r.stderr).toContain("<not set>");
+    // Both to and subject missing → two placeholders
+    const matches = r.stderr.match(/<not set>/g);
+    expect(matches).not.toBeNull();
+    expect(matches!.length).toBeGreaterThanOrEqual(2);
+  });
+
+  // ── Audit log ────────────────────────────────────────────────────
+
+  it("confirm=true send → creates audit log with correct content", () => {
+    runHook({
+      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_input: { to: "log@test.com", subject: "Audit Test", body: "Body", confirm: "true" },
+    });
+    const logPath = join(tempHome, ".himalaya-mcp", "sent.log");
+    expect(existsSync(logPath)).toBe(true);
+    const content = readFileSync(logPath, "utf-8");
+    expect(content).toContain("date:");
+    expect(content).toContain("to: log@test.com");
+    expect(content).toContain("subject: Audit Test");
+    expect(content).toContain("tool: mcp__plugin_email_himalaya__send_email");
+  });
+
+  it("confirm=false → no audit log created", () => {
+    runHook({
+      tool_name: "send_email",
+      tool_input: { to: "a@b.com", subject: "S", body: "B", confirm: false },
+    });
+    expect(existsSync(join(tempHome, ".himalaya-mcp", "sent.log"))).toBe(false);
+  });
+
+  it("non-send tool → no audit log created", () => {
+    runHook({ tool_name: "list_emails", tool_input: {} });
+    expect(existsSync(join(tempHome, ".himalaya-mcp", "sent.log"))).toBe(false);
   });
 });
 

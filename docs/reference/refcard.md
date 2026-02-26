@@ -86,7 +86,17 @@ Draft      Draft message
 /email:reply        Draft reply with safety gate workflow
 /email:compose      Compose new email with safety gate
 /email:attachments  List/download attachments, calendar invites
+/email:search       Search by keyword, sender, flags, date filters
+/email:manage       Bulk flag/unflag/move/archive with confirmation gate
+/email:stats        Inbox statistics, top senders, oldest unread, trends
+/email:config       Setup wizard — provider templates, connection test, doctor
 /email:help         Help hub — browse tools, prompts, workflows
+```
+
+## Plugin Hooks (Claude Code only)
+
+```
+pre-send.sh     PreToolUse on send_email/compose_email — preview gate + audit log
 ```
 
 ## Environment Variables
@@ -122,6 +132,10 @@ Attach:     list_attachments -> download_attachment -> [use file]
 Calendar:   extract_calendar_event -> [review] -> create_calendar_event(confirm=true)
 Folders:    list_folders -> create_folder / delete_folder(confirm=true)
 Digest:     triage_inbox prompt -> daily_email_digest prompt
+Search:     /email:search "query" -> read_email -> [act on results]
+Bulk:       /email:manage [action] [ids] [destination] -> confirmation -> progress
+Stats:      /email:stats [--weekly] -> unread count, top senders, trends
+Setup:      /email:config [--check | --add-account] -> wizard or validate
 Multi-acct: Any tool + account="work" | account="personal"
 ```
 
@@ -131,7 +145,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 npm run build           TypeScript compilation (development)
 npm run build:bundle    esbuild single-file bundle (~595KB, production)
 npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
-npm test                Run 315 tests (vitest)
+npm test                Run 335 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 

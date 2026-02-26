@@ -422,3 +422,152 @@ Tomorrow's priority list:
 
 Mark the other 3 as read and archive?
 ```
+
+## 17. Search and Filter Emails
+
+Use the `/email:search` skill for powerful email search with filter combinations.
+
+**Natural language:** "Find unread emails from Alice about the budget"
+
+**What happens:**
+
+1. `/email:search` parses your query into himalaya filter syntax
+2. `search_emails(query: "from alice and subject budget and not flag Seen")` -- combined filters
+3. Results displayed as a table with ID, From, Subject, Date, Flags
+4. Offers to read, triage, or act on results
+
+**Filter combinations:**
+
+```
+Keyword only:     "search meeting"         → subject meeting or body meeting
+Sender filter:    "search from:alice"      → from alice
+Flag filter:      "search --unread"        → not flag Seen
+Date filter:      "find emails from last week" → after 2026-02-19
+Combined:         "search from:alice --unread meeting" → from alice and not flag Seen and subject meeting
+```
+
+**Example interaction:**
+
+```
+You: "Find unread emails from Alice"
+
+Claude:
+Search: "from alice, unread" (3 results)
+
+| # | From              | Subject              | Date       | Flags |
+|---|-------------------|----------------------|------------|-------|
+| 1 | alice@work.com    | Q2 Planning          | Feb 25     |       |
+| 2 | alice@work.com    | Budget Revision      | Feb 24     |       |
+| 3 | alice@work.com    | Meeting Notes        | Feb 23     |       |
+
+→ "Read #1" to view full email
+→ "Flag all" to star these
+→ "/email:manage archive 1,2,3" to bulk archive
+```
+
+## 18. Bulk Email Management
+
+Use `/email:manage` for batch operations on multiple emails.
+
+**Natural language:** "Move emails 1, 2, 5 to Archive"
+
+**What happens:**
+
+1. `/email:manage` parses the action and target list
+2. Shows confirmation gate for operations on >5 emails
+3. Executes operations with progress display
+4. Shows summary
+
+**Batch patterns:**
+
+```
+Flag specific:    /email:manage flag 1,2,5
+Unflag:           /email:manage unflag 3,7
+Move to folder:   /email:manage move 1,2,3 Archive
+Archive shortcut: /email:manage archive 4,5,6
+All unread:       /email:manage move all-unread Spam
+```
+
+**Example interaction:**
+
+```
+You: "Archive all the newsletter emails"
+
+Claude:
+Found 8 newsletter emails.
+
+WARNING: This will move 8 emails to Archive. Continue? (yes/no)
+
+You: "yes"
+
+[1/8] Moving email #249064 to Archive...
+[2/8] Moving email #249058 to Archive...
+...
+[8/8] Moving email #249012 to Archive...
+
+Moved 8 emails to Archive
+
+→ "/email:inbox" to check remaining emails
+→ "Undo" to move these back to INBOX
+```
+
+**Tip:** Combine with search for powerful workflows:
+
+```
+You: "Find all emails from newsletter@dev.to and archive them"
+```
+
+## 19. Inbox Statistics and Trends
+
+Use `/email:stats` for a quick overview of your inbox health.
+
+**Natural language:** "How many unread emails do I have?"
+
+**What happens:**
+
+1. `/email:stats` calls `list_emails` and `search_emails` to gather data
+2. Computes unread count, today's volume, top senders, oldest unread
+3. Displays formatted statistics
+4. Optional `--weekly` for trend comparison
+
+**Example interaction:**
+
+```
+You: "/email:stats"
+
+Claude:
+Inbox Stats
+
+Unread: 47 (12 today, 8 yesterday)
+Total recent: 156 emails (last 7 days)
+
+Top senders:
+  1. boss@company.com -- 6 emails
+  2. team@company.com -- 4 emails
+  3. newsletter@dev.to -- 3 emails
+
+Oldest unread: 12 days ago
+  From: hr@company.com
+  Subject: Benefits enrollment deadline
+
+→ "Read oldest unread" to view it
+→ "/email:triage" to classify unread
+```
+
+**Weekly comparison:**
+
+```
+You: "/email:stats --weekly"
+
+Claude:
+Weekly Comparison
+
+           This week    Last week    Change
+Received:  47           52           down 10%
+Unread:    12           8            up 50%
+Sent:      23           19           up 21%
+
+→ Unread trending up -- consider /email:triage
+```
+
+**Tip:** Great for Monday morning email planning -- check stats before diving in.

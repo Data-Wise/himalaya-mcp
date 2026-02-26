@@ -26,13 +26,14 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 | 19 MCP tools | Yes | Yes |
 | 4 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
-| `/email:*` slash commands | Yes (7 skills) | No |
+| `/email:*` slash commands | Yes (11 skills) | No |
+| Plugin hooks | Yes (1 pre-send hook) | No |
 | Email assistant agent | Yes | No |
 | Natural language ("check my inbox") | Yes | Yes |
 | Two-phase send safety gate | Yes | Yes |
 | Env var configuration | Yes | Yes |
 
-**In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent. These are Claude Code-only features defined in the plugin manifest.
+**In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.
 
 **In Claude Desktop**, you get the full MCP server -- all 19 tools, 4 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
 
@@ -313,7 +314,7 @@ The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health
 ## Testing
 
 ```bash
-npm test    # 315 tests across 15 files (vitest)
+npm test    # 335 tests across 15 files (vitest)
 ```
 
 Test breakdown:

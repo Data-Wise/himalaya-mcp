@@ -33,7 +33,7 @@ Display the hub overview:
 | EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
 | Privacy-first email for Claude — 19 tools, 4 prompts,     |
-| 3 resources                                               |
+| 3 resources, 11 skills, 1 hook                            |
 +===========================================================+
 |                                                           |
 | TOOLS (19)                                                |
@@ -56,9 +56,14 @@ Display the hub overview:
 | RESOURCES (3)                                             |
 |   email://inbox, email://folders, email://message/{id}    |
 |                                                           |
-| SKILLS (6)                                                |
+| SKILLS (11)                                               |
 |   /email:inbox, /email:triage, /email:digest,             |
-|   /email:reply, /email:compose, /email:attachments        |
+|   /email:reply, /email:compose, /email:attachments,       |
+|   /email:search, /email:manage, /email:stats,             |
+|   /email:config, /email:help                              |
+|                                                           |
+| HOOKS (1)                                                 |
+|   pre-send .... Preview gate before send/compose          |
 |                                                           |
 +-----------------------------------------------------------+
 | /email:help tools        Detailed tool reference          |
@@ -348,6 +353,10 @@ One-line cheat sheet:
 | /email:reply        | Draft and send replies            |
 | /email:compose      | Compose new email                 |
 | /email:attachments  | List/download/calendar            |
+| /email:search       | Search by keyword/sender/flags    |
+| /email:manage       | Bulk flag/move/archive            |
+| /email:stats        | Inbox statistics + trends         |
+| /email:config       | Setup wizard + diagnostics        |
 | /email:help         | This help hub                     |
 +-----------------------------------------------------------+
 ```
