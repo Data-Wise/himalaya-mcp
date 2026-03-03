@@ -590,6 +590,36 @@ function checkCodePlugin(): CheckResult[] {
   return results;
 }
 
+function checkPluginCache(): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  const cachePaths = [
+    join(homedir(), ".claude", "plugins", "cache", "himalaya-mcp"),
+    join(homedir(), ".claude", "plugins", "cache", "local-plugins", "himalaya-mcp"),
+  ];
+
+  for (const cachePath of cachePaths) {
+    if (existsSync(cachePath)) {
+      results.push({
+        name: "Plugin cache", category: "Claude Code Plugin", status: "warn",
+        message: `Stale cache found at ${cachePath}`,
+        fix: {
+          description: `Remove stale cache at ${cachePath}`,
+          auto: () => {
+            rmSync(cachePath, { recursive: true });
+          },
+        },
+      });
+    }
+  }
+
+  if (results.length === 0) {
+    results.push({ name: "Plugin cache", category: "Claude Code Plugin", status: "pass", message: "No stale cache found" });
+  }
+
+  return results;
+}
+
 function checkEnvironment(): CheckResult[] {
   const results: CheckResult[] = [];
   const vars = ["HIMALAYA_BINARY", "HIMALAYA_ACCOUNT", "HIMALAYA_FOLDER", "HIMALAYA_TIMEOUT"];
@@ -624,6 +654,7 @@ function doctor(flags: { fix: boolean; json: boolean }): void {
     ...checkEmailConnectivity(),
     ...checkDesktopExtension(),
     ...checkCodePlugin(),
+    ...checkPluginCache(),
     ...checkEnvironment(),
   ];
 
