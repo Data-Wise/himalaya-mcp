@@ -6,6 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-03-03
+
+### Fixed
+
+- Convert skills from flat `.md` files to `SKILL.md` subdirectory format (11 skills now load correctly in Claude Code)
+- Remove `email:` prefix from skill `name` fields (Claude Code auto-prefixes plugin namespace)
+
+### Added
+
+- Enhanced skill descriptions for better auto-invocation matching (uses "This skill should be used when..." pattern)
+- Plugin cache freshness check in `doctor` / `doctor --fix` (detects and removes stale cache directories)
+
 ## [1.4.0] - 2026-02-26
 
 ### Added
