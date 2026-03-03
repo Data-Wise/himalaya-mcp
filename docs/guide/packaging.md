@@ -183,7 +183,7 @@ The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a li
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v1.4.0.mcpb (147 KB)
+# Output: himalaya-mcp-v1.4.1.mcpb (147 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:
@@ -201,7 +201,7 @@ Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.co
 ### Install (CLI)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v1.4.0.mcpb   # Install from file
+himalaya-mcp install-ext himalaya-mcp-v1.4.1.mcpb   # Install from file
 himalaya-mcp install-ext                              # Auto-find in project root
 himalaya-mcp remove-ext                               # Uninstall
 ```
@@ -258,7 +258,7 @@ The setup command:
 | `.claude-plugin/plugin.json` | Stripped to essentials | Full | Full |
 | `.claude-plugin/marketplace.json` | In libexec | In repo | In repo |
 | `.mcp.json` | In libexec | In repo | In repo |
-| `skills/*.md` | At libexec root | In repo | In repo |
+| `skills/*/SKILL.md` | At libexec root | In repo | In repo |
 | `agents/*.md` | At libexec root | In repo | In repo |
 | `node_modules/` | Not shipped | Not shipped | Local only |
 | `src/` | Not shipped | In repo | In repo |

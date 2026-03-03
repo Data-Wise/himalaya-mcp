@@ -61,7 +61,7 @@ himalaya-mcp/
 ├── himalaya-mcp-plugin/
 │   ├── .claude-plugin/
 │   │   └── plugin.json          # Claude Code plugin manifest
-│   ├── skills/                  # Claude Code plugin skills (7: inbox, triage, digest, reply, compose, attachments, help)
+│   ├── skills/                  # Claude Code plugin skills (11: inbox, triage, digest, compose, reply, search, manage, attachments, stats, config, help)
 │   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks
 ├── .claude-plugin/

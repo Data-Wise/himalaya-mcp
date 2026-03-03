@@ -50,7 +50,7 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
   │   ├─ .claude-plugin/plugin.json
   │   ├─ .claude-plugin/marketplace.json
   │   ├─ .mcp.json
-  │   ├─ plugin/skills/*.md
+  │   ├─ plugin/skills/*/SKILL.md
   │   ├─ plugin/agents/*.md
   │   └─ dist/index.js (esbuild bundle, 583KB)
   │
