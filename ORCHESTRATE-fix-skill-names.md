@@ -25,26 +25,37 @@ Evidence from working vs broken plugins:
 | workflow | `skills/design/frontend-designer.md` (flat) | 0 |
 | **himalaya-mcp** | `skills/inbox.md` (flat) | **0** |
 
-Craft has 20 flat `.md` skill files but only 3 `SKILL.md` skills — and only those 3 load.
-
 ### Secondary: Colon in `name` field
 
 `name: email:inbox` — colons likely violate the `[a-z0-9-]` naming constraint. The plugin name `email` is auto-prefixed by Claude Code, so the skill name should be bare (e.g., `inbox`).
 
 ### Non-issue: `triggers` field
 
-Initially suspected as broken, but the official `plugin-dev` plugin uses `triggers` successfully. Keep `triggers` — they may be used for future auto-invocation matching.
+Official `plugin-dev` plugin uses `triggers` successfully. Keep `triggers`.
 
-## Fix Plan
+---
 
-### Step 1: Convert flat files to SKILL.md subdirectories
+## Decisions (User Approved)
+
+| Decision | Choice |
+|----------|--------|
+| **Scope** | Fix all three plugins (himalaya-mcp, craft, workflow) |
+| **Descriptions** | Enhance to "This skill should be used when..." pattern |
+| **Cache handling** | Both: document manual clear + add to `doctor --fix` |
+| **Versioning** | Bump to v1.4.1 |
+
+---
+
+## Increment 1: Fix himalaya-mcp skills (primary)
+
+### Step 1.1: Convert flat files to SKILL.md subdirectories
 
 For each of the 11 skills:
 
 ```bash
-# Example for inbox
 mkdir -p himalaya-mcp-plugin/skills/inbox
-mv himalaya-mcp-plugin/skills/inbox.md himalaya-mcp-plugin/skills/inbox/SKILL.md
+git mv himalaya-mcp-plugin/skills/inbox.md himalaya-mcp-plugin/skills/inbox/SKILL.md
+# repeat for all 11
 ```
 
 Full list:
@@ -63,9 +74,9 @@ Full list:
 | `skills/config.md` | `skills/config/SKILL.md` |
 | `skills/help.md` | `skills/help/SKILL.md` |
 
-### Step 2: Fix `name` field in frontmatter
+### Step 1.2: Fix `name` field + enhance descriptions
 
-Remove `email:` prefix from each SKILL.md:
+Remove `email:` prefix and enhance descriptions to match the working pattern:
 
 ```yaml
 # Before
@@ -75,34 +86,57 @@ description: Check email inbox - list and summarize recent emails via himalaya
 triggers:
   - check email
   - inbox
+  - read email
+  - my emails
 ---
 
 # After
 ---
 name: inbox
-description: Check email inbox - list and summarize recent emails via himalaya
+description: This skill should be used when the user asks to "check email", "inbox", "read email", "my emails", or wants to list and summarize recent emails. Lists envelopes from the default inbox via himalaya CLI.
 triggers:
   - check email
   - inbox
+  - read email
+  - my emails
 ---
 ```
 
-Keep `triggers` intact (official plugins use it).
-Keep `description` as-is (no need to merge triggers into it).
+Pattern: `This skill should be used when the user asks to "[trigger1]", "[trigger2]", ... or [broader context]. [What it does in one sentence].`
 
-### Step 3: Test
+Apply to all 11 skills, keeping `triggers` list intact.
 
-1. `npm test` — all 335 tests should still pass (skill body content unchanged)
-2. Clear plugin cache:
-   ```bash
-   rm -rf ~/.claude/plugins/cache/himalaya-mcp/
-   rm -rf ~/.claude/plugins/cache/local-plugins/himalaya-mcp/
-   ```
-3. Restart Claude Code session
-4. Verify `/email:inbox` appears when typing `/`
-5. Check debug log for `Loaded 11 skills from plugin email`
+### Step 1.3: Add cache clear to `doctor --fix`
 
-### Step 4: Commit
+In `src/cli/setup.ts`, add a new doctor check:
+
+- **Check name**: "Plugin cache freshness"
+- **Logic**: Check if `~/.claude/plugins/cache/himalaya-mcp/` or `~/.claude/plugins/cache/local-plugins/himalaya-mcp/` exists with stale version
+- **Fix**: `rm -rf` the stale cache directories
+- **Description**: "Clear stale plugin cache (run with --fix)"
+
+### Step 1.4: Version bump to v1.4.1
+
+Update all version references per the version bump checklist:
+
+- `package.json` + `package-lock.json`
+- `.claude-plugin/marketplace.json`
+- `mcpb/manifest.json`
+- `himalaya-mcp-plugin/.claude-plugin/plugin.json`
+- `src/index.ts` — `VERSION` constant
+- `tests/e2e.test.ts` — version assertion
+- `CLAUDE.md`, `CHANGELOG.md`, `.STATUS`
+
+### Step 1.5: Test
+
+1. `npm test` — all tests pass (update test count if doctor test changes)
+2. `npm run build:bundle` — bundle builds
+3. Clear plugin cache manually
+4. Restart Claude Code session
+5. Verify `/email:inbox` appears in autocomplete
+6. Check debug log: `Loaded 11 skills from plugin email`
+
+### Step 1.6: Commits
 
 ```
 fix: convert skills to SKILL.md subdirectory format
@@ -110,39 +144,67 @@ fix: convert skills to SKILL.md subdirectory format
 Claude Code requires skills in `skills/name/SKILL.md` subdirectory
 structure, not flat `skills/name.md` files. Also removed `email:`
 prefix from skill names since the plugin name is auto-prefixed.
+Enhanced descriptions to "This skill should be used when..." pattern.
 
 Previously loaded 0 of 11 skills; now all 11 load correctly.
 ```
 
-## Files to Change
-
-### Move (11 files):
-
 ```
-himalaya-mcp-plugin/skills/inbox.md       → himalaya-mcp-plugin/skills/inbox/SKILL.md
-himalaya-mcp-plugin/skills/triage.md      → himalaya-mcp-plugin/skills/triage/SKILL.md
-himalaya-mcp-plugin/skills/digest.md      → himalaya-mcp-plugin/skills/digest/SKILL.md
-himalaya-mcp-plugin/skills/compose.md     → himalaya-mcp-plugin/skills/compose/SKILL.md
-himalaya-mcp-plugin/skills/reply.md       → himalaya-mcp-plugin/skills/reply/SKILL.md
-himalaya-mcp-plugin/skills/search.md      → himalaya-mcp-plugin/skills/search/SKILL.md
-himalaya-mcp-plugin/skills/manage.md      → himalaya-mcp-plugin/skills/manage/SKILL.md
-himalaya-mcp-plugin/skills/attachments.md → himalaya-mcp-plugin/skills/attachments/SKILL.md
-himalaya-mcp-plugin/skills/stats.md       → himalaya-mcp-plugin/skills/stats/SKILL.md
-himalaya-mcp-plugin/skills/config.md      → himalaya-mcp-plugin/skills/config/SKILL.md
-himalaya-mcp-plugin/skills/help.md        → himalaya-mcp-plugin/skills/help/SKILL.md
+feat: add plugin cache check to doctor --fix
+
+Detects stale plugin cache directories and clears them automatically
+when running `himalaya-mcp doctor --fix`.
 ```
 
-### Edit (11 files — frontmatter only):
+```
+chore: bump version to v1.4.1
+```
 
-Remove `email:` prefix from `name` field in each SKILL.md.
+---
 
-## Scope
+## Increment 2: Fix craft skills (separate PR to craft repo)
 
-- Directory restructure + frontmatter name fix only
-- No body/instruction changes needed
-- No version bump needed (bugfix for existing release)
-- Homebrew formula rebuild needed after merge to distribute fix
-- Clear plugin cache after install to pick up changes
+**NOTE**: This is a separate repo — create a separate branch/PR there.
+
+Convert craft's flat skill files to SKILL.md subdirectories:
+
+| Current (flat, not loading) | New (subdirectory) |
+|----------------------------|-------------------|
+| `skills/architecture/system-architect.md` | `skills/architecture/SKILL.md` |
+| `skills/ci/project-detector.md` | `skills/ci/SKILL.md` |
+| `skills/code/sync-features.md` | `skills/code/SKILL.md` |
+| `skills/design/backend-designer.md` | `skills/design/backend-designer/SKILL.md` |
+| `skills/design/frontend-designer.md` | `skills/design/frontend-designer/SKILL.md` |
+| `skills/design/devops-helper.md` | `skills/design/devops-helper/SKILL.md` |
+| `skills/distribution/*.md` (5 files) | `skills/distribution/*/SKILL.md` |
+| `skills/modes/mode-controller.md` | `skills/modes/SKILL.md` |
+| `skills/orchestration/*.md` (2 files) | `skills/orchestration/*/SKILL.md` |
+| `skills/planning/project-planner.md` | `skills/planning/SKILL.md` |
+| `skills/testing/*.md` (2 files) | `skills/testing/*/SKILL.md` |
+
+Enhance descriptions to "This skill should be used when..." pattern.
+
+**Commit**: `fix: convert flat skills to SKILL.md subdirectory format`
+
+---
+
+## Increment 3: Fix workflow skills (separate PR to workflow repo)
+
+**NOTE**: This is a separate repo — create a separate branch/PR there.
+
+Convert workflow's flat skill files to SKILL.md subdirectories:
+
+| Current (flat, not loading) | New (subdirectory) |
+|----------------------------|-------------------|
+| `skills/design/backend-designer.md` | `skills/design/backend-designer/SKILL.md` |
+| `skills/design/frontend-designer.md` | `skills/design/frontend-designer/SKILL.md` |
+| `skills/design/devops-helper.md` | `skills/design/devops-helper/SKILL.md` |
+
+Enhance descriptions to "This skill should be used when..." pattern.
+
+**Commit**: `fix: convert flat skills to SKILL.md subdirectory format`
+
+---
 
 ## Post-Fix Verification
 
@@ -152,3 +214,14 @@ Loaded 11 skills from plugin email default directory
 ```
 
 And `/email:inbox`, `/email:triage`, etc. should appear in skill autocomplete.
+
+## Files Changed (himalaya-mcp only — Increment 1)
+
+### Moved (11 files):
+- `himalaya-mcp-plugin/skills/*.md` → `himalaya-mcp-plugin/skills/*/SKILL.md`
+
+### Edited (11 + doctor + version files):
+- 11 SKILL.md files (frontmatter: name + description)
+- `src/cli/setup.ts` (new doctor check)
+- Version bump files (see checklist above)
+- `CHANGELOG.md`, `.STATUS`
