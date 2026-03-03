@@ -1,6 +1,6 @@
 ---
-name: email:attachments
-description: List and download email attachments, extract calendar events from ICS invites
+name: attachments
+description: This skill should be used when the user asks to "list attachments", "download attachment", "email attachment", "calendar invite", "meeting invite", or wants to work with files attached to emails. Lists, downloads, and extracts calendar events from ICS invites.
 triggers:
   - list attachments
   - download attachment

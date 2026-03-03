@@ -1,6 +1,6 @@
 ---
-name: email:stats
-description: Email inbox statistics — unread count, top senders, oldest unread, volume trends
+name: stats
+description: This skill should be used when the user asks for "email stats", "inbox stats", "email analytics", "how many unread", or wants to see inbox metrics. Shows unread count, top senders, oldest unread, and volume trends.
 triggers:
   - email stats
   - inbox stats

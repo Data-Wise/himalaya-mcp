@@ -1,6 +1,6 @@
 ---
-name: email:config
-description: Setup wizard for himalaya email — check installation, configure accounts, test connectivity
+name: config
+description: This skill should be used when the user asks for "email config", "email setup", "configure email", "himalaya setup", "setup email", or needs help installing and configuring himalaya. Interactive setup wizard that checks installation, configures accounts, and tests connectivity.
 triggers:
   - email config
   - email setup

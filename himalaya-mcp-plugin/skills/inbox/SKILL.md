@@ -1,6 +1,6 @@
 ---
-name: email:inbox
-description: Check email inbox - list and summarize recent emails via himalaya
+name: inbox
+description: This skill should be used when the user asks to "check email", "inbox", "read email", "my emails", or wants to see what's new in their inbox. Lists envelopes from the default inbox via himalaya CLI.
 triggers:
   - check email
   - inbox

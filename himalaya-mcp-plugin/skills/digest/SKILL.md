@@ -1,6 +1,6 @@
 ---
-name: email:digest
-description: Generate a daily email digest - summarize today's important emails in markdown
+name: digest
+description: This skill should be used when the user asks for "email digest", "daily digest", "email summary", "morning briefing", or wants a summary of recent emails. Generates a markdown digest grouped by priority.
 triggers:
   - email digest
   - daily digest

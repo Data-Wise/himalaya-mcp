@@ -977,12 +977,12 @@ describe("Packaging: plugin manifest structure", () => {
     expect(pluginJson.description).toBeTruthy();
   });
 
-  it("has skills directory with valid skill files", () => {
+  it("has skills directory with valid SKILL.md subdirectories", () => {
     const skillsDir = join(PROJECT_ROOT, "himalaya-mcp-plugin", "skills");
     expect(existsSync(skillsDir)).toBe(true);
-    const expectedSkills = ["inbox.md", "triage.md", "digest.md", "reply.md", "help.md", "compose.md", "attachments.md", "search.md", "manage.md", "stats.md", "config.md"];
+    const expectedSkills = ["inbox", "triage", "digest", "reply", "help", "compose", "attachments", "search", "manage", "stats", "config"];
     for (const skill of expectedSkills) {
-      expect(existsSync(join(skillsDir, skill))).toBe(true);
+      expect(existsSync(join(skillsDir, skill, "SKILL.md"))).toBe(true);
     }
   });
 

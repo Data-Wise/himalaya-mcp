@@ -1,6 +1,6 @@
 ---
-name: email:triage
-description: AI-powered email triage - classify inbox emails as actionable, informational, or skip
+name: triage
+description: This skill should be used when the user asks to "triage email", "classify email", "sort email", or wants to prioritize their inbox. Classifies emails as actionable, informational, or skip using MCP prompts.
 triggers:
   - triage email
   - classify email

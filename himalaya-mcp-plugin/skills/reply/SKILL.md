@@ -1,6 +1,6 @@
 ---
-name: email:reply
-description: Draft and send email replies with safety confirmation — never auto-sends
+name: reply
+description: This skill should be used when the user asks to "reply to email", "respond to email", "draft reply", "email reply", or wants to respond to a specific message. Drafts replies with safety confirmation that never auto-sends.
 triggers:
   - reply to email
   - respond to email

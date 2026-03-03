@@ -1,6 +1,6 @@
 ---
-name: email:search
-description: Search emails by keyword, sender, flags, or date — find specific messages fast
+name: search
+description: This skill should be used when the user asks to "search email", "find email", "look for email", "email from", "email about", or wants to locate specific messages. Searches by keyword, sender, flags, or date using himalaya filter syntax.
 triggers:
   - search email
   - find email

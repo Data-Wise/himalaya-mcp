@@ -1,6 +1,6 @@
 ---
-name: email:help
-description: Help hub for himalaya email plugin - browse all commands, tools, prompts, and workflows
+name: help
+description: This skill should be used when the user asks for "email help", "himalaya help", "email commands", "what can you do with email", or wants to discover available email capabilities. Help hub for browsing all tools, prompts, skills, and workflows.
 triggers:
   - email help
   - himalaya help
