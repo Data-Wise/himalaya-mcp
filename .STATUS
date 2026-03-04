@@ -27,6 +27,8 @@
 
 ## Just Completed
 
+- 2026-03-04: Full doc audit — fixed 16 gaps (param names, skill counts, test counts, bundle sizes)
+- 2026-03-04: Cleaned 8 stale remote feature branches
 - 2026-03-03: Released v1.4.1 — skill loading fix (SKILL.md subdirectory format), docs updated
 - 2026-02-17: Released v1.3.0 (GitHub + Homebrew + docs site)
 - 2026-02-17: .mcpb Desktop Extension packaging for Claude Desktop/Cowork
@@ -48,7 +50,7 @@
 - v1.4.1 released: GitHub, Homebrew, docs site all live
 - Skills: 11 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 19 MCP tools, 4 prompts, 3 resources
-- Tests: 335 across 15 test files
+- Tests: 342 across 15 test files
 - Bundle: 595KB (esbuild), .mcpb: ~147KB
 
 ## Install
