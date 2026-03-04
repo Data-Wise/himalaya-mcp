@@ -52,7 +52,7 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
   │   ├─ .mcp.json
   │   ├─ plugin/skills/*/SKILL.md
   │   ├─ plugin/agents/*.md
-  │   └─ dist/index.js (esbuild bundle, 583KB)
+  │   └─ dist/index.js (esbuild bundle, 595KB)
   │
   └─ post_install → himalaya-mcp-install
       ├─ symlink → ~/.claude/plugins/himalaya-mcp
@@ -67,7 +67,7 @@ src/index.ts (16 files)
   │
   ├─ npm run build          → dist/*.js + .d.ts (development)
   │
-  └─ npm run build:bundle   → dist/index.js (583KB, production)
+  └─ npm run build:bundle   → dist/index.js (595KB, production)
       esbuild --bundle --platform=node --target=node22 --format=esm --minify
       Inlines: @modelcontextprotocol/sdk, zod, content-type, raw-body
 ```

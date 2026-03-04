@@ -7,7 +7,7 @@ Privacy-first email for Claude -- MCP server and Claude Code plugin (`email`) wr
 - **19 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar
 - **4 MCP prompts**: triage inbox, summarize email, daily digest, draft reply
 - **3 MCP resources**: inbox, message by ID, folders
-- **7 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:help`
+- **11 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`
 - **Multi-account**: per-call account switching via `--account`
 - **Safe subprocess**: uses `execFile` (no shell injection)
 - **Two-phase send**: `send_email` returns preview first, requires explicit `confirm=true`
@@ -71,15 +71,15 @@ himalaya-mcp doctor    # Verify installation
 ## Testing
 
 ```bash
-npm test              # 335 tests across 15 test files (vitest)
+npm test              # 342 tests across 15 test files (vitest)
 ```
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
-| Unit (parser, config, clipboard) | 35 | Core parsing, config, template variable guards |
+| Unit (parser, config, clipboard) | 38 | Core parsing, config, template variable guards |
 | Integration (tools, prompts) | 80 | All 19 tools + 4 prompts |
-| Dogfooding | 122 | Realistic Claude usage + .mcpb packaging validation |
-| E2E | 34 | Full MCP server pipeline + .mcpb build pipeline |
+| Dogfooding | 146 | Realistic Claude usage + .mcpb packaging validation |
+| E2E | 37 | Full MCP server pipeline + .mcpb build pipeline |
 | Setup CLI | 36 | Setup, install/upgrade E2E, doctor command, plugin structure |
 
 ## Documentation

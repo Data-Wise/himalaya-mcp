@@ -42,9 +42,9 @@ compose_email       to subject body [account]                  Compose new email
 draft_reply         id [body] [reply_all] [folder] [account]   Generate draft (no send)
 send_email          template [confirm] [account]               Send (confirm=true required)
 list_attachments    id [folder] [account]                      List email attachments
-download_attachment id attachment_name [folder] [account]      Download attachment
+download_attachment id filename [folder] [account]             Download attachment
 extract_calendar_event  id [folder] [account]                  Extract calendar from email
-create_calendar_event   event_data                             Create calendar event
+create_calendar_event   summary dtstart dtend [location] [confirm]  Create calendar event
 export_to_markdown  id [folder] [account]                      Email -> markdown + YAML
 create_action_item  id [folder] [account]                      Extract todos/deadlines
 copy_to_clipboard   text                                       Copy to system clipboard
@@ -145,7 +145,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 npm run build           TypeScript compilation (development)
 npm run build:bundle    esbuild single-file bundle (~595KB, production)
 npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
-npm test                Run 335 tests (vitest)
+npm test                Run 342 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 

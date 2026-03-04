@@ -72,11 +72,11 @@ npm install && npm run build
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ```
 
-Restart Claude Code. The plugin provides `/email:inbox`, `/email:triage`, `/email:digest`, and `/email:reply` skills.
+Restart Claude Code. The plugin provides 11 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`.
 
 ### Claude Desktop (.mcpb)
 
-Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` package is lightweight (~150 KB) and configures the MCP server automatically.
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` package is lightweight (~147 KB) and configures the MCP server automatically.
 
 **Prerequisites:** himalaya CLI must be installed separately:
 
@@ -220,7 +220,7 @@ Example with env vars:
 |------|-------------|----------------|
 | `list_folders` | List all available folders | `account` |
 | `create_folder` | Create a new folder | `name`, `account` |
-| `delete_folder` | Delete an existing folder | `name`, `account` |
+| `delete_folder` | Delete an existing folder | `name`, `confirm`, `account` |
 
 ### Managing Emails
 
@@ -242,14 +242,14 @@ Example with env vars:
 | Tool | Description | Key Parameters |
 |------|-------------|----------------|
 | `list_attachments` | List all attachments in an email | `id`, `folder`, `account` |
-| `download_attachment` | Download a specific attachment | `id`, `attachment_name`, `folder`, `account` |
+| `download_attachment` | Download a specific attachment | `id`, `filename`, `folder`, `account` |
 
 ### Calendar
 
 | Tool | Description | Key Parameters |
 |------|-------------|----------------|
 | `extract_calendar_event` | Extract calendar event details from email | `id`, `folder`, `account` |
-| `create_calendar_event` | Create calendar event from extracted data | `event_data` |
+| `create_calendar_event` | Create calendar event from extracted data | `summary`, `dtstart`, `dtend`, `location`, `confirm` |
 
 ### Exporting
 
@@ -314,7 +314,7 @@ The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health
 ## Testing
 
 ```bash
-npm test    # 335 tests across 15 files (vitest)
+npm test    # 342 tests across 15 files (vitest)
 ```
 
 Test breakdown:
@@ -331,8 +331,8 @@ Test breakdown:
 | `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
 | `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
-| `config.test.ts` | 7 | Env var loading, template variable guards |
+| `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 122 | Realistic Claude usage scenarios + packaging validation |
-| `e2e.test.ts` | 34 | Full MCP server pipeline + .mcpb build pipeline |
+| `dogfood.test.ts` | 146 | Realistic Claude usage scenarios + packaging validation |
+| `e2e.test.ts` | 37 | Full MCP server pipeline + .mcpb build pipeline |
 | `setup.test.ts` | 36 | CLI setup/check/remove, install/upgrade E2E, doctor command |

@@ -34,7 +34,7 @@ brew install himalaya-mcp
 **What happens automatically:**
 
 1. Installs himalaya CLI + Node.js as dependencies
-2. Builds the esbuild bundle (583KB, no node_modules shipped)
+2. Builds the esbuild bundle (595KB, no node_modules shipped)
 3. Symlinks plugin to `~/.claude/plugins/himalaya-mcp`
 4. Registers in local marketplace
 5. Auto-runs install script (enables in Claude Code settings if Claude not running)
@@ -47,6 +47,10 @@ Restart Claude Code. The **`email`** plugin gives you:
 - `/email:reply` -- draft with safety gate
 - `/email:compose` -- compose new emails
 - `/email:attachments` -- list, download, calendar invites
+- `/email:search` -- search by keyword, sender, flags
+- `/email:manage` -- bulk flag/move/archive
+- `/email:stats` -- inbox statistics and trends
+- `/email:config` -- setup wizard
 - `/email:help` -- help hub
 
 **Verify:**
@@ -208,7 +212,7 @@ himalaya-mcp doctor
 # Auto-fix common issues
 himalaya-mcp doctor --fix
 
-# Run tests (335 tests)
+# Run tests (342 tests)
 npm test
 
 # Check Claude Desktop config (legacy)

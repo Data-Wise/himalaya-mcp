@@ -195,7 +195,7 @@ The extension works identically in Claude Cowork (the collaborative mode within 
 | 3 MCP resources | Yes | Yes |
 | Interaction style | Natural language | Natural language + `/email:*` skills |
 | Email assistant agent | No | Yes |
-| Slash commands | No | 7 skills (`/email:inbox`, etc.) |
+| Slash commands | No | 11 skills (`/email:inbox`, etc.) |
 
 In Claude Desktop, everything is natural language. Say "check my inbox" instead of `/email:inbox`. The underlying tools are identical.
 
