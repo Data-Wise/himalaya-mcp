@@ -23,6 +23,7 @@ import { registerComposeNewTools } from "./tools/compose-new.js";
 import { registerFolderTools } from "./tools/folders.js";
 import { registerAttachmentTools } from "./tools/attachments.js";
 import { registerCalendarTools } from "./tools/calendar.js";
+import { registerThreadTools } from "./tools/threads.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
 
 export const VERSION = "1.4.1";
@@ -45,6 +46,7 @@ registerComposeNewTools(server, client);
 registerFolderTools(server, client);
 registerAttachmentTools(server, client);
 registerCalendarTools(server, client);
+registerThreadTools(server, client);
 registerClipboardTools(server);
 
 // Register resources

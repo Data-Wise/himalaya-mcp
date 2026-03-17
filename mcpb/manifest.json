@@ -79,6 +79,8 @@
     {"name": "create_calendar_event", "description": "Create an event in Apple Calendar. SAFETY: requires confirm=true to actually create. Without confirm, returns a preview. macOS only."},
     {"name": "export_to_markdown", "description": "Export an email as formatted markdown with YAML frontmatter (date, from, to, subject, flags). Returns the markdown text."},
     {"name": "create_action_item", "description": "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events."},
+    {"name": "list_threads", "description": "List email threads (conversations) in a folder. Groups related emails by subject line. Returns threads sorted by most recent activity, with participant list and message count."},
+    {"name": "read_thread", "description": "Read all messages in a conversation thread. Given a thread_id (the ID of the first message), fetches all related messages and returns them in chronological order. Use list_threads first to get thread IDs."},
     {"name": "copy_to_clipboard", "description": "Copy text to the system clipboard (pbcopy on macOS, xclip on Linux). Useful for copying email content, markdown exports, or any text."}
   ],
 
