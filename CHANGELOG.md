@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-03-17
+
+### Added
+
+- **Thread/conversation view** — `list_threads` groups emails by subject into conversations; `read_thread` shows all messages in a thread chronologically (21 tools total)
+- **Morning briefing prompt** — `morning_briefing` MCP prompt guides urgency classification, calendar event extraction, and action item identification
+- **Inbox check prompt** — `inbox_check` MCP prompt for quick status with unread count, highlights, and suggested next actions (6 prompts total)
+- **`/email:morning` skill** — Morning email briefing with urgency classification and follow-up actions (12 skills total)
+- **SessionStart hook** — Injects email context at conversation start so "check my email" works without explicit `/email:inbox`
+- **Broadened skill descriptions** — All 12 skills now trigger from natural language variants (e.g., "any new messages", "what needs attention", "catch me up on email")
+- Thread parser with `normalizeSubject` (strips Re:/Fwd:/RE:/FW: prefixes) and `groupIntoThreads` (subject-line grouping with chronological sorting)
+- 43 new tests (thread parser, tool registration, prompt tests) — 378 total
+
 ## [1.4.1] - 2026-03-03
 
 ### Fixed

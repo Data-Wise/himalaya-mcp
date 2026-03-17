@@ -26,7 +26,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 | 19 MCP tools | Yes | Yes |
 | 4 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
-| `/email:*` slash commands | Yes (11 skills) | No |
+| `/email:*` slash commands | Yes (12 skills) | No |
 | Plugin hooks | Yes (1 pre-send hook) | No |
 | Email assistant agent | Yes | No |
 | Natural language ("check my inbox") | Yes | Yes |
@@ -35,7 +35,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 **In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.
 
-**In Claude Desktop**, you get the full MCP server -- all 19 tools, 4 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
+**In Claude Desktop**, you get the full MCP server -- all 21 tools, 6 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
 
 !!! tip "Which should I use?"
     Use **Claude Code** if you want the structured skill workflows and the email assistant agent. Use **Claude Desktop** if you prefer the desktop UI or want email access alongside other MCP servers.
@@ -72,7 +72,7 @@ npm install && npm run build
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ```
 
-Restart Claude Code. The plugin provides 11 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`.
+Restart Claude Code. The plugin provides 12 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`.
 
 ### Claude Desktop (.mcpb)
 
@@ -129,7 +129,7 @@ The `setup` command writes a server entry into Claude Desktop's config file. It 
 }
 ```
 
-Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 19 tools, 4 prompts, and 3 resources.
+Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 21 tools, 6 prompts, and 3 resources.
 
 #### Using himalaya-mcp in Claude Desktop
 
@@ -330,7 +330,7 @@ Test breakdown:
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
 | `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
-| `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
+| `prompts.test.ts` | 15 | All 6 prompts register and return correct text |
 | `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
 | `dogfood.test.ts` | 146 | Realistic Claude usage scenarios + packaging validation |

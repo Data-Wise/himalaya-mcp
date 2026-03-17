@@ -1,6 +1,6 @@
 # Plugin Skills & Agent
 
-When installed as a Claude Code plugin, the email plugin provides 11 slash commands (skills), 1 autonomous agent, and 1 hook.
+When installed as a Claude Code plugin, the email plugin provides 11 slash commands (skills), 1 autonomous agent, and 2 hooks.
 
 ## Skills vs Tools
 

@@ -1,6 +1,6 @@
 # Command Reference
 
-Complete reference for all 19 MCP tools, 4 prompts, 3 resources, and CLI commands.
+Complete reference for all 19 MCP tools, 6 prompts, 3 resources, and CLI commands.
 
 !!! tip "See also"
     **[Tutorials](../tutorials/index.md)** for step-by-step walkthroughs | **[Workflows](../guide/workflows.md)** for common email patterns
@@ -807,7 +807,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v1.4.1.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v1.5.0.mcpb     # Install specific file
 ```
 
 **What it does:**
@@ -878,7 +878,7 @@ himalaya-mcp doctor --json   # Machine-readable output
 **Sample output:**
 
 ```
-himalaya-mcp doctor v1.4.1
+himalaya-mcp doctor v1.5.0
 
   Prerequisites
   ✓ Node.js 22.14.0

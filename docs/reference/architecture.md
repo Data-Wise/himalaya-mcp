@@ -205,7 +205,7 @@ plugin/
     help.md           /email:help — help hub
 
   agents/
-    email-assistant.md  Autonomous triage agent (all 19 tools)
+    email-assistant.md  Autonomous triage agent (all 21 tools)
 
 .mcp.json             MCP server config (node dist/index.js)
 ```
