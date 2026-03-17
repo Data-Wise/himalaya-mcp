@@ -1488,8 +1488,8 @@ describe("Packaging: mcpb/manifest.json", () => {
     expect(manifest.tools).toHaveLength(21);
   });
 
-  it("lists exactly 4 prompts", () => {
-    expect(manifest.prompts).toHaveLength(4);
+  it("lists exactly 6 prompts", () => {
+    expect(manifest.prompts).toHaveLength(6);
   });
 
   it("every tool has name and description", () => {
@@ -1539,6 +1539,8 @@ describe("Packaging: mcpb/manifest.json", () => {
     expect(manifestPromptNames).toEqual([
       "daily_email_digest",
       "draft_reply",
+      "inbox_check",
+      "morning_briefing",
       "summarize_email",
       "triage_inbox",
     ]);

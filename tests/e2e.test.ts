@@ -240,7 +240,7 @@ describe("E2E: MCP Server Headless", () => {
 
   // --- Prompt listing ---
 
-  it("lists all 4 registered prompts", async () => {
+  it("lists all 6 registered prompts", async () => {
     const result = await sendRequest("prompts/list");
     const prompts = result.result.prompts;
     const promptNames = prompts.map((p: any) => p.name).sort();
@@ -248,6 +248,8 @@ describe("E2E: MCP Server Headless", () => {
     expect(promptNames).toEqual([
       "daily_email_digest",
       "draft_reply",
+      "inbox_check",
+      "morning_briefing",
       "summarize_email",
       "triage_inbox",
     ]);

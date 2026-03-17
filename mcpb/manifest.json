@@ -108,6 +108,18 @@
       "description": "Compose a professional reply to an email. Reads the original, generates a draft, and presents for review before sending.",
       "arguments": ["id", "tone", "instructions"],
       "text": "Help me compose a professional reply to the specified email. Show the draft for review before sending."
+    },
+    {
+      "name": "morning_briefing",
+      "description": "Comprehensive morning email briefing with urgency classification, calendar events, and action items.",
+      "arguments": ["account"],
+      "text": "Give me a morning email briefing with urgency classification, calendar events, and action items."
+    },
+    {
+      "name": "inbox_check",
+      "description": "Quick inbox status check with unread count, highlights, and suggested next actions.",
+      "arguments": ["account", "folder"],
+      "text": "Quick check on my inbox with unread count, flagged highlights, and suggested next actions."
     }
   ]
 }

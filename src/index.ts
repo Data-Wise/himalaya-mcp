@@ -25,6 +25,8 @@ import { registerAttachmentTools } from "./tools/attachments.js";
 import { registerCalendarTools } from "./tools/calendar.js";
 import { registerThreadTools } from "./tools/threads.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
+import { registerMorningPrompt } from "./prompts/morning.js";
+import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
 
 export const VERSION = "1.4.1";
 export const NAME = "himalaya-mcp";
@@ -57,6 +59,8 @@ registerTriagePrompt(server);
 registerSummarizePrompt(server);
 registerDigestPrompt(server);
 registerReplyPrompt(server);
+registerMorningPrompt(server);
+registerInboxCheckPrompt(server);
 
 // Start server
 async function main() {
