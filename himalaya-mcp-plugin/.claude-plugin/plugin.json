@@ -6,6 +6,17 @@
     "name": "Data-Wise"
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/session-start.sh\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "mcp__plugin_email_himalaya",

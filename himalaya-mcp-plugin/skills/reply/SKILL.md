@@ -1,11 +1,15 @@
 ---
 name: reply
-description: This skill should be used when the user asks to "reply to email", "respond to email", "draft reply", "email reply", or wants to respond to a specific message. Drafts replies with safety confirmation that never auto-sends.
+description: This skill should be used when the user asks to "reply to email", "respond to email", "draft reply", "email reply", "answer that email", "get back to them", "write back", "respond to that", "reply to that message", or wants to respond to a specific message. Drafts replies with safety confirmation that never auto-sends.
 triggers:
   - reply to email
   - respond to email
   - draft reply
   - email reply
+  - answer that email
+  - get back to them
+  - write back
+  - respond to that
 ---
 
 # /email:reply - Draft Email Reply

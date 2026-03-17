@@ -1,6 +1,6 @@
 ---
 name: manage
-description: This skill should be used when the user asks to "manage email", "bulk email", "move emails", "flag emails", "archive emails", "unflag emails", or wants to perform batch operations. Handles flag, unflag, move, and archive for multiple emails at once.
+description: This skill should be used when the user asks to "manage email", "bulk email", "move emails", "flag emails", "archive emails", "unflag emails", "move these emails", "flag this", "archive that", "mark as read", "star this email", "clean up my inbox", or wants to perform batch operations. Handles flag, unflag, move, and archive for multiple emails at once.
 triggers:
   - manage email
   - bulk email
@@ -8,6 +8,10 @@ triggers:
   - flag emails
   - archive emails
   - unflag emails
+  - move these emails
+  - flag this
+  - mark as read
+  - star this email
 ---
 
 # /email:manage - Bulk Email Management

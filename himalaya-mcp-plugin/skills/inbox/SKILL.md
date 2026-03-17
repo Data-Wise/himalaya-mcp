@@ -1,11 +1,16 @@
 ---
 name: inbox
-description: This skill should be used when the user asks to "check email", "inbox", "read email", "my emails", or wants to see what's new in their inbox. Lists envelopes from the default inbox via himalaya CLI.
+description: This skill should be used when the user asks to "check email", "inbox", "read email", "my emails", "any new messages", "what's in my email", "show me my mail", "unread emails", "check messages", "what emails do I have", "show my inbox", or wants to see what's new in their inbox. Lists envelopes from the default inbox via himalaya CLI.
 triggers:
   - check email
   - inbox
   - read email
   - my emails
+  - any new messages
+  - what's in my email
+  - show me my mail
+  - unread emails
+  - check messages
 ---
 
 # /email:inbox - Check Email Inbox

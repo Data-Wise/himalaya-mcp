@@ -1,11 +1,13 @@
 ---
 name: help
-description: This skill should be used when the user asks for "email help", "himalaya help", "email commands", "what can you do with email", or wants to discover available email capabilities. Help hub for browsing all tools, prompts, skills, and workflows.
+description: This skill should be used when the user asks for "email help", "himalaya help", "email commands", "what can you do with email", "email features", "how do I use email", "what email tools are available", "show email capabilities", or wants to discover available email capabilities. Help hub for browsing all tools, prompts, skills, and workflows.
 triggers:
   - email help
   - himalaya help
   - email commands
   - what can you do with email
+  - email features
+  - how do I use email
 ---
 
 # /email:help - Email Help Hub
