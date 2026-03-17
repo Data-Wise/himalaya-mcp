@@ -16,11 +16,11 @@ Make the himalaya-mcp plugin activate naturally from conversation (no explicit `
 
 | Phase | Task | Priority | Estimate | Status |
 |-------|------|----------|----------|--------|
-| 0 | Investigate himalaya thread headers | P0 | 15 min | Not started |
-| 1 | SessionStart hook + skill descriptions | P0 | 1 hr | Not started |
-| 2 | Thread view (list_threads + read_thread) | P1 | 4 hr | Not started |
-| 3 | Morning briefing + Desktop prompts | P1 | 2 hr | Not started |
-| 4 | Auto-enable fix + docs + polish | P1 | 1 hr | Not started |
+| 0 | Investigate himalaya thread headers | P0 | 15 min | Done |
+| 1 | SessionStart hook + skill descriptions | P0 | 1 hr | Done |
+| 2 | Thread view (list_threads + read_thread) | P1 | 4 hr | Done |
+| 3 | Morning briefing + Desktop prompts | P1 | 2 hr | Done |
+| 4 | Auto-enable fix + docs + polish | P1 | 1 hr | Done |
 
 **Total estimate:** ~8-9 hours
 
