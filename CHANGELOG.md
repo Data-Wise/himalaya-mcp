@@ -17,7 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **SessionStart hook** — Injects email context at conversation start so "check my email" works without explicit `/email:inbox`
 - **Broadened skill descriptions** — All 12 skills now trigger from natural language variants (e.g., "any new messages", "what needs attention", "catch me up on email")
 - Thread parser with `normalizeSubject` (strips Re:/Fwd:/RE:/FW: prefixes) and `groupIntoThreads` (subject-line grouping with chronological sorting)
-- 43 new tests (thread parser, tool registration, prompt tests) — 378 total
+- 72 new tests (thread parser, tool registration, prompt tests, v1.5.0 E2E) — 414 total
 
 ## [1.4.1] - 2026-03-03
 

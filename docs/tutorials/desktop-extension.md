@@ -190,8 +190,8 @@ The extension works identically in Claude Cowork (the collaborative mode within 
 
 | Feature | Claude Desktop | Claude Code |
 |---------|---------------|-------------|
-| 19 MCP tools | Yes | Yes |
-| 4 MCP prompts | Yes | Yes |
+| 21 MCP tools | Yes | Yes |
+| 6 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
 | Interaction style | Natural language | Natural language + `/email:*` skills |
 | Email assistant agent | No | Yes |

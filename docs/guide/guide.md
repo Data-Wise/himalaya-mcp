@@ -23,7 +23,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 | Feature | Claude Code | Claude Desktop |
 |---------|-------------|----------------|
-| 19 MCP tools | Yes | Yes |
+| 21 MCP tools | Yes | Yes |
 | 4 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
 | `/email:*` slash commands | Yes (12 skills) | No |
@@ -203,7 +203,7 @@ Example with env vars:
 }
 ```
 
-## MCP Tools (19)
+## MCP Tools (21)
 
 ### Reading
 
@@ -259,7 +259,14 @@ Example with env vars:
 | `create_action_item` | Extract todos, deadlines, commitments | `id`, `folder`, `account` |
 | `copy_to_clipboard` | Copy text to system clipboard | `text` |
 
-## MCP Prompts (4)
+### Threads
+
+| Tool | Description | Key Parameters |
+|------|-------------|----------------|
+| `list_threads` | List email threads grouped by conversation | `folder`, `page_size`, `account` |
+| `read_thread` | Read all messages in a thread chronologically | `thread_id`, `folder`, `account` |
+
+## MCP Prompts (6)
 
 Prompts guide Claude's reasoning for email tasks. Use them via the MCP prompt interface or through the plugin skills.
 
@@ -269,6 +276,8 @@ Prompts guide Claude's reasoning for email tasks. Use them via the MCP prompt in
 | `summarize_email` | One-sentence summary + action items + priority | `id`, `folder` |
 | `daily_email_digest` | Markdown digest grouped by priority (action/FYI/low) | (none) |
 | `draft_reply` | Compose a reply with tone guidance and safety reminders | `id`, `tone`, `instructions` |
+| `morning_briefing` | Morning email briefing with urgency classification | `account` |
+| `inbox_check` | Quick inbox status with highlights and next actions | `folder`, `account` |
 
 ## MCP Resources (3)
 
@@ -314,7 +323,7 @@ The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health
 ## Testing
 
 ```bash
-npm test    # 342 tests across 15 files (vitest)
+npm test    # 414 tests across 18 files (vitest)
 ```
 
 Test breakdown:
