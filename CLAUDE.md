@@ -92,9 +92,10 @@ himalaya-mcp/
 │   ├── prompts.test.ts          # 15 prompt registration tests
 │   ├── config.test.ts           # 9 config tests
 │   ├── clipboard.test.ts        # 4 clipboard tests
-│   ├── dogfood.test.ts          # 146 dogfooding tests (realistic Claude usage)
+│   ├── dogfood.test.ts          # 142 dogfooding tests (realistic Claude usage)
 │   ├── setup.test.ts            # 36 setup CLI + install + doctor E2E tests
-│   └── e2e.test.ts              # 37 E2E tests (headless MCP server pipeline + .mcpb build)
+│   ├── e2e.test.ts              # 34 E2E tests (headless MCP server pipeline + .mcpb build)
+│   └── v150-features.test.ts    # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
 ├── package.json
 └── tsconfig.json
 ```
