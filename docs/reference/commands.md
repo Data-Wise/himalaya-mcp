@@ -1,6 +1,6 @@
 # Command Reference
 
-Complete reference for all 19 MCP tools, 4 prompts, 3 resources, and CLI commands.
+Complete reference for all 21 MCP tools, 6 prompts, 3 resources, and CLI commands.
 
 !!! tip "See also"
     **[Tutorials](../tutorials/index.md)** for step-by-step walkthroughs | **[Workflows](../guide/workflows.md)** for common email patterns
@@ -630,6 +630,56 @@ Create an event in Apple Calendar. **Safety gate:** requires `confirm=true` to a
 
 ---
 
+### Threads
+
+#### `list_threads` {#list_threads}
+
+List email threads (conversations) grouped by subject line. Strips `Re:`, `Fwd:`, `RE:`, `FW:` prefixes to normalize subjects.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `folder` | string | No | `INBOX` | Folder to list threads from |
+| `page_size` | number | No | `50` | Number of envelopes to group |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Show my email conversations"
+→ list_threads()
+
+"List threads in my work inbox"
+→ list_threads(folder: "Work", account: "work")
+```
+
+**Related:** [read_thread](#read_thread), [list_emails](#list_emails)
+
+---
+
+#### `read_thread` {#read_thread}
+
+Read all messages in a thread chronologically, showing sender, date, and message body for each.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `thread_id` | string | **Yes** | — | Thread identifier (normalized subject) |
+| `folder` | string | No | `INBOX` | Folder to search |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Show me the full project kickoff thread"
+→ read_thread(thread_id: "Project kickoff")
+
+"Read the conversation about budget review"
+→ read_thread(thread_id: "Budget review")
+```
+
+**Related:** [list_threads](#list_threads)
+
+---
+
 ## Prompts
 
 ### `triage_inbox` {#triage_inbox-prompt}
@@ -731,6 +781,47 @@ Guided reply composition with tone control.
 
 ---
 
+### `morning_briefing` {#morning_briefing-prompt}
+
+Morning email briefing with urgency classification. Guides Claude to classify emails into categories: **Needs Reply Today**, **FYI**, and **Newsletter/Promo**, then extract calendar events and identify action items.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Give me my morning email briefing"
+→ morning_briefing prompt
+
+"Morning briefing for my work account"
+→ morning_briefing prompt (account: "work")
+```
+
+---
+
+### `inbox_check` {#inbox_check-prompt}
+
+Quick inbox status check with unread count, highlights, and suggested next actions.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `folder` | string | No | `INBOX` | Folder to check |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Quick check on my inbox"
+→ inbox_check prompt
+
+"Check my Sent folder"
+→ inbox_check prompt (folder: "Sent")
+```
+
+---
+
 ## Resources
 
 ### `email://inbox`
@@ -807,7 +898,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v1.4.1.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v1.5.0.mcpb     # Install specific file
 ```
 
 **What it does:**
@@ -878,7 +969,7 @@ himalaya-mcp doctor --json   # Machine-readable output
 **Sample output:**
 
 ```
-himalaya-mcp doctor v1.4.1
+himalaya-mcp doctor v1.5.0
 
   Prerequisites
   ✓ Node.js 22.14.0

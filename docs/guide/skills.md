@@ -1,6 +1,6 @@
 # Plugin Skills & Agent
 
-When installed as a Claude Code plugin, the email plugin provides 11 slash commands (skills), 1 autonomous agent, and 1 hook.
+When installed as a Claude Code plugin, the email plugin provides 12 slash commands (skills), 1 autonomous agent, and 2 hooks.
 
 ## Skills vs Tools
 
@@ -482,8 +482,8 @@ Help hub for the email plugin. Browse all available tools, prompts, resources, a
 | Command | Shows |
 |---------|-------|
 | `/email:help` | Overview of all capabilities |
-| `/email:help tools` | All 19 MCP tools with parameters |
-| `/email:help prompts` | All 4 MCP prompts |
+| `/email:help tools` | All 21 MCP tools with parameters |
+| `/email:help prompts` | All 6 MCP prompts |
 | `/email:help resources` | All 3 MCP resources |
 | `/email:help workflows` | Common email workflow patterns |
 | `/email:help quick` | One-page quick reference |

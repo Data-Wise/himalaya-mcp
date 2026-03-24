@@ -23,9 +23,12 @@ import { registerComposeNewTools } from "./tools/compose-new.js";
 import { registerFolderTools } from "./tools/folders.js";
 import { registerAttachmentTools } from "./tools/attachments.js";
 import { registerCalendarTools } from "./tools/calendar.js";
+import { registerThreadTools } from "./tools/threads.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
+import { registerMorningPrompt } from "./prompts/morning.js";
+import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
 
-export const VERSION = "1.4.1";
+export const VERSION = "1.5.0";
 export const NAME = "himalaya-mcp";
 
 const server = new McpServer({
@@ -45,6 +48,7 @@ registerComposeNewTools(server, client);
 registerFolderTools(server, client);
 registerAttachmentTools(server, client);
 registerCalendarTools(server, client);
+registerThreadTools(server, client);
 registerClipboardTools(server);
 
 // Register resources
@@ -55,6 +59,8 @@ registerTriagePrompt(server);
 registerSummarizePrompt(server);
 registerDigestPrompt(server);
 registerReplyPrompt(server);
+registerMorningPrompt(server);
+registerInboxCheckPrompt(server);
 
 // Start server
 async function main() {

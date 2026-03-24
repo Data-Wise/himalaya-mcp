@@ -1,11 +1,15 @@
 ---
 name: compose
-description: This skill should be used when the user asks to "compose email", "write email", "send email to", "new email", or wants to draft and send a new message. Composes emails with a two-phase safety gate that never auto-sends.
+description: This skill should be used when the user asks to "compose email", "write email", "send email to", "new email", "send a message to", "email someone", "write to", "new message", "draft an email", "message someone", or wants to draft and send a new message. Composes emails with a two-phase safety gate that never auto-sends.
 triggers:
   - compose email
   - write email
   - send email to
   - new email
+  - send a message to
+  - email someone
+  - write to
+  - new message
 ---
 
 # /email:compose - Compose New Email

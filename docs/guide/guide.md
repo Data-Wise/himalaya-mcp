@@ -23,11 +23,11 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 | Feature | Claude Code | Claude Desktop |
 |---------|-------------|----------------|
-| 19 MCP tools | Yes | Yes |
-| 4 MCP prompts | Yes | Yes |
+| 21 MCP tools | Yes | Yes |
+| 6 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
-| `/email:*` slash commands | Yes (11 skills) | No |
-| Plugin hooks | Yes (1 pre-send hook) | No |
+| `/email:*` slash commands | Yes (12 skills) | No |
+| Plugin hooks | Yes (2 hooks) | No |
 | Email assistant agent | Yes | No |
 | Natural language ("check my inbox") | Yes | Yes |
 | Two-phase send safety gate | Yes | Yes |
@@ -35,7 +35,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 **In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.
 
-**In Claude Desktop**, you get the full MCP server -- all 19 tools, 4 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
+**In Claude Desktop**, you get the full MCP server -- all 21 tools, 6 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
 
 !!! tip "Which should I use?"
     Use **Claude Code** if you want the structured skill workflows and the email assistant agent. Use **Claude Desktop** if you prefer the desktop UI or want email access alongside other MCP servers.
@@ -72,7 +72,7 @@ npm install && npm run build
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ```
 
-Restart Claude Code. The plugin provides 11 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`.
+Restart Claude Code. The plugin provides 12 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`.
 
 ### Claude Desktop (.mcpb)
 
@@ -129,7 +129,7 @@ The `setup` command writes a server entry into Claude Desktop's config file. It 
 }
 ```
 
-Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 19 tools, 4 prompts, and 3 resources.
+Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 21 tools, 6 prompts, and 3 resources.
 
 #### Using himalaya-mcp in Claude Desktop
 
@@ -203,7 +203,7 @@ Example with env vars:
 }
 ```
 
-## MCP Tools (19)
+## MCP Tools (21)
 
 ### Reading
 
@@ -259,7 +259,14 @@ Example with env vars:
 | `create_action_item` | Extract todos, deadlines, commitments | `id`, `folder`, `account` |
 | `copy_to_clipboard` | Copy text to system clipboard | `text` |
 
-## MCP Prompts (4)
+### Threads
+
+| Tool | Description | Key Parameters |
+|------|-------------|----------------|
+| `list_threads` | List email threads grouped by conversation | `folder`, `page_size`, `account` |
+| `read_thread` | Read all messages in a thread chronologically | `thread_id`, `folder`, `account` |
+
+## MCP Prompts (6)
 
 Prompts guide Claude's reasoning for email tasks. Use them via the MCP prompt interface or through the plugin skills.
 
@@ -269,6 +276,8 @@ Prompts guide Claude's reasoning for email tasks. Use them via the MCP prompt in
 | `summarize_email` | One-sentence summary + action items + priority | `id`, `folder` |
 | `daily_email_digest` | Markdown digest grouped by priority (action/FYI/low) | (none) |
 | `draft_reply` | Compose a reply with tone guidance and safety reminders | `id`, `tone`, `instructions` |
+| `morning_briefing` | Morning email briefing with urgency classification | `account` |
+| `inbox_check` | Quick inbox status with highlights and next actions | `folder`, `account` |
 
 ## MCP Resources (3)
 
@@ -314,7 +323,7 @@ The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health
 ## Testing
 
 ```bash
-npm test    # 342 tests across 15 files (vitest)
+npm test    # 414 tests across 18 files (vitest)
 ```
 
 Test breakdown:
@@ -330,7 +339,7 @@ Test breakdown:
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
 | `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
-| `prompts.test.ts` | 15 | All 4 prompts register and return correct text |
+| `prompts.test.ts` | 15 | All 6 prompts register and return correct text |
 | `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
 | `dogfood.test.ts` | 146 | Realistic Claude usage scenarios + packaging validation |

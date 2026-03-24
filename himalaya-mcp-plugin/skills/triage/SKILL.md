@@ -1,10 +1,14 @@
 ---
 name: triage
-description: This skill should be used when the user asks to "triage email", "classify email", "sort email", or wants to prioritize their inbox. Classifies emails as actionable, informational, or skip using MCP prompts.
+description: This skill should be used when the user asks to "triage email", "classify email", "sort email", "go through my inbox", "what needs attention", "prioritize my email", "sort my messages", "which emails are important", "what should I respond to", or wants to prioritize their inbox. Classifies emails as actionable, informational, or skip using MCP prompts.
 triggers:
   - triage email
   - classify email
   - sort email
+  - go through my inbox
+  - what needs attention
+  - prioritize my email
+  - sort my messages
 ---
 
 # /email:triage - AI Email Triage

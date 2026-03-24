@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "himalaya-mcp",
   "display_name": "Himalaya Email",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Privacy-first email for Claude via the himalaya CLI. List, search, read, triage, compose, and manage emails without sending credentials to the cloud.",
   "author": {
     "name": "Data-Wise",
@@ -79,6 +79,8 @@
     {"name": "create_calendar_event", "description": "Create an event in Apple Calendar. SAFETY: requires confirm=true to actually create. Without confirm, returns a preview. macOS only."},
     {"name": "export_to_markdown", "description": "Export an email as formatted markdown with YAML frontmatter (date, from, to, subject, flags). Returns the markdown text."},
     {"name": "create_action_item", "description": "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events."},
+    {"name": "list_threads", "description": "List email threads (conversations) in a folder. Groups related emails by subject line. Returns threads sorted by most recent activity, with participant list and message count."},
+    {"name": "read_thread", "description": "Read all messages in a conversation thread. Given a thread_id (the ID of the first message), fetches all related messages and returns them in chronological order. Use list_threads first to get thread IDs."},
     {"name": "copy_to_clipboard", "description": "Copy text to the system clipboard (pbcopy on macOS, xclip on Linux). Useful for copying email content, markdown exports, or any text."}
   ],
 
@@ -106,6 +108,18 @@
       "description": "Compose a professional reply to an email. Reads the original, generates a draft, and presents for review before sending.",
       "arguments": ["id", "tone", "instructions"],
       "text": "Help me compose a professional reply to the specified email. Show the draft for review before sending."
+    },
+    {
+      "name": "morning_briefing",
+      "description": "Comprehensive morning email briefing with urgency classification, calendar events, and action items.",
+      "arguments": ["account"],
+      "text": "Give me a morning email briefing with urgency classification, calendar events, and action items."
+    },
+    {
+      "name": "inbox_check",
+      "description": "Quick inbox status check with unread count, highlights, and suggested next actions.",
+      "arguments": ["account", "folder"],
+      "text": "Quick check on my inbox with unread count, flagged highlights, and suggested next actions."
     }
   ]
 }

@@ -189,6 +189,40 @@ export interface ExtractCalendarEventParams {
   account?: string;
 }
 
+// --- Thread types ---
+
+export interface Thread {
+  /** ID of the first message in the thread (used as thread_id) */
+  thread_id: string;
+  /** Normalized subject line (stripped of Re:/Fwd: prefixes) */
+  subject: string;
+  /** Number of messages in the thread */
+  message_count: number;
+  /** Participants (unique senders) */
+  participants: Address[];
+  /** Date of the most recent message */
+  latest_date: string;
+  /** Date of the first message */
+  earliest_date: string;
+  /** Envelopes in the thread, sorted chronologically */
+  messages: Envelope[];
+  /** Whether any message in the thread is unread */
+  has_unread: boolean;
+}
+
+export interface ListThreadsParams {
+  folder?: string;
+  page_size?: number;
+  page?: number;
+  account?: string;
+}
+
+export interface ReadThreadParams {
+  thread_id: string;
+  folder?: string;
+  account?: string;
+}
+
 export interface CreateCalendarEventParams {
   summary: string;
   dtstart: string;
