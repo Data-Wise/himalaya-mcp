@@ -24,10 +24,10 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 | Feature | Claude Code | Claude Desktop |
 |---------|-------------|----------------|
 | 21 MCP tools | Yes | Yes |
-| 4 MCP prompts | Yes | Yes |
+| 6 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
 | `/email:*` slash commands | Yes (12 skills) | No |
-| Plugin hooks | Yes (1 pre-send hook) | No |
+| Plugin hooks | Yes (2 hooks) | No |
 | Email assistant agent | Yes | No |
 | Natural language ("check my inbox") | Yes | Yes |
 | Two-phase send safety gate | Yes | Yes |

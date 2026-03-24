@@ -228,7 +228,7 @@ fi
 
 section "6. MCP Prompts (6 expected)"
 
-PROMPT_FILES=(triage.ts summarize.ts digest.ts reply.ts morning.ts)
+PROMPT_FILES=(triage.ts summarize.ts digest.ts reply.ts morning.ts inbox-check.ts)
 for pf in "${PROMPT_FILES[@]}"; do
     assert_file_exists "src/prompts/$pf" "prompt source: $pf"
 done

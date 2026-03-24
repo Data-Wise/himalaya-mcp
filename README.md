@@ -76,9 +76,9 @@ npm test              # 414 tests across 18 test files (vitest)
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
-| Unit (parser, config, clipboard) | 38 | Core parsing, config, template variable guards |
-| Integration (tools, prompts) | 80 | All 21 tools + 6 prompts |
-| v1.5.0 features | 36 | SessionStart hook, threads, morning prompts, skills |
+| Unit (parser, client, config, clipboard) | 38 | Core parsing, config, template variable guards |
+| Integration (tools, prompts) | 85 | All 21 tools + 6 prompts |
+| v1.5.0 features | 79 | Threads (30), morning/inbox prompts (13), E2E integration (36) |
 | Dogfooding | 142 | Realistic Claude usage + .mcpb packaging validation |
 | E2E | 34 | Full MCP server pipeline + .mcpb build pipeline |
 | Setup CLI | 36 | Setup, install/upgrade E2E, doctor command, plugin structure |
