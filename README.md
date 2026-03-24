@@ -4,10 +4,10 @@ Privacy-first email for Claude -- MCP server and Claude Code plugin (`email`) wr
 
 ## Features
 
-- **19 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar
-- **4 MCP prompts**: triage inbox, summarize email, daily digest, draft reply
+- **21 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar, threads
+- **6 MCP prompts**: triage inbox, summarize email, daily digest, draft reply, morning briefing, inbox check
 - **3 MCP resources**: inbox, message by ID, folders
-- **7 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:help`
+- **12 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`, `/email:morning`
 - **Multi-account**: per-call account switching via `--account`
 - **Safe subprocess**: uses `execFile` (no shell injection)
 - **Two-phase send**: `send_email` returns preview first, requires explicit `confirm=true`
@@ -71,14 +71,15 @@ himalaya-mcp doctor    # Verify installation
 ## Testing
 
 ```bash
-npm test              # 335 tests across 15 test files (vitest)
+npm test              # 414 tests across 18 test files (vitest)
 ```
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
-| Unit (parser, config, clipboard) | 35 | Core parsing, config, template variable guards |
-| Integration (tools, prompts) | 80 | All 19 tools + 4 prompts |
-| Dogfooding | 122 | Realistic Claude usage + .mcpb packaging validation |
+| Unit (parser, client, config, clipboard) | 38 | Core parsing, config, template variable guards |
+| Integration (tools, prompts) | 85 | All 21 tools + 6 prompts |
+| v1.5.0 features | 79 | Threads (30), morning/inbox prompts (13), E2E integration (36) |
+| Dogfooding | 142 | Realistic Claude usage + .mcpb packaging validation |
 | E2E | 34 | Full MCP server pipeline + .mcpb build pipeline |
 | Setup CLI | 36 | Setup, install/upgrade E2E, doctor command, plugin structure |
 

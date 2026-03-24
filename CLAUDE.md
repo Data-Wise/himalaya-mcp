@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.4.1
-- **Current Phase:** All phases complete (19 tools, 4 prompts, 3 resources, 335 tests)
+- **Version:** 1.5.0
+- **Current Phase:** All phases complete (21 tools, 6 prompts, 3 resources, 414 tests)
 
 ### What It Does
 
@@ -37,7 +37,8 @@ himalaya-mcp/
 │   ├── himalaya/
 │   │   ├── client.ts            # Subprocess wrapper (execFile, no shell injection)
 │   │   ├── parser.ts            # JSON response parser + formatEnvelope helper
-│   │   └── types.ts             # TypeScript types (Envelope, Folder, params, etc.)
+│   │   ├── thread-parser.ts     # Thread/conversation grouping by subject line
+│   │   └── types.ts             # TypeScript types (Envelope, Thread, Folder, params, etc.)
 │   ├── tools/
 │   │   ├── inbox.ts             # list_emails, search_emails
 │   │   ├── read.ts              # read_email, read_email_html
@@ -47,12 +48,15 @@ himalaya-mcp/
 │   │   ├── folders.ts           # list_folders, create_folder, delete_folder
 │   │   ├── attachments.ts       # list_attachments, download_attachment
 │   │   ├── calendar.ts          # extract_calendar_event, create_calendar_event
+│   │   ├── threads.ts           # list_threads, read_thread (conversation view)
 │   │   └── actions.ts           # export_to_markdown, create_action_item
 │   ├── prompts/
 │   │   ├── triage.ts            # triage_inbox prompt
 │   │   ├── summarize.ts         # summarize_email prompt
 │   │   ├── digest.ts            # daily_email_digest prompt
-│   │   └── reply.ts             # draft_reply prompt
+│   │   ├── reply.ts             # draft_reply prompt
+│   │   ├── morning.ts           # morning_briefing prompt
+│   │   └── inbox-check.ts       # inbox_check prompt
 │   ├── resources/
 │   │   └── index.ts             # email://inbox, email://message/{id}, email://folders
 │   └── adapters/
@@ -61,7 +65,7 @@ himalaya-mcp/
 ├── himalaya-mcp-plugin/
 │   ├── .claude-plugin/
 │   │   └── plugin.json          # Claude Code plugin manifest
-│   ├── skills/                  # Claude Code plugin skills (11: inbox, triage, digest, compose, reply, search, manage, attachments, stats, config, help)
+│   ├── skills/                  # Claude Code plugin skills (12: inbox, triage, digest, compose, reply, search, manage, attachments, stats, config, help, morning)
 │   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks
 ├── .claude-plugin/
@@ -83,17 +87,20 @@ himalaya-mcp/
 │   ├── attachments.test.ts      # 10 attachment tools tests
 │   ├── calendar.test.ts         # 18 calendar tests (ICS parser + tools + escaping)
 │   ├── actions.test.ts          # 6 export/action tests
+│   ├── threads.test.ts          # 30 thread parser + tool registration tests
+│   ├── morning.test.ts          # 13 morning/inbox-check prompt tests
 │   ├── prompts.test.ts          # 15 prompt registration tests
-│   ├── config.test.ts           # 7 config tests
+│   ├── config.test.ts           # 9 config tests
 │   ├── clipboard.test.ts        # 4 clipboard tests
-│   ├── dogfood.test.ts          # 91 dogfooding tests (realistic Claude usage)
+│   ├── dogfood.test.ts          # 142 dogfooding tests (realistic Claude usage)
 │   ├── setup.test.ts            # 36 setup CLI + install + doctor E2E tests
-│   └── e2e.test.ts              # 34 E2E tests (headless MCP server pipeline + .mcpb build)
+│   ├── e2e.test.ts              # 34 E2E tests (headless MCP server pipeline + .mcpb build)
+│   └── v150-features.test.ts    # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
 ├── package.json
 └── tsconfig.json
 ```
 
-### Implemented MCP Tools (19)
+### Implemented MCP Tools (21)
 
 | Tool | Description |
 |------|-------------|
@@ -115,9 +122,11 @@ himalaya-mcp/
 | `create_calendar_event` | Add event to Apple Calendar with safety gate (macOS) |
 | `export_to_markdown` | Convert email to markdown with YAML frontmatter |
 | `create_action_item` | Extract action items and context from email |
+| `list_threads` | List email threads (conversations) grouped by subject |
+| `read_thread` | Read all messages in a thread chronologically |
 | `copy_to_clipboard` | Copy text to system clipboard (pbcopy/xclip) |
 
-### Implemented MCP Prompts (4)
+### Implemented MCP Prompts (6)
 
 | Prompt | Description |
 |--------|-------------|
@@ -125,6 +134,8 @@ himalaya-mcp/
 | `summarize_email` | One-sentence summary + action items |
 | `daily_email_digest` | Markdown digest grouped by priority |
 | `draft_reply` | Reply composition with tone/safety guidance |
+| `morning_briefing` | Morning email briefing with urgency classification |
+| `inbox_check` | Quick inbox status with highlights and next actions |
 
 ### Implemented MCP Resources (3)
 
@@ -201,7 +212,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (335 tests across 15 test files)
+npm test                         # Run vitest (414 tests across 18 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~595KB)
 node dist/index.js               # Run MCP server directly
 ```

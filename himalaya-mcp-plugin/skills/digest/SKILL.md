@@ -1,11 +1,14 @@
 ---
 name: digest
-description: This skill should be used when the user asks for "email digest", "daily digest", "email summary", "morning briefing", or wants a summary of recent emails. Generates a markdown digest grouped by priority.
+description: This skill should be used when the user asks for "email digest", "daily digest", "email summary", "morning briefing", "what happened overnight", "email roundup", "catch me up on email", "summarize my inbox", "what did I miss", or wants a summary of recent emails. Generates a markdown digest grouped by priority.
 triggers:
   - email digest
   - daily digest
   - email summary
   - morning briefing
+  - what happened overnight
+  - email roundup
+  - catch me up on email
 ---
 
 # /email:digest - Daily Email Digest

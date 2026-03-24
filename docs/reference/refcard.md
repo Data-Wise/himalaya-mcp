@@ -26,7 +26,7 @@ himalaya-mcp doctor --fix       Auto-fix common issues
 himalaya-mcp doctor --json      Machine-readable diagnostic output
 ```
 
-## Tools (19)
+## Tools (21)
 
 ```
 list_emails         [folder] [page_size] [page] [account]     List envelopes
@@ -42,21 +42,25 @@ compose_email       to subject body [account]                  Compose new email
 draft_reply         id [body] [reply_all] [folder] [account]   Generate draft (no send)
 send_email          template [confirm] [account]               Send (confirm=true required)
 list_attachments    id [folder] [account]                      List email attachments
-download_attachment id attachment_name [folder] [account]      Download attachment
+download_attachment id filename [folder] [account]             Download attachment
 extract_calendar_event  id [folder] [account]                  Extract calendar from email
-create_calendar_event   event_data                             Create calendar event
+create_calendar_event   summary dtstart dtend [location] [confirm]  Create calendar event
+list_threads        [folder] [page_size] [account]             List conversation threads
+read_thread         thread_id [folder] [account]               Read all messages in thread
 export_to_markdown  id [folder] [account]                      Email -> markdown + YAML
 create_action_item  id [folder] [account]                      Extract todos/deadlines
 copy_to_clipboard   text                                       Copy to system clipboard
 ```
 
-## Prompts (4)
+## Prompts (6)
 
 ```
 triage_inbox         [count=10]              Classify emails: actionable/FYI/skip
 summarize_email      id [folder]             One-sentence summary + action items
 daily_email_digest   (none)                  Priority-grouped markdown digest
 draft_reply          id [tone] [instructions] Guided reply composition
+morning_briefing     [account]               Morning briefing with urgency classification
+inbox_check          [folder] [account]      Quick inbox status + highlights
 ```
 
 ## Resources (3)
@@ -145,7 +149,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 npm run build           TypeScript compilation (development)
 npm run build:bundle    esbuild single-file bundle (~595KB, production)
 npm run build:mcpb      Build .mcpb Desktop Extension (~147KB)
-npm test                Run 335 tests (vitest)
+npm test                Run 414 tests (vitest)
 node dist/index.js      Start MCP server standalone
 ```
 

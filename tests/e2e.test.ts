@@ -183,7 +183,7 @@ describe("E2E: MCP Server Headless", () => {
 
     expect(initResult.result).toBeDefined();
     expect(initResult.result.serverInfo.name).toBe("himalaya-mcp");
-    expect(initResult.result.serverInfo.version).toBe("1.4.1");
+    expect(initResult.result.serverInfo.version).toBe("1.5.0");
 
     // Send initialized notification
     sendNotification("notifications/initialized");
@@ -200,7 +200,7 @@ describe("E2E: MCP Server Headless", () => {
 
   // --- Tool listing ---
 
-  it("lists all 19 registered tools", async () => {
+  it("lists all 21 registered tools", async () => {
     const result = await sendRequest("tools/list");
     const tools = result.result.tools;
     const toolNames = tools.map((t: any) => t.name).sort();
@@ -220,9 +220,11 @@ describe("E2E: MCP Server Headless", () => {
       "list_attachments",
       "list_emails",
       "list_folders",
+      "list_threads",
       "move_email",
       "read_email",
       "read_email_html",
+      "read_thread",
       "search_emails",
       "send_email",
     ]);
@@ -238,7 +240,7 @@ describe("E2E: MCP Server Headless", () => {
 
   // --- Prompt listing ---
 
-  it("lists all 4 registered prompts", async () => {
+  it("lists all 6 registered prompts", async () => {
     const result = await sendRequest("prompts/list");
     const prompts = result.result.prompts;
     const promptNames = prompts.map((p: any) => p.name).sort();
@@ -246,6 +248,8 @@ describe("E2E: MCP Server Headless", () => {
     expect(promptNames).toEqual([
       "daily_email_digest",
       "draft_reply",
+      "inbox_check",
+      "morning_briefing",
       "summarize_email",
       "triage_inbox",
     ]);

@@ -18,7 +18,7 @@ flowchart TD
     SRC["`**Source**
     16 TypeScript files
     + MCP SDK + zod`"] -->|esbuild| BUNDLE["`**dist/index.js**
-    583KB single file`"]
+    595KB single file`"]
 
     BUNDLE --> HB["`**Homebrew**
     brew install himalaya-mcp`"]
@@ -51,13 +51,13 @@ npm run build:bundle
 
 **Input:** 16 TypeScript source files + `@modelcontextprotocol/sdk` dependency
 
-**Output:** Single `dist/index.js` (583KB minified)
+**Output:** Single `dist/index.js` (595KB minified)
 
 The bundle includes all dependencies (MCP SDK, zod) inlined. No runtime `node_modules` needed -- just `node dist/index.js`.
 
 ### Why esbuild
 
-- **72MB to 583KB** -- node_modules eliminated entirely
+- **72MB to 595KB** -- node_modules eliminated entirely
 - **Zero runtime deps** -- single file ships in Homebrew formula
 - **Fast** -- builds in ~25ms
 - **ESM compatible** -- handles zod/v4 import maps and MCP SDK subpath exports
@@ -67,7 +67,7 @@ The bundle includes all dependencies (MCP SDK, zod) inlined. No runtime `node_mo
 | Script | Purpose | Output |
 |--------|---------|--------|
 | `npm run build` | TypeScript compilation (development) | `dist/*.js` + `.d.ts` + sourcemaps |
-| `npm run build:bundle` | esbuild single-file (production) | `dist/index.js` (583KB) |
+| `npm run build:bundle` | esbuild single-file (production) | `dist/index.js` (595KB) |
 
 ## Homebrew Formula
 
@@ -183,7 +183,7 @@ The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a li
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v1.4.1.mcpb (147 KB)
+# Output: himalaya-mcp-v1.5.0.mcpb (147 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:
@@ -201,7 +201,7 @@ Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.co
 ### Install (CLI)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v1.4.1.mcpb   # Install from file
+himalaya-mcp install-ext himalaya-mcp-v1.5.0.mcpb   # Install from file
 himalaya-mcp install-ext                              # Auto-find in project root
 himalaya-mcp remove-ext                               # Uninstall
 ```

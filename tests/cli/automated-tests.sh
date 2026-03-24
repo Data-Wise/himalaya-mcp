@@ -209,7 +209,7 @@ fi
 
 # ───────────────────────────────────────────────────────────────────────
 
-section "5. MCP Server Source (19 tools)"
+section "5. MCP Server Source (21 tools)"
 
 TOOL_FILES=(inbox.ts read.ts manage.ts compose.ts compose-new.ts folders.ts attachments.ts calendar.ts actions.ts)
 for tf in "${TOOL_FILES[@]}"; do
@@ -218,17 +218,17 @@ done
 
 # Count registerTool calls
 TOOL_COUNT=$(grep -r 'registerTool' src/tools/*.ts src/adapters/clipboard.ts 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$TOOL_COUNT" -eq 19 ]]; then
-    assert_pass "19 registerTool calls found"
+if [[ "$TOOL_COUNT" -eq 21 ]]; then
+    assert_pass "21 registerTool calls found"
 else
-    assert_fail "19 registerTool calls found" "Found $TOOL_COUNT"
+    assert_fail "21 registerTool calls found" "Found $TOOL_COUNT"
 fi
 
 # ───────────────────────────────────────────────────────────────────────
 
-section "6. MCP Prompts (4 expected)"
+section "6. MCP Prompts (6 expected)"
 
-PROMPT_FILES=(triage.ts summarize.ts digest.ts reply.ts)
+PROMPT_FILES=(triage.ts summarize.ts digest.ts reply.ts morning.ts inbox-check.ts)
 for pf in "${PROMPT_FILES[@]}"; do
     assert_file_exists "src/prompts/$pf" "prompt source: $pf"
 done

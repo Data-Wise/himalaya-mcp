@@ -1,11 +1,13 @@
 ---
 name: help
-description: This skill should be used when the user asks for "email help", "himalaya help", "email commands", "what can you do with email", or wants to discover available email capabilities. Help hub for browsing all tools, prompts, skills, and workflows.
+description: This skill should be used when the user asks for "email help", "himalaya help", "email commands", "what can you do with email", "email features", "how do I use email", "what email tools are available", "show email capabilities", or wants to discover available email capabilities. Help hub for browsing all tools, prompts, skills, and workflows.
 triggers:
   - email help
   - himalaya help
   - email commands
   - what can you do with email
+  - email features
+  - how do I use email
 ---
 
 # /email:help - Email Help Hub
@@ -16,8 +18,8 @@ Single entry point for discovering all email commands, tools, prompts, and workf
 
 ```
 /email:help                  # Overview of all capabilities
-/email:help tools            # All 19 MCP tools with usage
-/email:help prompts          # All 4 MCP prompts
+/email:help tools            # All 21 MCP tools with usage
+/email:help prompts          # All 6 MCP prompts
 /email:help resources        # All 3 MCP resources
 /email:help <command>        # Detail for a specific tool (e.g. "search_emails")
 /email:help workflows        # Common workflow patterns
@@ -32,11 +34,11 @@ Display the hub overview:
 +-----------------------------------------------------------+
 | EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
-| Privacy-first email for Claude — 19 tools, 4 prompts,     |
-| 3 resources, 11 skills, 1 hook                            |
+| Privacy-first email for Claude — 21 tools, 6 prompts,     |
+| 3 resources, 12 skills, 2 hooks                           |
 +===========================================================+
 |                                                           |
-| TOOLS (19)                                                |
+| TOOLS (21)                                                |
 |   Inbox ....... list_emails, search_emails                |
 |   Read ........ read_email, read_email_html               |
 |   Folders ..... list_folders, create_folder,              |
@@ -46,23 +48,25 @@ Display the hub overview:
 |   Attachments . list_attachments, download_attachment      |
 |   Calendar .... extract_calendar_event,                   |
 |                 create_calendar_event                      |
+|   Threads ..... list_threads, read_thread                 |
 |   Actions ..... export_to_markdown, create_action_item    |
 |   Adapters .... copy_to_clipboard                         |
 |                                                           |
-| PROMPTS (4)                                               |
+| PROMPTS (6)                                               |
 |   triage_inbox, summarize_email, daily_email_digest,      |
-|   draft_reply                                             |
+|   draft_reply, morning_briefing, inbox_check              |
 |                                                           |
 | RESOURCES (3)                                             |
 |   email://inbox, email://folders, email://message/{id}    |
 |                                                           |
-| SKILLS (11)                                               |
+| SKILLS (12)                                               |
 |   /email:inbox, /email:triage, /email:digest,             |
 |   /email:reply, /email:compose, /email:attachments,       |
 |   /email:search, /email:manage, /email:stats,             |
-|   /email:config, /email:help                              |
+|   /email:config, /email:help, /email:morning              |
 |                                                           |
-| HOOKS (1)                                                 |
+| HOOKS (2)                                                 |
+|   session ...... Context injection at conversation start   |
 |   pre-send .... Preview gate before send/compose          |
 |                                                           |
 +-----------------------------------------------------------+
@@ -75,7 +79,7 @@ Display the hub overview:
 
 ## When Invoked with "tools"
 
-Display all 19 tools grouped by category:
+Display all 21 tools grouped by category:
 
 ```
 +-----------------------------------------------------------+
@@ -182,6 +186,18 @@ Display all 19 tools grouped by category:
 |     Extract todos, deadlines, commitments                 |
 |     Params: id (required), folder?, account?              |
 |                                                           |
+| THREADS                                                   |
+|                                                           |
+|   list_threads                                            |
+|     List email threads grouped by conversation            |
+|     Params: folder?, page_size?, account?                 |
+|     Example: "Show my email conversations"                |
+|                                                           |
+|   read_thread                                             |
+|     Read all messages in a thread chronologically         |
+|     Params: thread_id (required), folder?, account?       |
+|     Example: "Show me the full thread about project X"    |
+|                                                           |
 | ADAPTERS                                                  |
 |                                                           |
 |   copy_to_clipboard                                       |
@@ -195,7 +211,7 @@ Display all 19 tools grouped by category:
 
 ## When Invoked with "prompts"
 
-Display all 4 prompts:
+Display all 6 prompts:
 
 ```
 +-----------------------------------------------------------+
@@ -223,6 +239,17 @@ Display all 4 prompts:
 |     Params: id (required), tone?, instructions?           |
 |     Tones: professional, casual, brief, detailed          |
 |     "Reply casually to email 42"                          |
+|                                                           |
+|   morning_briefing                                        |
+|     Morning email briefing with urgency classification    |
+|     Params: account?                                      |
+|     Categories: Needs Reply Today, FYI, Newsletter/Promo  |
+|     "Give me my morning email briefing"                   |
+|                                                           |
+|   inbox_check                                             |
+|     Quick inbox status with highlights                    |
+|     Params: folder?, account?                             |
+|     "Quick check on my inbox"                             |
 |                                                           |
 +-----------------------------------------------------------+
 ```
@@ -335,6 +362,8 @@ One-line cheat sheet:
 | extract_calendar_event| Parse ICS calendar invite         |
 | create_calendar_event | Add to Apple Calendar (macOS)     |
 | export_to_markdown    | Email → markdown + frontmatter    |
+| list_threads          | List conversation threads         |
+| read_thread           | Read all messages in thread       |
 | create_action_item    | Extract todos and deadlines       |
 | copy_to_clipboard     | Copy text to clipboard            |
 +-----------------------+-----------------------------------+
@@ -344,6 +373,8 @@ One-line cheat sheet:
 | summarize_email   | One-line summary + actions            |
 | daily_email_digest| Priority-grouped digest               |
 | draft_reply       | Guided reply composition              |
+| morning_briefing  | Morning briefing + urgency            |
+| inbox_check       | Quick inbox status + highlights       |
 +-------------------+---------------------------------------+
 | Skill               | What it does                    |
 |-----------------------+-----------------------------------|
@@ -357,6 +388,7 @@ One-line cheat sheet:
 | /email:manage       | Bulk flag/move/archive            |
 | /email:stats        | Inbox statistics + trends         |
 | /email:config       | Setup wizard + diagnostics        |
+| /email:morning      | Morning briefing + follow-ups     |
 | /email:help         | This help hub                     |
 +-----------------------------------------------------------+
 ```

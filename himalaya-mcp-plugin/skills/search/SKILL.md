@@ -1,12 +1,15 @@
 ---
 name: search
-description: This skill should be used when the user asks to "search email", "find email", "look for email", "email from", "email about", or wants to locate specific messages. Searches by keyword, sender, flags, or date using himalaya filter syntax.
+description: This skill should be used when the user asks to "search email", "find email", "look for email", "email from", "email about", "did I get an email about", "find message from", "look for that email from", "any emails about", "search my inbox for", or wants to locate specific messages. Searches by keyword, sender, flags, or date using himalaya filter syntax.
 triggers:
   - search email
   - find email
   - look for email
   - email from
   - email about
+  - did I get an email about
+  - find message from
+  - look for that email from
 ---
 
 # /email:search - Search Emails

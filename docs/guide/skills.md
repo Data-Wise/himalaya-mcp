@@ -1,6 +1,6 @@
 # Plugin Skills & Agent
 
-When installed as a Claude Code plugin, the email plugin provides 11 slash commands (skills), 1 autonomous agent, and 1 hook.
+When installed as a Claude Code plugin, the email plugin provides 12 slash commands (skills), 1 autonomous agent, and 2 hooks.
 
 ## Skills vs Tools
 
@@ -208,6 +208,102 @@ Want me to:
 
 ---
 
+## /email:compose
+
+Compose and send a new email from scratch with safety confirmation.
+
+**Triggers:** "compose email", "new email", "send email", "write email"
+
+**What it does:**
+
+1. Asks for recipient, subject, and body (or infers from natural language)
+2. Calls `compose_email` to generate a preview
+3. Shows the full email for your review
+4. Accepts edits ("add a CC", "make it shorter", "attach the report")
+5. Only sends after your explicit confirmation with `confirm=true`
+
+**Example:**
+
+```
+You: /email:compose
+
+Claude:
+Who should I send this to?
+
+You: alice@work.com, subject "Meeting Tomorrow", say I'll bring the slides
+
+Claude:
+Here's a preview:
+
+---
+To: alice@work.com
+Subject: Meeting Tomorrow
+
+Hi Alice,
+
+Just a heads up — I'll bring the slides for tomorrow's meeting.
+
+Best,
+[Your name]
+---
+
+Want me to:
+- Send this as-is?
+- Make changes?
+- Cancel?
+```
+
+**Safety rules:**
+
+- First call returns a **preview only** (never sends)
+- `confirm=true` is the only path to actually send
+- You can revise unlimited times before confirming
+- "Cancel" stops the workflow entirely
+
+---
+
+## /email:attachments
+
+List, download, and process email attachments including calendar invites.
+
+**Triggers:** "attachments", "download attachment", "calendar invite", "attached files"
+
+**What it does:**
+
+1. Lists all attachments for an email (filename, MIME type, size)
+2. Downloads specific attachments to a temp directory
+3. Detects calendar invites (`.ics` files) and offers to extract event details
+4. Can add calendar events to Apple Calendar (macOS)
+
+**Example:**
+
+```
+You: /email:attachments 249088
+
+Claude:
+Email 249088 has 3 attachments:
+
+| # | Filename         | Type            | Size    |
+|---|------------------|-----------------|---------|
+| 1 | report.pdf       | application/pdf | 2.4 MB  |
+| 2 | meeting.ics      | text/calendar   | 1.2 KB  |
+| 3 | photo.jpg        | image/jpeg      | 845 KB  |
+
+Would you like me to:
+- Download any of these?
+- Extract the calendar invite?
+- Download all attachments?
+```
+
+**Calendar workflow:**
+
+When a `.ics` attachment is detected:
+1. Extract event details (summary, date/time, location, attendees)
+2. Show event preview
+3. Offer to add to Apple Calendar (macOS only, requires confirmation)
+
+---
+
 ## /email:search
 
 Search emails by keyword, sender, flags, or date.
@@ -386,8 +482,8 @@ Help hub for the email plugin. Browse all available tools, prompts, resources, a
 | Command | Shows |
 |---------|-------|
 | `/email:help` | Overview of all capabilities |
-| `/email:help tools` | All 19 MCP tools with parameters |
-| `/email:help prompts` | All 4 MCP prompts |
+| `/email:help tools` | All 21 MCP tools with parameters |
+| `/email:help prompts` | All 6 MCP prompts |
 | `/email:help resources` | All 3 MCP resources |
 | `/email:help workflows` | Common email workflow patterns |
 | `/email:help quick` | One-page quick reference |
@@ -411,6 +507,10 @@ Claude:
 │    /email:reply        Draft & send safely   │
 │    /email:compose      Compose new emails    │
 │    /email:attachments  Files & calendar      │
+│    /email:search       Search emails         │
+│    /email:manage       Bulk operations       │
+│    /email:stats        Inbox statistics      │
+│    /email:config       Setup wizard          │
 │    /email:help         This help             │
 │                                              │
 │  Quick actions:                              │
