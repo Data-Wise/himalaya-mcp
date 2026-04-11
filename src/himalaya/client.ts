@@ -35,6 +35,8 @@ export class HimalayaClient {
     account?: string;
     timeout?: number;
     cwd?: string;
+    /** Positional args appended after all flags (e.g. search query words) */
+    trailingArgs?: string[];
   }): Promise<string> {
     const args: string[] = [];
 
@@ -49,6 +51,11 @@ export class HimalayaClient {
 
     // Output format
     args.push("--output", "json");
+
+    // Positional args must come after all flags (e.g. search query)
+    if (options?.trailingArgs?.length) {
+      args.push(...options.trailingArgs);
+    }
 
     const timeout = options?.timeout ?? this.opts.timeout;
 
@@ -94,9 +101,9 @@ export class HimalayaClient {
     if (f && f !== "INBOX") {
       args.push("--folder", f);
     }
-    // Query words are positional args to himalaya (not a -q flag)
-    args.push(...query.split(" "));
-    return this.exec(args, { folder: f, account });
+    // Query words are positional args that must come after all flags
+    const queryArgs = query.split(" ");
+    return this.exec(args, { folder: f, account, trailingArgs: queryArgs });
   }
 
   /** Read a message body (plain text). */
