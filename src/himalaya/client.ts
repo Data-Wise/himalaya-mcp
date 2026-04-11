@@ -211,12 +211,12 @@ export class HimalayaClient {
 
   /** Download ALL attachments for a message to a directory. */
   async downloadAttachments(id: string, destDir: string, folder?: string, account?: string): Promise<string> {
-    const args = ["attachment", "download", id];
+    const args = ["attachment", "download", "--downloads-dir", destDir, id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
       args.push("--folder", f);
     }
-    return this.exec(args, { folder: f, account, cwd: destDir });
+    return this.exec(args, { folder: f, account });
   }
 
   /** Wrap errors with meaningful messages. */
