@@ -11,8 +11,9 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 
 /** Build an MML email template from parameters. */
-function buildTemplate(to: string, subject: string, body: string, cc?: string, bcc?: string): string {
+function buildTemplate(from: string, to: string, subject: string, body: string, cc?: string, bcc?: string): string {
   const headers: string[] = [];
+  headers.push(`From: ${from}`);
   headers.push(`To: ${to}`);
   if (cc) headers.push(`Cc: ${cc}`);
   if (bcc) headers.push(`Bcc: ${bcc}`);
@@ -43,7 +44,17 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       };
     }
 
-    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc);
+    if (!client.from) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: "Sending is not configured. Set HIMALAYA_FROM environment variable to the sender email address.",
+        }],
+        isError: true,
+      };
+    }
+
+    const template = buildTemplate(client.from, args.to, args.subject, args.body, args.cc, args.bcc);
 
     // Safety gate: without confirm=true, just show preview
     if (!args.confirm) {

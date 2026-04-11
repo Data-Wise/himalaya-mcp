@@ -14,6 +14,7 @@ const DEFAULT_OPTIONS: Required<HimalayaClientOptions> = {
   account: "",
   folder: "INBOX",
   timeout: 120_000,
+  from: "",
 };
 
 export class HimalayaClient {
@@ -24,6 +25,11 @@ export class HimalayaClient {
     // Remove empty strings so they don't override
     if (!options.account) this.opts.account = "";
     if (!options.folder) this.opts.folder = DEFAULT_OPTIONS.folder;
+  }
+
+  /** Sender email address (from HIMALAYA_FROM env var). */
+  get from(): string {
+    return this.opts.from;
   }
 
   /**
@@ -174,19 +180,52 @@ export class HimalayaClient {
       args.push("--all");
     }
     args.push(id);
-    if (body) {
-      args.push(body);
-    }
-    return this.exec(args, { folder: f, account });
+    const trailingArgs = body ? [body] : undefined;
+    return this.exec(args, { folder: f, account, trailingArgs });
   }
 
-  /** Send a template (MML format). */
+  /** Send a template (MML format) via stdin. */
   async sendTemplate(
     template: string,
     account?: string,
   ): Promise<string> {
-    const args = ["template", "send", template];
-    return this.exec(args, { account });
+    const { spawn } = await import("node:child_process");
+
+    const args = ["template", "send", "--output", "json"];
+    const acct = account || this.opts.account;
+    if (acct) {
+      args.push("--account", acct);
+    }
+
+    return new Promise((resolve, reject) => {
+      const child = spawn(this.opts.binary, args, {
+        stdio: ["pipe", "pipe", "pipe"],
+        env: { ...process.env },
+      });
+
+      let stdout = "";
+      let stderr = "";
+      child.stdout.on("data", (d: Buffer) => { stdout += d.toString(); });
+      child.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
+
+      child.on("close", (code: number | null) => {
+        if (code === 0) {
+          resolve(stdout);
+        } else {
+          reject(this.wrapError(new Error(`himalaya error: ${stderr || stdout}`)));
+        }
+      });
+
+      child.on("error", (err: Error) => reject(this.wrapError(err)));
+
+      child.stdin.write(template);
+      child.stdin.end();
+
+      setTimeout(() => {
+        child.kill();
+        reject(new Error("Send timed out"));
+      }, this.opts.timeout);
+    });
   }
 
   /** List folders. */
@@ -201,7 +240,7 @@ export class HimalayaClient {
 
   /** Delete a folder. */
   async deleteFolder(name: string, account?: string): Promise<string> {
-    return this.exec(["folder", "delete", name], { account });
+    return this.exec(["folder", "delete", "--yes", name], { account });
   }
 
   /** List accounts. */

@@ -55,6 +55,8 @@ export interface HimalayaClientOptions {
   folder?: string;
   /** Timeout in milliseconds (default: 120000; 0 = unlimited) */
   timeout?: number;
+  /** Sender email address for compose/send (required for sending) */
+  from?: string;
 }
 
 // --- Command result ---

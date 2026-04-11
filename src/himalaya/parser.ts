@@ -70,9 +70,18 @@ export function parseMessageBody(raw: string): CommandOutput<MessageBody> {
 
   // himalaya message read --output json returns a JSON string (quoted)
   // e.g., "Hello world\n\nThis is the body"
+  // himalaya template reply --output json returns an object:
+  // e.g., {"content":"...","cursor":{"row":6,"col":0}}
   try {
-    const body = JSON.parse(trimmed) as string;
-    return { ok: true, data: body };
+    const parsed = JSON.parse(trimmed);
+    if (typeof parsed === "string") {
+      return { ok: true, data: parsed };
+    }
+    if (typeof parsed === "object" && parsed !== null && typeof parsed.content === "string") {
+      return { ok: true, data: parsed.content };
+    }
+    // Unknown object shape — stringify as fallback
+    return { ok: true, data: JSON.stringify(parsed) };
   } catch {
     // If it's not valid JSON, it might be raw text (fallback)
     return { ok: true, data: trimmed };
