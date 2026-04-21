@@ -26,6 +26,17 @@ export class HimalayaClient {
     if (!options.folder) this.opts.folder = DEFAULT_OPTIONS.folder;
   }
 
+  // Resolve the folder for this call, and append --folder to `args` if
+  // it differs from the implicit INBOX default. Returns the effective
+  // folder for passing down to exec().
+  private applyFolderArg(args: string[], folder: string | undefined): string {
+    const f = folder || this.opts.folder;
+    if (f && f !== "INBOX") {
+      args.push("--folder", f);
+    }
+    return f;
+  }
+
   /**
    * Execute a himalaya CLI command and return raw stdout.
    * Always appends --output json.
@@ -68,10 +79,7 @@ export class HimalayaClient {
   /** List envelopes in a folder. */
   async listEnvelopes(folder?: string, pageSize?: number, page?: number, account?: string): Promise<string> {
     const args = ["envelope", "list"];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     if (pageSize) {
       args.push("--page-size", String(pageSize));
     }
@@ -90,10 +98,7 @@ export class HimalayaClient {
    */
   async searchEnvelopes(query: string, folder?: string, account?: string): Promise<string> {
     const args = ["envelope", "list"];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     // Query words are positional args to himalaya (not a -q flag)
     args.push(...query.split(" "));
     return this.exec(args, { folder: f, account });
@@ -102,20 +107,14 @@ export class HimalayaClient {
   /** Read a message body (plain text). */
   async readMessage(id: string, folder?: string, account?: string): Promise<string> {
     const args = ["message", "read", id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
   /** Read a message body (HTML). */
   async readMessageHtml(id: string, folder?: string, account?: string): Promise<string> {
     const args = ["message", "read", "--html", id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -128,10 +127,7 @@ export class HimalayaClient {
     account?: string,
   ): Promise<string> {
     const args = ["flag", action, id, ...flags];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -143,10 +139,7 @@ export class HimalayaClient {
     account?: string,
   ): Promise<string> {
     const args = ["message", "move", targetFolder, id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -159,10 +152,7 @@ export class HimalayaClient {
     account?: string,
   ): Promise<string> {
     const args = ["template", "reply"];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     if (replyAll) {
       args.push("--all");
     }
@@ -205,10 +195,7 @@ export class HimalayaClient {
   /** Download ALL attachments for a message to a directory. */
   async downloadAttachments(id: string, destDir: string, folder?: string, account?: string): Promise<string> {
     const args = ["attachment", "download", id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account, cwd: destDir });
   }
 
