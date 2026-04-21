@@ -9,6 +9,34 @@ import type { HimalayaClientOptions } from "./types.js";
 
 const execFileAsync = promisify(execFile);
 
+// himalaya uses Clap, so any argv that starts with "-" is parsed as a flag.
+// Reject those for user-provided values to prevent flag smuggling
+// (e.g. query="--config /tmp/evil.toml" or target_folder="--help").
+function assertSafeArg(value: string, field: string): void {
+  if (value.startsWith("-")) {
+    throw new Error(
+      `${field} value "${value}" looks like a flag (starts with "-"). ` +
+      `Refusing to pass it to himalaya.`,
+    );
+  }
+}
+
+// Tokenize a search query with quote awareness, so `subject "meeting notes"`
+// becomes two tokens instead of three. Supports single and double quotes.
+// Unbalanced quotes fall through to whitespace splitting of the remainder.
+function tokenizeQuery(query: string): string[] {
+  const tokens: string[] = [];
+  const re = /"([^"]*)"|'([^']*)'|(\S+)/g;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(query)) !== null) {
+    const token = match[1] ?? match[2] ?? match[3];
+    if (token !== undefined && token.length > 0) {
+      tokens.push(token);
+    }
+  }
+  return tokens;
+}
+
 const DEFAULT_OPTIONS: Required<HimalayaClientOptions> = {
   binary: "himalaya",
   account: "",
@@ -44,6 +72,7 @@ export class HimalayaClient {
     // Subcommand flags
     const account = options?.account || this.opts.account;
     if (account) {
+      assertSafeArg(account, "account");
       args.push("--account", account);
     }
 
@@ -70,6 +99,7 @@ export class HimalayaClient {
     const args = ["envelope", "list"];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
     if (pageSize) {
@@ -92,18 +122,27 @@ export class HimalayaClient {
     const args = ["envelope", "list"];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
-    // Query words are positional args to himalaya (not a -q flag)
-    args.push(...query.split(" "));
+    // Query words are positional args to himalaya (not a -q flag).
+    // Tokenize with quote awareness so `subject "meeting notes"` works,
+    // and refuse any token that would be parsed as a flag.
+    const tokens = tokenizeQuery(query);
+    for (const token of tokens) {
+      assertSafeArg(token, "query");
+    }
+    args.push(...tokens);
     return this.exec(args, { folder: f, account });
   }
 
   /** Read a message body (plain text). */
   async readMessage(id: string, folder?: string, account?: string): Promise<string> {
+    assertSafeArg(id, "id");
     const args = ["message", "read", id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
     return this.exec(args, { folder: f, account });
@@ -111,9 +150,11 @@ export class HimalayaClient {
 
   /** Read a message body (HTML). */
   async readMessageHtml(id: string, folder?: string, account?: string): Promise<string> {
+    assertSafeArg(id, "id");
     const args = ["message", "read", "--html", id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
     return this.exec(args, { folder: f, account });
@@ -127,9 +168,14 @@ export class HimalayaClient {
     folder?: string,
     account?: string,
   ): Promise<string> {
+    assertSafeArg(id, "id");
+    for (const flag of flags) {
+      assertSafeArg(flag, "flag");
+    }
     const args = ["flag", action, id, ...flags];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
     return this.exec(args, { folder: f, account });
@@ -142,9 +188,12 @@ export class HimalayaClient {
     folder?: string,
     account?: string,
   ): Promise<string> {
+    assertSafeArg(id, "id");
+    assertSafeArg(targetFolder, "target_folder");
     const args = ["message", "move", targetFolder, id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
     return this.exec(args, { folder: f, account });
@@ -158,9 +207,11 @@ export class HimalayaClient {
     folder?: string,
     account?: string,
   ): Promise<string> {
+    assertSafeArg(id, "id");
     const args = ["template", "reply"];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
     if (replyAll) {
@@ -168,6 +219,9 @@ export class HimalayaClient {
     }
     args.push(id);
     if (body) {
+      // Body can contain anything a user might type, but it must not
+      // lead with "-" since himalaya will treat it as a flag.
+      assertSafeArg(body, "body");
       args.push(body);
     }
     return this.exec(args, { folder: f, account });
@@ -178,6 +232,7 @@ export class HimalayaClient {
     template: string,
     account?: string,
   ): Promise<string> {
+    assertSafeArg(template, "template");
     const args = ["template", "send", template];
     return this.exec(args, { account });
   }
@@ -189,11 +244,13 @@ export class HimalayaClient {
 
   /** Create a folder. */
   async createFolder(name: string, account?: string): Promise<string> {
+    assertSafeArg(name, "name");
     return this.exec(["folder", "create", name], { account });
   }
 
   /** Delete a folder. */
   async deleteFolder(name: string, account?: string): Promise<string> {
+    assertSafeArg(name, "name");
     return this.exec(["folder", "delete", name], { account });
   }
 
@@ -204,9 +261,11 @@ export class HimalayaClient {
 
   /** Download ALL attachments for a message to a directory. */
   async downloadAttachments(id: string, destDir: string, folder?: string, account?: string): Promise<string> {
+    assertSafeArg(id, "id");
     const args = ["attachment", "download", id];
     const f = folder || this.opts.folder;
     if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
       args.push("--folder", f);
     }
     return this.exec(args, { folder: f, account, cwd: destDir });
