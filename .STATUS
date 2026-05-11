@@ -38,7 +38,9 @@
 ## Current State
 
 - Branch: `dev` (clean, synced with main)
+- Active worktree: `~/.git-worktrees/himalaya-mcp/feature-v1.6.0-reliability` on `feature/v1.6.0-reliability` (v1.6.0 reliability work in progress)
 - v1.5.0 released: GitHub, Homebrew, docs site all live
+- v1.6.0 planned: see `docs/specs/SPEC-v1.6.0-reliability-2026-05-11.md` + `PLAN-v1.6.0-reliability-2026-05-11.md`
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 21 MCP tools, 6 prompts, 3 resources
 - Tests: 414 across 18 test files
