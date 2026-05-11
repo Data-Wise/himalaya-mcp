@@ -110,6 +110,47 @@ describe("HimalayaClient", () => {
     });
   });
 
+  describe("error formatting", () => {
+    it("includes account name when subprocess rejects with stderr", async () => {
+      const err = Object.assign(new Error("CONNECTIONRESET"), { stderr: "stderr: CONNECTIONRESET" });
+      setupErrorMock(err);
+      const client = new HimalayaClient({ account: "unm" });
+
+      await expect(client.exec(["envelope", "list"]))
+        .rejects.toThrow(/\[account: unm\].*CONNECTIONRESET/);
+    });
+
+    it("suggests a debug command when an operation fails", async () => {
+      const err = Object.assign(new Error("fail"), { stderr: "stderr: fail" });
+      setupErrorMock(err);
+      const client = new HimalayaClient({ account: "unm" });
+
+      await expect(client.exec(["envelope", "list"]))
+        .rejects.toThrow(/himalaya envelope list -a unm/);
+    });
+
+    it("uses (default) prefix and omits -a when no account set", async () => {
+      const err = Object.assign(new Error("fail"), { stderr: "stderr: fail" });
+      setupErrorMock(err);
+      const client = new HimalayaClient();
+
+      await expect(client.exec(["envelope", "list"]))
+        .rejects.toThrow(/\[account: \(default\)\]/);
+      setupErrorMock(err);
+      await expect(client.exec(["envelope", "list"]))
+        .rejects.not.toThrow(/-a /);
+    });
+
+    it("preserves ENOENT message with account context", async () => {
+      const err = Object.assign(new Error("spawn himalaya ENOENT"), { code: "ENOENT" });
+      setupErrorMock(err);
+      const client = new HimalayaClient({ account: "work" });
+
+      await expect(client.exec(["envelope", "list"]))
+        .rejects.toThrow(/\[account: work\].*himalaya CLI not found/);
+    });
+  });
+
   describe("convenience methods", () => {
     it("listEnvelopes builds correct args", async () => {
       setupMock("[]");

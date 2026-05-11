@@ -61,7 +61,7 @@ export class HimalayaClient {
       });
       return stdout;
     } catch (err: unknown) {
-      throw this.wrapError(err);
+      throw this.wrapError(err, subcommand, account);
     }
   }
 
@@ -212,32 +212,43 @@ export class HimalayaClient {
     return this.exec(args, { folder: f, account, cwd: destDir });
   }
 
-  /** Wrap errors with meaningful messages. */
-  private wrapError(err: unknown): Error {
+  /** Wrap errors with meaningful messages, including account context and a debug hint. */
+  private wrapError(err: unknown, subcommand: string[] = [], account = ""): Error {
+    const accountName = account || this.opts.account || "";
+    const prefix = `[account: ${accountName || "(default)"}]`;
+    const debugArgs = ["himalaya", ...subcommand];
+    if (accountName) {
+      debugArgs.push("-a", accountName);
+    }
+    const debugHint = `\n  Try: ${debugArgs.join(" ")}`;
+
     if (err instanceof Error) {
       const msg = err.message;
+      const stderr = (err as { stderr?: string }).stderr;
 
       // CLI not found
       if ("code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
         return new Error(
-          `himalaya CLI not found at "${this.opts.binary}". Install with: brew install himalaya`
+          `${prefix} himalaya CLI not found at "${this.opts.binary}". Install with: brew install himalaya${debugHint}`,
         );
       }
 
       // Timeout
       if ("killed" in err && (err as { killed: boolean }).killed) {
         return new Error(
-          `himalaya command timed out after ${this.opts.timeout}ms`
+          `${prefix} himalaya command timed out after ${this.opts.timeout}ms${debugHint}`,
         );
       }
 
       // Auth / connection errors
       if (msg.includes("authentication") || msg.includes("login")) {
-        return new Error(`himalaya authentication failed: ${msg}`);
+        return new Error(`${prefix} himalaya authentication failed: ${msg}${debugHint}`);
       }
 
-      return new Error(`himalaya error: ${msg}`);
+      // Generic error — include stderr if present
+      const detail = stderr && stderr.trim() ? stderr.trim() : msg;
+      return new Error(`${prefix} himalaya error: ${detail}${debugHint}`);
     }
-    return new Error(`himalaya unknown error: ${String(err)}`);
+    return new Error(`${prefix} himalaya unknown error: ${String(err)}${debugHint}`);
   }
 }
