@@ -32,7 +32,9 @@ This release adds multi-account diagnostics, structured error envelopes, transie
 - [ ] Transient IMAP errors (`ECONNRESET`, timeout, `* BYE`) auto-retry once with 200 ms backoff before surfacing as failures
 - [ ] `docs/troubleshooting.md` exists, is linked from doctor output, and covers the five most common IMAP failure modes
 - [ ] All 414 existing tests pass; new tests cover all items above
-- [ ] Test count increases by ~30-50 (target: ~445-465 total)
+- [ ] Test count increases by ~50-70 (target: ~465-485 total)
+- [ ] New `docs/troubleshooting.md` exists with five failure-mode walkthroughs
+- [ ] `docs/architecture.md`, `docs/guide.md`, `docs/REFCARD.md`, `docs/workflows.md`, `README.md`, and the relevant plugin skills all reference the new diagnostics surface
 
 ---
 
@@ -105,6 +107,7 @@ Each module has one purpose and a documented interface. `errors.ts` has no I/O. 
 | `tests/accounts.test.ts` | Unit tests for config parsing (fixtures) | ~8 tests |
 | `tests/health.test.ts` | Integration tests for `health_check` tool | ~10 tests |
 | `tests/retry.test.ts` | Tests for retry/backoff behavior (mock execFile) | ~6 tests |
+| `tests/dogfood-reliability.test.ts` | Realistic Claude-usage scenarios for v1.6.0 features (multi-account doctor, health_check, error-recovery flows) | ~20 tests |
 | `docs/troubleshooting.md` | User-facing troubleshooting guide | ~200 lines |
 
 ## Changed Files
@@ -117,10 +120,18 @@ Each module has one purpose and a documented interface. `errors.ts` has no I/O. 
 | All `src/tools/*.ts` | Catch `MCPError` from client; surface structured envelope in MCP response |
 | `tests/setup.test.ts` | Update doctor tests for multi-account output |
 | `tests/client.test.ts` | Add tests for retry behavior and error classification |
-| `docs/guide.md` | Reference troubleshooting doc; document `health_check` tool |
-| `CLAUDE.md` | Bump version to 1.6.0; update tool count (21→22); update test count |
-| `CHANGELOG.md` | New section for v1.6.0 |
+| `docs/guide.md` | Document `health_check` tool; document `doctor --account` flag; cross-link to troubleshooting.md |
+| `docs/REFCARD.md` | Add `health_check` to tool list; add troubleshooting one-liner |
+| `docs/architecture.md` | Document `errors.ts` and `accounts.ts` modules; update module map; document retry/backoff policy |
+| `docs/workflows.md` | New workflow: "Diagnosing email problems" (when a tool fails → ask Claude to run health_check → act on hint) |
+| `README.md` | Update tool count (21→22); mention `health_check` in feature highlights; link to troubleshooting.md |
+| `tests/dogfood.test.ts` | Optional: extend existing realistic-usage scenarios to exercise new error envelopes (some scenarios may move to `dogfood-reliability.test.ts`) |
+| `himalaya-mcp-plugin/skills/help/SKILL.md` | Reference `health_check` tool and troubleshooting.md so `/email:help` surfaces the new diagnostics path |
+| `himalaya-mcp-plugin/skills/config/SKILL.md` | Mention `health_check` as the in-conversation alternative to running `himalaya-mcp doctor` from a terminal |
+| `CLAUDE.md` | Bump version to 1.6.0; update tool count (21→22); update test count; add `errors.ts`/`accounts.ts` to module map |
+| `CHANGELOG.md` | New section for v1.6.0 (Added: health_check, --account flag, troubleshooting docs; Changed: error envelope, multi-account doctor; Fixed: transient retry) |
 | `docs/CHANGELOG.md` | Mirror root CHANGELOG (per release checklist) |
+| `.STATUS` | Phase + priority update |
 | `package.json` | Version bump to 1.6.0 |
 | `src/index.ts` | `VERSION` constant bump to 1.6.0 |
 
@@ -198,6 +209,54 @@ export interface MCPError {
 
 ---
 
+## Documentation Plan
+
+Documentation is a first-class deliverable for this release — the theme is "actionable diagnostics," which only works if users (and Claude) can find the docs from the failure surface.
+
+### New documentation
+
+- **`docs/troubleshooting.md`** (~200 lines, primary new doc)
+  - Section 1: How to read the doctor output (per-account table, what each column means)
+  - Section 2: Five most common failure modes — for each, the symptom, the error envelope `code`, the underlying cause, and step-by-step remediation:
+    1. Expired app password (`imap_auth_failed`)
+    2. Network restrictions / VPN required (`transient` after retry)
+    3. Certificate trust issues (`imap_cert_error`)
+    4. Missing/corrupt himalaya config (`himalaya_config_missing`)
+    5. Account renamed or removed in himalaya config (`account_not_found`)
+  - Section 3: How to ask Claude for help — example prompts that invoke `health_check`
+  - Section 4: When to file an issue vs. fix locally — pointer to GitHub issues template
+  - Section 5: Reference table of all `MCPErrorCode` values and their hints
+
+### Documentation cross-linking
+
+Every layer must point users to the next:
+
+```text
+tool failure  →  error envelope hint  →  docs/troubleshooting.md  →  GitHub issue
+   ↓                ↓                        ↓
+health_check     doctor output           Section 2 entry
+```
+
+- Doctor output footer (when any account fails): `"See https://github.com/Data-Wise/himalaya-mcp/blob/main/docs/troubleshooting.md"`
+- Error envelope `hint` field includes a section anchor when relevant: `"See troubleshooting.md#imap-auth-failed"`
+- `docs/guide.md` "When something goes wrong" section links to troubleshooting.md as the canonical reference
+
+### Updated documentation
+
+See "Changed Files" table above for the full list. Key updates:
+
+- **`docs/architecture.md`** — add `errors.ts` and `accounts.ts` to the module map; document the retry policy and stderr-pattern classifier as architectural decisions
+- **`docs/workflows.md`** — add a "Diagnosing email problems" workflow showing the full Claude-driven debugging loop
+- **Plugin skills (`help`, `config`)** — surface `health_check` and troubleshooting.md so `/email:help` and `/email:config` users discover the new diagnostic path without reading release notes
+
+### Documentation quality gate
+
+- All doc changes pass the existing `Documentation quality checks` pre-commit hook
+- Internal links validated (no broken anchors)
+- New `docs/troubleshooting.md` referenced from at least: doctor output, error envelope hints, `docs/guide.md`, `README.md`
+
+---
+
 ## Testing Plan
 
 ### Unit tests
@@ -211,16 +270,50 @@ export interface MCPError {
 - `tests/health.test.ts` — invoke `health_check` tool with mocked himalaya CLI; assert structured response shape
 - `tests/setup.test.ts` (extended) — doctor with multi-account fixture; doctor with `--account <name>`; doctor surfaces hints
 
+### Dogfood tests (`tests/dogfood-reliability.test.ts`)
+
+Following the existing `dogfood.test.ts` pattern: simulate realistic Claude-usage flows end-to-end (via MCP server stdin/stdout with mocked himalaya CLI) and assert that the responses give Claude enough information to take the right next action. Each scenario is named for the user intent, not the tool call.
+
+**Scope:** ~20 scenarios covering:
+
+| # | Scenario | What we assert |
+|---|----------|----------------|
+| 1 | "Check my email" with one account broken, others healthy | `list_emails` works on healthy accounts; failed account returns envelope with account name + hint |
+| 2 | "Is email working?" | `health_check` returns multi-account table; overall `degraded` when ≥1 account fails |
+| 3 | "List my inbox" hits transient `ECONNRESET` once | Tool succeeds with `attempts: 2`; Claude sees no error |
+| 4 | "List my inbox" hits persistent transient failures | Tool fails with `code: transient`, `attempts: 2`, `recoverable: true`; hint suggests network check |
+| 5 | "Send this email" with expired app password | Returns `imap_auth_failed`; hint includes `himalaya account configure <account>` |
+| 6 | "Check unm account" after seeing degraded status | `health_check --account unm` returns isolated per-account detail with `rawStderr` |
+| 7 | "List threads" with cert error | Returns `imap_cert_error`; hint references trust-store remediation |
+| 8 | "What's wrong with email?" follow-up after any tool failure | Claude calls `health_check`; envelope surfaces the same `code` it saw on the original failure (consistency check) |
+| 9 | Tool failure with unrecognized stderr | Returns `code: unknown`, `rawStderr` populated, `recoverable: false` (conservative default) |
+| 10 | Multi-account doctor with mixed states | Output table shows ≥3 accounts: healthy / auth_failed / transient_after_retry |
+| 11 | `health_check` invoked with no accounts configured | Returns `himalaya_config_missing`; hint suggests `himalaya account configure` |
+| 12 | `health_check` invoked when himalaya binary missing | Returns `himalaya_not_installed`; hint suggests `brew install himalaya` |
+| 13 | Folder operation against deleted folder | Returns `folder_not_found`; hint suggests `list_folders` |
+| 14 | Read email by ID that no longer exists | Returns `message_not_found`; hint references stale UID |
+| 15 | Auth failure should NOT trigger retry | Mock execFile asserted to be called exactly once for `AUTHENTICATIONFAILED` |
+| 16 | Transient failure DOES trigger one retry, no more | Mock execFile asserted called exactly twice for persistent `ECONNRESET` |
+| 17 | Error envelope serializes cleanly through MCP transport | Round-trip test: server emits envelope → client reads → all fields preserved |
+| 18 | `hint` field is human-readable for every `code` | Snapshot test: every `MCPErrorCode` has a non-empty hint |
+| 19 | "Why did my morning briefing fail?" | After `morning_briefing` prompt fails on one account, `health_check` identifies which account; user receives both partial briefing AND remediation hint |
+| 20 | Backward-compat smoke: a tool that doesn't fail returns the same shape as v1.5.0 | Success path unchanged by error-envelope refactor |
+
+**Why a separate file:** keeping reliability scenarios isolated from the existing 142-scenario `dogfood.test.ts` makes test failures easier to attribute and lets the new file evolve as v1.6.0 patterns mature. Some scenarios may later migrate into the main dogfood suite.
+
 ### Manual verification
 
 - Run `himalaya-mcp doctor` against the live config — verify per-account table renders for all configured accounts
 - Run `himalaya-mcp doctor --account unm` — verify it isolates the failing account
 - Invoke `health_check` from Claude in a real session — verify structured output is useful for follow-up
+- Read `docs/troubleshooting.md` cold (as a new user would) — verify each of the 5 failure modes is followable end-to-end
+- Click every link in the new docs — verify no 404s
 
 ### Regression
 
 - All 414 existing tests must pass unchanged
 - Existing tool error paths must continue to work (tools should still throw on error; only the *shape* of the thrown error changes)
+- Existing `dogfood.test.ts` (142 tests) must pass without modification, except where success-path response shapes are extended (additive only)
 
 ---
 
@@ -236,14 +329,16 @@ export interface MCPError {
 
 | Commit | Scope | Why this order |
 |--------|-------|---------------|
-| 1 | W5 (`docs/troubleshooting.md`) + W3 (better failure messages, naïve version using raw stderr) | Lowest risk, docs-first; unblocks user from diagnosing `unm` immediately |
+| 1 | W5 (`docs/troubleshooting.md` initial draft) + W3 (better failure messages, naïve version using raw stderr) | Lowest risk, docs-first; unblocks user from diagnosing `unm` immediately |
 | 2 | M1 (`accounts.ts`) + W2 (`doctor --account` flag, multi-account loop) | Multi-account view depends on `accounts.ts`; bundled |
 | 3 | M2 (`errors.ts`, refactor `client.ts` to throw `MCPError`); update all tools | Foundational refactor; biggest test impact |
 | 4 | M3 (retry/backoff in `client.ts`) | Builds on M2's error classification |
 | 5 | W4 (`health_check` tool) | Wraps everything above as an MCP-callable surface |
-| 6 | Docs + version bump (CLAUDE.md, CHANGELOG.md, docs/CHANGELOG.md, package.json, src/index.ts) | Release prep |
+| 6 | `tests/dogfood-reliability.test.ts` (~20 scenarios) | End-to-end verification that the surface composes correctly from a Claude-usage perspective |
+| 7 | Documentation pass: finalize `docs/troubleshooting.md`, update `architecture.md`, `guide.md`, `REFCARD.md`, `workflows.md`, `README.md`, plugin skills (`help`, `config`) | Docs benefit from being written *after* the code stabilizes; cross-linking is a single coherent edit |
+| 8 | Release prep: version bump (CLAUDE.md, CHANGELOG.md, docs/CHANGELOG.md, .STATUS, package.json, src/index.ts) | Final step before opening PR |
 
-One feature branch (`feature/v1.6.0-reliability`), six commits, one PR to `dev`.
+One feature branch (`feature/v1.6.0-reliability`), eight commits, one PR to `dev`.
 
 ---
 
