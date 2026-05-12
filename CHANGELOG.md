@@ -13,18 +13,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - `health_check` MCP tool — exposes multi-account diagnostics during conversations. Returns `overall` status (`healthy`/`degraded`/`broken`) plus per-account detail with code, hint, and retry attempts from the structured error envelope.
 - `himalaya-mcp doctor --account <name>` flag for targeted diagnostics. Doctor now iterates all configured accounts by default.
 - `docs/troubleshooting.md` — user-facing guide for the five most common email failure modes with error-code reference table.
-- `src/himalaya/errors.ts` — structured `MCPError` envelope (`code`, `message`, `hint`, `account`, `recoverable`, `attempts`, `rawStderr`) and `HimalayaError` class. Stderr-pattern classifier covers 9 known codes plus `unknown` fallthrough.
+- `src/himalaya/errors.ts` — structured `MCPError` envelope (`code`, `message`, `hint`, `account`, `recoverable`, `attempts`, `rawStderr`) and `HimalayaError` class. Stderr-pattern classifier covers 10 known codes plus `unknown` fallthrough.
 - `src/himalaya/accounts.ts` — multi-account discovery via `himalaya account list -o json`.
+- `parse_error` MCP error code for parser failures (envelope JSON decode), so the MCP response shape is invariant across subprocess and parser failure modes.
 
 ### Changed
 
 - `himalaya-mcp doctor` now reports per-account health (table view) instead of testing only the default account.
-- All tool handlers surface structured error envelopes via the shared `envelopeError` helper.
+- All tool handlers surface structured error envelopes via the shared `envelopeError` helper — including parser failures in `list_emails`, `search_emails`, `list_threads`, and `read_thread`, which previously returned a plain `"Error: ..."` string.
+- `doctor --json` output now includes a per-account `Accounts` category section, mirroring the text output.
+- `health_check` probes accounts in parallel (`Promise.all`) — N-account latency is bounded by the slowest probe, not the sum.
+- `accounts.ts listAccounts()` throws `HimalayaError` (with codes `himalaya_not_installed` and `parse_error`) instead of plain `Error` — consistent with the rest of the client surface.
+- Auth-failure regex broadened to also match "login failed/error/rejected" and "auth rejected" stderr variants.
 - Tool count: 21 → 22.
 
 ### Fixed
 
 - Transient IMAP failures (`ECONNRESET`, `ETIMEDOUT`, `* BYE`) auto-retry once with 200ms backoff before surfacing as errors. Configurable via `retryBackoffMs` option.
+- `HimalayaClient.exec` retry loop now throws a defensive `Error` if the loop somehow exits without returning or throwing, instead of a possibly-`undefined` reference.
+- `v150-features.test.ts` morning/inbox `beforeAll` hook timeout bumped 60s → 120s to absorb CI cold-start variance.
+
+### Security
+
+- `MCPError.rawStderr` preserves the verbatim stderr from himalaya. Callers should treat the field as untrusted input and not surface it to end-users without sanitization. The MCP protocol model expects Claude to summarize structured errors to the user — `rawStderr` is for debugging, not display.
 
 ## [1.5.0] - 2026-03-17
 

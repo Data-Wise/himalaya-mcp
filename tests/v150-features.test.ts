@@ -472,12 +472,14 @@ echo '[]'
       }
     });
 
+    // CI runners can be slow to JIT-compile dist/index.js on cold start;
+    // bump the budget to 120s to absorb startup variance.
     await sendRequest("initialize", {
       protocolVersion: "2025-03-26",
       capabilities: {},
       clientInfo: { name: "v150-prompt-test", version: "1.0.0" },
     });
-  }, 60_000);
+  }, 120_000);
 
   afterAll(() => {
     serverProcess?.kill();

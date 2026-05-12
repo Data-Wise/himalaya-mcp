@@ -43,13 +43,11 @@ export class HimalayaClient {
     timeout?: number;
     cwd?: string;
   }): Promise<string> {
-    let lastErr: HimalayaError | undefined;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
       try {
         return await this.execOnce(subcommand, options);
       } catch (err) {
         if (!(err instanceof HimalayaError)) throw err;
-        lastErr = err;
         if (err.envelope.code !== "transient" || attempt === MAX_ATTEMPTS) {
           err.envelope.attempts = attempt;
           throw err;
@@ -59,8 +57,9 @@ export class HimalayaClient {
         }
       }
     }
-    // Unreachable — loop either returns or throws.
-    throw lastErr;
+    // Loop above either returns or throws on the final attempt; reaching
+    // here means MAX_ATTEMPTS was set to 0 or the loop logic regressed.
+    throw new Error("HimalayaClient.exec: retry loop exited without resolution");
   }
 
   /** Single-attempt subprocess invocation. */

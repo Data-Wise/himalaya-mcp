@@ -371,10 +371,11 @@ describe("dogfood: reliability scenarios", () => {
     }
   });
 
-  // ─── Scenarios 15 + 16: spy on execFile at the subprocess level ──────────
-  // We use a nested describe to isolate the node:child_process mock so it
-  // doesn't bleed into the other scenarios in this file (which spy on
-  // HimalayaClient.prototype methods directly).
+  // ─── Scenarios 15 + 16: see the sibling describe block below ─────────────
+  // Those scenarios live in a separate top-level describe so its
+  // restoreAllMocks() resets prototype spies leaked from this block
+  // (Scenarios 1–14, 18–20), allowing listEnvelopes() to reach the
+  // module-level node:child_process mock for accurate call-count assertions.
 
   // ─── Scenario 17 ─────────────────────────────────────────────────────────
   // Skipped: this would spawn `dist/index.js`, send JSON-RPC over stdio,

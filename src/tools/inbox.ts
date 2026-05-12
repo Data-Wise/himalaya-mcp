@@ -6,6 +6,7 @@ import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseEnvelopes, formatEnvelope } from "../himalaya/parser.js";
+import { parseError } from "../himalaya/errors.js";
 import { envelopeError } from "./_envelope.js";
 
 export function registerInboxTools(server: McpServer, client: HimalayaClient) {
@@ -23,7 +24,7 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
       const result = parseEnvelopes(raw);
 
       if (!result.ok) {
-        return { content: [{ type: "text" as const, text: `Error: ${result.error}` }], isError: true };
+        return envelopeError(parseError(result.error, args.account));
       }
 
       const summary = result.data.map(formatEnvelope).join("\n");
@@ -52,7 +53,7 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
       const result = parseEnvelopes(raw);
 
       if (!result.ok) {
-        return { content: [{ type: "text" as const, text: `Error: ${result.error}` }], isError: true };
+        return envelopeError(parseError(result.error, args.account));
       }
 
       if (result.data.length === 0) {

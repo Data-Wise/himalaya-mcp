@@ -317,13 +317,14 @@ describe("Dogfooding: error handling", () => {
     expect(envelope.code).toBe("imap_auth_failed");
   });
 
-  it("Scenario: malformed JSON from CLI — returns parse error", async () => {
+  it("Scenario: malformed JSON from CLI — returns parse error envelope", async () => {
     vi.spyOn(client, "listEnvelopes").mockResolvedValue("not json at all");
     const tool = getToolHandler(server, "list_emails");
     const result = await tool.handler({ folder: undefined, page_size: undefined, page: undefined, account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error:");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.code).toBe("parse_error");
   });
 });
 

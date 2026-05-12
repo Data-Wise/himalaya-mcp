@@ -44,13 +44,14 @@ export async function handleHealthCheck(
   let accounts;
   try {
     accounts = await listAccounts();
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const hint = err instanceof Error ? err.message : String(err);
     return {
       content: [
         {
           type: "text",
           text: JSON.stringify(
-            { overall: "broken", accounts: [], hint: err?.message ?? String(err) },
+            { overall: "broken", accounts: [], hint },
             null,
             2,
           ),
@@ -82,27 +83,37 @@ export async function handleHealthCheck(
     };
   }
 
-  const statuses: AccountStatus[] = [];
-  for (const acc of accounts) {
-    try {
-      await client.listFolders(acc.name);
-      statuses.push({ name: acc.name, reachable: true });
-    } catch (err) {
-      if (err instanceof HimalayaError) {
-        const env: MCPError = err.envelope;
-        statuses.push({
+  // Probe accounts in parallel so N-account latency is bounded by the
+  // slowest probe, not the sum. Each probe still inherits transient-retry
+  // from HimalayaClient.exec.
+  const statuses: AccountStatus[] = await Promise.all(
+    accounts.map(async (acc): Promise<AccountStatus> => {
+      try {
+        await client.listFolders(acc.name);
+        return { name: acc.name, reachable: true };
+      } catch (err: unknown) {
+        if (err instanceof HimalayaError) {
+          const env: MCPError = err.envelope;
+          return {
+            name: acc.name,
+            reachable: false,
+            code: env.code,
+            message: env.message,
+            hint: env.hint,
+            attempts: env.attempts,
+          };
+        }
+        // Non-HimalayaError surfaces as a generic unknown so one buggy
+        // account doesn't reject the whole Promise.all.
+        return {
           name: acc.name,
           reachable: false,
-          code: env.code,
-          message: env.message,
-          hint: env.hint,
-          attempts: env.attempts,
-        });
-      } else {
-        throw err;
+          code: "unknown",
+          message: err instanceof Error ? err.message : String(err),
+        };
       }
-    }
-  }
+    }),
+  );
 
   const reachableCount = statuses.filter((s) => s.reachable).length;
   const overall: HealthCheckResult["overall"] =

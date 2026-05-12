@@ -15,6 +15,7 @@ export type MCPErrorCode =
   | "message_not_found"
   | "himalaya_not_installed"
   | "himalaya_config_missing"
+  | "parse_error"
   | "transient"
   | "unknown";
 
@@ -44,8 +45,9 @@ const PATTERNS: Pattern[] = [
   },
   {
     // Broader than the spec: also matches lowercase "authentication failed"
-    // produced by himalaya itself (not just IMAP server response strings).
-    re: /AUTHENTICATIONFAILED|Invalid credentials|authentication failed/i,
+    // produced by himalaya itself, "login failed/error" variants, and
+    // "auth(?:entication)? rejected" forms surfaced by some IMAP servers.
+    re: /AUTHENTICATIONFAILED|Invalid credentials|authentication failed|login (?:failed|error|rejected)|auth(?:entication)? rejected/i,
     code: "imap_auth_failed",
     hint: "Re-check app password. Run: himalaya account configure <account>",
     recoverable: true,
@@ -112,6 +114,21 @@ export function classifyStderr(stderr: string, account?: string): MCPError {
     recoverable: false,
     rawStderr: stderr,
   };
+}
+
+/**
+ * Build a HimalayaError for parser failures so the MCP response shape is
+ * invariant: every tool error reaches Claude as `{ error: MCPError }` JSON,
+ * regardless of whether the subprocess or the JSON parser produced it.
+ */
+export function parseError(detail: string, account?: string): HimalayaError {
+  return new HimalayaError({
+    code: "parse_error",
+    message: `himalaya output failed to parse: ${detail}`,
+    hint: "This usually indicates a himalaya version mismatch or corrupt response. Run: himalaya --version",
+    account,
+    recoverable: false,
+  });
 }
 
 /**

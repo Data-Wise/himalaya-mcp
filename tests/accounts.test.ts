@@ -13,6 +13,7 @@ vi.mock("node:child_process", async () => {
 
 import { execFile } from "node:child_process";
 import { listAccounts, getDefaultAccount } from "../src/himalaya/accounts";
+import { HimalayaError } from "../src/himalaya/errors";
 
 const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
 
@@ -42,12 +43,18 @@ describe("accounts", () => {
     expect(await listAccounts()).toEqual([]);
   });
 
-  it("listAccounts throws when himalaya CLI is not installed", async () => {
+  it("listAccounts throws HimalayaError(himalaya_not_installed) on ENOENT", async () => {
     const err: any = new Error("spawn himalaya ENOENT");
     err.code = "ENOENT";
     mockExecFileAsync.mockRejectedValue(err);
 
-    await expect(listAccounts()).rejects.toThrow(/not installed|ENOENT/);
+    try {
+      await listAccounts();
+      throw new Error("expected to throw");
+    } catch (e) {
+      expect(e).toBeInstanceOf(HimalayaError);
+      expect((e as HimalayaError).envelope.code).toBe("himalaya_not_installed");
+    }
   });
 
   it("getDefaultAccount returns the account marked default", async () => {
@@ -71,8 +78,14 @@ describe("accounts", () => {
     expect(await getDefaultAccount()).toBeNull();
   });
 
-  it("listAccounts handles malformed JSON gracefully", async () => {
+  it("listAccounts throws HimalayaError(parse_error) on malformed JSON", async () => {
     mockExecFileAsync.mockResolvedValue({ stdout: "not json", stderr: "" });
-    await expect(listAccounts()).rejects.toThrow(/parse/i);
+    try {
+      await listAccounts();
+      throw new Error("expected to throw");
+    } catch (e) {
+      expect(e).toBeInstanceOf(HimalayaError);
+      expect((e as HimalayaError).envelope.code).toBe("parse_error");
+    }
   });
 });

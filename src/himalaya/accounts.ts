@@ -8,6 +8,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { loadConfig } from "../config.js";
+import { HimalayaError, parseError } from "./errors.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -24,20 +25,28 @@ interface HimalayaAccountJson {
 
 export async function listAccounts(): Promise<Account[]> {
   const binary = loadConfig().binary ?? "himalaya";
+  let stdout: string;
   try {
-    const { stdout } = await execFileAsync(binary, ["account", "list", "-o", "json"]);
-    let parsed: HimalayaAccountJson[];
-    try {
-      parsed = JSON.parse(stdout);
-    } catch {
-      throw new Error(`Failed to parse himalaya account list output`);
-    }
-    return parsed.map((a) => ({ name: a.name, isDefault: a.default }));
-  } catch (err: any) {
-    if (err?.code === "ENOENT") {
-      throw new Error(`himalaya CLI not installed (ENOENT). Run: brew install himalaya`);
+    const result = await execFileAsync(binary, ["account", "list", "-o", "json"]);
+    stdout = result.stdout;
+  } catch (err: unknown) {
+    if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {
+      throw new HimalayaError({
+        code: "himalaya_not_installed",
+        message: `himalaya CLI not installed (ENOENT). Run: brew install himalaya`,
+        hint: "Run: brew install himalaya",
+        recoverable: true,
+      });
     }
     throw err;
+  }
+  try {
+    const parsed = JSON.parse(stdout) as HimalayaAccountJson[];
+    return parsed.map((a) => ({ name: a.name, isDefault: a.default }));
+  } catch (err: unknown) {
+    throw parseError(
+      err instanceof Error ? err.message : String(err),
+    );
   }
 }
 

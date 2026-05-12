@@ -808,10 +808,11 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
 
 /**
  * Run the `--json` path for doctor \u2014 emits machine-readable JSON of
- * check results (excluding the new per-account section, which is
- * surfaced in the text output only).
+ * check results plus a per-account reachability section under the
+ * synthetic "Accounts" category so tooling has the same view as the
+ * text output.
  */
-function runDoctorJson(opts: DoctorOptions): { output: string; failed: number } {
+async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; failed: number }> {
   const results: CheckResult[] = [
     ...checkPrerequisites(),
     ...checkMcpServer(),
@@ -836,6 +837,35 @@ function runDoctorJson(opts: DoctorOptions): { output: string; failed: number } 
     }
   }
 
+  // Per-account reachability \u2014 same data the text path renders, projected
+  // into the existing CheckResult shape so JSON consumers see a uniform list.
+  let accountsToCheck: { name: string }[] = [];
+  if (opts.account) {
+    accountsToCheck = [{ name: opts.account }];
+  } else {
+    try {
+      accountsToCheck = await listAccounts();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      results.push({
+        name: "list",
+        category: "Accounts",
+        status: "fail",
+        message: `Could not list accounts: ${msg}`,
+      });
+    }
+  }
+  const probe = opts.probeAccount ?? checkAccountHealth;
+  for (const acc of accountsToCheck) {
+    const status = await probe(acc.name);
+    results.push({
+      name: acc.name,
+      category: "Accounts",
+      status: status.reachable ? "pass" : "fail",
+      message: status.reachable ? "reachable" : (status.error ?? "unreachable"),
+    });
+  }
+
   const failed = results.filter(r => r.status === "fail").length;
   const output = JSON.stringify(
     results.map(r => ({
@@ -857,7 +887,7 @@ function runDoctorJson(opts: DoctorOptions): { output: string; failed: number } 
  */
 async function doctor(flags: { fix: boolean; json: boolean; account?: string }): Promise<void> {
   if (flags.json) {
-    const { output, failed } = runDoctorJson(flags);
+    const { output, failed } = await runDoctorJson(flags);
     console.log(output);
     if (failed > 0) process.exit(1);
     return;

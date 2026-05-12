@@ -10,6 +10,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseEnvelopes, parseMessageBody } from "../himalaya/parser.js";
 import { groupIntoThreads, formatThread } from "../himalaya/thread-parser.js";
+import { parseError } from "../himalaya/errors.js";
 import { envelopeError } from "./_envelope.js";
 
 export function registerThreadTools(server: McpServer, client: HimalayaClient) {
@@ -41,10 +42,7 @@ export function registerThreadTools(server: McpServer, client: HimalayaClient) {
       const result = parseEnvelopes(raw);
 
       if (!result.ok) {
-        return {
-          content: [{ type: "text" as const, text: `Error: ${result.error}` }],
-          isError: true,
-        };
+        return envelopeError(parseError(result.error, args.account));
       }
 
       const threads = groupIntoThreads(result.data);
@@ -87,10 +85,7 @@ export function registerThreadTools(server: McpServer, client: HimalayaClient) {
       const result = parseEnvelopes(raw);
 
       if (!result.ok) {
-        return {
-          content: [{ type: "text" as const, text: `Error: ${result.error}` }],
-          isError: true,
-        };
+        return envelopeError(parseError(result.error, args.account));
       }
 
       const threads = groupIntoThreads(result.data);
