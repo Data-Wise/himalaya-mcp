@@ -124,14 +124,14 @@ describe("v1.5.0: plugin.json hook structure", () => {
   });
 
   it("description reflects updated counts", () => {
-    expect(pluginJson.description).toContain("21 tools");
+    expect(pluginJson.description).toContain("22 tools");
     expect(pluginJson.description).toContain("6 prompts");
     expect(pluginJson.description).toContain("12 skills");
     expect(pluginJson.description).toContain("2 hooks");
   });
 
-  it("version is 1.5.0", () => {
-    expect(pluginJson.version).toBe("1.5.0");
+  it("version is 1.6.0", () => {
+    expect(pluginJson.version).toBe("1.6.0");
   });
 });
 
@@ -472,12 +472,14 @@ echo '[]'
       }
     });
 
+    // CI runners can be slow to JIT-compile dist/index.js on cold start;
+    // bump the budget to 120s to absorb startup variance.
     await sendRequest("initialize", {
       protocolVersion: "2025-03-26",
       capabilities: {},
       clientInfo: { name: "v150-prompt-test", version: "1.0.0" },
     });
-  }, 60_000);
+  }, 120_000);
 
   afterAll(() => {
     serverProcess?.kill();

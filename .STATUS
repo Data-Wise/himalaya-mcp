@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.5.0 released
-## Phase: Released, Homebrew CI fix pending
+## Focus: v1.6.0 reliability — release pending merge
+## Phase: Feature branch complete, PR pending
 ## Priority: 2
-## Progress: 100 (v1.5.0 released)
+## Progress: 100 (v1.6.0 implementation + docs + version bump complete)
 
 ## Completed
 
@@ -24,27 +24,24 @@
 - Plugin Packaging: esbuild bundle (595KB), Homebrew formula, marketplace.json, CLI setup
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
-- Total: 21 tools, 6 prompts, 3 resources, 12 skills, 414 tests (18 test files)
+- v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
+- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 473 tests (23 test files)
 
 ## Just Completed
 
-- 2026-03-24: Released v1.5.0 — GitHub release + Homebrew formula + docs site
-- 2026-03-24: PR #47 review — fixed 5 issues (stale counts, ORCHESTRATE cleanup, test table)
-- 2026-03-24: PR #48 release merge — dev → main, all CI green
-- 2026-03-24: Diagnosed Homebrew CI auth failure — PAT expired, added App secret passthrough
-- 2026-03-24: Updated Homebrew formula manually (v1.5.0, SHA256, skill/tool counts)
-- 2026-03-24: Fixed CLAUDE.md test tree (dogfood 146→142, e2e 37→34, added v150-features)
+- 2026-05-11: v1.6.0 implementation — errors.ts, retry policy, accounts.ts, health_check tool, multi-account doctor
+- 2026-05-11: v1.6.0 docs — troubleshooting.md, guide/refcard/architecture/workflows updates
+- 2026-05-11: v1.6.0 dogfood scenarios — 20 reliability scenarios (1 skipped)
+- 2026-05-11: v1.6.0 version bump — manifests, CHANGELOG, CLAUDE.md, .STATUS
 
 ## Current State
 
-- Branch: `dev` (clean, synced with main)
-- Active worktree: `~/.git-worktrees/himalaya-mcp/feature-v1.6.0-reliability` on `feature/v1.6.0-reliability` (v1.6.0 reliability work in progress)
-- v1.5.0 released: GitHub, Homebrew, docs site all live
-- v1.6.0 planned: see `docs/specs/SPEC-v1.6.0-reliability-2026-05-11.md` + `PLAN-v1.6.0-reliability-2026-05-11.md`
+- Branch: `feature/v1.6.0-reliability` (clean, pending PR)
+- v1.6.0 implementation complete, PR pending
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
-- Tools: 21 MCP tools, 6 prompts, 3 resources
-- Tests: 414 across 18 test files
-- Bundle: 595KB (esbuild), .mcpb: ~147KB
+- Tools: 22 MCP tools, 6 prompts, 3 resources
+- Tests: 473 passing / 1 skipped / 0 failed across 23 test files
+- Bundle: 604KB (esbuild), .mcpb: ~147KB
 
 ## Install
 
@@ -73,8 +70,8 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Fix Homebrew CI: install GitHub App on homebrew-tap repo, test workflow dispatch
-- Merge workflow fix from dev to main (commit 674ac7a)
+- Open PR for v1.6.0 reliability work (feature → dev)
+- After merge: release pipeline (PR dev → main, GitHub release, Homebrew formula update)
 
 ## Future
 
@@ -87,5 +84,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-03-25
-**Status:** v1.5.0 released — Homebrew CI auth fix pending
+**Last Updated:** 2026-05-11
+**Status:** v1.6.0 reliability — branch complete, PR pending

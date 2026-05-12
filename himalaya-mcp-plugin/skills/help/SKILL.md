@@ -18,7 +18,7 @@ Single entry point for discovering all email commands, tools, prompts, and workf
 
 ```
 /email:help                  # Overview of all capabilities
-/email:help tools            # All 21 MCP tools with usage
+/email:help tools            # All 22 MCP tools with usage
 /email:help prompts          # All 6 MCP prompts
 /email:help resources        # All 3 MCP resources
 /email:help <command>        # Detail for a specific tool (e.g. "search_emails")
@@ -34,11 +34,11 @@ Display the hub overview:
 +-----------------------------------------------------------+
 | EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
-| Privacy-first email for Claude — 21 tools, 6 prompts,     |
+| Privacy-first email for Claude — 22 tools, 6 prompts,     |
 | 3 resources, 12 skills, 2 hooks                           |
 +===========================================================+
 |                                                           |
-| TOOLS (21)                                                |
+| TOOLS (22)                                                |
 |   Inbox ....... list_emails, search_emails                |
 |   Read ........ read_email, read_email_html               |
 |   Folders ..... list_folders, create_folder,              |
@@ -51,6 +51,7 @@ Display the hub overview:
 |   Threads ..... list_threads, read_thread                 |
 |   Actions ..... export_to_markdown, create_action_item    |
 |   Adapters .... copy_to_clipboard                         |
+|   Diagnostics . health_check                              |
 |                                                           |
 | PROMPTS (6)                                               |
 |   triage_inbox, summarize_email, daily_email_digest,      |
@@ -79,7 +80,7 @@ Display the hub overview:
 
 ## When Invoked with "tools"
 
-Display all 21 tools grouped by category:
+Display all 22 tools grouped by category:
 
 ```
 +-----------------------------------------------------------+
@@ -203,6 +204,13 @@ Display all 21 tools grouped by category:
 |   copy_to_clipboard                                       |
 |     Copy text to system clipboard                         |
 |     Params: text (required)                               |
+|                                                           |
+| DIAGNOSTICS                                               |
+|                                                           |
+|   health_check                                            |
+|     Check per-account IMAP connectivity                   |
+|     Params: account? (defaults to all)                    |
+|     Example: "Run a health check on my email accounts"    |
 |                                                           |
 +-----------------------------------------------------------+
 | /email:help <tool_name>   Detail for specific tool        |
@@ -366,6 +374,7 @@ One-line cheat sheet:
 | read_thread           | Read all messages in thread       |
 | create_action_item    | Extract todos and deadlines       |
 | copy_to_clipboard     | Copy text to clipboard            |
+| health_check          | Per-account IMAP health           |
 +-----------------------+-----------------------------------+
 | Prompt            | What it does                          |
 |-------------------+---------------------------------------|
@@ -441,3 +450,12 @@ Example for `/email:help search_emails`:
 |                                                           |
 +-----------------------------------------------------------+
 ```
+
+## When something goes wrong
+
+If an email operation fails, ask:
+
+- "Run a health check on my email accounts."
+- "Why is email failing?"
+
+This invokes the `health_check` MCP tool. For detailed troubleshooting, see [docs/troubleshooting.md](../../../docs/troubleshooting.md).

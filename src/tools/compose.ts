@@ -11,6 +11,7 @@ import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseMessageBody } from "../himalaya/parser.js";
+import { envelopeError } from "./_envelope.js";
 
 export function registerComposeTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("draft_reply", {
@@ -55,13 +56,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error drafting reply: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 
@@ -102,13 +97,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error sending email: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 }

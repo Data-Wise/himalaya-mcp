@@ -558,6 +558,21 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 // ==============================================================================
 
 describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
+  // Isolate HOME per-test so the doctor's checkEmailConnectivity() doesn't
+  // attempt real IMAP probes against the developer's configured accounts
+  // (each probe has a 10s timeout; 3 probes can blow the 30s test budget).
+  // With a fresh HOME, himalaya finds no config and account-list fails
+  // immediately, short-circuiting the connectivity section.
+  let tempHome: string;
+
+  beforeEach(async () => {
+    tempHome = await mkdtemp(join(tmpdir(), "himalaya-doctor-test-"));
+  });
+
+  afterEach(async () => {
+    if (tempHome) await rm(tempHome, { recursive: true, force: true });
+  });
+
   it("doctor runs and outputs check results", async () => {
     // doctor exits non-zero when checks fail (e.g. himalaya not installed in CI)
     // so we capture stdout from the error object
@@ -566,7 +581,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
       const result = await execFileAsync(
         "node",
         ["dist/cli/setup.js", "doctor"],
-        { cwd: PROJECT_ROOT }
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
     } catch (err: unknown) {
@@ -581,11 +596,18 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   }, 30_000);
 
   it("doctor --json outputs valid JSON array", async () => {
-    const { stdout } = await execFileAsync(
-      "node",
-      ["dist/cli/setup.js", "doctor", "--json"],
-      { cwd: PROJECT_ROOT }
-    );
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "doctor", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      // doctor --json exits 1 when any check fails; the JSON still prints
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
 
     const results = JSON.parse(stdout) as Array<{ name: string; category: string; status: string }>;
     expect(Array.isArray(results)).toBe(true);
@@ -600,11 +622,17 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   }, 30_000);
 
   it("doctor checks all categories", async () => {
-    const { stdout } = await execFileAsync(
-      "node",
-      ["dist/cli/setup.js", "doctor", "--json"],
-      { cwd: PROJECT_ROOT }
-    );
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "doctor", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
 
     const results = JSON.parse(stdout) as Array<{ category: string }>;
     const categories = new Set(results.map(r => r.category));
@@ -614,11 +642,17 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   }, 30_000);
 
   it("doctor detects Node.js as passing", async () => {
-    const { stdout } = await execFileAsync(
-      "node",
-      ["dist/cli/setup.js", "doctor", "--json"],
-      { cwd: PROJECT_ROOT }
-    );
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "doctor", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
 
     const results = JSON.parse(stdout) as Array<{ name: string; status: string }>;
     const nodeCheck = results.find(r => r.name === "Node.js");
@@ -630,7 +664,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
     const { stdout } = await execFileAsync(
       "node",
       ["dist/cli/setup.js", "unknown-command"],
-      { cwd: PROJECT_ROOT }
+      { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
     );
 
     expect(stdout).toContain("doctor");
@@ -693,5 +727,80 @@ describe("Plugin structure validation", () => {
 
     expect(plugin.version).toBe(pkg.version);
     expect(marketplace.metadata.version).toBe(pkg.version);
+  });
+});
+
+// ==============================================================================
+// doctor multi-account: M1/W2 — per-account reachability section
+// ==============================================================================
+
+import { runDoctor } from "../src/cli/setup";
+import * as accountsModule from "../src/himalaya/accounts";
+
+describe("doctor multi-account", () => {
+  // Use `includeBaseChecks: false` + an injected `probeAccount` so tests
+  // never spawn real himalaya subprocesses or hit the filesystem outside
+  // the existing vi.mock("node:fs") boundary.
+  const okProbe = async () => ({ reachable: true } as const);
+
+  beforeEach(() => {
+    vi.spyOn(accountsModule, "listAccounts").mockResolvedValue([
+      { name: "unm", isDefault: true },
+      { name: "personal", isDefault: false },
+    ]);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("renders a row per configured account when no --account flag", async () => {
+    const output = await runDoctor({ includeBaseChecks: false, probeAccount: okProbe });
+    expect(output).toContain("Accounts");
+    expect(output).toContain("unm");
+    expect(output).toContain("personal");
+  });
+
+  it("runs against only the named account when --account is passed", async () => {
+    const output = await runDoctor({
+      account: "personal",
+      includeBaseChecks: false,
+      probeAccount: okProbe,
+    });
+    expect(output).toContain("personal");
+    // listAccounts must not be consulted when --account is supplied.
+    expect(accountsModule.listAccounts).not.toHaveBeenCalled();
+    // The other account must not appear in the Accounts section row.
+    const accountsSection = output.slice(output.indexOf("Accounts"));
+    expect(accountsSection).not.toMatch(/[✓✗]\s+unm/);
+  });
+
+  it("includes a link to troubleshooting.md in the footer when any account fails", async () => {
+    // Force a deterministic failure: listAccounts rejects with a realistic
+    // error message. The doctor surface should record the failure and emit
+    // the troubleshooting footer.
+    vi.spyOn(accountsModule, "listAccounts").mockRejectedValue(
+      new Error("himalaya CLI not installed (ENOENT). Run: brew install himalaya"),
+    );
+
+    const output = await runDoctor({ includeBaseChecks: false, probeAccount: okProbe });
+    expect(output).toContain("Could not list accounts");
+    expect(output).toContain("docs/troubleshooting.md");
+  });
+
+  it("emits troubleshooting footer when a per-account probe fails", async () => {
+    // Even when listAccounts succeeds, a single failing account must trigger
+    // the troubleshooting footer.
+    vi.spyOn(accountsModule, "listAccounts").mockResolvedValue([
+      { name: "unm", isDefault: true },
+    ]);
+    const failingProbe = async (name: string) => ({
+      reachable: false,
+      error: `IMAP connection refused for ${name}`,
+    });
+    const output = await runDoctor({ includeBaseChecks: false, probeAccount: failingProbe });
+    expect(output).toMatch(/✗\s+unm/);
+    expect(output).toContain("IMAP connection refused");
+    expect(output).toContain("docs/troubleshooting.md");
   });
 });

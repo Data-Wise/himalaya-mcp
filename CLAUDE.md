@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.5.0
-- **Current Phase:** All phases complete (21 tools, 6 prompts, 3 resources, 414 tests)
+- **Version:** 1.6.0
+- **Current Phase:** All phases complete (22 tools, 6 prompts, 3 resources, 473 tests)
 
 ### What It Does
 
@@ -35,9 +35,11 @@ himalaya-mcp/
 │   ├── index.ts                 # MCP server entry point
 │   ├── config.ts                # Env-based configuration (HIMALAYA_BINARY, etc.)
 │   ├── himalaya/
-│   │   ├── client.ts            # Subprocess wrapper (execFile, no shell injection)
+│   │   ├── client.ts            # Subprocess wrapper (execFile, no shell injection) + retry policy
 │   │   ├── parser.ts            # JSON response parser + formatEnvelope helper
 │   │   ├── thread-parser.ts     # Thread/conversation grouping by subject line
+│   │   ├── errors.ts            # MCPError envelope, HimalayaError, stderr classifier
+│   │   ├── accounts.ts          # Multi-account discovery (himalaya account list -o json)
 │   │   └── types.ts             # TypeScript types (Envelope, Thread, Folder, params, etc.)
 │   ├── tools/
 │   │   ├── inbox.ts             # list_emails, search_emails
@@ -49,6 +51,7 @@ himalaya-mcp/
 │   │   ├── attachments.ts       # list_attachments, download_attachment
 │   │   ├── calendar.ts          # extract_calendar_event, create_calendar_event
 │   │   ├── threads.ts           # list_threads, read_thread (conversation view)
+│   │   ├── health.ts            # health_check (per-account diagnostics)
 │   │   └── actions.ts           # export_to_markdown, create_action_item
 │   ├── prompts/
 │   │   ├── triage.ts            # triage_inbox prompt
@@ -78,29 +81,34 @@ himalaya-mcp/
 │   ├── architecture.md          # System design, module map, data flow
 │   └── specs/                   # Design specs
 ├── tests/
-│   ├── parser.test.ts           # 13 parser tests
-│   ├── client.test.ts           # 12 client tests (subprocess mock)
-│   ├── manage.test.ts           # 7 manage tools tests
-│   ├── compose.test.ts          # 9 compose tools tests
-│   ├── compose-new.test.ts      # 8 compose_email tests
-│   ├── folders.test.ts          # 12 folder tools tests
-│   ├── attachments.test.ts      # 10 attachment tools tests
-│   ├── calendar.test.ts         # 18 calendar tests (ICS parser + tools + escaping)
-│   ├── actions.test.ts          # 6 export/action tests
-│   ├── threads.test.ts          # 30 thread parser + tool registration tests
-│   ├── morning.test.ts          # 13 morning/inbox-check prompt tests
-│   ├── prompts.test.ts          # 15 prompt registration tests
-│   ├── config.test.ts           # 9 config tests
-│   ├── clipboard.test.ts        # 4 clipboard tests
-│   ├── dogfood.test.ts          # 142 dogfooding tests (realistic Claude usage)
-│   ├── setup.test.ts            # 36 setup CLI + install + doctor E2E tests
-│   ├── e2e.test.ts              # 34 E2E tests (headless MCP server pipeline + .mcpb build)
-│   └── v150-features.test.ts    # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
+│   ├── parser.test.ts                  # 13 parser tests
+│   ├── client.test.ts                  # 15 client tests (subprocess mock + retry)
+│   ├── manage.test.ts                  # 7 manage tools tests
+│   ├── compose.test.ts                 # 9 compose tools tests
+│   ├── compose-new.test.ts             # 8 compose_email tests
+│   ├── folders.test.ts                 # 12 folder tools tests
+│   ├── attachments.test.ts             # 10 attachment tools tests
+│   ├── calendar.test.ts                # 18 calendar tests (ICS parser + tools + escaping)
+│   ├── actions.test.ts                 # 6 export/action tests
+│   ├── threads.test.ts                 # 30 thread parser + tool registration tests
+│   ├── morning.test.ts                 # 13 morning/inbox-check prompt tests
+│   ├── prompts.test.ts                 # 15 prompt registration tests
+│   ├── config.test.ts                  # 9 config tests
+│   ├── clipboard.test.ts               # 4 clipboard tests
+│   ├── errors.test.ts                  # 18 MCPError envelope + stderr classifier tests
+│   ├── retry.test.ts                   # 4 transient retry policy tests
+│   ├── accounts.test.ts                # 6 multi-account discovery tests
+│   ├── health.test.ts                  # 5 health_check tool tests
+│   ├── dogfood.test.ts                 # 142 dogfooding tests (realistic Claude usage)
+│   ├── dogfood-reliability.test.ts     # 20 reliability scenarios (1 skipped)
+│   ├── setup.test.ts                   # 40 setup CLI + multi-account doctor E2E tests
+│   ├── e2e.test.ts                     # 34 E2E tests (headless MCP server pipeline + .mcpb build)
+│   └── v150-features.test.ts           # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
 ├── package.json
 └── tsconfig.json
 ```
 
-### Implemented MCP Tools (21)
+### Implemented MCP Tools (22)
 
 | Tool | Description |
 |------|-------------|
@@ -125,6 +133,7 @@ himalaya-mcp/
 | `list_threads` | List email threads (conversations) grouped by subject |
 | `read_thread` | Read all messages in a thread chronologically |
 | `copy_to_clipboard` | Copy text to system clipboard (pbcopy/xclip) |
+| `health_check` | Per-account IMAP diagnostics (overall + per-account status, hint, attempts) |
 
 ### Implemented MCP Prompts (6)
 
@@ -212,7 +221,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (414 tests across 18 test files)
+npm test                         # Run vitest (473 tests across 23 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~595KB)
 node dist/index.js               # Run MCP server directly
 ```
@@ -283,4 +292,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-02-25
+**Last Updated:** 2026-05-11

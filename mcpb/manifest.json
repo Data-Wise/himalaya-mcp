@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "himalaya-mcp",
   "display_name": "Himalaya Email",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Privacy-first email for Claude via the himalaya CLI. List, search, read, triage, compose, and manage emails without sending credentials to the cloud.",
   "author": {
     "name": "Data-Wise",
@@ -81,7 +81,8 @@
     {"name": "create_action_item", "description": "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events."},
     {"name": "list_threads", "description": "List email threads (conversations) in a folder. Groups related emails by subject line. Returns threads sorted by most recent activity, with participant list and message count."},
     {"name": "read_thread", "description": "Read all messages in a conversation thread. Given a thread_id (the ID of the first message), fetches all related messages and returns them in chronological order. Use list_threads first to get thread IDs."},
-    {"name": "copy_to_clipboard", "description": "Copy text to the system clipboard (pbcopy on macOS, xclip on Linux). Useful for copying email content, markdown exports, or any text."}
+    {"name": "copy_to_clipboard", "description": "Copy text to the system clipboard (pbcopy on macOS, xclip on Linux). Useful for copying email content, markdown exports, or any text."},
+    {"name": "health_check", "description": "Check himalaya-mcp installation health and per-account IMAP connectivity. Returns overall status (healthy/degraded/broken) and a per-account detail array. Use when an email tool fails to diagnose which accounts are reachable."}
   ],
 
   "prompts": [

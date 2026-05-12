@@ -6,6 +6,7 @@ import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseFolders } from "../himalaya/parser.js";
+import { envelopeError } from "./_envelope.js";
 
 export function registerFolderTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("list_folders", {
@@ -28,10 +29,7 @@ export function registerFolderTools(server: McpServer, client: HimalayaClient) {
         content: [{ type: "text" as const, text: lines.length > 0 ? lines.join("\n") : "No folders found." }],
       };
     } catch (err) {
-      return {
-        content: [{ type: "text" as const, text: `Error listing folders: ${err instanceof Error ? err.message : String(err)}` }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 
@@ -55,10 +53,7 @@ export function registerFolderTools(server: McpServer, client: HimalayaClient) {
         content: [{ type: "text" as const, text: `Folder "${args.name}" created successfully.` }],
       };
     } catch (err) {
-      return {
-        content: [{ type: "text" as const, text: `Error creating folder: ${err instanceof Error ? err.message : String(err)}` }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 
@@ -104,10 +99,7 @@ export function registerFolderTools(server: McpServer, client: HimalayaClient) {
         content: [{ type: "text" as const, text: `Folder "${args.name}" deleted successfully.` }],
       };
     } catch (err) {
-      return {
-        content: [{ type: "text" as const, text: `Error deleting folder: ${err instanceof Error ? err.message : String(err)}` }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 }

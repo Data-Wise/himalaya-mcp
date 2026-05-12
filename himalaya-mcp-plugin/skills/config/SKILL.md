@@ -173,8 +173,10 @@ Common fixes:
 ### Step 6: Verify MCP Integration
 
 ```bash
-himalaya-mcp doctor    # End-to-end check
+himalaya-mcp doctor    # End-to-end check — iterates all configured accounts
 ```
+
+In-conversation alternative — ask Claude to "Run a health check on my email accounts." This invokes the `health_check` MCP tool, which returns the same per-account reachability status without leaving the chat.
 
 ```
 ✅ Setup complete!

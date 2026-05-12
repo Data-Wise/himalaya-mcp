@@ -12,7 +12,7 @@
 │   ┌─────────────┐   MCP Protocol   ┌──────────────────────┐    │
 │   │ MCP Client  │◄────────────────►│ himalaya-mcp         │    │
 │   └─────────────┘   (JSON-RPC)     │                      │    │
-│                                     │  Tools (21)          │    │
+│                                     │  Tools (22)          │    │
 │                                     │  Prompts (6)         │    │
 │                                     │  Resources (3)       │    │
 │                                     └──────────┬───────────┘    │
@@ -109,6 +109,9 @@ src/
 │   │                     execFile("himalaya", [...args, "--output", "json"])
 │   ├── parser.ts         parseEnvelopes, parseMessageBody, parseFolders
 │   │                     formatEnvelope — human-readable one-liner
+│   ├── errors.ts         MCPError envelope, HimalayaError class,
+│   │                     classifyStderr (stderr-pattern → stable code)
+│   ├── accounts.ts       discoverAccounts — `himalaya account list -o json`
 │   └── types.ts          Envelope, Folder, HimalayaClientOptions, *Params
 │
 ├── tools/
@@ -120,6 +123,7 @@ src/
 │   ├── folders.ts        list_folders, create_folder, delete_folder
 │   ├── attachments.ts    list_attachments, download_attachment
 │   ├── calendar.ts       extract_calendar_event, create_calendar_event
+│   ├── health.ts         health_check — per-account IMAP reachability
 │   └── actions.ts        export_to_markdown, create_action_item
 │
 ├── prompts/
@@ -205,10 +209,64 @@ plugin/
     help.md           /email:help — help hub
 
   agents/
-    email-assistant.md  Autonomous triage agent (all 21 tools)
+    email-assistant.md  Autonomous triage agent (all 22 tools)
 
 .mcp.json             MCP server config (node dist/index.js)
 ```
+
+## Reliability & Error Model
+
+himalaya-mcp turns raw himalaya stderr into a stable, structured error envelope so tool handlers and Claude can reason about failures without parsing strings.
+
+### Error envelope
+
+`MCPError` (defined in `src/himalaya/errors.ts`):
+
+```
+code         stable identifier (e.g., imap_auth_failed, transient, account_not_found)
+message      human-readable error
+hint         one-line suggested fix (e.g., "Run: himalaya account configure <account>")
+account      which account failed (multi-account aware)
+recoverable  whether the operation is worth retrying
+attempts     retry count surfaced to the caller (1 = first try, 2 = retried once)
+rawStderr    original stderr preserved for debugging
+```
+
+`HimalayaError extends Error` carries the envelope. `client.ts` is the sole thrower; tool handlers catch it and surface the envelope via `envelopeError`.
+
+### Stderr-pattern classifier
+
+`classifyStderr(stderr, account)` scans stderr against an ordered pattern table:
+
+| Code | Pattern (substring/regex) | Hint |
+|------|---------------------------|------|
+| `transient` | `ECONNRESET`, `ETIMEDOUT`, `* BYE` | auto-retried; check network if persistent |
+| `imap_auth_failed` | `AUTHENTICATIONFAILED`, `Invalid credentials`, `authentication failed` | Re-check app password |
+| `imap_cert_error` | `certificate verify failed`, `self-signed certificate` | Trust cert or set `insecure = true` |
+| `account_not_found` | `Cannot find account` | `himalaya account list` |
+| `folder_not_found` | `No such folder`, `Mailbox doesn't exist` | `himalaya folder list` |
+| `message_not_found` | `Message not found` | UID may be stale |
+| `himalaya_not_installed` | `command not found: himalaya`, `spawn himalaya ENOENT` | `brew install himalaya` |
+| `himalaya_config_missing` | `Cannot find config` | `himalaya account configure` |
+
+Process-level failures (ENOENT, killed-by-timeout) are detected before stderr classification:
+
+- `ENOENT` → `himalaya_not_installed`
+- `killed = true` (execFile timeout) → `imap_timeout`
+
+Anything not matched falls through to `code: "unknown"` with the raw stderr preserved.
+
+### Retry policy
+
+`HimalayaClient` retries a subprocess once on the `transient` code with a 200ms backoff (configurable via `retryBackoffMs` option). Other recoverable codes are surfaced without retry — including `imap_timeout`, which already represents a timeout and benefits from user remediation rather than blind retry. `attempts` is included in the envelope so callers can distinguish first-try failures from post-retry surfaces.
+
+### Multi-account discovery
+
+`discoverAccounts()` in `src/himalaya/accounts.ts` parses `himalaya account list -o json`. Used by:
+
+- `himalaya-mcp doctor` (default mode iterates all accounts)
+- `health_check` MCP tool (default mode iterates all accounts)
+- `--account <name>` flags target a single account
 
 ## Security Boundaries
 
