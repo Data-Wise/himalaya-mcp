@@ -695,3 +695,78 @@ describe("Plugin structure validation", () => {
     expect(marketplace.metadata.version).toBe(pkg.version);
   });
 });
+
+// ==============================================================================
+// doctor multi-account: M1/W2 — per-account reachability section
+// ==============================================================================
+
+import { runDoctor } from "../src/cli/setup";
+import * as accountsModule from "../src/himalaya/accounts";
+
+describe("doctor multi-account", () => {
+  // Use `includeBaseChecks: false` + an injected `probeAccount` so tests
+  // never spawn real himalaya subprocesses or hit the filesystem outside
+  // the existing vi.mock("node:fs") boundary.
+  const okProbe = async () => ({ reachable: true } as const);
+
+  beforeEach(() => {
+    vi.spyOn(accountsModule, "listAccounts").mockResolvedValue([
+      { name: "unm", isDefault: true },
+      { name: "personal", isDefault: false },
+    ]);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("renders a row per configured account when no --account flag", async () => {
+    const output = await runDoctor({ includeBaseChecks: false, probeAccount: okProbe });
+    expect(output).toContain("Accounts");
+    expect(output).toContain("unm");
+    expect(output).toContain("personal");
+  });
+
+  it("runs against only the named account when --account is passed", async () => {
+    const output = await runDoctor({
+      account: "personal",
+      includeBaseChecks: false,
+      probeAccount: okProbe,
+    });
+    expect(output).toContain("personal");
+    // listAccounts must not be consulted when --account is supplied.
+    expect(accountsModule.listAccounts).not.toHaveBeenCalled();
+    // The other account must not appear in the Accounts section row.
+    const accountsSection = output.slice(output.indexOf("Accounts"));
+    expect(accountsSection).not.toMatch(/[✓✗]\s+unm/);
+  });
+
+  it("includes a link to troubleshooting.md in the footer when any account fails", async () => {
+    // Force a deterministic failure: listAccounts rejects with a realistic
+    // error message. The doctor surface should record the failure and emit
+    // the troubleshooting footer.
+    vi.spyOn(accountsModule, "listAccounts").mockRejectedValue(
+      new Error("himalaya CLI not installed (ENOENT). Run: brew install himalaya"),
+    );
+
+    const output = await runDoctor({ includeBaseChecks: false, probeAccount: okProbe });
+    expect(output).toContain("Could not list accounts");
+    expect(output).toContain("docs/troubleshooting.md");
+  });
+
+  it("emits troubleshooting footer when a per-account probe fails", async () => {
+    // Even when listAccounts succeeds, a single failing account must trigger
+    // the troubleshooting footer.
+    vi.spyOn(accountsModule, "listAccounts").mockResolvedValue([
+      { name: "unm", isDefault: true },
+    ]);
+    const failingProbe = async (name: string) => ({
+      reachable: false,
+      error: `IMAP connection refused for ${name}`,
+    });
+    const output = await runDoctor({ includeBaseChecks: false, probeAccount: failingProbe });
+    expect(output).toMatch(/✗\s+unm/);
+    expect(output).toContain("IMAP connection refused");
+    expect(output).toContain("docs/troubleshooting.md");
+  });
+});
