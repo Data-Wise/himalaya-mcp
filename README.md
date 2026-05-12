@@ -4,11 +4,12 @@ Privacy-first email for Claude -- MCP server and Claude Code plugin (`email`) wr
 
 ## Features
 
-- **21 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar, threads
+- **22 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar, threads, health check
 - **6 MCP prompts**: triage inbox, summarize email, daily digest, draft reply, morning briefing, inbox check
 - **3 MCP resources**: inbox, message by ID, folders
 - **12 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`, `/email:morning`
 - **Multi-account**: per-call account switching via `--account`
+- **Reliability**: account-aware diagnostics via the `health_check` tool and multi-account `doctor`; structured error envelopes with one-line fix hints
 - **Safe subprocess**: uses `execFile` (no shell injection)
 - **Two-phase send**: `send_email` returns preview first, requires explicit `confirm=true`
 - **Env-based config**: `HIMALAYA_BINARY`, `HIMALAYA_ACCOUNT`, `HIMALAYA_FOLDER`, `HIMALAYA_TIMEOUT`
@@ -77,7 +78,7 @@ npm test              # 414 tests across 18 test files (vitest)
 | Category | Tests | Coverage |
 |----------|-------|----------|
 | Unit (parser, client, config, clipboard) | 38 | Core parsing, config, template variable guards |
-| Integration (tools, prompts) | 85 | All 21 tools + 6 prompts |
+| Integration (tools, prompts) | 85 | All 22 tools + 6 prompts |
 | v1.5.0 features | 79 | Threads (30), morning/inbox prompts (13), E2E integration (36) |
 | Dogfooding | 142 | Realistic Claude usage + .mcpb packaging validation |
 | E2E | 34 | Full MCP server pipeline + .mcpb build pipeline |
@@ -94,6 +95,25 @@ Full documentation at **[data-wise.github.io/himalaya-mcp](https://data-wise.git
 - [Command Reference](https://data-wise.github.io/himalaya-mcp/reference/commands/)
 - [Quick Reference Card](https://data-wise.github.io/himalaya-mcp/reference/refcard/)
 - [Architecture](https://data-wise.github.io/himalaya-mcp/reference/architecture/)
+
+## Troubleshooting
+
+If an email tool fails, ask Claude:
+
+```
+Run a health check on my email accounts.
+```
+
+This invokes the `health_check` MCP tool and surfaces a per-account status with one-line fix hints.
+
+From a terminal, run:
+
+```bash
+himalaya-mcp doctor                    # All accounts
+himalaya-mcp doctor --account <name>   # Single account
+```
+
+For the full failure-mode catalog and recovery steps, see [docs/troubleshooting.md](docs/troubleshooting.md).
 
 ## License
 

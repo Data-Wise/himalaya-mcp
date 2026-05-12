@@ -571,3 +571,21 @@ Sent:      23           19           up 21%
 ```
 
 **Tip:** Great for Monday morning email planning -- check stats before diving in.
+
+## Diagnosing email problems
+
+When an email tool fails, the structured error envelope tells Claude (and you) what went wrong and how to fix it.
+
+**Recommended Claude prompts:**
+
+- "Run a health check on my email accounts."
+- "Why is email failing?"
+- "Check if my <account> account is working."
+
+Claude will invoke the `health_check` MCP tool. Based on the response:
+
+- `overall: healthy` -- all good
+- `overall: degraded` -- at least one account fails; Claude surfaces the per-account `hint`
+- `overall: broken` -- no account reachable; Claude follows the top-level `hint`
+
+For detailed failure-mode walkthroughs, see [troubleshooting.md](../troubleshooting.md).

@@ -23,7 +23,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 | Feature | Claude Code | Claude Desktop |
 |---------|-------------|----------------|
-| 21 MCP tools | Yes | Yes |
+| 22 MCP tools | Yes | Yes |
 | 6 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
 | `/email:*` slash commands | Yes (12 skills) | No |
@@ -35,7 +35,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 **In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.
 
-**In Claude Desktop**, you get the full MCP server -- all 21 tools, 6 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
+**In Claude Desktop**, you get the full MCP server -- all 22 tools, 6 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
 
 !!! tip "Which should I use?"
     Use **Claude Code** if you want the structured skill workflows and the email assistant agent. Use **Claude Desktop** if you prefer the desktop UI or want email access alongside other MCP servers.
@@ -129,7 +129,7 @@ The `setup` command writes a server entry into Claude Desktop's config file. It 
 }
 ```
 
-Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 21 tools, 6 prompts, and 3 resources.
+Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 22 tools, 6 prompts, and 3 resources.
 
 #### Using himalaya-mcp in Claude Desktop
 
@@ -203,7 +203,7 @@ Example with env vars:
 }
 ```
 
-## MCP Tools (21)
+## MCP Tools (22)
 
 ### Reading
 
@@ -266,6 +266,34 @@ Example with env vars:
 | `list_threads` | List email threads grouped by conversation | `folder`, `page_size`, `account` |
 | `read_thread` | Read all messages in a thread chronologically | `thread_id`, `folder`, `account` |
 
+### Diagnostics
+
+| Tool | Description | Key Parameters |
+|------|-------------|----------------|
+| `health_check` | Check himalaya-mcp installation health and per-account IMAP connectivity | `account` (optional) |
+
+#### `health_check`
+
+Returns `overall` status (`healthy` / `degraded` / `broken`) plus a per-account detail array. Use it when an email tool fails — Claude can call `health_check` to diagnose which accounts are reachable and surface the per-account `hint` from the structured error envelope.
+
+**Arguments:**
+
+- `account` (optional) — Specific account to test. Defaults to all configured accounts.
+
+**Example response:**
+
+```json
+{
+  "overall": "degraded",
+  "accounts": [
+    { "name": "unm", "reachable": false, "code": "imap_auth_failed", "hint": "Re-check app password. Run: himalaya account configure <account>" },
+    { "name": "personal", "reachable": true }
+  ]
+}
+```
+
+If any tool fails, also see the [troubleshooting guide](../troubleshooting.md).
+
 ## MCP Prompts (6)
 
 Prompts guide Claude's reasoning for email tasks. Use them via the MCP prompt interface or through the plugin skills.
@@ -313,12 +341,26 @@ No emails are ever deleted -- only flagged or moved.
 ## Diagnostics
 
 ```bash
-himalaya-mcp doctor          # Check all settings across the full stack
-himalaya-mcp doctor --fix    # Auto-fix common issues
-himalaya-mcp doctor --json   # Machine-readable output
+himalaya-mcp doctor                    # Check all accounts (default)
+himalaya-mcp doctor --account work     # Check only one account
+himalaya-mcp doctor --fix              # Auto-fix common issues
+himalaya-mcp doctor --json             # Machine-readable output
 ```
 
-The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health, email connectivity, Claude Desktop extension state, Claude Code plugin registration, and environment variables. See the [Command Reference](../reference/commands.md#himalaya-mcp-doctor) for full details.
+The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health, per-account email connectivity, Claude Desktop extension state, Claude Code plugin registration, and environment variables. See the [Command Reference](../reference/commands.md#himalaya-mcp-doctor) for full details.
+
+For in-conversation diagnostics, ask Claude to run a health check — that invokes the `health_check` MCP tool documented above.
+
+## When something goes wrong
+
+When an email tool fails, the structured error envelope tells Claude (and you) what went wrong and how to fix it. Each failure carries:
+
+- `code` — stable identifier (e.g., `imap_auth_failed`, `transient`, `account_not_found`)
+- `hint` — one-line suggested fix
+- `account` — which account failed (in multi-account setups)
+- `attempts` — how many times the operation was retried before surfacing
+
+For the full failure-mode catalog and recovery steps, see the canonical [troubleshooting guide](../troubleshooting.md).
 
 ## Testing
 
