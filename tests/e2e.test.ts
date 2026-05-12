@@ -865,3 +865,226 @@ describe("E2E: MCPB Build Pipeline", () => {
     45_000
   );
 });
+
+// =============================================================================
+// E2E: Structured Error Envelopes (Round-Trip)
+//
+// Replaces the skipped Scenario 17 in tests/dogfood-reliability.test.ts —
+// verifies that error envelopes survive the full client → tool → MCP stdio →
+// JSON-RPC response pipeline. Each test spawns its own server with a fake
+// himalaya whose stderr triggers a specific MCPError code.
+// =============================================================================
+
+interface RoundTripHarness {
+  send: (method: string, params?: any) => Promise<any>;
+  cleanup: () => Promise<void>;
+}
+
+async function spawnHarnessWithFakeHimalaya(
+  script: string
+): Promise<RoundTripHarness> {
+  const dir = join(
+    tmpdir(),
+    `himalaya-roundtrip-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  );
+  await mkdir(dir, { recursive: true });
+  const binPath = join(dir, "himalaya");
+  await writeFile(binPath, script);
+  await chmod(binPath, 0o755);
+
+  const proc = spawn("node", ["dist/index.js"], {
+    cwd: PROJECT_ROOT,
+    env: { ...process.env, HIMALAYA_BINARY: binPath },
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+
+  let buffer = "";
+  const resolvers = new Map<number, (value: any) => void>();
+  let nextId = 0;
+
+  proc.stdout!.on("data", (chunk: Buffer) => {
+    buffer += chunk.toString();
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const msg = JSON.parse(line);
+        if (msg.id && resolvers.has(msg.id)) {
+          resolvers.get(msg.id)!(msg);
+          resolvers.delete(msg.id);
+        }
+      } catch {
+        // Not JSON, skip
+      }
+    }
+  });
+
+  const send = (method: string, params?: any): Promise<any> => {
+    const id = ++nextId;
+    proc.stdin!.write(
+      JSON.stringify({ jsonrpc: "2.0", id, method, params: params || {} }) +
+        "\n"
+    );
+    return new Promise((resolve) => resolvers.set(id, resolve));
+  };
+
+  await send("initialize", {
+    protocolVersion: "2025-03-26",
+    capabilities: {},
+    clientInfo: { name: "roundtrip-test", version: "1.0.0" },
+  });
+
+  const cleanup = async () => {
+    proc.kill("SIGTERM");
+    await rm(dir, { recursive: true, force: true });
+  };
+
+  return { send, cleanup };
+}
+
+/** Parse the structured envelope from a tools/call response. */
+function parseEnvelope(response: any): {
+  code: string;
+  message: string;
+  hint?: string;
+  recoverable?: boolean;
+  attempts?: number;
+  account?: string;
+  rawStderr?: string;
+} {
+  expect(response.result?.isError).toBe(true);
+  const text = response.result.content[0].text as string;
+  const body = JSON.parse(text);
+  expect(body.error).toBeDefined();
+  return body.error;
+}
+
+describe("E2E: Structured Error Envelopes (Round-Trip)", () => {
+  it(
+    "imap_auth_failed: AUTHENTICATIONFAILED stderr → envelope code + hint",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(`#!/bin/bash
+echo "AUTHENTICATIONFAILED for user@example.com" >&2
+exit 1
+`);
+      try {
+        const result = await harness.send("tools/call", {
+          name: "list_emails",
+          arguments: {},
+        });
+        const envelope = parseEnvelope(result);
+        expect(envelope.code).toBe("imap_auth_failed");
+        expect(envelope.recoverable).toBe(true);
+        expect(envelope.hint).toMatch(/configure/i);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "transient: ECONNRESET retried then surfaced with attempts=2",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(`#!/bin/bash
+echo "ECONNRESET: connection reset by peer" >&2
+exit 1
+`);
+      try {
+        const result = await harness.send("tools/call", {
+          name: "list_emails",
+          arguments: {},
+        });
+        const envelope = parseEnvelope(result);
+        expect(envelope.code).toBe("transient");
+        expect(envelope.attempts).toBe(2);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "folder_not_found: 'No such folder' stderr → folder_not_found code",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(`#!/bin/bash
+echo "Error: No such folder: NonExistent" >&2
+exit 1
+`);
+      try {
+        const result = await harness.send("tools/call", {
+          name: "list_emails",
+          arguments: { folder: "NonExistent" },
+        });
+        const envelope = parseEnvelope(result);
+        expect(envelope.code).toBe("folder_not_found");
+        expect(envelope.hint).toMatch(/folder list/i);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "parse_error: invalid JSON stdout → parse_error envelope (parser path)",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(`#!/bin/bash
+echo "this is not json at all"
+`);
+      try {
+        const result = await harness.send("tools/call", {
+          name: "list_emails",
+          arguments: {},
+        });
+        const envelope = parseEnvelope(result);
+        expect(envelope.code).toBe("parse_error");
+        expect(envelope.recoverable).toBe(false);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "health_check tool surfaces same envelope codes for failing accounts",
+    async () => {
+      // listFolders → fails with auth error; health_check should surface
+      // the structured code from the subprocess all the way through the
+      // MCP transport. account list returns one account so we have something
+      // to probe.
+      const harness = await spawnHarnessWithFakeHimalaya(`#!/bin/bash
+args="$*"
+if echo "$args" | grep -q "account list"; then
+  echo '[{"name":"unm","default":true,"backend":"imap"}]'
+  exit 0
+fi
+if echo "$args" | grep -q "folder list"; then
+  echo "AUTHENTICATIONFAILED for unm" >&2
+  exit 1
+fi
+echo '[]'
+`);
+      try {
+        const result = await harness.send("tools/call", {
+          name: "health_check",
+          arguments: {},
+        });
+        // health_check responds with the result body, not as isError
+        const text = result.result.content[0].text as string;
+        const body = JSON.parse(text);
+        expect(body.overall).toBe("broken");
+        expect(body.accounts).toHaveLength(1);
+        expect(body.accounts[0].reachable).toBe(false);
+        expect(body.accounts[0].code).toBe("imap_auth_failed");
+        expect(body.accounts[0].hint).toMatch(/configure/i);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+});
