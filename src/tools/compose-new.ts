@@ -9,6 +9,7 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
+import { envelopeError } from "./_envelope.js";
 
 /** Build an MML email template from parameters. */
 function buildTemplate(to: string, subject: string, body: string, cc?: string, bcc?: string): string {
@@ -74,13 +75,7 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error sending email: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 }

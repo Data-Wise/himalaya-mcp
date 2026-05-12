@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.5.0 ready for PR
-## Phase: Implementation complete, docs updated
+## Focus: v1.6.0 merged to dev — release pending
+## Phase: Merged, awaiting release PR to main
 ## Priority: 2
-## Progress: 100 (v1.5.0 complete)
+## Progress: 100 (v1.6.0 implementation + review fixes merged to dev)
 
 ## Completed
 
@@ -24,29 +24,29 @@
 - Plugin Packaging: esbuild bundle (595KB), Homebrew formula, marketplace.json, CLI setup
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
-- Total: 21 tools, 6 prompts, 3 resources, 12 skills, 414 tests (18 test files)
+- v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
+- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 473 tests (23 test files)
 
 ## Just Completed
 
-- 2026-03-19: Docs sync — updated counts across 15 files (tools, prompts, skills, tests)
-- 2026-03-19: Fixed v150-features.test.ts E2E timeout (Content-Length → newline-delimited JSON)
-- 2026-03-17: All 4 orchestration phases complete for v1.5.0
-- 2026-03-17: Thread/conversation view — list_threads + read_thread (2 new tools)
-- 2026-03-17: Morning briefing + inbox check prompts (2 new prompts)
-- 2026-03-17: SessionStart hook + broadened skill descriptions (12 skills)
-- 2026-03-17: /email:morning skill added
-- 2026-03-17: Version bumped to 1.5.0
-- 2026-03-04: Full doc audit — fixed 16 gaps
-- 2026-03-03: Released v1.4.1 — skill loading fix
+- 2026-05-12: PR #57 merged to dev (v1.6.0 reliability) — merge commit e48a52b
+- 2026-05-12: PR #57 review fixes — parse_error envelope, parallel health probing, structured listAccounts errors, doctor --json per-account section, broader auth regex, defensive retry-loop throw, CI flake fix (beforeAll 60s→120s)
+- 2026-05-11: v1.6.0 implementation — errors.ts, retry policy, accounts.ts, health_check tool, multi-account doctor
+- 2026-05-11: v1.6.0 docs — troubleshooting.md, guide/refcard/architecture/workflows updates
+- 2026-05-11: v1.6.0 dogfood scenarios — 20 reliability scenarios (1 skipped)
+- 2026-05-11: v1.6.0 version bump — manifests, CHANGELOG, CLAUDE.md, .STATUS
+- 2026-03-24: Released v1.5.0 — GitHub release + Homebrew formula + docs site
 
 ## Current State
 
-- Branch: `feature/plugin-improvements` (worktree)
-- v1.5.0 implementation complete, all tests passing
+- Branch: `dev` (v1.6.0 merged, ahead of main)
+- No active worktrees
+- v1.5.0 released: GitHub, Homebrew, docs site all live
+- v1.6.0 merged to dev — release PR to main pending
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
-- Tools: 21 MCP tools, 6 prompts, 3 resources
-- Tests: 414 across 18 test files
-- Bundle: 595KB (esbuild), .mcpb: ~147KB
+- Tools: 22 MCP tools, 6 prompts, 3 resources
+- Tests: 473 passing, 1 skipped across 23 test files
+- Bundle: 604KB (esbuild), .mcpb: ~147KB
 
 ## Install
 
@@ -75,7 +75,9 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Commit docs sync + test fix, create PR to dev
+- Cut v1.6.0 release: `gh pr create --base main --head dev --title "Release: v1.6.0"`
+- After release merge: tag, GitHub release, update Homebrew formula
+- Follow-up: add real round-trip envelope test in tests/e2e.test.ts (currently Scenario 17 in dogfood-reliability.test.ts is skipped)
 
 ## Future
 
@@ -88,5 +90,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-03-19
-**Status:** v1.5.0 implementation complete — ready for PR to dev
+**Last Updated:** 2026-05-12
+**Status:** v1.6.0 merged to dev — release PR to main pending

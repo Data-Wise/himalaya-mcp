@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
+import { HimalayaError } from "../src/himalaya/errors.js";
 import { registerFolderTools } from "../src/tools/folders.js";
 
 // --- Mock client ---
@@ -58,16 +59,24 @@ describe("Folder tools", () => {
       expect(client.listFolders).toHaveBeenCalledWith("work");
     });
 
-    it("handles errors", async () => {
-      vi.spyOn(client, "listFolders").mockRejectedValue(new Error("connection failed"));
+    it("handles errors as envelope", async () => {
+      vi.spyOn(client, "listFolders").mockRejectedValue(
+        new HimalayaError({
+          code: "transient",
+          message: "ECONNRESET",
+          hint: "retry",
+          recoverable: true,
+        }),
+      );
       const tool = getToolHandler(server, "list_folders");
       const result = await tool.handler({
         account: undefined,
       }, {} as any);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error listing folders");
-      expect(result.content[0].text).toContain("connection failed");
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.error.code).toBe("transient");
+      expect(parsed.error.message).toBe("ECONNRESET");
     });
 
     it("handles parse errors", async () => {
@@ -105,8 +114,14 @@ describe("Folder tools", () => {
       expect(client.createFolder).toHaveBeenCalledWith("Projects", "work");
     });
 
-    it("handles errors", async () => {
-      vi.spyOn(client, "createFolder").mockRejectedValue(new Error("folder exists"));
+    it("handles errors as envelope", async () => {
+      vi.spyOn(client, "createFolder").mockRejectedValue(
+        new HimalayaError({
+          code: "unknown",
+          message: "folder exists",
+          recoverable: false,
+        }),
+      );
       const tool = getToolHandler(server, "create_folder");
       const result = await tool.handler({
         name: "INBOX",
@@ -114,8 +129,9 @@ describe("Folder tools", () => {
       }, {} as any);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error creating folder");
-      expect(result.content[0].text).toContain("folder exists");
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.error.code).toBe("unknown");
+      expect(parsed.error.message).toContain("folder exists");
     });
   });
 
@@ -172,8 +188,14 @@ describe("Folder tools", () => {
       expect(client.deleteFolder).toHaveBeenCalledWith("OldStuff", "personal");
     });
 
-    it("handles errors", async () => {
-      vi.spyOn(client, "deleteFolder").mockRejectedValue(new Error("permission denied"));
+    it("handles errors as envelope", async () => {
+      vi.spyOn(client, "deleteFolder").mockRejectedValue(
+        new HimalayaError({
+          code: "unknown",
+          message: "permission denied",
+          recoverable: false,
+        }),
+      );
       const tool = getToolHandler(server, "delete_folder");
       const result = await tool.handler({
         name: "INBOX",
@@ -182,8 +204,9 @@ describe("Folder tools", () => {
       }, {} as any);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error deleting folder");
-      expect(result.content[0].text).toContain("permission denied");
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.error.code).toBe("unknown");
+      expect(parsed.error.message).toContain("permission denied");
     });
   });
 });

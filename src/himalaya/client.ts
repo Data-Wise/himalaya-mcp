@@ -6,6 +6,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { HimalayaClientOptions } from "./types.js";
+import { classifyStderr, HimalayaError } from "./errors.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -14,7 +15,10 @@ const DEFAULT_OPTIONS: Required<HimalayaClientOptions> = {
   account: "",
   folder: "INBOX",
   timeout: 120_000,
+  retryBackoffMs: 200,
 };
+
+const MAX_ATTEMPTS = 2;
 
 export class HimalayaClient {
   private opts: Required<HimalayaClientOptions>;
@@ -29,8 +33,37 @@ export class HimalayaClient {
   /**
    * Execute a himalaya CLI command and return raw stdout.
    * Always appends --output json.
+   *
+   * Retries once with backoff on transient failures (ECONNRESET, ETIMEDOUT, * BYE).
+   * Auth/cert/not-found and timeout errors are NOT retried — user-action required.
    */
   async exec(subcommand: string[], options?: {
+    folder?: string;
+    account?: string;
+    timeout?: number;
+    cwd?: string;
+  }): Promise<string> {
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+      try {
+        return await this.execOnce(subcommand, options);
+      } catch (err) {
+        if (!(err instanceof HimalayaError)) throw err;
+        if (err.envelope.code !== "transient" || attempt === MAX_ATTEMPTS) {
+          err.envelope.attempts = attempt;
+          throw err;
+        }
+        if (this.opts.retryBackoffMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, this.opts.retryBackoffMs));
+        }
+      }
+    }
+    // Loop above either returns or throws on the final attempt; reaching
+    // here means MAX_ATTEMPTS was set to 0 or the loop logic regressed.
+    throw new Error("HimalayaClient.exec: retry loop exited without resolution");
+  }
+
+  /** Single-attempt subprocess invocation. */
+  private async execOnce(subcommand: string[], options?: {
     folder?: string;
     account?: string;
     timeout?: number;
@@ -61,7 +94,7 @@ export class HimalayaClient {
       });
       return stdout;
     } catch (err: unknown) {
-      throw this.wrapError(err);
+      throw this.wrapError(err, account);
     }
   }
 
@@ -212,32 +245,50 @@ export class HimalayaClient {
     return this.exec(args, { folder: f, account, cwd: destDir });
   }
 
-  /** Wrap errors with meaningful messages. */
-  private wrapError(err: unknown): Error {
+  /**
+   * Wrap a subprocess error into a HimalayaError carrying a structured envelope.
+   *
+   * Process-level errors (ENOENT, timeout) are detected before stderr classification
+   * because execFile attaches them as properties on the Error, not in stderr.
+   * Other failures route through {@link classifyStderr} for pattern matching.
+   */
+  private wrapError(err: unknown, account = ""): HimalayaError {
+    const accountName = account || this.opts.account || undefined;
+
     if (err instanceof Error) {
-      const msg = err.message;
-
-      // CLI not found
+      // CLI not found — binary missing on PATH
       if ("code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
-        return new Error(
-          `himalaya CLI not found at "${this.opts.binary}". Install with: brew install himalaya`
-        );
+        return new HimalayaError({
+          code: "himalaya_not_installed",
+          message: `himalaya CLI not found at "${this.opts.binary}"`,
+          hint: "Run: brew install himalaya",
+          account: accountName,
+          recoverable: true,
+        });
       }
 
-      // Timeout
+      // Timeout — process killed via SIGTERM by execFile timeout
       if ("killed" in err && (err as { killed: boolean }).killed) {
-        return new Error(
-          `himalaya command timed out after ${this.opts.timeout}ms`
-        );
+        return new HimalayaError({
+          code: "imap_timeout",
+          message: `himalaya command timed out after ${this.opts.timeout}ms`,
+          hint: "Check network or VPN, or increase HIMALAYA_TIMEOUT",
+          account: accountName,
+          recoverable: true,
+        });
       }
 
-      // Auth / connection errors
-      if (msg.includes("authentication") || msg.includes("login")) {
-        return new Error(`himalaya authentication failed: ${msg}`);
-      }
-
-      return new Error(`himalaya error: ${msg}`);
+      // Otherwise classify stderr (or err.message if stderr is empty)
+      const stderr = (err as { stderr?: string }).stderr ?? "";
+      const text = stderr.trim() ? stderr : err.message;
+      return new HimalayaError(classifyStderr(text, accountName));
     }
-    return new Error(`himalaya unknown error: ${String(err)}`);
+
+    return new HimalayaError({
+      code: "unknown",
+      message: `himalaya unknown error: ${String(err)}`,
+      account: accountName,
+      recoverable: false,
+    });
   }
 }

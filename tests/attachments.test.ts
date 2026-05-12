@@ -89,7 +89,8 @@ describe("Attachment tools", () => {
       const tool = getToolHandler(server, "list_attachments");
       const result = await tool.handler({ id: "999", folder: undefined, account: undefined }, {} as any);
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error listing attachments");
+      const envelope = JSON.parse(result.content[0].text as string).error;
+      expect(envelope.message).toContain("not found");
     });
   });
 
@@ -152,7 +153,8 @@ describe("Attachment tools", () => {
       }, {} as any);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error downloading attachment");
+      const envelope = JSON.parse(result.content[0].text as string).error;
+      expect(envelope.message).toContain("download failed");
     });
   });
 });

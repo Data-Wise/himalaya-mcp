@@ -9,6 +9,7 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
+import { envelopeError } from "./_envelope.js";
 import { mkdir, readdir, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, extname, basename } from "node:path";
@@ -115,13 +116,7 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error listing attachments: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     } finally {
       if (destDir) {
         await rm(destDir, { recursive: true, force: true }).catch(() => {});
@@ -172,13 +167,7 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error downloading attachment: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 }

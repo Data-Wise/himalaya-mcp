@@ -21,12 +21,13 @@ himalaya-mcp setup --check      Verify configuration exists and paths valid
 himalaya-mcp setup --remove     Remove MCP server entry
 himalaya-mcp install-ext [file] Install .mcpb as Desktop extension
 himalaya-mcp remove-ext         Remove Desktop extension
-himalaya-mcp doctor             Diagnose full stack (prereqs, email, extension, plugin)
+himalaya-mcp doctor             Diagnose full stack — checks all configured accounts
+himalaya-mcp doctor --account <name>  Diagnose a single account
 himalaya-mcp doctor --fix       Auto-fix common issues
 himalaya-mcp doctor --json      Machine-readable diagnostic output
 ```
 
-## Tools (21)
+## Tools (22)
 
 ```
 list_emails         [folder] [page_size] [page] [account]     List envelopes
@@ -50,6 +51,15 @@ read_thread         thread_id [folder] [account]               Read all messages
 export_to_markdown  id [folder] [account]                      Email -> markdown + YAML
 create_action_item  id [folder] [account]                      Extract todos/deadlines
 copy_to_clipboard   text                                       Copy to system clipboard
+health_check        [account]                                  Check per-account IMAP health
+```
+
+## Troubleshooting
+
+```
+docs/troubleshooting.md    Common failure modes + error-code reference table
+health_check tool          In-conversation: "Run a health check on my email accounts"
+himalaya-mcp doctor        CLI: per-account health (multi-account aware)
 ```
 
 ## Prompts (6)

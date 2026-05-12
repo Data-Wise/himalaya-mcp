@@ -15,9 +15,10 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, realpathSync, readdirSync, rmSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { homedir } from "node:os";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { listAccounts } from "../himalaya/accounts.js";
 
 function getConfigDir(): string {
   switch (process.platform) {
@@ -647,19 +648,82 @@ function checkEnvironment(): CheckResult[] {
   return results;
 }
 
-function doctor(flags: { fix: boolean; json: boolean }): void {
-  const results: CheckResult[] = [
-    ...checkPrerequisites(),
-    ...checkMcpServer(),
-    ...checkEmailConnectivity(),
-    ...checkDesktopExtension(),
-    ...checkCodePlugin(),
-    ...checkPluginCache(),
-    ...checkEnvironment(),
-  ];
+export interface DoctorOptions {
+  account?: string;
+  fix?: boolean;
+  json?: boolean;
+  /**
+   * When false, skips the prerequisite / MCP / extension / plugin checks
+   * and renders only the multi-account section. Tests use this to isolate
+   * the new code path; the CLI leaves it true.
+   */
+  includeBaseChecks?: boolean;
+  /**
+   * Override the per-account reachability probe. Tests use this to avoid
+   * spawning real himalaya subprocesses.
+   */
+  probeAccount?: (name: string) => Promise<AccountHealth> | AccountHealth;
+}
+
+export interface AccountHealth {
+  reachable: boolean;
+  error?: string;
+  hint?: string;
+}
+
+export function checkAccountHealth(name: string): AccountHealth {
+  const himalayaPath = whichBin("himalaya");
+  if (!himalayaPath) {
+    return {
+      reachable: false,
+      error: "himalaya CLI not found on PATH",
+      hint: "Install: brew install himalaya",
+    };
+  }
+  // Use a shorter timeout for the per-account probe so doctor stays responsive
+  // even if an account is partially configured or IMAP is slow to respond.
+  let stdout = "";
+  let stderr = "";
+  let ok = false;
+  try {
+    stdout = execFileSync(
+      himalayaPath,
+      ["folder", "list", "--account", name, "--output", "json"],
+      { timeout: 5_000, stdio: "pipe" },
+    ).toString().trim();
+    ok = true;
+  } catch (err: unknown) {
+    stderr = err instanceof Error ? err.message : String(err);
+  }
+  if (ok && stdout) {
+    return { reachable: true };
+  }
+  return { reachable: false, error: stderr || "folder list failed" };
+}
+
+/**
+ * Run doctor diagnostics and return formatted output as a string.
+ *
+ * Combines the existing prerequisite / MCP / extension / plugin checks with
+ * a new per-account reachability section. Used by tests and by the CLI
+ * `doctor` command for non-JSON output paths.
+ */
+export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
+  const includeBase = opts.includeBaseChecks !== false;
+  const results: CheckResult[] = includeBase
+    ? [
+      ...checkPrerequisites(),
+      ...checkMcpServer(),
+      ...checkEmailConnectivity(),
+      ...checkDesktopExtension(),
+      ...checkCodePlugin(),
+      ...checkPluginCache(),
+      ...checkEnvironment(),
+    ]
+    : [];
 
   // Apply auto-fixes
-  if (flags.fix) {
+  if (opts.fix) {
     for (const r of results) {
       if (r.status !== "pass" && r.fix?.auto) {
         try {
@@ -673,22 +737,10 @@ function doctor(flags: { fix: boolean; json: boolean }): void {
     }
   }
 
-  // Output
-  if (flags.json) {
-    const output = results.map(r => ({
-      name: r.name,
-      category: r.category,
-      status: r.status,
-      message: r.message,
-      fixAvailable: !!r.fix,
-    }));
-    console.log(JSON.stringify(output, null, 2));
-    return;
-  }
-
-  // Pretty-print
+  const lines: string[] = [];
   const version = getVersion();
-  console.log(`himalaya-mcp doctor${version ? ` v${version}` : ""}\n`);
+  lines.push(`himalaya-mcp doctor${version ? ` v${version}` : ""}`);
+  lines.push("");
 
   let currentCategory = "";
   const icons = { pass: "\u2713", warn: "!", fail: "\u2717" };
@@ -697,13 +749,13 @@ function doctor(flags: { fix: boolean; json: boolean }): void {
   for (const r of results) {
     if (r.category !== currentCategory) {
       currentCategory = r.category;
-      console.log(`  ${currentCategory}`);
+      lines.push(`  ${currentCategory}`);
     }
 
     const icon = icons[r.status];
-    console.log(`  ${icon} ${r.name}: ${r.message}`);
-    if (r.status !== "pass" && r.fix && !flags.fix) {
-      console.log(`    Fix: ${r.fix.description} (run with --fix)`);
+    lines.push(`  ${icon} ${r.name}: ${r.message}`);
+    if (r.status !== "pass" && r.fix && !opts.fix) {
+      lines.push(`    Fix: ${r.fix.description} (run with --fix)`);
     }
 
     if (r.status === "pass") pass++;
@@ -711,10 +763,139 @@ function doctor(flags: { fix: boolean; json: boolean }): void {
     else fail++;
   }
 
-  console.log("");
-  console.log(`  Summary: ${pass} passed, ${warn} warnings, ${fail} failed`);
+  // Multi-account reachability section
+  lines.push("");
+  lines.push("  Accounts");
+  let accountsToCheck: { name: string }[];
+  if (opts.account) {
+    accountsToCheck = [{ name: opts.account }];
+  } else {
+    try {
+      accountsToCheck = await listAccounts();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      lines.push(`  ${icons.fail} Could not list accounts: ${msg}`);
+      accountsToCheck = [];
+      fail++;
+    }
+  }
 
-  if (fail > 0) process.exit(1);
+  const probe = opts.probeAccount ?? checkAccountHealth;
+  let anyAccountFailed = false;
+  for (const acc of accountsToCheck) {
+    const status = await probe(acc.name);
+    if (status.reachable) {
+      lines.push(`  ${icons.pass} ${acc.name}: reachable`);
+      pass++;
+    } else {
+      anyAccountFailed = true;
+      lines.push(`  ${icons.fail} ${acc.name}: ${status.error}`);
+      if (status.hint) lines.push(`    Hint: ${status.hint}`);
+      fail++;
+    }
+  }
+
+  lines.push("");
+  lines.push(`  Summary: ${pass} passed, ${warn} warnings, ${fail} failed`);
+
+  if (anyAccountFailed || fail > 0) {
+    lines.push("");
+    lines.push("  See: docs/troubleshooting.md");
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * Run the `--json` path for doctor \u2014 emits machine-readable JSON of
+ * check results plus a per-account reachability section under the
+ * synthetic "Accounts" category so tooling has the same view as the
+ * text output.
+ */
+async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; failed: number }> {
+  const results: CheckResult[] = [
+    ...checkPrerequisites(),
+    ...checkMcpServer(),
+    ...checkEmailConnectivity(),
+    ...checkDesktopExtension(),
+    ...checkCodePlugin(),
+    ...checkPluginCache(),
+    ...checkEnvironment(),
+  ];
+
+  if (opts.fix) {
+    for (const r of results) {
+      if (r.status !== "pass" && r.fix?.auto) {
+        try {
+          r.fix.auto();
+          r.status = "pass";
+          r.message += " (fixed)";
+        } catch (err: unknown) {
+          r.message += ` (fix failed: ${err instanceof Error ? err.message : String(err)})`;
+        }
+      }
+    }
+  }
+
+  // Per-account reachability \u2014 same data the text path renders, projected
+  // into the existing CheckResult shape so JSON consumers see a uniform list.
+  let accountsToCheck: { name: string }[] = [];
+  if (opts.account) {
+    accountsToCheck = [{ name: opts.account }];
+  } else {
+    try {
+      accountsToCheck = await listAccounts();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      results.push({
+        name: "list",
+        category: "Accounts",
+        status: "fail",
+        message: `Could not list accounts: ${msg}`,
+      });
+    }
+  }
+  const probe = opts.probeAccount ?? checkAccountHealth;
+  for (const acc of accountsToCheck) {
+    const status = await probe(acc.name);
+    results.push({
+      name: acc.name,
+      category: "Accounts",
+      status: status.reachable ? "pass" : "fail",
+      message: status.reachable ? "reachable" : (status.error ?? "unreachable"),
+    });
+  }
+
+  const failed = results.filter(r => r.status === "fail").length;
+  const output = JSON.stringify(
+    results.map(r => ({
+      name: r.name,
+      category: r.category,
+      status: r.status,
+      message: r.message,
+      fixAvailable: !!r.fix,
+    })),
+    null,
+    2,
+  );
+  return { output, failed };
+}
+
+/**
+ * Thin CLI wrapper around runDoctor / runDoctorJson \u2014 prints output
+ * and exits non-zero on failure. Preserves the existing CLI contract.
+ */
+async function doctor(flags: { fix: boolean; json: boolean; account?: string }): Promise<void> {
+  if (flags.json) {
+    const { output, failed } = await runDoctorJson(flags);
+    console.log(output);
+    if (failed > 0) process.exit(1);
+    return;
+  }
+
+  const output = await runDoctor(flags);
+  console.log(output);
+  if (output.includes("\u2717")) process.exit(1);
 }
 
 function getVersion(): string {
@@ -728,34 +909,59 @@ function getVersion(): string {
   }
 }
 
-// CLI argument parsing
-const args = process.argv.slice(2);
-const command = args[0];
+// CLI argument parsing — gated so importing this module (e.g. from tests)
+// does not trigger side effects.
+function parseAccountFlag(args: string[]): string | undefined {
+  const idx = args.indexOf("--account");
+  if (idx >= 0 && idx + 1 < args.length) return args[idx + 1];
+  return undefined;
+}
 
-if (command === "--check" || command === "check") {
-  check();
-} else if (command === "--remove" || command === "remove") {
-  remove();
-} else if (command === "install-ext") {
-  installExtension(args[1]);
-} else if (command === "remove-ext") {
-  removeExtension();
-} else if (command === "doctor") {
-  const fix = args.includes("--fix");
-  const json = args.includes("--json");
-  doctor({ fix, json });
-} else if (!command || command === "setup") {
-  setup();
-} else {
-  console.log("himalaya-mcp CLI");
-  console.log("");
-  console.log("Usage:");
-  console.log("  himalaya-mcp setup              Add MCP server to Claude Desktop config");
-  console.log("  himalaya-mcp setup --check      Verify configuration");
-  console.log("  himalaya-mcp setup --remove     Remove MCP server entry");
-  console.log("  himalaya-mcp install-ext [file]  Install .mcpb as Desktop extension");
-  console.log("  himalaya-mcp remove-ext          Remove Desktop extension");
-  console.log("  himalaya-mcp doctor              Diagnose installation and connectivity");
-  console.log("  himalaya-mcp doctor --fix        Auto-fix common issues");
-  console.log("  himalaya-mcp doctor --json       Machine-readable output");
+async function runCli(): Promise<void> {
+  const args = process.argv.slice(2);
+  const command = args[0];
+
+  if (command === "--check" || command === "check") {
+    check();
+  } else if (command === "--remove" || command === "remove") {
+    remove();
+  } else if (command === "install-ext") {
+    installExtension(args[1]);
+  } else if (command === "remove-ext") {
+    removeExtension();
+  } else if (command === "doctor") {
+    const fix = args.includes("--fix");
+    const json = args.includes("--json");
+    const account = parseAccountFlag(args);
+    await doctor({ fix, json, account });
+  } else if (!command || command === "setup") {
+    setup();
+  } else {
+    console.log("himalaya-mcp CLI");
+    console.log("");
+    console.log("Usage:");
+    console.log("  himalaya-mcp setup              Add MCP server to Claude Desktop config");
+    console.log("  himalaya-mcp setup --check      Verify configuration");
+    console.log("  himalaya-mcp setup --remove     Remove MCP server entry");
+    console.log("  himalaya-mcp install-ext [file]  Install .mcpb as Desktop extension");
+    console.log("  himalaya-mcp remove-ext          Remove Desktop extension");
+    console.log("  himalaya-mcp doctor              Diagnose installation and connectivity");
+    console.log("  himalaya-mcp doctor --account N  Run checks for a specific account only");
+    console.log("  himalaya-mcp doctor --fix        Auto-fix common issues");
+    console.log("  himalaya-mcp doctor --json       Machine-readable output");
+  }
+}
+
+const isMain = (() => {
+  try {
+    const entry = process.argv[1];
+    if (!entry) return false;
+    return import.meta.url === pathToFileURL(entry).href;
+  } catch {
+    return false;
+  }
+})();
+
+if (isMain) {
+  void runCli();
 }

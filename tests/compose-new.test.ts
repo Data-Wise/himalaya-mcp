@@ -94,7 +94,8 @@ describe("Compose new email tool", () => {
       }, {} as any);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error sending email");
+      const envelope = JSON.parse(result.content[0].text as string).error;
+      expect(envelope.message).toContain("SMTP error");
     });
 
     it("passes account parameter when sending", async () => {
