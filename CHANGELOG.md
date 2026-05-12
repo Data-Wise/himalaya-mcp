@@ -6,6 +6,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+
+- **Round-trip envelope E2E tests** (`tests/e2e.test.ts`) — five tests spawn `dist/index.js` with a fake himalaya and assert the full structured-error pipeline (client → tool → MCP stdio → JSON-RPC response). Covers `imap_auth_failed`, `transient` (with `attempts=2` after retry), `folder_not_found`, `parse_error`, and the `health_check` tool. Replaces the skipped Scenario 17 in `dogfood-reliability.test.ts`.
+- **Homebrew workflow auth pre-check** — new `verify-tap-auth` job in `homebrew-release.yml` validates that GitHub App credentials OR a working PAT are present before invoking the tap update. Surfaces a clear runbook when both are missing or the PAT is expired, instead of letting `actions/checkout` die with "fatal: could not read Username". Targets the recurring v1.5.0 / v1.6.0 release auth failure.
+
+### Changed
+
+- Test count: 473 passing / 1 skipped → 479 passing / 0 skipped. Scenario 17 in `dogfood-reliability.test.ts` is now a passing sentinel pointing to the new e2e tests.
+
 ## [1.6.0] - 2026-05-11
 
 ### Added

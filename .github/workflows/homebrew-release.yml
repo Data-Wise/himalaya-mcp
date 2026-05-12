@@ -151,9 +151,97 @@ jobs:
           echo "::error::Failed to download tarball after 5 attempts"
           exit 1
 
+  verify-tap-auth:
+    name: Verify tap-write credentials
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check auth method availability and validity
+        env:
+          APP_ID: ${{ secrets.APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+        run: |
+          # Belt-and-suspenders pre-check so we fail fast with an
+          # actionable runbook instead of dying inside actions/checkout
+          # with "fatal: could not read Username".
+
+          has_app=false
+          has_pat=false
+          [ -n "$APP_ID" ] && [ -n "$APP_PRIVATE_KEY" ] && has_app=true
+          [ -n "$TAP_TOKEN" ] && has_pat=true
+
+          echo "Auth method discovery:"
+          echo "  GitHub App credentials: $([ "$has_app" = true ] && echo present || echo MISSING)"
+          echo "  PAT (HOMEBREW_TAP_GITHUB_TOKEN): $([ "$has_pat" = true ] && echo present || echo MISSING)"
+
+          if [ "$has_app" = false ] && [ "$has_pat" = false ]; then
+            cat <<'EOF'
+          ::error::No tap-write credentials configured.
+
+          Fix (pick ONE):
+
+          A) GitHub App (recommended):
+             Set these repo secrets on Data-Wise/himalaya-mcp:
+               gh secret set APP_ID --body "<app-id>" --repo Data-Wise/himalaya-mcp
+               gh secret set APP_PRIVATE_KEY < private-key.pem
+             App must be installed on Data-Wise/homebrew-tap with
+             Contents read+write and Pull requests read+write.
+
+          B) Personal Access Token (fallback):
+             Fine-grained PAT scoped to Data-Wise/homebrew-tap with
+             Contents read+write and Pull requests read+write:
+               gh secret set HOMEBREW_TAP_GITHUB_TOKEN --body "<pat>"
+          EOF
+            exit 1
+          fi
+
+          # Validate the PAT can authenticate against the tap.
+          if [ "$has_pat" = true ]; then
+            echo "Validating PAT against Data-Wise/homebrew-tap..."
+            status=$(curl -sS -o /tmp/pat-check.json -w "%{http_code}" \
+              -H "Authorization: Bearer $TAP_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/Data-Wise/homebrew-tap)
+            case "$status" in
+              200)
+                push_perm=$(grep -o '"push"[[:space:]]*:[[:space:]]*true' /tmp/pat-check.json || true)
+                if [ -z "$push_perm" ]; then
+                  echo "::warning::PAT can read tap but lacks push permission."
+                  if [ "$has_app" = false ]; then
+                    echo "::error::No working auth method (App missing, PAT read-only)."
+                    exit 1
+                  fi
+                else
+                  echo "PAT is valid and has push permission."
+                fi
+                ;;
+              401|403)
+                echo "::warning::PAT failed authentication (HTTP $status) — likely expired or wrong scope."
+                if [ "$has_app" = false ]; then
+                  cat <<'EOF'
+          ::error::PAT is invalid and no GitHub App configured. Rotate the PAT:
+            1. https://github.com/settings/personal-access-tokens/new
+            2. Repository access: Data-Wise/homebrew-tap
+            3. Permissions: Contents read+write, Pull requests read+write
+            4. gh secret set HOMEBREW_TAP_GITHUB_TOKEN --body "<new-pat>"
+          EOF
+                  exit 1
+                fi
+                echo "PAT is broken but GitHub App will be used as primary."
+                ;;
+              *)
+                echo "::warning::Unexpected response validating PAT: HTTP $status"
+                ;;
+            esac
+            rm -f /tmp/pat-check.json
+          fi
+
+          echo "Auth pre-check passed. Primary method: $([ "$has_app" = true ] && echo App || echo PAT)"
+
   update-homebrew:
     name: Update Homebrew Formula
-    needs: prepare
+    needs: [prepare, verify-tap-auth]
     uses: Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@main
     with:
       formula_name: himalaya-mcp
