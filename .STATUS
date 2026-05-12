@@ -37,16 +37,17 @@
 - 2026-05-11: v1.6.0 docs — troubleshooting.md, guide/refcard/architecture/workflows updates
 - 2026-05-11: v1.6.0 dogfood scenarios — 20 reliability scenarios (1 skipped)
 - 2026-05-11: v1.6.0 version bump — manifests, CHANGELOG, CLAUDE.md, .STATUS
+- 2026-05-12: PR #59 merged to dev (v1.6.1 followups) — round-trip envelope e2e tests (Scenario 17 retired) + Homebrew workflow auth pre-check job
 - 2026-03-24: Released v1.5.0 — GitHub release + Homebrew formula + docs site
 
 ## Current State
 
-- Branch: `dev` (synced with main at v1.6.0)
+- Branch: `dev` (v1.6.1 followups merged, ahead of main)
 - No active worktrees
 - v1.6.0 released: GitHub, Homebrew, docs site all live
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
-- Tests: 473 passing, 1 skipped across 23 test files
+- Tests: 479 passing across 23 test files (Scenario 17 now real round-trip e2e)
 - Bundle: 604KB (esbuild), .mcpb: 151KB
 
 ## Install
@@ -76,8 +77,9 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Fix Homebrew CI auth (still broken after v1.5.0 release; manual fallback used for v1.6.0 too): install GitHub App on homebrew-tap repo OR rotate `HOMEBREW_TAP_GITHUB_TOKEN`
-- Follow-up: add real round-trip envelope test in tests/e2e.test.ts (currently Scenario 17 in dogfood-reliability.test.ts is skipped)
+- Fix Homebrew tap auth (GitHub-side action required — workflow now has pre-check that fails fast with runbook):
+  - Option A: `gh secret set APP_ID` + `gh secret set APP_PRIVATE_KEY` on himalaya-mcp (App must be installed on homebrew-tap with Contents+PRs read+write)
+  - Option B: Rotate `HOMEBREW_TAP_GITHUB_TOKEN` with fine-grained PAT scoped to homebrew-tap (Contents+PRs read+write)
 
 ## Future
 
