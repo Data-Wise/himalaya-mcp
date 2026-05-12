@@ -4,8 +4,8 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.6.0 released
-## Phase: Released, Homebrew CI auth fix still pending (manual formula bump used)
+## Focus: v1.6.0 released, Homebrew CI auth fixed
+## Phase: Released and infrastructure healthy
 ## Priority: 2
 ## Progress: 100 (v1.6.0 released — GitHub release + Homebrew formula + docs site)
 
@@ -37,6 +37,7 @@
 - 2026-05-11: v1.6.0 docs — troubleshooting.md, guide/refcard/architecture/workflows updates
 - 2026-05-11: v1.6.0 dogfood scenarios — 20 reliability scenarios (1 skipped)
 - 2026-05-11: v1.6.0 version bump — manifests, CHANGELOG, CLAUDE.md, .STATUS
+- 2026-05-12: Fixed Homebrew CI auth permanently — set APP_ID + APP_PRIVATE_KEY on himalaya-mcp (App ID 2874502). Verified via workflow_dispatch → PR #106 on tap merged (fixed stale generator manifest v1.4.1 → v1.6.0). Next release won't need manual fallback.
 - 2026-05-12: PR #59 merged to dev (v1.6.1 followups) — round-trip envelope e2e tests (Scenario 17 retired) + Homebrew workflow auth pre-check job
 - 2026-03-24: Released v1.5.0 — GitHub release + Homebrew formula + docs site
 
@@ -77,9 +78,8 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Fix Homebrew tap auth (GitHub-side action required — workflow now has pre-check that fails fast with runbook):
-  - Option A: `gh secret set APP_ID` + `gh secret set APP_PRIVATE_KEY` on himalaya-mcp (App must be installed on homebrew-tap with Contents+PRs read+write)
-  - Option B: Rotate `HOMEBREW_TAP_GITHUB_TOKEN` with fine-grained PAT scoped to homebrew-tap (Contents+PRs read+write)
+- Infrastructure healthy — no outstanding action items.
+- Optional: brainstorm v1.7.0 scope when ready.
 
 ## Future
 
@@ -93,4 +93,4 @@ himalaya-mcp doctor --fix
 ---
 
 **Last Updated:** 2026-05-12
-**Status:** v1.6.0 released — Homebrew CI auth fix still pending
+**Status:** v1.6.0 released — Homebrew CI auth fixed (App-token path)
