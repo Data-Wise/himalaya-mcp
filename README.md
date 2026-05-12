@@ -78,7 +78,7 @@ npm test              # 470 tests across 23 test files (vitest)
 | Category | Tests | Coverage |
 |----------|-------|----------|
 | Unit (parser, client, config, clipboard) | 41 | Core parsing, config, template variable guards |
-| Integration (tools, prompts) | 90 | All 22 tools + 6 prompts |
+| Integration (tools, prompts) | 85 | Tool registration, MCP prompts, account validation |
 | Reliability (errors, retry, accounts, health) | 33 | Error envelope, transient retry, multi-account discovery, health_check |
 | v1.5.0 features | 79 | Threads (30), morning/inbox prompts (13), E2E integration (36) |
 | Dogfooding | 162 | Realistic Claude usage + reliability scenarios + .mcpb validation |
