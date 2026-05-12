@@ -25,7 +25,7 @@
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
 - v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
-- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 470 tests (23 test files)
+- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 473 tests (23 test files)
 
 ## Just Completed
 
@@ -40,7 +40,7 @@
 - v1.6.0 implementation complete, PR pending
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
-- Tests: 470 passing / 1 skipped / 3 pre-existing doctor E2E failures across 23 test files
+- Tests: 473 passing / 1 skipped / 0 failed across 23 test files
 - Bundle: 604KB (esbuild), .mcpb: ~147KB
 
 ## Install

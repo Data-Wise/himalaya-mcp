@@ -558,6 +558,21 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 // ==============================================================================
 
 describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
+  // Isolate HOME per-test so the doctor's checkEmailConnectivity() doesn't
+  // attempt real IMAP probes against the developer's configured accounts
+  // (each probe has a 10s timeout; 3 probes can blow the 30s test budget).
+  // With a fresh HOME, himalaya finds no config and account-list fails
+  // immediately, short-circuiting the connectivity section.
+  let tempHome: string;
+
+  beforeEach(async () => {
+    tempHome = await mkdtemp(join(tmpdir(), "himalaya-doctor-test-"));
+  });
+
+  afterEach(async () => {
+    if (tempHome) await rm(tempHome, { recursive: true, force: true });
+  });
+
   it("doctor runs and outputs check results", async () => {
     // doctor exits non-zero when checks fail (e.g. himalaya not installed in CI)
     // so we capture stdout from the error object
@@ -566,7 +581,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
       const result = await execFileAsync(
         "node",
         ["dist/cli/setup.js", "doctor"],
-        { cwd: PROJECT_ROOT }
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
     } catch (err: unknown) {
@@ -581,11 +596,18 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   }, 30_000);
 
   it("doctor --json outputs valid JSON array", async () => {
-    const { stdout } = await execFileAsync(
-      "node",
-      ["dist/cli/setup.js", "doctor", "--json"],
-      { cwd: PROJECT_ROOT }
-    );
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "doctor", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      // doctor --json exits 1 when any check fails; the JSON still prints
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
 
     const results = JSON.parse(stdout) as Array<{ name: string; category: string; status: string }>;
     expect(Array.isArray(results)).toBe(true);
@@ -600,11 +622,17 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   }, 30_000);
 
   it("doctor checks all categories", async () => {
-    const { stdout } = await execFileAsync(
-      "node",
-      ["dist/cli/setup.js", "doctor", "--json"],
-      { cwd: PROJECT_ROOT }
-    );
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "doctor", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
 
     const results = JSON.parse(stdout) as Array<{ category: string }>;
     const categories = new Set(results.map(r => r.category));
@@ -614,11 +642,17 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   }, 30_000);
 
   it("doctor detects Node.js as passing", async () => {
-    const { stdout } = await execFileAsync(
-      "node",
-      ["dist/cli/setup.js", "doctor", "--json"],
-      { cwd: PROJECT_ROOT }
-    );
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "doctor", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
 
     const results = JSON.parse(stdout) as Array<{ name: string; status: string }>;
     const nodeCheck = results.find(r => r.name === "Node.js");
@@ -630,7 +664,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
     const { stdout } = await execFileAsync(
       "node",
       ["dist/cli/setup.js", "unknown-command"],
-      { cwd: PROJECT_ROOT }
+      { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
     );
 
     expect(stdout).toContain("doctor");
