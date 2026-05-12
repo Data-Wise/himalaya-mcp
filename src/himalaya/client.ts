@@ -15,7 +15,10 @@ const DEFAULT_OPTIONS: Required<HimalayaClientOptions> = {
   account: "",
   folder: "INBOX",
   timeout: 120_000,
+  retryBackoffMs: 200,
 };
+
+const MAX_ATTEMPTS = 2;
 
 export class HimalayaClient {
   private opts: Required<HimalayaClientOptions>;
@@ -30,8 +33,38 @@ export class HimalayaClient {
   /**
    * Execute a himalaya CLI command and return raw stdout.
    * Always appends --output json.
+   *
+   * Retries once with backoff on transient failures (ECONNRESET, ETIMEDOUT, * BYE).
+   * Auth/cert/not-found and timeout errors are NOT retried — user-action required.
    */
   async exec(subcommand: string[], options?: {
+    folder?: string;
+    account?: string;
+    timeout?: number;
+    cwd?: string;
+  }): Promise<string> {
+    let lastErr: HimalayaError | undefined;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+      try {
+        return await this.execOnce(subcommand, options);
+      } catch (err) {
+        if (!(err instanceof HimalayaError)) throw err;
+        lastErr = err;
+        if (err.envelope.code !== "transient" || attempt === MAX_ATTEMPTS) {
+          err.envelope.attempts = attempt;
+          throw err;
+        }
+        if (this.opts.retryBackoffMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, this.opts.retryBackoffMs));
+        }
+      }
+    }
+    // Unreachable — loop either returns or throws.
+    throw lastErr;
+  }
+
+  /** Single-attempt subprocess invocation. */
+  private async execOnce(subcommand: string[], options?: {
     folder?: string;
     account?: string;
     timeout?: number;

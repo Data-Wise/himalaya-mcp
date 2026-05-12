@@ -55,6 +55,8 @@ export interface HimalayaClientOptions {
   folder?: string;
   /** Timeout in milliseconds (default: 120000; 0 = unlimited) */
   timeout?: number;
+  /** Backoff delay in milliseconds between retry attempts (default: 200) */
+  retryBackoffMs?: number;
 }
 
 // --- Command result ---

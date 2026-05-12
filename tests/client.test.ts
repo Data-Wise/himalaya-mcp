@@ -144,7 +144,8 @@ describe("HimalayaClient", () => {
     it("carries account name in envelope (default omitted when none set)", async () => {
       const err = Object.assign(new Error("fail"), { stderr: "ECONNRESET" });
       setupErrorMock(err);
-      const himalayaErr = await captureError(new HimalayaClient());
+      // Transient errors now retry; disable backoff to keep test fast.
+      const himalayaErr = await captureError(new HimalayaClient({ retryBackoffMs: 0 }));
       expect(himalayaErr.envelope.code).toBe("transient");
       expect(himalayaErr.envelope.account).toBeUndefined();
     });
