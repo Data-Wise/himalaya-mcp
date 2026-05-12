@@ -124,14 +124,14 @@ describe("v1.5.0: plugin.json hook structure", () => {
   });
 
   it("description reflects updated counts", () => {
-    expect(pluginJson.description).toContain("21 tools");
+    expect(pluginJson.description).toContain("22 tools");
     expect(pluginJson.description).toContain("6 prompts");
     expect(pluginJson.description).toContain("12 skills");
     expect(pluginJson.description).toContain("2 hooks");
   });
 
-  it("version is 1.5.0", () => {
-    expect(pluginJson.version).toBe("1.5.0");
+  it("version is 1.6.0", () => {
+    expect(pluginJson.version).toBe("1.6.0");
   });
 });
 

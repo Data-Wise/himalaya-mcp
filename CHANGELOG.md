@@ -6,6 +6,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-05-11
+
+### Added
+
+- `health_check` MCP tool — exposes multi-account diagnostics during conversations. Returns `overall` status (`healthy`/`degraded`/`broken`) plus per-account detail with code, hint, and retry attempts from the structured error envelope.
+- `himalaya-mcp doctor --account <name>` flag for targeted diagnostics. Doctor now iterates all configured accounts by default.
+- `docs/troubleshooting.md` — user-facing guide for the five most common email failure modes with error-code reference table.
+- `src/himalaya/errors.ts` — structured `MCPError` envelope (`code`, `message`, `hint`, `account`, `recoverable`, `attempts`, `rawStderr`) and `HimalayaError` class. Stderr-pattern classifier covers 9 known codes plus `unknown` fallthrough.
+- `src/himalaya/accounts.ts` — multi-account discovery via `himalaya account list -o json`.
+
+### Changed
+
+- `himalaya-mcp doctor` now reports per-account health (table view) instead of testing only the default account.
+- All tool handlers surface structured error envelopes via the shared `envelopeError` helper.
+- Tool count: 21 → 22.
+
+### Fixed
+
+- Transient IMAP failures (`ECONNRESET`, `ETIMEDOUT`, `* BYE`) auto-retry once with 200ms backoff before surfacing as errors. Configurable via `retryBackoffMs` option.
+
 ## [1.5.0] - 2026-03-17
 
 ### Added
