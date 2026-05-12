@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
+import { HimalayaError } from "../src/himalaya/errors.js";
 import { registerComposeTools } from "../src/tools/compose.js";
 
 // --- Mock client ---
@@ -69,8 +70,15 @@ describe("Compose tools", () => {
       expect(client.replyTemplate).toHaveBeenCalledWith("42", "Thanks, confirmed!", undefined, undefined, undefined);
     });
 
-    it("handles errors gracefully", async () => {
-      vi.spyOn(client, "replyTemplate").mockRejectedValue(new Error("not found"));
+    it("handles errors as envelope", async () => {
+      vi.spyOn(client, "replyTemplate").mockRejectedValue(
+        new HimalayaError({
+          code: "message_not_found",
+          message: "not found",
+          hint: "UID may be stale",
+          recoverable: true,
+        }),
+      );
       const tool = getToolHandler(server, "draft_reply");
       const result = await tool.handler({
         id: "999", body: undefined, reply_all: undefined,
@@ -78,7 +86,8 @@ describe("Compose tools", () => {
       }, {} as any);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error drafting reply");
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.error.code).toBe("message_not_found");
     });
   });
 
@@ -126,7 +135,8 @@ describe("Compose tools", () => {
       }, {} as any);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Error sending email");
+      const envelope = JSON.parse(result.content[0].text as string).error;
+      expect(envelope.message).toContain("SMTP error");
     });
 
     it("passes account when specified", async () => {

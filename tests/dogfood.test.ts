@@ -277,26 +277,44 @@ describe("Dogfooding: error handling", () => {
     registerReadTools(server, client);
   });
 
-  it("Scenario: himalaya CLI not found — returns actionable error", async () => {
+  it("Scenario: himalaya CLI not found — returns actionable envelope", async () => {
+    const { HimalayaError } = await import("../src/himalaya/errors.js");
     vi.spyOn(client, "listEnvelopes").mockRejectedValue(
-      new Error('himalaya CLI not found at "himalaya". Install with: brew install himalaya')
+      new HimalayaError({
+        code: "himalaya_not_installed",
+        message: 'himalaya CLI not found at "himalaya"',
+        hint: "Run: brew install himalaya",
+        recoverable: true,
+      })
     );
     const tool = getToolHandler(server, "list_emails");
+    const result = await tool.handler(
+      { folder: undefined, page_size: undefined, page: undefined, account: undefined },
+      {} as any
+    );
 
-    await expect(
-      tool.handler({ folder: undefined, page_size: undefined, page: undefined, account: undefined }, {} as any)
-    ).rejects.toThrow("himalaya CLI not found");
+    expect(result.isError).toBe(true);
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.code).toBe("himalaya_not_installed");
+    expect(envelope.hint).toMatch(/brew install/);
   });
 
-  it("Scenario: auth failure — returns clear error", async () => {
+  it("Scenario: auth failure — returns envelope with imap_auth_failed code", async () => {
+    const { HimalayaError } = await import("../src/himalaya/errors.js");
     vi.spyOn(client, "readMessage").mockRejectedValue(
-      new Error("himalaya authentication failed: bad credentials")
+      new HimalayaError({
+        code: "imap_auth_failed",
+        message: "authentication failed: bad credentials",
+        hint: "Re-check app password. Run: himalaya account configure <account>",
+        recoverable: true,
+      })
     );
     const tool = getToolHandler(server, "read_email");
+    const result = await tool.handler({ id: "123", folder: undefined, account: undefined }, {} as any);
 
-    await expect(
-      tool.handler({ id: "123", folder: undefined, account: undefined }, {} as any)
-    ).rejects.toThrow("authentication failed");
+    expect(result.isError).toBe(true);
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.code).toBe("imap_auth_failed");
   });
 
   it("Scenario: malformed JSON from CLI — returns parse error", async () => {
@@ -351,7 +369,9 @@ describe("Dogfooding: flag_email", () => {
     const result = await tool.handler({ id: "249088", flags: ["Seen"], action: "add", folder: undefined, account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error flagging email");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.code).toBeDefined();
+    expect(envelope.message).toContain("connection timeout");
   });
 });
 
@@ -388,7 +408,8 @@ describe("Dogfooding: move_email", () => {
     const result = await tool.handler({ id: "249064", target_folder: "NonExistent", folder: undefined, account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error moving email");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("folder not found");
   });
 });
 
@@ -434,7 +455,8 @@ describe("Dogfooding: export_to_markdown", () => {
     const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error exporting email");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("timeout");
   });
 });
 
@@ -610,7 +632,8 @@ describe("Dogfooding: list_folders", () => {
     const result = await tool.handler({ account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error listing folders");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("auth expired");
   });
 });
 
@@ -639,7 +662,8 @@ describe("Dogfooding: create_folder", () => {
     const result = await tool.handler({ name: "Existing", account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error creating folder");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("folder already exists");
   });
 });
 
@@ -677,7 +701,8 @@ describe("Dogfooding: delete_folder safety gate", () => {
     const result = await tool.handler({ name: "Protected", confirm: true, account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error deleting folder");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("permission denied");
   });
 });
 
@@ -745,7 +770,8 @@ describe("Dogfooding: compose_email safety gate", () => {
     }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error sending email");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("SMTP connection refused");
   });
 });
 
@@ -786,7 +812,8 @@ describe("Dogfooding: list_attachments", () => {
     const result = await tool.handler({ id: "249064", folder: undefined, account: undefined }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error listing attachments");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("timeout");
   });
 });
 
@@ -823,7 +850,8 @@ describe("Dogfooding: download_attachment", () => {
     }, {} as any);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error downloading attachment");
+    const envelope = JSON.parse(result.content[0].text as string).error;
+    expect(envelope.message).toContain("attachment not found");
   });
 });
 

@@ -10,6 +10,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseICSFile, createAppleCalendarEvent } from "../adapters/calendar.js";
 import { downloadAndList } from "./attachments.js";
+import { envelopeError } from "./_envelope.js";
 import { join } from "node:path";
 
 export function registerCalendarTools(server: McpServer, client: HimalayaClient) {
@@ -60,13 +61,7 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
         content: [{ type: "text" as const, text: lines.join("\n") }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error extracting calendar event: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 

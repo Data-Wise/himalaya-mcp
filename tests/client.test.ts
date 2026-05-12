@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { promisify } from "node:util";
 import { HimalayaClient } from "../src/himalaya/client.js";
+import { HimalayaError } from "../src/himalaya/errors.js";
 
 // Mock node:child_process - we use execFile (safe, no shell injection).
 // Must preserve util.promisify.custom so promisify(execFile) returns {stdout, stderr}.
@@ -81,73 +82,71 @@ describe("HimalayaClient", () => {
     });
   });
 
-  describe("error handling", () => {
-    it("wraps ENOENT as CLI not found", async () => {
+  describe("error envelope", () => {
+    async function captureError(client: HimalayaClient): Promise<HimalayaError> {
+      try {
+        await client.exec(["envelope", "list"]);
+        throw new Error("expected to throw");
+      } catch (err) {
+        if (!(err instanceof HimalayaError)) {
+          throw new Error(`expected HimalayaError, got ${err}`);
+        }
+        return err;
+      }
+    }
+
+    it("wraps ENOENT as himalaya_not_installed envelope", async () => {
       const err = Object.assign(new Error("spawn himalaya ENOENT"), { code: "ENOENT" });
       setupErrorMock(err);
-      const client = new HimalayaClient();
-
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.toThrow("himalaya CLI not found");
+      const himalayaErr = await captureError(new HimalayaClient({ account: "work" }));
+      expect(himalayaErr.envelope.code).toBe("himalaya_not_installed");
+      expect(himalayaErr.envelope.account).toBe("work");
+      expect(himalayaErr.envelope.hint).toMatch(/brew install/);
+      expect(himalayaErr.envelope.recoverable).toBe(true);
     });
 
-    it("wraps killed process as timeout", async () => {
+    it("wraps killed process as imap_timeout envelope", async () => {
       const err = Object.assign(new Error("killed"), { killed: true });
       setupErrorMock(err);
-      const client = new HimalayaClient();
-
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.toThrow("timed out");
+      const himalayaErr = await captureError(new HimalayaClient());
+      expect(himalayaErr.envelope.code).toBe("imap_timeout");
+      expect(himalayaErr.envelope.message).toMatch(/timed out/);
+      expect(himalayaErr.envelope.recoverable).toBe(true);
     });
 
-    it("wraps auth errors", async () => {
+    it("classifies auth errors as imap_auth_failed envelope", async () => {
       const err = new Error("authentication failed: bad credentials");
       setupErrorMock(err);
-      const client = new HimalayaClient();
-
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.toThrow("authentication failed");
-    });
-  });
-
-  describe("error formatting", () => {
-    it("includes account name when subprocess rejects with stderr", async () => {
-      const err = Object.assign(new Error("CONNECTIONRESET"), { stderr: "stderr: CONNECTIONRESET" });
-      setupErrorMock(err);
-      const client = new HimalayaClient({ account: "unm" });
-
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.toThrow(/\[account: unm\].*CONNECTIONRESET/);
+      const himalayaErr = await captureError(new HimalayaClient());
+      expect(himalayaErr.envelope.code).toBe("imap_auth_failed");
+      expect(himalayaErr.envelope.hint).toMatch(/configure/i);
     });
 
-    it("suggests a debug command when an operation fails", async () => {
-      const err = Object.assign(new Error("fail"), { stderr: "stderr: fail" });
+    it("classifies stderr text from execFile error", async () => {
+      const err = Object.assign(new Error("exited 1"), {
+        stderr: "AUTHENTICATIONFAILED for user@example.com",
+      });
       setupErrorMock(err);
-      const client = new HimalayaClient({ account: "unm" });
-
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.toThrow(/himalaya envelope list -a unm/);
+      const himalayaErr = await captureError(new HimalayaClient({ account: "unm" }));
+      expect(himalayaErr.envelope.code).toBe("imap_auth_failed");
+      expect(himalayaErr.envelope.account).toBe("unm");
+      expect(himalayaErr.envelope.recoverable).toBe(true);
     });
 
-    it("uses (default) prefix and omits -a when no account set", async () => {
-      const err = Object.assign(new Error("fail"), { stderr: "stderr: fail" });
+    it("falls back to 'unknown' on unmatched stderr", async () => {
+      const err = Object.assign(new Error("exited 1"), { stderr: "something totally weird" });
       setupErrorMock(err);
-      const client = new HimalayaClient();
-
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.toThrow(/\[account: \(default\)\]/);
-      setupErrorMock(err);
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.not.toThrow(/-a /);
+      const himalayaErr = await captureError(new HimalayaClient({ account: "unm" }));
+      expect(himalayaErr.envelope.code).toBe("unknown");
+      expect(himalayaErr.envelope.rawStderr).toContain("totally weird");
     });
 
-    it("preserves ENOENT message with account context", async () => {
-      const err = Object.assign(new Error("spawn himalaya ENOENT"), { code: "ENOENT" });
+    it("carries account name in envelope (default omitted when none set)", async () => {
+      const err = Object.assign(new Error("fail"), { stderr: "ECONNRESET" });
       setupErrorMock(err);
-      const client = new HimalayaClient({ account: "work" });
-
-      await expect(client.exec(["envelope", "list"]))
-        .rejects.toThrow(/\[account: work\].*himalaya CLI not found/);
+      const himalayaErr = await captureError(new HimalayaClient());
+      expect(himalayaErr.envelope.code).toBe("transient");
+      expect(himalayaErr.envelope.account).toBeUndefined();
     });
   });
 

@@ -6,6 +6,7 @@ import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { parseEnvelopes, parseMessageBody } from "../himalaya/parser.js";
+import { envelopeError } from "./_envelope.js";
 
 export function registerActionTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("export_to_markdown", {
@@ -75,13 +76,7 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
         content: [{ type: "text" as const, text: md }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error exporting email: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 
@@ -148,13 +143,7 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error extracting actions: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 }

@@ -5,6 +5,7 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
+import { envelopeError } from "./_envelope.js";
 
 export function registerManageTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("flag_email", {
@@ -27,13 +28,7 @@ export function registerManageTools(server: McpServer, client: HimalayaClient) {
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error flagging email: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 
@@ -55,13 +50,7 @@ export function registerManageTools(server: McpServer, client: HimalayaClient) {
         }],
       };
     } catch (err) {
-      return {
-        content: [{
-          type: "text" as const,
-          text: `Error moving email: ${err instanceof Error ? err.message : String(err)}`,
-        }],
-        isError: true,
-      };
+      return envelopeError(err);
     }
   });
 }

@@ -6,6 +6,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { HimalayaClientOptions } from "./types.js";
+import { classifyStderr, HimalayaError } from "./errors.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -61,7 +62,7 @@ export class HimalayaClient {
       });
       return stdout;
     } catch (err: unknown) {
-      throw this.wrapError(err, subcommand, account);
+      throw this.wrapError(err, account);
     }
   }
 
@@ -212,43 +213,50 @@ export class HimalayaClient {
     return this.exec(args, { folder: f, account, cwd: destDir });
   }
 
-  /** Wrap errors with meaningful messages, including account context and a debug hint. */
-  private wrapError(err: unknown, subcommand: string[] = [], account = ""): Error {
-    const accountName = account || this.opts.account || "";
-    const prefix = `[account: ${accountName || "(default)"}]`;
-    const debugArgs = ["himalaya", ...subcommand];
-    if (accountName) {
-      debugArgs.push("-a", accountName);
-    }
-    const debugHint = `\n  Try: ${debugArgs.join(" ")}`;
+  /**
+   * Wrap a subprocess error into a HimalayaError carrying a structured envelope.
+   *
+   * Process-level errors (ENOENT, timeout) are detected before stderr classification
+   * because execFile attaches them as properties on the Error, not in stderr.
+   * Other failures route through {@link classifyStderr} for pattern matching.
+   */
+  private wrapError(err: unknown, account = ""): HimalayaError {
+    const accountName = account || this.opts.account || undefined;
 
     if (err instanceof Error) {
-      const msg = err.message;
-      const stderr = (err as { stderr?: string }).stderr;
-
-      // CLI not found
+      // CLI not found — binary missing on PATH
       if ("code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
-        return new Error(
-          `${prefix} himalaya CLI not found at "${this.opts.binary}". Install with: brew install himalaya${debugHint}`,
-        );
+        return new HimalayaError({
+          code: "himalaya_not_installed",
+          message: `himalaya CLI not found at "${this.opts.binary}"`,
+          hint: "Run: brew install himalaya",
+          account: accountName,
+          recoverable: true,
+        });
       }
 
-      // Timeout
+      // Timeout — process killed via SIGTERM by execFile timeout
       if ("killed" in err && (err as { killed: boolean }).killed) {
-        return new Error(
-          `${prefix} himalaya command timed out after ${this.opts.timeout}ms${debugHint}`,
-        );
+        return new HimalayaError({
+          code: "imap_timeout",
+          message: `himalaya command timed out after ${this.opts.timeout}ms`,
+          hint: "Check network or VPN, or increase HIMALAYA_TIMEOUT",
+          account: accountName,
+          recoverable: true,
+        });
       }
 
-      // Auth / connection errors
-      if (msg.includes("authentication") || msg.includes("login")) {
-        return new Error(`${prefix} himalaya authentication failed: ${msg}${debugHint}`);
-      }
-
-      // Generic error — include stderr if present
-      const detail = stderr && stderr.trim() ? stderr.trim() : msg;
-      return new Error(`${prefix} himalaya error: ${detail}${debugHint}`);
+      // Otherwise classify stderr (or err.message if stderr is empty)
+      const stderr = (err as { stderr?: string }).stderr ?? "";
+      const text = stderr.trim() ? stderr : err.message;
+      return new HimalayaError(classifyStderr(text, accountName));
     }
-    return new Error(`${prefix} himalaya unknown error: ${String(err)}${debugHint}`);
+
+    return new HimalayaError({
+      code: "unknown",
+      message: `himalaya unknown error: ${String(err)}`,
+      account: accountName,
+      recoverable: false,
+    });
   }
 }
