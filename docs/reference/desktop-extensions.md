@@ -277,13 +277,13 @@ Source values: `"registry"` (from Anthropic registry), `"local"` (manual install
 ```
 src/index.ts (16 source files)
     │
-    ├── npm run build:bundle    →  dist/index.js (595 KB, esbuild)
+    ├── npm run build:bundle    →  dist/index.js (604 KB, esbuild)
     │
     ├── copy to mcpb/dist/      →  mcpb/dist/index.js
     │
     ├── mcpb validate mcpb/     →  Schema check
     │
-    └── mcpb pack mcpb/         →  himalaya-mcp-v1.6.0.mcpb (147 KB)
+    └── mcpb pack mcpb/         →  himalaya-mcp-v1.6.0.mcpb (151 KB)
 ```
 
 Run: `npm run build:mcpb`
@@ -293,8 +293,8 @@ Run: `npm run build:mcpb`
 | File | Size | Purpose |
 |------|------|---------|
 | `manifest.json` | 6.3 KB | Extension descriptor |
-| `dist/index.js` | 595.3 KB | esbuild bundle (all deps inlined) |
-| **Total (compressed)** | **~147 KB** | ZIP archive |
+| `dist/index.js` | 604.3 KB | esbuild bundle (all deps inlined) |
+| **Total (compressed)** | **~151 KB** | ZIP archive |
 
 ## Signing
 

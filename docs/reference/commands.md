@@ -1,6 +1,6 @@
 # Command Reference
 
-Complete reference for all 21 MCP tools, 6 prompts, 3 resources, and CLI commands.
+Complete reference for all 22 MCP tools, 6 prompts, 3 resources, and CLI commands.
 
 !!! tip "See also"
     **[Tutorials](../tutorials/index.md)** for step-by-step walkthroughs | **[Workflows](../guide/workflows.md)** for common email patterns
@@ -977,7 +977,7 @@ himalaya-mcp doctor v1.6.0
   ✓ himalaya config exists
 
   MCP Server
-  ✓ dist/index.js exists (595 KB)
+  ✓ dist/index.js exists (604 KB)
 
   Email Connectivity
   ✓ Accounts: personal, work
