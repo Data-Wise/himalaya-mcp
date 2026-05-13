@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.6.1 release pending merge
-## Phase: Version bumped, PR pending dev → main
+## Focus: v1.6.1 released
+## Phase: Released and infrastructure healthy (Homebrew automation now works)
 ## Priority: 2
-## Progress: 100 (v1.6.1 = v1.6.0 + round-trip tests + Homebrew auth fix + docs sync)
+## Progress: 100 (v1.6.1 released — GitHub release + Homebrew auto-pushed via App auth)
 
 ## Completed
 
@@ -29,6 +29,7 @@
 
 ## Just Completed
 
+- 2026-05-12: Released v1.6.1 — first release where Homebrew automation worked end-to-end. PR #60 merged, tag v1.6.1, GitHub release with .mcpb, Homebrew formula auto-bumped via reusable workflow (App-token path, no manual fallback needed).
 - 2026-05-12: Released v1.6.0 — GitHub release (tag v1.6.0, .mcpb attached) + Homebrew formula (manual fallback) + docs site auto-deploy
 - 2026-05-12: PR #58 release merge — dev → main, all CI green; tap formula bumped manually (Homebrew CI auth still pending fix)
 - 2026-05-12: PR #57 merged to dev (v1.6.0 reliability) — merge commit e48a52b
@@ -43,9 +44,9 @@
 
 ## Current State
 
-- Branch: `dev` (v1.6.1 followups merged, ahead of main)
+- Branch: `dev` (synced with main at v1.6.1)
 - No active worktrees
-- v1.6.0 released: GitHub, Homebrew, docs site all live
+- v1.6.1 released: GitHub, Homebrew, docs site all live
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
 - Tests: 479 passing across 23 test files (Scenario 17 now real round-trip e2e)
@@ -78,7 +79,7 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Infrastructure healthy — no outstanding action items.
+- All infrastructure healthy. No outstanding action items.
 - Optional: brainstorm v1.7.0 scope when ready.
 
 ## Future
@@ -92,5 +93,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-05-12
-**Status:** v1.6.0 released — Homebrew CI auth fixed (App-token path)
+**Last Updated:** 2026-05-13
+**Status:** v1.6.1 released — full release automation (App-token path) working end-to-end
