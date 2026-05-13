@@ -25,6 +25,8 @@ himalaya-mcp doctor             Diagnose full stack — checks all configured ac
 himalaya-mcp doctor --account <name>  Diagnose a single account
 himalaya-mcp doctor --fix       Auto-fix common issues
 himalaya-mcp doctor --json      Machine-readable diagnostic output
+himalaya-mcp --help             Grouped usage (also: -h, help)
+himalaya-mcp --version          Print just the semver (also: -v, version)
 ```
 
 ## Tools (22)

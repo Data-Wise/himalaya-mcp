@@ -158,6 +158,8 @@ After installing himalaya-mcp via Homebrew or from source, configure it as an MC
 himalaya-mcp setup           # Add to Claude Desktop config
 himalaya-mcp setup --check   # Verify configuration
 himalaya-mcp setup --remove  # Remove server entry
+himalaya-mcp --help          # See all CLI commands and flags
+himalaya-mcp --version       # Print installed version
 ```
 
 This adds the server to `~/Library/Application Support/Claude/claude_desktop_config.json`. Restart Claude Desktop after running setup.
