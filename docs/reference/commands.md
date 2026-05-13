@@ -991,7 +991,7 @@ himalaya-mcp doctor --json             # Machine-readable output
 **Sample output:**
 
 ```
-himalaya-mcp doctor v1.6.0
+himalaya-mcp doctor v1.6.2
 
   Prerequisites
   ✓ Node.js 22.14.0
