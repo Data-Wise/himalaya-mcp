@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.6.1 released
-## Phase: Released and infrastructure healthy (Homebrew automation now works)
+## Focus: v1.6.2 release pending merge
+## Phase: Version bumped, PR pending dev → main
 ## Priority: 2
-## Progress: 100 (v1.6.1 released — GitHub release + Homebrew auto-pushed via App auth)
+## Progress: 100 (v1.6.2 = v1.6.1 + CLI --help/--version + diagnose-issues tutorial + site sync)
 
 ## Completed
 

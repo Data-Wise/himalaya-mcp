@@ -6,16 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-05-13
+
 ### Added
 
 - **CLI `--help` / `-h` / `help`** — first-class help flag. Prints a versioned, grouped usage summary (Setup / Desktop extension / Diagnostics / Meta / Examples) to stdout and exits 0.
 - **CLI `--version` / `-v` / `version`** — prints the semantic version on its own line and exits 0. Reads from `package.json` via the existing `getVersion()` helper.
+- **"Diagnose Email Issues" tutorial** (`docs/tutorials/diagnose-issues.md`) — Level 1 walkthrough of the `health_check` tool, `himalaya-mcp doctor`, `--account` scoping, `--fix`, and the structured error-code table. Includes a mermaid decision-tree diagram mapping symptoms to commands.
+- `--help` and `--version` discovery hints surfaced in `docs/reference/refcard.md`, `docs/getting-started/quickstart.md`, and `docs/getting-started/installation.md`.
 
 ### Changed
 
-- CLI help header now includes the version (`himalaya-mcp CLI v1.6.1`).
+- CLI help header now includes the version (`himalaya-mcp CLI v1.6.2`).
 - CLI help is reorganized into labeled sections (Setup, Desktop extension, Diagnostics, Meta, Examples) instead of a flat list.
 - Help now explicitly documents the `check` and `remove` short aliases for `setup --check` / `setup --remove`.
+- Test count: 479 → 484 (5 new CLI E2E tests covering `--help`, `-h`, `help`, `--version`, `-v`, and unknown-command exit behavior).
+- Learning path total time: 43 min → 48 min (added diagnostics tutorial).
 
 ### Fixed
 
