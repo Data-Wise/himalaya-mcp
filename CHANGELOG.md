@@ -6,6 +6,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+
+- **CLI `--help` / `-h` / `help`** — first-class help flag. Prints a versioned, grouped usage summary (Setup / Desktop extension / Diagnostics / Meta / Examples) to stdout and exits 0.
+- **CLI `--version` / `-v` / `version`** — prints the semantic version on its own line and exits 0. Reads from `package.json` via the existing `getVersion()` helper.
+
+### Changed
+
+- CLI help header now includes the version (`himalaya-mcp CLI v1.6.1`).
+- CLI help is reorganized into labeled sections (Setup, Desktop extension, Diagnostics, Meta, Examples) instead of a flat list.
+- Help now explicitly documents the `check` and `remove` short aliases for `setup --check` / `setup --remove`.
+
+### Fixed
+
+- Unknown CLI commands now write a short hint to stderr and exit with code 1, instead of dumping full help to stdout and exiting 0. Lets scripts detect typos. The full help only ever goes to stdout via `--help`.
+
 ## [1.6.1] - 2026-05-12
 
 ### Added
