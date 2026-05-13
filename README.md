@@ -72,7 +72,7 @@ himalaya-mcp doctor    # Verify installation
 ## Testing
 
 ```bash
-npm test              # 479 tests across 23 files (vitest)
+npm test              # 484 tests across 23 files (vitest)
 ```
 
 | Category | Tests | Coverage |
@@ -83,7 +83,7 @@ npm test              # 479 tests across 23 files (vitest)
 | v1.5.0 features | 79 | Threads (30), morning/inbox prompts (13), E2E integration (36) |
 | Dogfooding | 162 | Realistic Claude usage + reliability scenarios + .mcpb validation |
 | E2E | 39 | Full MCP server pipeline + structured envelope round-trip + .mcpb build pipeline |
-| Setup CLI | 40 | Setup, install/upgrade E2E, multi-account doctor, plugin structure |
+| Setup CLI | 45 | Setup, install/upgrade E2E, multi-account doctor, plugin structure, --help/--version |
 
 ## Documentation
 

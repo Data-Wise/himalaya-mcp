@@ -80,6 +80,7 @@ nav:
     - "Level 1: Getting Started":
       - Read Your First Email: tutorials/read-first-email.md
       - Multi-Account Email: tutorials/multi-account.md
+      - Diagnose Email Issues: tutorials/diagnose-issues.md
       - Desktop Extension: tutorials/desktop-extension.md
     - "Level 2: Productivity":
       - Triage Your Inbox: tutorials/triage-inbox.md

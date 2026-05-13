@@ -870,6 +870,27 @@ These parameters appear on most tools:
 
 ## CLI Commands
 
+### `himalaya-mcp --help` / `--version`
+
+Standard discovery flags.
+
+```bash
+himalaya-mcp --help            # Print grouped usage (also: -h, help)
+himalaya-mcp --version         # Print just the semantic version (also: -v, version)
+```
+
+`--help` writes to stdout and exits 0. Unknown commands write a short hint to stderr and exit 1, so scripts can detect typos:
+
+```bash
+$ himalaya-mcp foo
+himalaya-mcp: unknown command 'foo'
+Run 'himalaya-mcp --help' for usage.
+$ echo $?
+1
+```
+
+---
+
 ### `himalaya-mcp setup`
 
 Configure himalaya-mcp as an MCP server for Claude Desktop (legacy `mcpServers` approach).
@@ -898,7 +919,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v1.6.1.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v1.6.2.mcpb     # Install specific file
 ```
 
 **What it does:**
@@ -941,9 +962,10 @@ Restart Claude Desktop after removal.
 Diagnose your himalaya-mcp installation across the full stack: prerequisites, MCP server, email connectivity, Claude Desktop extension, and Claude Code plugin.
 
 ```bash
-himalaya-mcp doctor          # Run all checks
-himalaya-mcp doctor --fix    # Auto-fix what can be fixed
-himalaya-mcp doctor --json   # Machine-readable output
+himalaya-mcp doctor                    # Run all checks (per-account by default)
+himalaya-mcp doctor --account <name>   # Scope to one configured account
+himalaya-mcp doctor --fix              # Auto-fix what can be fixed
+himalaya-mcp doctor --json             # Machine-readable output
 ```
 
 **Check categories:**

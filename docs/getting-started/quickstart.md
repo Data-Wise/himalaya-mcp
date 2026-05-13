@@ -36,7 +36,8 @@ Restart Claude Code after install.
 ## 2. Verify
 
 ```bash
-himalaya-mcp doctor    # Check all settings
+himalaya-mcp doctor    # Check all settings (per-account)
+himalaya-mcp --help    # See all commands and flags
 ```
 
 ## 3. Try It

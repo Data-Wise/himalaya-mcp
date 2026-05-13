@@ -917,11 +917,49 @@ function parseAccountFlag(args: string[]): string | undefined {
   return undefined;
 }
 
+function printHelp(): void {
+  const version = getVersion();
+  console.log(`himalaya-mcp CLI${version ? ` v${version}` : ""}`);
+  console.log("");
+  console.log("Usage: himalaya-mcp <command> [flags]");
+  console.log("");
+  console.log("Setup (Claude Desktop):");
+  console.log("  setup                     Add MCP server to Claude Desktop config (default)");
+  console.log("  setup --check, check      Verify configuration");
+  console.log("  setup --remove, remove    Remove MCP server entry");
+  console.log("");
+  console.log("Desktop extension (.mcpb):");
+  console.log("  install-ext [file]        Install .mcpb as Desktop extension");
+  console.log("  remove-ext                Remove Desktop extension");
+  console.log("");
+  console.log("Diagnostics:");
+  console.log("  doctor                    Diagnose installation and per-account connectivity");
+  console.log("  doctor --account <name>   Run checks for a specific account only");
+  console.log("  doctor --fix              Auto-fix common issues");
+  console.log("  doctor --json             Machine-readable output");
+  console.log("");
+  console.log("Meta:");
+  console.log("  --version, -v             Print version and exit");
+  console.log("  --help, -h, help          Print this help and exit");
+  console.log("");
+  console.log("Examples:");
+  console.log("  himalaya-mcp setup                    # First-time install");
+  console.log("  himalaya-mcp doctor --account work    # Diagnose one account");
+  console.log("  himalaya-mcp doctor --json | jq .     # Pipe diagnostics to jq");
+  console.log("");
+  console.log("Docs: https://data-wise.github.io/himalaya-mcp/");
+}
+
 async function runCli(): Promise<void> {
   const args = process.argv.slice(2);
   const command = args[0];
 
-  if (command === "--check" || command === "check") {
+  if (command === "--help" || command === "-h" || command === "help") {
+    printHelp();
+  } else if (command === "--version" || command === "-v" || command === "version") {
+    const version = getVersion();
+    console.log(version || "unknown");
+  } else if (command === "--check" || command === "check") {
     check();
   } else if (command === "--remove" || command === "remove") {
     remove();
@@ -937,18 +975,11 @@ async function runCli(): Promise<void> {
   } else if (!command || command === "setup") {
     setup();
   } else {
-    console.log("himalaya-mcp CLI");
-    console.log("");
-    console.log("Usage:");
-    console.log("  himalaya-mcp setup              Add MCP server to Claude Desktop config");
-    console.log("  himalaya-mcp setup --check      Verify configuration");
-    console.log("  himalaya-mcp setup --remove     Remove MCP server entry");
-    console.log("  himalaya-mcp install-ext [file]  Install .mcpb as Desktop extension");
-    console.log("  himalaya-mcp remove-ext          Remove Desktop extension");
-    console.log("  himalaya-mcp doctor              Diagnose installation and connectivity");
-    console.log("  himalaya-mcp doctor --account N  Run checks for a specific account only");
-    console.log("  himalaya-mcp doctor --fix        Auto-fix common issues");
-    console.log("  himalaya-mcp doctor --json       Machine-readable output");
+    // Unknown command — short hint on stderr, exit 1 so scripts can
+    // detect typos. Full help only ever goes to stdout via --help.
+    console.error(`himalaya-mcp: unknown command '${command}'`);
+    console.error("Run 'himalaya-mcp --help' for usage.");
+    process.exit(1);
   }
 }
 

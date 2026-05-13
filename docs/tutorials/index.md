@@ -8,7 +8,8 @@ Step-by-step guides from simple to advanced. Each tutorial builds on the previou
 flowchart LR
     subgraph L1["Level 1: Getting Started"]
         A1[Read First Email] --> A2[Multi-Account]
-        A2 --> A3[Desktop Extension]
+        A2 --> A4[Diagnose Issues]
+        A4 --> A3[Desktop Extension]
     end
 
     subgraph L2["Level 2: Productivity"]
@@ -40,6 +41,7 @@ Get comfortable reading and navigating your email through Claude.
 |----------|------|-------------------|
 | [Read Your First Email](read-first-email.md) | 2 min | List inbox, read messages, HTML vs plain text |
 | [Multi-Account Email](multi-account.md) | 3 min | Switch accounts, cross-account queries, defaults |
+| [Diagnose Email Issues](diagnose-issues.md) | 5 min | `health_check`, `doctor --account`, error-code decoding |
 | [Desktop Extension](desktop-extension.md) | 5 min | Install .mcpb, configure, use in Claude Desktop/Cowork |
 
 ### Level 2: Productivity
@@ -65,6 +67,6 @@ Let the email-assistant agent handle your entire inbox workflow.
 
 ---
 
-**Total learning time:** ~43 minutes from zero to full automation.
+**Total learning time:** ~48 minutes from zero to full automation.
 
 **Prerequisites:** [Installation](../getting-started/installation.md) complete and himalaya CLI configured with at least one email account.

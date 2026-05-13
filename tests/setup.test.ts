@@ -290,17 +290,83 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     }
   });
 
-  it("displays usage for unknown command", async () => {
+  it("--help prints versioned help on stdout, exits 0", async () => {
     const { stdout, stderr } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "unknown-command"],
+      ["dist/cli/setup.js", "--help"],
       { cwd: PROJECT_ROOT }
     );
 
+    expect(stdout).toContain("himalaya-mcp CLI v");
     expect(stdout).toContain("Usage:");
-    expect(stdout).toContain("himalaya-mcp setup");
-    expect(stdout).toContain("Add MCP server to Claude Desktop");
+    expect(stdout).toContain("Setup (Claude Desktop)");
+    expect(stdout).toContain("Desktop extension (.mcpb)");
+    expect(stdout).toContain("Diagnostics:");
+    expect(stdout).toContain("Examples:");
     expect(stderr).toBe("");
+  }, 10_000);
+
+  it("-h is an alias for --help", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "-h"],
+      { cwd: PROJECT_ROOT }
+    );
+    expect(stdout).toContain("Usage:");
+    expect(stdout).toContain("Setup (Claude Desktop)");
+  }, 10_000);
+
+  it("help (no dashes) is an alias for --help", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "help"],
+      { cwd: PROJECT_ROOT }
+    );
+    expect(stdout).toContain("Usage:");
+  }, 10_000);
+
+  it("--version prints just the version", async () => {
+    const { stdout, stderr } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "--version"],
+      { cwd: PROJECT_ROOT }
+    );
+    // Semver shape: N.N.N (no leading 'v', no extra prose)
+    expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
+    expect(stderr).toBe("");
+  }, 10_000);
+
+  it("-v is an alias for --version", async () => {
+    const { stdout } = await execFileAsync(
+      "node",
+      ["dist/cli/setup.js", "-v"],
+      { cwd: PROJECT_ROOT }
+    );
+    expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
+  }, 10_000);
+
+  it("unknown command writes to stderr and exits 1", async () => {
+    let exitCode = 0;
+    let stdout = "";
+    let stderr = "";
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/setup.js", "totally-not-a-command"],
+        { cwd: PROJECT_ROOT }
+      );
+      stdout = result.stdout;
+      stderr = result.stderr;
+    } catch (err: unknown) {
+      const e = err as { code?: number; stdout?: string; stderr?: string };
+      exitCode = e.code ?? 0;
+      stdout = e.stdout ?? "";
+      stderr = e.stderr ?? "";
+    }
+    expect(exitCode).toBe(1);
+    expect(stderr).toContain("unknown command 'totally-not-a-command'");
+    expect(stderr).toContain("--help");
+    expect(stdout).toBe("");
   }, 10_000);
 
   it("setup --check exits 1 when no config exists", async () => {
@@ -660,15 +726,18 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
     expect(nodeCheck!.status).toBe("pass");
   }, 30_000);
 
-  it("displays usage including doctor command", async () => {
+  it("--help mentions doctor and its flags", async () => {
     const { stdout } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "unknown-command"],
+      ["dist/cli/setup.js", "--help"],
       { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
     );
 
     expect(stdout).toContain("doctor");
     expect(stdout).toContain("Diagnose");
+    expect(stdout).toContain("--account");
+    expect(stdout).toContain("--fix");
+    expect(stdout).toContain("--json");
   }, 10_000);
 });
 

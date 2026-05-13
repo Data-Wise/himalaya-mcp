@@ -143,7 +143,7 @@ If you have himalaya-mcp installed (Homebrew or source), you can install the ext
 
 ```bash
 npm run build:mcpb                                     # Build .mcpb (dev only)
-himalaya-mcp install-ext himalaya-mcp-v1.6.1.mcpb      # Install from file
+himalaya-mcp install-ext himalaya-mcp-v1.6.2.mcpb      # Install from file
 himalaya-mcp install-ext                                # Auto-find in project root
 himalaya-mcp remove-ext                                 # Uninstall extension
 ```
@@ -158,6 +158,8 @@ After installing himalaya-mcp via Homebrew or from source, configure it as an MC
 himalaya-mcp setup           # Add to Claude Desktop config
 himalaya-mcp setup --check   # Verify configuration
 himalaya-mcp setup --remove  # Remove server entry
+himalaya-mcp --help          # See all CLI commands and flags
+himalaya-mcp --version       # Print installed version
 ```
 
 This adds the server to `~/Library/Application Support/Claude/claude_desktop_config.json`. Restart Claude Desktop after running setup.
@@ -212,7 +214,7 @@ himalaya-mcp doctor
 # Auto-fix common issues
 himalaya-mcp doctor --fix
 
-# Run tests (479 tests)
+# Run tests (484 tests)
 npm test
 
 # Check Claude Desktop config (legacy)
