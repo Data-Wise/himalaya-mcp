@@ -29,6 +29,7 @@
 
 ## Just Completed
 
+- 2026-05-13: PR #61 merged to dev — CLI ergonomics: first-class --help / --version, grouped help sections, exit 1 on unknown command. 484 tests passing (+5).
 - 2026-05-12: Released v1.6.1 — first release where Homebrew automation worked end-to-end. PR #60 merged, tag v1.6.1, GitHub release with .mcpb, Homebrew formula auto-bumped via reusable workflow (App-token path, no manual fallback needed).
 - 2026-05-12: Released v1.6.0 — GitHub release (tag v1.6.0, .mcpb attached) + Homebrew formula (manual fallback) + docs site auto-deploy
 - 2026-05-12: PR #58 release merge — dev → main, all CI green; tap formula bumped manually (Homebrew CI auth still pending fix)
@@ -44,12 +45,12 @@
 
 ## Current State
 
-- Branch: `dev` (synced with main at v1.6.1)
+- Branch: `dev` (ahead of main at v1.6.1: CLI help improvements pending next release)
 - No active worktrees
 - v1.6.1 released: GitHub, Homebrew, docs site all live
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
-- Tests: 479 passing across 23 test files (Scenario 17 now real round-trip e2e)
+- Tests: 484 passing across 23 test files (+5 CLI --help/--version/exit-code tests in PR #61)
 - Bundle: 604KB (esbuild), .mcpb: 151KB
 
 ## Install
