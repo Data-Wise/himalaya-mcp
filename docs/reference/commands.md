@@ -898,7 +898,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v1.6.0.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v1.6.1.mcpb     # Install specific file
 ```
 
 **What it does:**
