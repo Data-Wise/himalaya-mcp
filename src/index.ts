@@ -29,7 +29,7 @@ import { registerReplyPrompt } from "./prompts/reply.js";
 import { registerMorningPrompt } from "./prompts/morning.js";
 import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
 
-export const VERSION = "1.6.0";
+export const VERSION = "1.6.1";
 export const NAME = "himalaya-mcp";
 
 const server = new McpServer({

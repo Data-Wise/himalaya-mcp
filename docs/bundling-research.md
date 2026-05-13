@@ -158,7 +158,7 @@ Gatekeeper allows execution only when all three conditions are met. [Source: [Di
 | himalaya binary (universal) | 49 MB uncompressed, 18.3 MB gzip | Rust binary with all features |
 | Node.js runtime (if bundled) | ~67 KB (symlink) | Not needed—.mcpb uses system Node.js |
 | Our dist/index.js | 2.3 KB | esbuild bundle (minimal, imports only) |
-| MCP server code (with deps) | ~595 KB | Estimated from package.json dependencies |
+| MCP server code (with deps) | ~604 KB | esbuild bundle (all deps inlined) |
 
 ### .mcpb Bundle Size Estimate
 

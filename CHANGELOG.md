@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-05-12
+
+### Added
+
+- **Round-trip envelope E2E tests** (`tests/e2e.test.ts`) — five tests spawn `dist/index.js` with a fake himalaya and assert the full structured-error pipeline (client → tool → MCP stdio → JSON-RPC response). Covers `imap_auth_failed`, `transient` (with `attempts=2` after retry), `folder_not_found`, `parse_error`, and the `health_check` tool. Replaces the skipped Scenario 17 in `dogfood-reliability.test.ts`.
+- **Homebrew workflow auth pre-check** — new `verify-tap-auth` job in `homebrew-release.yml` validates that GitHub App credentials OR a working PAT are present before invoking the tap update. Surfaces a clear runbook when both are missing or the PAT is expired, instead of letting `actions/checkout` die with "fatal: could not read Username". Targets the recurring v1.5.0 / v1.6.0 release auth failure.
+
+### Changed
+
+- Test count: 473 passing / 1 skipped → 479 passing / 0 skipped. Scenario 17 in `dogfood-reliability.test.ts` is now a passing sentinel pointing to the new e2e tests.
+- Documentation sync across 16 files: test count claims, tool count claims (21 → 22), and bundle size claims (595KB → 604KB, .mcpb 147KB → 151KB) now reflect the live build.
+
+### Fixed
+
+- **Homebrew CI auth (v1.5.0 + v1.6.0 release regression)** — set `APP_ID` and `APP_PRIVATE_KEY` secrets on this repo so the reusable workflow's GitHub App token path activates. Verified end-to-end via `workflow_dispatch` against v1.6.0 (tap PR #106 merged, manifest drift corrected from v1.4.1 → v1.6.0). Next release no longer needs the manual formula bump.
+
 ## [1.6.0] - 2026-05-11
 
 ### Added

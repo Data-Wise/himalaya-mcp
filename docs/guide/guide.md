@@ -76,7 +76,7 @@ Restart Claude Code. The plugin provides 12 skills: `/email:inbox`, `/email:tria
 
 ### Claude Desktop (.mcpb)
 
-Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` package is lightweight (~147 KB) and configures the MCP server automatically.
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` package is lightweight (~151 KB) and configures the MCP server automatically.
 
 **Prerequisites:** himalaya CLI must be installed separately:
 
@@ -365,7 +365,7 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 414 tests across 18 files (vitest)
+npm test    # 479 tests across 23 files (vitest)
 ```
 
 Test breakdown:
