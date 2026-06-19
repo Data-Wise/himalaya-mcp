@@ -57,6 +57,8 @@ export interface HimalayaClientOptions {
   timeout?: number;
   /** Backoff delay in milliseconds between retry attempts (default: 200) */
   retryBackoffMs?: number;
+  /** Sender email address for compose/send (required for sending; set via HIMALAYA_FROM) */
+  from?: string;
 }
 
 // --- Command result ---
@@ -127,6 +129,8 @@ export interface DraftReplyParams {
 export interface SendEmailParams {
   /** Raw MML template (headers + body) to send */
   template: string;
+  /** Local file paths to attach */
+  attachments?: string[];
   /** Must be true to actually send — safety gate */
   confirm?: boolean;
   account?: string;
@@ -144,6 +148,8 @@ export interface ComposeEmailParams {
   body: string;
   cc?: string;
   bcc?: string;
+  /** Local file paths to attach */
+  attachments?: string[];
   confirm?: boolean;
   account?: string;
 }

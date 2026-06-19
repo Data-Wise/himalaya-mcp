@@ -233,9 +233,9 @@ Example with env vars:
 
 | Tool | Description | Key Parameters |
 |------|-------------|----------------|
-| `compose_email` | Compose a new email from scratch | `to`, `subject`, `body`, `account` |
+| `compose_email` | Compose a new email from scratch | `to`, `subject`, `body`, `attachments`, `account` |
 | `draft_reply` | Generate reply template (does NOT send) | `id`, `body`, `reply_all` |
-| `send_email` | Send with safety gate | `template`, `confirm` (must be `true` to send) |
+| `send_email` | Send with safety gate | `template`, `attachments`, `confirm` (must be `true` to send) |
 
 ### Attachments
 
@@ -292,7 +292,7 @@ Returns `overall` status (`healthy` / `degraded` / `broken`) plus a per-account 
 }
 ```
 
-If any tool fails, also see the [troubleshooting guide](../troubleshooting.md).
+If any tool fails, also see the [troubleshooting guide](troubleshooting.md).
 
 ## MCP Prompts (6)
 
@@ -360,12 +360,12 @@ When an email tool fails, the structured error envelope tells Claude (and you) w
 - `account` — which account failed (in multi-account setups)
 - `attempts` — how many times the operation was retried before surfacing
 
-For the full failure-mode catalog and recovery steps, see the canonical [troubleshooting guide](../troubleshooting.md).
+For the full failure-mode catalog and recovery steps, see the canonical [troubleshooting guide](troubleshooting.md).
 
 ## Testing
 
 ```bash
-npm test    # 484 tests across 23 files (vitest)
+npm test    # 507 tests across 23 files (vitest)
 ```
 
 Test breakdown:
@@ -375,8 +375,8 @@ Test breakdown:
 | `parser.test.ts` | 13 | JSON response parsing, formatEnvelope |
 | `client.test.ts` | 12 | Subprocess wrapper, argument building |
 | `manage.test.ts` | 7 | flag_email, move_email client methods |
-| `compose.test.ts` | 9 | draft_reply, send_email safety gate |
-| `compose-new.test.ts` | 8 | compose_email safety gate |
+| `compose.test.ts` | 13 | draft_reply, send_email safety gate + attachment tests |
+| `compose-new.test.ts` | 12 | compose_email safety gate + attachment tests |
 | `folders.test.ts` | 12 | Folder tools (list, create, delete) |
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
 | `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
@@ -384,6 +384,6 @@ Test breakdown:
 | `prompts.test.ts` | 15 | All 6 prompts register and return correct text |
 | `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 146 | Realistic Claude usage scenarios + packaging validation |
-| `e2e.test.ts` | 37 | Full MCP server pipeline + .mcpb build pipeline |
+| `dogfood.test.ts` | 142 | Realistic Claude usage scenarios + packaging validation |
+| `e2e.test.ts` | 39 | Full MCP server pipeline + .mcpb build pipeline |
 | `setup.test.ts` | 36 | CLI setup/check/remove, install/upgrade E2E, doctor command |

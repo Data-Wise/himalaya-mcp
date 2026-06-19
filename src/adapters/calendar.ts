@@ -56,14 +56,41 @@ export function parseICS(content: string): CalendarEvent | null {
   }
 
   return {
-    summary: props.SUMMARY,
+    summary: unescapeICS(props.SUMMARY),
     dtstart: formatICSDate(props.DTSTART),
     dtend: props.DTEND ? formatICSDate(props.DTEND) : props.DTSTART,
-    location: props.LOCATION || undefined,
+    location: props.LOCATION ? unescapeICS(props.LOCATION) : undefined,
     organizer: props.ORGANIZER ? props.ORGANIZER.replace(/^mailto:/i, "") : undefined,
-    description: props.DESCRIPTION || undefined,
+    description: props.DESCRIPTION ? unescapeICS(props.DESCRIPTION) : undefined,
     uid: props.UID || undefined,
   };
+}
+
+/**
+ * Unescape an RFC 5545 TEXT value.
+ * Per section 3.3.11: \\, \;, \, and \N/\n are the defined sequences.
+ * Anything else keeps its leading backslash so callers can see malformed input.
+ */
+export function unescapeICS(value: string): string {
+  let out = "";
+  for (let i = 0; i < value.length; i++) {
+    const c = value[i];
+    if (c === "\\" && i + 1 < value.length) {
+      const next = value[i + 1];
+      if (next === "\\" || next === ";" || next === ",") {
+        out += next;
+        i++;
+        continue;
+      }
+      if (next === "n" || next === "N") {
+        out += "\n";
+        i++;
+        continue;
+      }
+    }
+    out += c;
+  }
+  return out;
 }
 
 /**

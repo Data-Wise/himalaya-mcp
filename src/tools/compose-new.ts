@@ -10,15 +10,29 @@ import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { envelopeError } from "./_envelope.js";
+import { validateAttachmentPaths, buildAttachmentMml } from "./_attachments.js";
 
 /** Build an MML email template from parameters. */
-function buildTemplate(to: string, subject: string, body: string, cc?: string, bcc?: string): string {
+function buildTemplate(
+  to: string,
+  subject: string,
+  body: string,
+  cc?: string,
+  bcc?: string,
+  from?: string,
+  attachments?: string[],
+): string {
   const headers: string[] = [];
+  if (from) headers.push(`From: ${from}`);
   headers.push(`To: ${to}`);
   if (cc) headers.push(`Cc: ${cc}`);
   if (bcc) headers.push(`Bcc: ${bcc}`);
   headers.push(`Subject: ${subject}`);
-  return headers.join("\n") + "\n\n" + body;
+  let result = headers.join("\n") + "\n\n" + body;
+  if (attachments?.length) {
+    result += "\n\n" + buildAttachmentMml(attachments);
+  }
+  return result;
 }
 
 export function registerComposeNewTools(server: McpServer, client: HimalayaClient) {
@@ -30,6 +44,7 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       body: z.string().describe("Email body text"),
       cc: z.string().optional().describe("CC recipient(s)"),
       bcc: z.string().optional().describe("BCC recipient(s)"),
+      attachments: z.array(z.string()).optional().describe("Local file paths to attach (e.g. [\"/tmp/report.pdf\"])"),
       confirm: z.boolean().optional().describe("Set to true to actually send. Without this, only shows a preview."),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
@@ -44,7 +59,28 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       };
     }
 
-    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc);
+    if (!client.from) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: "HIMALAYA_FROM is not set. Set it to your email address to compose new emails.",
+        }],
+        isError: true,
+      };
+    }
+
+    // Validate attachment paths before building the template
+    if (args.attachments?.length) {
+      const err = validateAttachmentPaths(args.attachments);
+      if (err) {
+        return {
+          content: [{ type: "text" as const, text: err }],
+          isError: true,
+        };
+      }
+    }
+
+    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc, client.from, args.attachments);
 
     // Safety gate: without confirm=true, just show preview
     if (!args.confirm) {

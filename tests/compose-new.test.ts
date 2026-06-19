@@ -1,10 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
 import { registerComposeNewTools } from "../src/tools/compose-new.js";
+import { tmpdir } from "node:os";
+import { writeFileSync, unlinkSync } from "node:fs";
+import { join } from "node:path";
 
 function createMockClient(): HimalayaClient {
-  const client = new HimalayaClient();
+  const client = new HimalayaClient({ from: "sender@example.com" });
   vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
   return client;
 }
@@ -31,7 +34,7 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       const result = await tool.handler({
         to: "alice@example.com", subject: "Meeting", body: "Hello Alice",
-        cc: undefined, bcc: undefined, confirm: undefined, account: undefined,
+        cc: undefined, bcc: undefined, attachments: undefined, confirm: undefined, account: undefined,
       }, {} as any);
 
       const text = result.content[0].text;
@@ -47,7 +50,7 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       await tool.handler({
         to: "test@test.com", subject: "Test", body: "Body",
-        cc: undefined, bcc: undefined, confirm: false, account: undefined,
+        cc: undefined, bcc: undefined, attachments: undefined, confirm: false, account: undefined,
       }, {} as any);
 
       expect(client.sendTemplate).not.toHaveBeenCalled();
@@ -57,7 +60,7 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       const result = await tool.handler({
         to: "alice@example.com", subject: "Meeting", body: "Hello",
-        cc: undefined, bcc: undefined, confirm: true, account: undefined,
+        cc: undefined, bcc: undefined, attachments: undefined, confirm: true, account: undefined,
       }, {} as any);
 
       expect(result.content[0].text).toContain("sent successfully");
@@ -69,7 +72,7 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       const result = await tool.handler({
         to: "alice@example.com", subject: "Meeting", body: "Hello",
-        cc: "bob@example.com", bcc: undefined, confirm: undefined, account: undefined,
+        cc: "bob@example.com", bcc: undefined, attachments: undefined, confirm: undefined, account: undefined,
       }, {} as any);
 
       expect(result.content[0].text).toContain("Cc: bob@example.com");
@@ -79,7 +82,7 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       const result = await tool.handler({
         to: "alice@example.com", subject: "Meeting", body: "Hello",
-        cc: undefined, bcc: "secret@example.com", confirm: undefined, account: undefined,
+        cc: undefined, bcc: "secret@example.com", attachments: undefined, confirm: undefined, account: undefined,
       }, {} as any);
 
       expect(result.content[0].text).toContain("Bcc: secret@example.com");
@@ -90,7 +93,7 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       const result = await tool.handler({
         to: "alice@example.com", subject: "Test", body: "Body",
-        cc: undefined, bcc: undefined, confirm: true, account: undefined,
+        cc: undefined, bcc: undefined, attachments: undefined, confirm: true, account: undefined,
       }, {} as any);
 
       expect(result.isError).toBe(true);
@@ -102,7 +105,7 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       await tool.handler({
         to: "alice@example.com", subject: "Test", body: "Body",
-        cc: undefined, bcc: undefined, confirm: true, account: "work",
+        cc: undefined, bcc: undefined, attachments: undefined, confirm: true, account: "work",
       }, {} as any);
 
       expect(client.sendTemplate).toHaveBeenCalledWith(
@@ -115,12 +118,73 @@ describe("Compose new email tool", () => {
       const tool = getToolHandler(server, "compose_email");
       const result = await tool.handler({
         to: "alice@example.com", subject: "Test", body: "Body",
-        cc: undefined, bcc: undefined, confirm: undefined, account: undefined,
+        cc: undefined, bcc: undefined, attachments: undefined, confirm: undefined, account: undefined,
       }, {} as any);
 
       const text = result.content[0].text;
       expect(text).not.toContain("Cc:");
       expect(text).not.toContain("Bcc:");
+    });
+
+    describe("attachments", () => {
+      let tmpFile: string;
+
+      beforeEach(() => {
+        tmpFile = join(tmpdir(), `test-attach-${process.pid}.pdf`);
+        writeFileSync(tmpFile, "fake pdf content");
+      });
+
+      afterEach(() => {
+        try { unlinkSync(tmpFile); } catch { /* ignore */ }
+      });
+
+      it("attachment path appears in preview template", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        const result = await tool.handler({
+          to: "alice@example.com", subject: "Test", body: "See attached",
+          cc: undefined, bcc: undefined, attachments: [tmpFile], confirm: undefined, account: undefined,
+        }, {} as any);
+
+        const text = result.content[0].text;
+        expect(text).toContain("<#part");
+        expect(text).toContain(tmpFile);
+        expect(text).toContain("<#/part>");
+        expect(text).toContain("application/pdf");
+      });
+
+      it("attachment MML is included when confirm=true", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        await tool.handler({
+          to: "alice@example.com", subject: "Test", body: "See attached",
+          cc: undefined, bcc: undefined, attachments: [tmpFile], confirm: true, account: undefined,
+        }, {} as any);
+
+        const [templateArg] = (client.sendTemplate as ReturnType<typeof vi.fn>).mock.calls[0];
+        expect(templateArg).toContain("<#part");
+        expect(templateArg).toContain(tmpFile);
+      });
+
+      it("missing attachment path returns error before sending", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        const result = await tool.handler({
+          to: "alice@example.com", subject: "Test", body: "Body",
+          cc: undefined, bcc: undefined, attachments: ["/nonexistent/file.pdf"], confirm: true, account: undefined,
+        }, {} as any);
+
+        expect(result.isError).toBe(true);
+        expect(result.content[0].text).toContain("not found");
+        expect(client.sendTemplate).not.toHaveBeenCalled();
+      });
+
+      it("no <#part> sections when attachments is empty", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        const result = await tool.handler({
+          to: "alice@example.com", subject: "Test", body: "Body",
+          cc: undefined, bcc: undefined, attachments: [], confirm: undefined, account: undefined,
+        }, {} as any);
+
+        expect(result.content[0].text).not.toContain("<#part");
+      });
     });
   });
 });

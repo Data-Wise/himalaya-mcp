@@ -10,8 +10,9 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
-import { parseMessageBody } from "../himalaya/parser.js";
+import { parseTemplate } from "../himalaya/parser.js";
 import { envelopeError } from "./_envelope.js";
+import { validateAttachmentPaths, buildAttachmentMml } from "./_attachments.js";
 
 export function registerComposeTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("draft_reply", {
@@ -32,7 +33,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
         args.folder,
         args.account,
       );
-      const result = parseMessageBody(raw);
+      const result = parseTemplate(raw);
 
       if (!result.ok) {
         return {
@@ -64,10 +65,27 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
     description: "Send an email template. SAFETY: requires confirm=true to actually send. Without confirm, returns a preview. Always show the user the preview and get their approval before sending with confirm=true.",
     inputSchema: {
       template: z.string().describe("The full email template (MML format with headers and body). Get this from draft_reply output."),
+      attachments: z.array(z.string()).optional().describe("Local file paths to attach (e.g. [\"/tmp/report.pdf\"])"),
       confirm: z.boolean().optional().describe("Set to true to actually send. Without this, only shows a preview."),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
+    // Validate attachment paths before showing preview or sending
+    if (args.attachments?.length) {
+      const err = validateAttachmentPaths(args.attachments);
+      if (err) {
+        return {
+          content: [{ type: "text" as const, text: err }],
+          isError: true,
+        };
+      }
+    }
+
+    // Inject attachment MML parts into the template (after headers+body)
+    const template = args.attachments?.length
+      ? args.template + "\n\n" + buildAttachmentMml(args.attachments)
+      : args.template;
+
     // Safety gate: without confirm=true, just show preview
     if (!args.confirm) {
       return {
@@ -76,7 +94,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
           text: [
             "--- EMAIL PREVIEW (not sent) ---",
             "",
-            args.template,
+            template,
             "",
             "--- END PREVIEW ---",
             "",
@@ -89,7 +107,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
 
     // Actually send
     try {
-      await client.sendTemplate(args.template, args.account);
+      await client.sendTemplate(template, args.account);
       return {
         content: [{
           type: "text" as const,

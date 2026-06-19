@@ -74,12 +74,47 @@ Claude calls `compose_email` with `confirm=true` and the email is sent.
 !!! warning "Safety gate"
     Just like replies, new emails are **never sent without your explicit approval**. Claude always shows a preview first.
 
+## Step 4: Send with an attachment
+
+You can include local files in the same natural-language request:
+
+```
+You: "Email alice@example.com the Q1 report — attach /Users/me/Downloads/q1-report.pdf"
+```
+
+Claude calls `compose_email` with `attachments: ["/Users/me/Downloads/q1-report.pdf"]` and shows a preview:
+
+```
+--- EMAIL PREVIEW (not sent) ---
+
+To: alice@example.com
+Subject: Q1 Report
+
+Hi Alice,
+
+Please find the Q1 report attached.
+
+Best regards
+
+Attachments: q1-report.pdf
+
+--- END PREVIEW ---
+
+Send this, edit it, or cancel?
+```
+
+When you confirm, the file is validated (missing paths are caught before send) and attached using himalaya's MML format piped via stdin.
+
+!!! tip "Multiple files"
+    Pass a list: "attach the PDF and the spreadsheet" → Claude resolves paths and includes both in the preview.
+
 ## What you learned
 
 - `compose_email` creates new emails (not replies)
 - The same two-phase safety gate applies: preview first, then confirm
 - You can add CC/BCC recipients
 - Natural language editing works before sending
+- `attachments` accepts an array of local file paths; missing files are caught before send
 
 ---
 

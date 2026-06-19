@@ -1,6 +1,6 @@
 {
   "name": "himalaya-mcp",
-  "version": "1.6.2",
+  "version": "1.7.0",
   "description": "MCP server wrapping himalaya CLI for privacy-first email access in Claude",
   "type": "module",
   "main": "dist/index.js",
@@ -27,7 +27,8 @@
   "author": "Data-Wise",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
