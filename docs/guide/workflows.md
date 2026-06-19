@@ -588,4 +588,4 @@ Claude will invoke the `health_check` MCP tool. Based on the response:
 - `overall: degraded` -- at least one account fails; Claude surfaces the per-account `hint`
 - `overall: broken` -- no account reachable; Claude follows the top-level `hint`
 
-For detailed failure-mode walkthroughs, see [troubleshooting.md](../troubleshooting.md).
+For detailed failure-mode walkthroughs, see [troubleshooting.md](troubleshooting.md).

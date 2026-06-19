@@ -50,7 +50,7 @@ Claude calls `health_check({ account: "personal" })` and returns one row. Useful
 himalaya-mcp doctor
 ```
 
-Doctor groups checks by category and ends with a per-account `Accounts` section. Failures point you to `docs/troubleshooting.md` with the matching error code.
+Doctor groups checks by category and ends with a per-account `Accounts` section. Failures point you to `docs/guide/troubleshooting.md` with the matching error code.
 
 ## Step 4: Target one account from the CLI
 
@@ -86,7 +86,7 @@ Both `health_check` and `doctor` surface the same stable codes:
 | `folder_not_found` | UID or folder stale | Run `himalaya folder list` |
 | `himalaya_not_installed` | Binary missing on PATH | `brew install himalaya` |
 
-The full table lives in [Troubleshooting](../troubleshooting.md).
+The full table lives in [Troubleshooting](../guide/troubleshooting.md).
 
 ## Decision flow
 

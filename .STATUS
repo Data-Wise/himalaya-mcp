@@ -48,11 +48,11 @@
 ## Current State
 
 - Branch: `dev` (synced with main at v1.6.2)
-- No active worktrees
+- Active worktree: `~/.git-worktrees/himalaya-mcp/feature-issue-64-attachment-send` → `feature/issue-64-attachment-send`
 - v1.6.2 released: GitHub, Homebrew, docs site all live
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
-- Tests: 484 passing across 23 test files
+- Tests: 507 passing across 23 test files (feature branch; was 484 on dev)
 - Tutorials: 10 across 3 levels (added Diagnose Email Issues in v1.6.2)
 - Bundle: 604KB (esbuild), .mcpb: 151KB
 

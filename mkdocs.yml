@@ -42,6 +42,10 @@ theme:
 extra_css:
   - stylesheets/extra.css
 
+exclude_docs: |
+  specs/
+  bundling-research.md
+
 plugins:
   - search
 

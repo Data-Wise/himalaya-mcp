@@ -233,9 +233,9 @@ Example with env vars:
 
 | Tool | Description | Key Parameters |
 |------|-------------|----------------|
-| `compose_email` | Compose a new email from scratch | `to`, `subject`, `body`, `account` |
+| `compose_email` | Compose a new email from scratch | `to`, `subject`, `body`, `attachments`, `account` |
 | `draft_reply` | Generate reply template (does NOT send) | `id`, `body`, `reply_all` |
-| `send_email` | Send with safety gate | `template`, `confirm` (must be `true` to send) |
+| `send_email` | Send with safety gate | `template`, `attachments`, `confirm` (must be `true` to send) |
 
 ### Attachments
 
@@ -292,7 +292,7 @@ Returns `overall` status (`healthy` / `degraded` / `broken`) plus a per-account 
 }
 ```
 
-If any tool fails, also see the [troubleshooting guide](../troubleshooting.md).
+If any tool fails, also see the [troubleshooting guide](troubleshooting.md).
 
 ## MCP Prompts (6)
 
@@ -360,7 +360,7 @@ When an email tool fails, the structured error envelope tells Claude (and you) w
 - `account` — which account failed (in multi-account setups)
 - `attempts` — how many times the operation was retried before surfacing
 
-For the full failure-mode catalog and recovery steps, see the canonical [troubleshooting guide](../troubleshooting.md).
+For the full failure-mode catalog and recovery steps, see the canonical [troubleshooting guide](troubleshooting.md).
 
 ## Testing
 

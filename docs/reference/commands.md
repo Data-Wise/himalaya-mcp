@@ -310,6 +310,7 @@ Compose and send a new email (not a reply). **Two-phase safety gate:** requires 
 | `body` | string | **Yes** | — | Email body text |
 | `cc` | string | No | — | CC recipient(s) |
 | `bcc` | string | No | — | BCC recipient(s) |
+| `attachments` | string[] | No | — | Local file paths to attach (e.g. `["/tmp/report.pdf"]`) |
 | `confirm` | boolean | No | `false` | Set `true` to actually send |
 | `account` | string | No | default | Account name |
 
@@ -330,6 +331,10 @@ Compose and send a new email (not a reply). **Two-phase safety gate:** requires 
 
 "Email the team about the deadline"
 → compose_email(to: "team@example.com", subject: "Q2 Deadline Reminder", body: "...")
+
+"Send Alice the Q1 report PDF"
+→ compose_email(to: "alice@example.com", subject: "Q1 Report", body: "See attached.",
+                attachments: ["/Users/me/Downloads/q1-report.pdf"])
 ```
 
 !!! danger "Never skip the preview step"
@@ -454,6 +459,7 @@ Send an email template. **Two-phase safety gate:** requires explicit `confirm=tr
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `template` | string | **Yes** | — | Full email template (MML format from draft_reply) |
+| `attachments` | string[] | No | — | Local file paths to attach (e.g. `["/tmp/report.pdf"]`) |
 | `confirm` | boolean | No | `false` | Set `true` to actually send |
 | `account` | string | No | default | Account name |
 
@@ -464,6 +470,13 @@ Send an email template. **Two-phase safety gate:** requires explicit `confirm=tr
 2. send_email(template: "...")     → shows PREVIEW (not sent)
 3. User reviews and approves
 4. send_email(template: "...", confirm: true)  → SENDS
+```
+
+To attach local files, pass `attachments` before confirming. The attachment MML is injected into the template and visible in the preview:
+
+```
+send_email(template: "...", attachments: ["/tmp/report.pdf"])     → PREVIEW with attachment shown
+send_email(template: "...", attachments: ["/tmp/report.pdf"], confirm: true)  → SENDS with attachment
 ```
 
 !!! danger "Never skip the preview step"
