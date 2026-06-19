@@ -7,6 +7,7 @@
  *   HIMALAYA_ACCOUNT — default account name
  *   HIMALAYA_FOLDER  — default folder (default: "INBOX")
  *   HIMALAYA_TIMEOUT — command timeout in ms (default: 120000; 0 = unlimited)
+ *   HIMALAYA_FROM    — sender email address for compose/send (required for sending)
  */
 
 import type { HimalayaClientOptions } from "./himalaya/types.js";
@@ -35,6 +36,9 @@ export function loadConfig(): HimalayaClientOptions {
     const timeout = parseInt(timeoutStr, 10);
     if (!isNaN(timeout) && timeout >= 0) config.timeout = timeout;
   }
+
+  const from = resolvedEnv("HIMALAYA_FROM");
+  if (from) config.from = from;
 
   return config;
 }

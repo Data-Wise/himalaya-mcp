@@ -4,7 +4,7 @@ import { HimalayaClient } from "../src/himalaya/client.js";
 import { registerComposeNewTools } from "../src/tools/compose-new.js";
 
 function createMockClient(): HimalayaClient {
-  const client = new HimalayaClient();
+  const client = new HimalayaClient({ from: "sender@example.com" });
   vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
   return client;
 }

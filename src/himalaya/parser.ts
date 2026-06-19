@@ -58,6 +58,43 @@ export function formatEnvelope(e: Envelope): string {
 }
 
 /**
+ * Parse a template response from `himalaya template reply --output json`.
+ *
+ * himalaya returns either a plain JSON string OR an object of the form
+ * `{content: string, cursor: {row: number, col: number}}`.
+ * Both forms are normalized to a plain string for downstream use.
+ */
+export function parseTemplate(raw: string): CommandOutput<string> {
+  const trimmed = raw.trim();
+
+  if (!trimmed) {
+    return { ok: false, error: "Empty template response", code: "EMPTY" };
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+
+    if (typeof parsed === "string") {
+      return { ok: true, data: parsed };
+    }
+
+    if (
+      parsed !== null &&
+      typeof parsed === "object" &&
+      "content" in parsed &&
+      typeof (parsed as { content: unknown }).content === "string"
+    ) {
+      return { ok: true, data: (parsed as { content: string }).content };
+    }
+
+    // Unexpected shape — fall through to raw text
+    return { ok: true, data: trimmed };
+  } catch {
+    return { ok: true, data: trimmed };
+  }
+}
+
+/**
  * Parse message body response.
  * himalaya returns the body as a JSON-quoted string.
  */

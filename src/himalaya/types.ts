@@ -57,6 +57,8 @@ export interface HimalayaClientOptions {
   timeout?: number;
   /** Backoff delay in milliseconds between retry attempts (default: 200) */
   retryBackoffMs?: number;
+  /** Sender email address for compose/send (required for sending; set via HIMALAYA_FROM) */
+  from?: string;
 }
 
 // --- Command result ---

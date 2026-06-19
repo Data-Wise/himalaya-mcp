@@ -86,9 +86,17 @@ elif echo "$clean" | grep -q "folder create"; then
 elif echo "$clean" | grep -q "folder delete"; then
   echo '{}'
 elif echo "$clean" | grep -q "attachment download"; then
-  # Create fake attachment files in cwd (our tools do readdir+stat on real files)
-  echo "fake pdf content for e2e testing" > "$PWD/report.pdf"
-  cat > "$PWD/invite.ics" << 'ICSEOF'
+  # Parse --downloads-dir <dir> from original args (before clean strips flags)
+  downloads_dir=""
+  prev=""
+  for arg in $args; do
+    if [ "$prev" = "--downloads-dir" ]; then downloads_dir="$arg"; fi
+    prev="$arg"
+  done
+  dest="$downloads_dir"; if [ -z "$dest" ]; then dest="$PWD"; fi
+  # Create fake attachment files in dest (our tools do readdir+stat on real files)
+  printf 'fake pdf content for e2e testing\n' > "$dest/report.pdf"
+  cat > "$dest/invite.ics" << 'ICSEOF'
 BEGIN:VCALENDAR
 BEGIN:VEVENT
 SUMMARY:E2E Test Meeting
@@ -101,8 +109,8 @@ UID:e2e-test-uid@example.com
 END:VEVENT
 END:VCALENDAR
 ICSEOF
-  echo "body text" > "$PWD/plain.txt"
-  echo "<html>body</html>" > "$PWD/index.html"
+  echo "body text" > "$dest/plain.txt"
+  echo "<html>body</html>" > "$dest/index.html"
   echo '{}'
 else
   echo '[]'
@@ -150,6 +158,7 @@ describe("E2E: MCP Server Headless", () => {
         ...process.env,
         PATH: `${fakeBinDir}:${process.env.PATH}`,
         HIMALAYA_BINARY: join(fakeBinDir, "himalaya"),
+        HIMALAYA_FROM: "e2e@example.com",
       },
       stdio: ["pipe", "pipe", "pipe"],
     });

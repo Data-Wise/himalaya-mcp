@@ -12,8 +12,16 @@ import type { HimalayaClient } from "../himalaya/client.js";
 import { envelopeError } from "./_envelope.js";
 
 /** Build an MML email template from parameters. */
-function buildTemplate(to: string, subject: string, body: string, cc?: string, bcc?: string): string {
+function buildTemplate(
+  to: string,
+  subject: string,
+  body: string,
+  cc?: string,
+  bcc?: string,
+  from?: string,
+): string {
   const headers: string[] = [];
+  if (from) headers.push(`From: ${from}`);
   headers.push(`To: ${to}`);
   if (cc) headers.push(`Cc: ${cc}`);
   if (bcc) headers.push(`Bcc: ${bcc}`);
@@ -44,7 +52,17 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       };
     }
 
-    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc);
+    if (!client.from) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: "HIMALAYA_FROM is not set. Set it to your email address to compose new emails.",
+        }],
+        isError: true,
+      };
+    }
+
+    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc, client.from);
 
     // Safety gate: without confirm=true, just show preview
     if (!args.confirm) {

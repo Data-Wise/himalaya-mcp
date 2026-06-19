@@ -10,7 +10,7 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
-import { parseMessageBody } from "../himalaya/parser.js";
+import { parseTemplate } from "../himalaya/parser.js";
 import { envelopeError } from "./_envelope.js";
 
 export function registerComposeTools(server: McpServer, client: HimalayaClient) {
@@ -32,7 +32,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
         args.folder,
         args.account,
       );
-      const result = parseMessageBody(raw);
+      const result = parseTemplate(raw);
 
       if (!result.ok) {
         return {

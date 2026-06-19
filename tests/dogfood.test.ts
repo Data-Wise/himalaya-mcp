@@ -114,7 +114,7 @@ const ATTACHMENT_FILES_WITH_ICS = ["invite.ics", "agenda.pdf", "plain.txt"];
 // --- Mock client ---
 
 function createMockClient(): HimalayaClient {
-  const client = new HimalayaClient();
+  const client = new HimalayaClient({ from: "sender@example.com" });
   vi.spyOn(client, "listEnvelopes").mockResolvedValue(SAMPLE_ENVELOPES);
   vi.spyOn(client, "searchEnvelopes").mockResolvedValue(EMPTY_SEARCH);
   vi.spyOn(client, "readMessage").mockResolvedValue(SAMPLE_MESSAGE);

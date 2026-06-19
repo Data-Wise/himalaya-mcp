@@ -44,6 +44,7 @@ const DEFAULT_OPTIONS: Required<HimalayaClientOptions> = {
   folder: "INBOX",
   timeout: 120_000,
   retryBackoffMs: 200,
+  from: "",
 };
 
 const MAX_ATTEMPTS = 2;
@@ -56,6 +57,11 @@ export class HimalayaClient {
     // Remove empty strings so they don't override
     if (!options.account) this.opts.account = "";
     if (!options.folder) this.opts.folder = DEFAULT_OPTIONS.folder;
+  }
+
+  /** Sender email address (from HIMALAYA_FROM env var). */
+  get from(): string {
+    return this.opts.from;
   }
 
   // Resolve the effective folder, validate it, and append --folder to `args`
@@ -81,6 +87,8 @@ export class HimalayaClient {
     account?: string;
     timeout?: number;
     cwd?: string;
+    /** Positional args appended after all flags (e.g. reply body) */
+    trailingArgs?: string[];
   }): Promise<string> {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
       try {
@@ -107,6 +115,7 @@ export class HimalayaClient {
     account?: string;
     timeout?: number;
     cwd?: string;
+    trailingArgs?: string[];
   }): Promise<string> {
     const args: string[] = [];
 
@@ -122,6 +131,11 @@ export class HimalayaClient {
 
     // Output format
     args.push("--output", "json");
+
+    // Positional args must come after all flags (e.g. reply body)
+    if (options?.trailingArgs?.length) {
+      args.push(...options.trailingArgs);
+    }
 
     const timeout = options?.timeout ?? this.opts.timeout;
 
@@ -234,23 +248,68 @@ export class HimalayaClient {
       args.push("--all");
     }
     args.push(id);
-    if (body) {
-      // Body can contain anything a user might type, but it must not
-      // lead with "-" since himalaya will treat it as a flag.
-      assertSafeArg(body, "body");
-      args.push(body);
-    }
-    return this.exec(args, { folder: f, account });
+    // Body must come after --output json (trailingArgs), and must not
+    // start with "-" to avoid flag confusion.
+    const trailingArgs = body ? (assertSafeArg(body, "body"), [body]) : undefined;
+    return this.exec(args, { folder: f, account, trailingArgs });
   }
 
-  /** Send a template (MML format). */
+  /**
+   * Send a template (MML format) via stdin.
+   * Uses spawn() with an args array — no shell involved, safe for multiline templates.
+   * Positional-arg approach breaks for multiline MML; stdin is the correct path.
+   */
   async sendTemplate(
     template: string,
     account?: string,
   ): Promise<string> {
-    assertSafeArg(template, "template");
-    const args = ["template", "send", template];
-    return this.exec(args, { account });
+    // Template going to stdin, not CLI args — but reject leading-dash as sanity check.
+    if (template.startsWith("-")) {
+      throw new Error(
+        `template value "${template.slice(0, 20)}" looks like a flag (starts with "-"). ` +
+        `Refusing to pass it to himalaya.`,
+      );
+    }
+
+    const { spawn } = await import("node:child_process");
+
+    const args = ["template", "send", "--output", "json"];
+    const acct = account || this.opts.account;
+    if (acct) {
+      assertSafeArg(acct, "account");
+      args.push("--account", acct);
+    }
+
+    return new Promise((resolve, reject) => {
+      // spawn with an args array — no shell, no injection risk
+      const child = spawn(this.opts.binary, args, {
+        stdio: ["pipe", "pipe", "pipe"],
+        env: { ...process.env },
+      });
+
+      let stdout = "";
+      let stderr = "";
+      child.stdout.on("data", (d: Buffer) => { stdout += d.toString(); });
+      child.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
+
+      child.on("close", (code: number | null) => {
+        if (code === 0) {
+          resolve(stdout);
+        } else {
+          reject(this.wrapError(new Error(`himalaya error: ${stderr || stdout}`)));
+        }
+      });
+
+      child.on("error", (err: Error) => reject(this.wrapError(err)));
+
+      child.stdin.write(template);
+      child.stdin.end();
+
+      setTimeout(() => {
+        child.kill();
+        reject(new Error("Send timed out"));
+      }, this.opts.timeout);
+    });
   }
 
   /** List folders. */
@@ -267,7 +326,9 @@ export class HimalayaClient {
   /** Delete a folder. */
   async deleteFolder(name: string, account?: string): Promise<string> {
     assertSafeArg(name, "name");
-    return this.exec(["folder", "delete", name], { account });
+    // --yes suppresses the interactive confirmation prompt that himalaya prints
+    // to stdout, which would block when invoked as a subprocess (no TTY).
+    return this.exec(["folder", "delete", "--yes", name], { account });
   }
 
   /** List accounts. */
@@ -278,9 +339,10 @@ export class HimalayaClient {
   /** Download ALL attachments for a message to a directory. */
   async downloadAttachments(id: string, destDir: string, folder?: string, account?: string): Promise<string> {
     assertSafeArg(id, "id");
-    const args = ["attachment", "download", id];
+    assertSafeArg(destDir, "destDir");
+    const args = ["attachment", "download", "--downloads-dir", destDir, id];
     const f = this.applyFolderArg(args, folder);
-    return this.exec(args, { folder: f, account, cwd: destDir });
+    return this.exec(args, { folder: f, account });
   }
 
   /**
