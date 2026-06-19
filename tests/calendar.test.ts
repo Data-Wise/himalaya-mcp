@@ -144,6 +144,52 @@ END:VCALENDAR`;
     const event = parseICS(ics);
     expect(event!.dtstart).toBe("2026-02-16T09:00:00");
   });
+
+  it("unescapes RFC 5545 sequences in SUMMARY, LOCATION, DESCRIPTION", () => {
+    // Per RFC 5545 §3.3.11, TEXT values escape the separators \, and \;
+    // and use \n for line breaks. Backslash itself is \\.
+    const ics = `BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY:Dinner\\, drinks\\; talks
+DTSTART:20260216T090000
+DTEND:20260216T100000
+LOCATION:Caf\\, 5th Ave
+DESCRIPTION:Line one\\nLine two\\\\ends here
+END:VEVENT
+END:VCALENDAR`;
+
+    const event = parseICS(ics);
+    expect(event!.summary).toBe("Dinner, drinks; talks");
+    expect(event!.location).toBe("Caf, 5th Ave");
+    expect(event!.description).toBe("Line one\nLine two\\ends here");
+  });
+
+  it("treats \\N the same as \\n (case-insensitive line break)", () => {
+    const ics = `BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY:Test
+DTSTART:20260216T090000
+DESCRIPTION:First\\NSecond
+END:VEVENT
+END:VCALENDAR`;
+
+    const event = parseICS(ics);
+    expect(event!.description).toBe("First\nSecond");
+  });
+
+  it("keeps unknown backslash sequences literal", () => {
+    const ics = `BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY:Path C:\\temp\\readme
+DTSTART:20260216T090000
+END:VEVENT
+END:VCALENDAR`;
+
+    const event = parseICS(ics);
+    // \t and \r aren't defined in RFC 5545, so we leave them alone
+    // rather than silently eating the backslash.
+    expect(event!.summary).toBe("Path C:\\temp\\readme");
+  });
 });
 
 // --- Calendar Tool Tests ---
