@@ -58,6 +58,17 @@ export class HimalayaClient {
     if (!options.folder) this.opts.folder = DEFAULT_OPTIONS.folder;
   }
 
+  // Resolve the effective folder, validate it, and append --folder to `args`
+  // if it differs from the implicit INBOX default. Returns the effective folder.
+  private applyFolderArg(args: string[], folder: string | undefined): string {
+    const f = folder || this.opts.folder;
+    if (f && f !== "INBOX") {
+      assertSafeArg(f, "folder");
+      args.push("--folder", f);
+    }
+    return f;
+  }
+
   /**
    * Execute a himalaya CLI command and return raw stdout.
    * Always appends --output json.
@@ -130,11 +141,7 @@ export class HimalayaClient {
   /** List envelopes in a folder. */
   async listEnvelopes(folder?: string, pageSize?: number, page?: number, account?: string): Promise<string> {
     const args = ["envelope", "list"];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     if (pageSize) {
       args.push("--page-size", String(pageSize));
     }
@@ -153,11 +160,7 @@ export class HimalayaClient {
    */
   async searchEnvelopes(query: string, folder?: string, account?: string): Promise<string> {
     const args = ["envelope", "list"];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     // Query words are positional args to himalaya (not a -q flag).
     // Tokenize with quote awareness so `subject "meeting notes"` works,
     // and refuse any token that would be parsed as a flag.
@@ -173,11 +176,7 @@ export class HimalayaClient {
   async readMessage(id: string, folder?: string, account?: string): Promise<string> {
     assertSafeArg(id, "id");
     const args = ["message", "read", id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -185,11 +184,7 @@ export class HimalayaClient {
   async readMessageHtml(id: string, folder?: string, account?: string): Promise<string> {
     assertSafeArg(id, "id");
     const args = ["message", "read", "--html", id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -206,11 +201,7 @@ export class HimalayaClient {
       assertSafeArg(flag, "flag");
     }
     const args = ["flag", action, id, ...flags];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -224,11 +215,7 @@ export class HimalayaClient {
     assertSafeArg(id, "id");
     assertSafeArg(targetFolder, "target_folder");
     const args = ["message", "move", targetFolder, id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -242,11 +229,7 @@ export class HimalayaClient {
   ): Promise<string> {
     assertSafeArg(id, "id");
     const args = ["template", "reply"];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     if (replyAll) {
       args.push("--all");
     }
@@ -296,11 +279,7 @@ export class HimalayaClient {
   async downloadAttachments(id: string, destDir: string, folder?: string, account?: string): Promise<string> {
     assertSafeArg(id, "id");
     const args = ["attachment", "download", id];
-    const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
-      assertSafeArg(f, "folder");
-      args.push("--folder", f);
-    }
+    const f = this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account, cwd: destDir });
   }
 
