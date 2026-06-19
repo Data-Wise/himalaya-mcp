@@ -200,4 +200,95 @@ describe("HimalayaClient", () => {
       );
     });
   });
+
+  describe("flag-injection guard", () => {
+    it("rejects an id that starts with a dash", async () => {
+      const client = new HimalayaClient();
+      await expect(client.readMessage("--help")).rejects.toThrow(/looks like a flag/);
+    });
+
+    it("rejects a target folder that starts with a dash", async () => {
+      const client = new HimalayaClient();
+      await expect(client.moveMessage("1", "--config=/tmp/evil")).rejects.toThrow(/looks like a flag/);
+    });
+
+    it("rejects a folder override that starts with a dash", async () => {
+      const client = new HimalayaClient();
+      await expect(client.listEnvelopes("--help")).rejects.toThrow(/looks like a flag/);
+    });
+
+    it("rejects a flag argument that starts with a dash", async () => {
+      const client = new HimalayaClient();
+      await expect(client.flagMessage("1", ["--help"], "add")).rejects.toThrow(/looks like a flag/);
+    });
+
+    it("rejects an account override that starts with a dash", async () => {
+      setupMock("[]");
+      const client = new HimalayaClient();
+      await expect(
+        client.exec(["envelope", "list"], { account: "--config=/tmp/evil" }),
+      ).rejects.toThrow(/looks like a flag/);
+    });
+
+    it("rejects a new folder name that starts with a dash", async () => {
+      const client = new HimalayaClient();
+      await expect(client.createFolder("--help")).rejects.toThrow(/looks like a flag/);
+    });
+
+    it("rejects a send template that starts with a dash", async () => {
+      const client = new HimalayaClient();
+      await expect(client.sendTemplate("--help")).rejects.toThrow(/looks like a flag/);
+    });
+
+    it("does not reach execFile when a flag is rejected", async () => {
+      const client = new HimalayaClient();
+      await expect(client.readMessage("--help")).rejects.toThrow();
+      expect(mockExecFileAsync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("searchEnvelopes tokenizer", () => {
+    it("keeps a quoted multi-word value as one argv entry", async () => {
+      setupMock("[]");
+      const client = new HimalayaClient();
+      await client.searchEnvelopes('subject "meeting notes"', "INBOX");
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["envelope", "list", "subject", "meeting notes"]),
+        expect.any(Object),
+      );
+    });
+
+    it("handles single quotes", async () => {
+      setupMock("[]");
+      const client = new HimalayaClient();
+      await client.searchEnvelopes("from 'foo bar@example.com'", "INBOX");
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["envelope", "list", "from", "foo bar@example.com"]),
+        expect.any(Object),
+      );
+    });
+
+    it("collapses runs of whitespace", async () => {
+      setupMock("[]");
+      const client = new HimalayaClient();
+      await client.searchEnvelopes("subject    invoice", "INBOX");
+
+      const call = mockExecFileAsync.mock.calls[0];
+      const argv = call?.[1] as string[];
+      expect(argv.filter((a) => a === "")).toHaveLength(0);
+      expect(argv).toContain("subject");
+      expect(argv).toContain("invoice");
+    });
+
+    it("rejects a query token that starts with a dash", async () => {
+      const client = new HimalayaClient();
+      await expect(
+        client.searchEnvelopes("subject foo --folder Trash", "INBOX"),
+      ).rejects.toThrow(/looks like a flag/);
+    });
+  });
 });
