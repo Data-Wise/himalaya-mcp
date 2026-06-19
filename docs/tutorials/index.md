@@ -54,7 +54,7 @@ Organize, reply, and export emails efficiently.
 | [Reply to an Email](reply-email.md) | 5 min | Level 1 |
 | [Compose and Send Email](compose-email.md) | 5 min | Level 1 |
 | [Attachments and Calendar](attachments-calendar.md) | 5 min | Level 1 |
-| [Search and Manage](../guide/workflows.md#17-search-and-filter-emails) | 5 min | Level 1 |
+| [Search and Manage](../guide/workflows.md#18-search-and-filter-emails) | 5 min | Level 1 |
 | [Export and Save Emails](export-save.md) | 3 min | Level 1 |
 
 ### Level 3: Automation

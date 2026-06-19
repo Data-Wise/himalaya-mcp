@@ -304,7 +304,44 @@ Send this, edit it, or cancel?
 
 **Tip:** Add CC/BCC: "Email Alice, CC Bob about the meeting change"
 
-## 13. Download and Process Attachments
+## 13. Send Email with Attachments
+
+Compose a new email and include local files as attachments.
+
+**Natural language:** "Email the Q1 report to alice@example.com — attach /Users/me/Downloads/q1-report.pdf"
+
+**What happens:**
+
+1. `compose_email(to, subject, body, attachments: ["/path/file.pdf"])` -- generates preview with attachment list
+2. Show preview including attachment names
+3. File paths are validated before send; missing files surface an error without sending
+4. `compose_email(..., confirm: true)` -- sends with attachments via MML format
+
+```
+You: "Email the Q1 report to alice@example.com — attach /Downloads/q1-report.pdf"
+
+Claude:
+--- EMAIL PREVIEW (not sent) ---
+
+To: alice@example.com
+Subject: Q1 Report
+
+Hi Alice,
+
+Please find the Q1 report attached.
+
+Attachments: q1-report.pdf
+
+--- END PREVIEW ---
+
+Send this, edit it, or cancel?
+```
+
+**Multiple attachments:** "attach the PDF and the spreadsheet" → Claude includes both files in one `attachments` array.
+
+**Tip:** The same `attachments` parameter works on `send_email` when replying via a template from `draft_reply`.
+
+## 14. Download and Process Attachments
 
 View and download email attachments.
 
@@ -329,7 +366,7 @@ Downloaded "report.pdf" to: /tmp/himalaya-mcp-abc123/report.pdf
 
 **Note:** Body parts (`plain.txt`, `index.html`) are automatically filtered out.
 
-## 14. Process Calendar Invites
+## 15. Process Calendar Invites
 
 Extract meeting details from ICS attachments and add to Apple Calendar.
 
@@ -358,7 +395,7 @@ Create this event in Apple Calendar?
 
 **Note:** Calendar creation is macOS only (uses AppleScript).
 
-## 15. Folder Management
+## 16. Folder Management
 
 Create and organize email folders.
 
@@ -384,7 +421,7 @@ WARNING: This will permanently delete the folder and all emails in it.
 Are you sure? This action cannot be undone.
 ```
 
-## 16. End-of-Day Email Sweep
+## 17. End-of-Day Email Sweep
 
 Quick cleanup before signing off. Now includes attachment checks and calendar event extraction.
 
@@ -423,7 +460,7 @@ Tomorrow's priority list:
 Mark the other 3 as read and archive?
 ```
 
-## 17. Search and Filter Emails
+## 18. Search and Filter Emails
 
 Use the `/email:search` skill for powerful email search with filter combinations.
 
@@ -465,7 +502,7 @@ Search: "from alice, unread" (3 results)
 → "/email:manage archive 1,2,3" to bulk archive
 ```
 
-## 18. Bulk Email Management
+## 19. Bulk Email Management
 
 Use `/email:manage` for batch operations on multiple emails.
 
@@ -517,7 +554,7 @@ Moved 8 emails to Archive
 You: "Find all emails from newsletter@dev.to and archive them"
 ```
 
-## 19. Inbox Statistics and Trends
+## 20. Inbox Statistics and Trends
 
 Use `/email:stats` for a quick overview of your inbox health.
 

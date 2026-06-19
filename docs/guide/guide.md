@@ -365,7 +365,7 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 484 tests across 23 files (vitest)
+npm test    # 507 tests across 23 files (vitest)
 ```
 
 Test breakdown:
@@ -375,8 +375,8 @@ Test breakdown:
 | `parser.test.ts` | 13 | JSON response parsing, formatEnvelope |
 | `client.test.ts` | 12 | Subprocess wrapper, argument building |
 | `manage.test.ts` | 7 | flag_email, move_email client methods |
-| `compose.test.ts` | 9 | draft_reply, send_email safety gate |
-| `compose-new.test.ts` | 8 | compose_email safety gate |
+| `compose.test.ts` | 13 | draft_reply, send_email safety gate + attachment tests |
+| `compose-new.test.ts` | 12 | compose_email safety gate + attachment tests |
 | `folders.test.ts` | 12 | Folder tools (list, create, delete) |
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
 | `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
@@ -384,6 +384,6 @@ Test breakdown:
 | `prompts.test.ts` | 15 | All 6 prompts register and return correct text |
 | `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 146 | Realistic Claude usage scenarios + packaging validation |
-| `e2e.test.ts` | 37 | Full MCP server pipeline + .mcpb build pipeline |
+| `dogfood.test.ts` | 142 | Realistic Claude usage scenarios + packaging validation |
+| `e2e.test.ts` | 39 | Full MCP server pipeline + .mcpb build pipeline |
 | `setup.test.ts` | 36 | CLI setup/check/remove, install/upgrade E2E, doctor command |

@@ -6,6 +6,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+
+- **Attachment support for `compose_email` and `send_email`** — both tools now accept an `attachments` parameter (array of local file paths). Files are validated before send; missing paths return a structured error without sending. Attachments are formatted as MML (`<#part>` sections) and piped to `himalaya template send` via stdin. Supports all MIME types with auto-detection by extension.
+- `src/tools/_attachments.ts` — shared attachment helper (`buildAttachmentMML`, `validateAttachments`) used by both compose and send tools.
+- 23 new tests covering attachment preview, MML inclusion on send, missing-file error guard, and no-attachment baseline.
+
+### Changed
+
+- Test count: 484 → 507 (23 new attachment tests across `compose.test.ts` and `compose-new.test.ts`).
+
 ## [1.6.2] - 2026-05-13
 
 ### Added
