@@ -1,8 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
 import { HimalayaError } from "../src/himalaya/errors.js";
 import { registerComposeTools } from "../src/tools/compose.js";
+import { tmpdir } from "node:os";
+import { writeFileSync, unlinkSync } from "node:fs";
+import { join } from "node:path";
 
 // --- Mock client ---
 
@@ -146,6 +149,68 @@ describe("Compose tools", () => {
       }, {} as any);
 
       expect(client.sendTemplate).toHaveBeenCalledWith("test", "work");
+    });
+
+    describe("attachments", () => {
+      let tmpFile: string;
+
+      beforeEach(() => {
+        tmpFile = join(tmpdir(), `test-send-attach-${process.pid}.pdf`);
+        writeFileSync(tmpFile, "fake pdf content");
+      });
+
+      afterEach(() => {
+        try { unlinkSync(tmpFile); } catch { /* ignore */ }
+      });
+
+      it("attachment MML injected into preview template", async () => {
+        const tool = getToolHandler(server, "send_email");
+        const template = "From: me@test.com\nTo: you@test.com\nSubject: Report\n\nSee attached.";
+        const result = await tool.handler({
+          template, attachments: [tmpFile], confirm: undefined, account: undefined,
+        }, {} as any);
+
+        const text = result.content[0].text;
+        expect(text).toContain("<#part");
+        expect(text).toContain(tmpFile);
+        expect(text).toContain("<#/part>");
+        expect(client.sendTemplate).not.toHaveBeenCalled();
+      });
+
+      it("attachment MML injected when confirm=true", async () => {
+        const tool = getToolHandler(server, "send_email");
+        const template = "From: me@test.com\nTo: you@test.com\nSubject: Report\n\nSee attached.";
+        await tool.handler({
+          template, attachments: [tmpFile], confirm: true, account: undefined,
+        }, {} as any);
+
+        const [templateArg] = (client.sendTemplate as ReturnType<typeof vi.fn>).mock.calls[0];
+        expect(templateArg).toContain(template);
+        expect(templateArg).toContain("<#part");
+        expect(templateArg).toContain(tmpFile);
+      });
+
+      it("missing attachment path returns error before sending", async () => {
+        const tool = getToolHandler(server, "send_email");
+        const result = await tool.handler({
+          template: "test template", attachments: ["/nonexistent/missing.pdf"],
+          confirm: true, account: undefined,
+        }, {} as any);
+
+        expect(result.isError).toBe(true);
+        expect(result.content[0].text).toContain("not found");
+        expect(client.sendTemplate).not.toHaveBeenCalled();
+      });
+
+      it("no attachment MML when attachments is undefined", async () => {
+        const tool = getToolHandler(server, "send_email");
+        const template = "From: me@test.com\nTo: you@test.com\nSubject: Hi\n\nHello!";
+        const result = await tool.handler({
+          template, confirm: undefined, account: undefined,
+        }, {} as any);
+
+        expect(result.content[0].text).not.toContain("<#part");
+      });
     });
   });
 });
