@@ -183,7 +183,7 @@ The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a li
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v1.6.2.mcpb (151 KB)
+# Output: himalaya-mcp-v1.7.0.mcpb (151 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:
@@ -201,7 +201,7 @@ Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.co
 ### Install (CLI)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v1.6.2.mcpb   # Install from file
+himalaya-mcp install-ext himalaya-mcp-v1.7.0.mcpb   # Install from file
 himalaya-mcp install-ext                              # Auto-find in project root
 himalaya-mcp remove-ext                               # Uninstall
 ```

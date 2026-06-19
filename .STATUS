@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.6.2 released
-## Phase: Released and infrastructure healthy (Homebrew auto-pipeline ran cleanly end-to-end)
+## Focus: v1.7.0 release
+## Phase: Release in progress (dev bumped, PR pending)
 ## Priority: 2
-## Progress: 100 (v1.6.2 released — GitHub release + Homebrew auto-pushed + .mcpb auto-uploaded)
+## Progress: 90 (v1.7.0 version bump committed, awaiting PR → main → GitHub release → Homebrew)
 
 ## Completed
 
@@ -29,6 +29,7 @@
 
 ## Just Completed
 
+- 2026-06-19: v1.7.0 version bump — all manifests, src/index.ts, tests, docs bumped 1.6.2→1.7.0. CHANGELOG [Unreleased]→[1.7.0]. PR dev→main pending.
 - 2026-06-19: PR #65 merged to dev — attachment support for compose_email and send_email (MML format, file validation, 23 new tests → 507 total). Closed community PR #50 (changes already incorporated). Fixed Homebrew hooks gap (Issue #63).
 - 2026-05-13: Released v1.6.2 — first release with FULLY clean Homebrew pipeline (Upload MCPB ✓, no manual fallback, no duplicate-asset cosmetic failure). PR #62 merged, tag v1.6.2, auto-pushed to data-wise/tap.
 - 2026-05-13: Added "Diagnose Email Issues" Level 1 tutorial — walks through health_check, doctor --account, --fix, error-code decoding.
@@ -47,9 +48,8 @@
 
 ## Current State
 
-- Branch: `dev` (synced with main at v1.6.2)
-- Active worktree: `~/.git-worktrees/himalaya-mcp/feature-issue-64-attachment-send` → `feature/issue-64-attachment-send`
-- v1.6.2 released: GitHub, Homebrew, docs site all live
+- Branch: `dev` (ahead of main — v1.7.0 bump committed, PR pending)
+- v1.6.2 was last released: GitHub, Homebrew, docs site all live; v1.7.0 release in progress
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
 - Tests: 507 passing across 23 test files
@@ -97,5 +97,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-05-13
-**Status:** v1.6.2 released — Homebrew pipeline runs fully clean (every job ✓, including MCPB auto-upload)
+**Last Updated:** 2026-06-19
+**Status:** v1.7.0 release in progress — version bumped on dev, PR to main pending
