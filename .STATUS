@@ -25,14 +25,14 @@
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
 - v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
-- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 473 tests (23 test files)
+- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 507 tests (23 test files)
 
 ## Just Completed
 
+- 2026-06-19: PR #65 merged to dev — attachment support for compose_email and send_email (MML format, file validation, 23 new tests → 507 total). Closed community PR #50 (changes already incorporated). Fixed Homebrew hooks gap (Issue #63).
 - 2026-05-13: Released v1.6.2 — first release with FULLY clean Homebrew pipeline (Upload MCPB ✓, no manual fallback, no duplicate-asset cosmetic failure). PR #62 merged, tag v1.6.2, auto-pushed to data-wise/tap.
 - 2026-05-13: Added "Diagnose Email Issues" Level 1 tutorial — walks through health_check, doctor --account, --fix, error-code decoding.
 - 2026-05-13: PR #61 merged to dev — CLI ergonomics: first-class --help / --version, grouped help sections, exit 1 on unknown command. 484 tests passing (+5).
-- 2026-05-12: Released v1.6.1 — first release where Homebrew automation worked end-to-end. PR #60 merged, tag v1.6.1, GitHub release with .mcpb, Homebrew formula auto-bumped via reusable workflow (App-token path, no manual fallback needed).
 - 2026-05-12: Released v1.6.0 — GitHub release (tag v1.6.0, .mcpb attached) + Homebrew formula (manual fallback) + docs site auto-deploy
 - 2026-05-12: PR #58 release merge — dev → main, all CI green; tap formula bumped manually (Homebrew CI auth still pending fix)
 - 2026-05-12: PR #57 merged to dev (v1.6.0 reliability) — merge commit e48a52b
@@ -52,7 +52,7 @@
 - v1.6.2 released: GitHub, Homebrew, docs site all live
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
-- Tests: 507 passing across 23 test files (feature branch; was 484 on dev)
+- Tests: 507 passing across 23 test files
 - Tutorials: 10 across 3 levels (added Diagnose Email Issues in v1.6.2)
 - Bundle: 604KB (esbuild), .mcpb: 151KB
 

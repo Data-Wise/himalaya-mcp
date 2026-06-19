@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 1.6.2
-- **Current Phase:** All phases complete (22 tools, 6 prompts, 3 resources, 484 tests)
+- **Current Phase:** All phases complete (22 tools, 6 prompts, 3 resources, 507 tests)
 
 ### What It Does
 
@@ -84,8 +84,8 @@ himalaya-mcp/
 │   ├── parser.test.ts                  # 13 parser tests
 │   ├── client.test.ts                  # 15 client tests (subprocess mock + retry)
 │   ├── manage.test.ts                  # 7 manage tools tests
-│   ├── compose.test.ts                 # 9 compose tools tests
-│   ├── compose-new.test.ts             # 8 compose_email tests
+│   ├── compose.test.ts                 # 13 compose tools tests
+│   ├── compose-new.test.ts             # 12 compose_email tests
 │   ├── folders.test.ts                 # 12 folder tools tests
 │   ├── attachments.test.ts             # 10 attachment tools tests
 │   ├── calendar.test.ts                # 18 calendar tests (ICS parser + tools + escaping)
@@ -221,7 +221,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (484 tests across 23 test files)
+npm test                         # Run vitest (507 tests across 23 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~604KB)
 node dist/index.js               # Run MCP server directly
 ```
