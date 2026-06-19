@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.7.0 release
-## Phase: Release in progress (dev bumped, PR pending)
+## Focus: v1.7.0 released
+## Phase: Post-release
 ## Priority: 2
-## Progress: 90 (v1.7.0 version bump committed, awaiting PR → main → GitHub release → Homebrew)
+## Progress: 100
 
 ## Completed
 
@@ -29,7 +29,7 @@
 
 ## Just Completed
 
-- 2026-06-19: v1.7.0 version bump — all manifests, src/index.ts, tests, docs bumped 1.6.2→1.7.0. CHANGELOG [Unreleased]→[1.7.0]. PR dev→main pending.
+- 2026-06-19: Released v1.7.0 — attachment support (compose_email + send_email, MML format), 3 community security fixes (flag injection, ICS escapes, Zod dep). GitHub release + Homebrew auto-pushed + docs deploying.
 - 2026-06-19: PR #65 merged to dev — attachment support for compose_email and send_email (MML format, file validation, 23 new tests → 507 total). Closed community PR #50 (changes already incorporated). Fixed Homebrew hooks gap (Issue #63).
 - 2026-05-13: Released v1.6.2 — first release with FULLY clean Homebrew pipeline (Upload MCPB ✓, no manual fallback, no duplicate-asset cosmetic failure). PR #62 merged, tag v1.6.2, auto-pushed to data-wise/tap.
 - 2026-05-13: Added "Diagnose Email Issues" Level 1 tutorial — walks through health_check, doctor --account, --fix, error-code decoding.
@@ -48,8 +48,8 @@
 
 ## Current State
 
-- Branch: `dev` (ahead of main — v1.7.0 bump committed, PR pending)
-- v1.6.2 was last released: GitHub, Homebrew, docs site all live; v1.7.0 release in progress
+- Branch: `dev` (in sync with main — v1.7.0 released)
+- v1.7.0 released: GitHub (tag + .mcpb), Homebrew formula auto-pushed, docs site deploying
 - Skills: 12 skills using `skills/*/SKILL.md` subdirectory format
 - Tools: 22 MCP tools, 6 prompts, 3 resources
 - Tests: 507 passing across 23 test files
@@ -83,8 +83,8 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- All infrastructure healthy. No outstanding action items.
-- Optional: brainstorm v1.7.0 scope when ready.
+- All infrastructure healthy. v1.7.0 shipped.
+- Optional: brainstorm v1.8.0 scope when ready.
 
 ## Future
 
@@ -98,4 +98,4 @@ himalaya-mcp doctor --fix
 ---
 
 **Last Updated:** 2026-06-19
-**Status:** v1.7.0 release in progress — version bumped on dev, PR to main pending
+**Status:** v1.7.0 released — GitHub + Homebrew + docs site
