@@ -1,0 +1,109 @@
+# Aggregator sync — keep this plugin's entry in Data-Wise/claude-plugins current on each release.
+# SELF-CONTAINED (no dependency on craft's scripts). Inert until APP_ID/APP_PRIVATE_KEY secrets
+# exist AND the GitHub App is installed on Data-Wise/claude-plugins with contents:write +
+# pull_requests:write + admin/bypass on main. The guard step skips cleanly when unconfigured,
+# so this never breaks a release run before it's wired up.
+#
+# PLUGIN_NAME below is per-repo: scholar | rforge | email  (email = the himalaya-mcp plugin name).
+name: Aggregator Sync
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      PLUGIN_NAME: "email"          # <-- set per repo
+      AGG_REPO: Data-Wise/claude-plugins
+      APP_ID: ${{ secrets.APP_ID }}
+    steps:
+      - name: Guard — skip if not configured
+        id: guard
+        run: |
+          if [ -z "${APP_ID}" ]; then
+            echo "App secrets absent — aggregator sync not yet configured for this repo; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Mint App token
+        if: steps.guard.outputs.skip != 'true'
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: Data-Wise
+          repositories: claude-plugins
+
+      - name: Check out aggregator
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: Data-Wise/claude-plugins
+          token: ${{ steps.app-token.outputs.token }}
+          path: aggregator
+
+      - name: Sync this plugin's entry (version + name assert)
+        if: steps.guard.outputs.skip != 'true'
+        id: sync
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          # Derive bare version from the release tag (strip a leading v).
+          VERSION="${RELEASE_TAG#v}"
+          AGG_FILE="aggregator/.claude-plugin/marketplace.json"
+          python3 - "$AGG_FILE" "$PLUGIN_NAME" "$VERSION" <<'PY'
+          import json, sys
+          path, name, version = sys.argv[1], sys.argv[2], sys.argv[3]
+          d = json.load(open(path))
+          plugins = d.get("plugins", [])
+          entry = next((p for p in plugins if p.get("name") == name), None)
+          if entry is None:
+              # Name mismatch / missing entry is a hard error (the #67 class) — fail loud.
+              sys.stderr.write(f"ERROR: no aggregator entry named '{name}' in {path}\n")
+              sys.exit(1)
+          if entry.get("version") == version:
+              print("noop")          # already current
+              sys.exit(0)
+          entry["version"] = version
+          json.dump(d, open(path, "w"), indent=2)
+          open(path, "a").write("\n")
+          print("changed")
+          PY
+          # Capture changed/noop for downstream gating.
+          RESULT="$(cd aggregator && git diff --quiet -- .claude-plugin/marketplace.json && echo noop || echo changed)"
+          echo "result=$RESULT" >> "$GITHUB_OUTPUT"
+
+      - name: Open + auto-merge PR (fail loud on unmerged)
+        if: steps.guard.outputs.skip != 'true' && steps.sync.outputs.result == 'changed'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          VERSION_TAG: ${{ github.event.release.tag_name }}
+        working-directory: aggregator
+        run: |
+          set -euo pipefail
+          BR="aggregator-sync/${PLUGIN_NAME}-${VERSION_TAG}"
+          git config user.name "data-wise-bot"
+          git config user.email "bot@data-wise.local"
+          git checkout -b "$BR"
+          git add .claude-plugin/marketplace.json
+          git commit -m "chore(marketplace): sync ${PLUGIN_NAME} -> ${VERSION_TAG}"
+          git push origin "$BR"
+          gh pr create --base main --head "$BR" \
+            --title "chore(marketplace): sync ${PLUGIN_NAME} ${VERSION_TAG}" \
+            --body "Automated aggregator sync on ${PLUGIN_NAME} release ${VERSION_TAG}."
+          gh pr merge "$BR" --admin --squash
+          # Fail loud: a PR that opened but did not merge must not exit green (the #218 class).
+          STATE="$(gh pr view "$BR" --json state -q .state)"
+          if [ "$STATE" != "MERGED" ]; then
+            echo "ERROR: aggregator PR opened but did not merge (state=$STATE)"
+            exit 1
+          fi
