@@ -182,8 +182,12 @@ export class HimalayaClient {
     for (const token of tokens) {
       assertSafeArg(token, "query");
     }
-    args.push(...tokens);
-    return this.exec(args, { folder: f, account });
+    // The query is a trailing positional that must come AFTER all flags
+    // (including --output json). himalaya parses the filter greedily, so a
+    // query placed before --output json makes the CLI treat "--output json"
+    // as part of the filter ("cannot parse search emails query"). Routing
+    // the tokens through trailingArgs places them last.
+    return this.exec(args, { folder: f, account, trailingArgs: tokens });
   }
 
   /** Read a message body (plain text). */
