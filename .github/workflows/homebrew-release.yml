@@ -13,11 +13,11 @@ on:
         description: 'Auto-merge the formula PR'
         required: false
         type: boolean
+        default: true
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
-        default: true
 
 jobs:
   validate:
