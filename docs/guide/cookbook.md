@@ -303,6 +303,181 @@ Every Friday: "/email:search from:newsletter --unread"
 
 ---
 
+## Recipe 13: Thread Conversation
+
+Read a full email thread chronologically, identify participants, extract action items, and offer to reply.
+
+```
+You: "Show me the whole budget review conversation and what still needs doing"
+
+Step 1: "/email:search subject:budget"
+  → Find all budget-related emails
+
+Step 2: "Read the thread 'Q1 Budget Review'"
+  → read_thread(thread_id: "Q1 Budget Review")
+  → See all messages chronologically
+
+Step 3: "What are the action items from this thread?"
+  → create_action_item on each message in the thread
+  → Deduplicate and consolidate
+
+Step 4: "Draft a reply summarizing the status"
+  → Draft a reply to the thread with context from all messages
+  → Review and send
+```
+
+**Why threads matter:** A single email only shows one side of the conversation. Threads give you the full story — who said what, when, and what decisions were made.
+
+---
+
+## Recipe 14: Triage with Auto-Flag
+
+A lighter triage variant that only flags — no moves, no archives, no deletions.
+
+```
+You: "Read my last 20 emails, flag what needs attention, and leave everything else alone"
+
+Step 1: "/email:inbox 20"
+  → See what's waiting
+
+Step 2: "Read #1, #4, #7 — they look important"
+  → read_email for each
+
+Step 3: "Star the ones I need to act on"
+  → flag_email(id, flags: ["Flagged"], action: "add") for actionable items
+
+Step 4: "Mark the ones I've read as seen"
+  → flag_email(id, flags: ["Seen"], action: "add") for FYI items
+
+Result: Important emails are starred, FYIs are marked read, newsletters are untouched.
+```
+
+**When to use this:** You're too busy for full triage but don't want to lose track of important emails. Just star them and come back later.
+
+---
+
+## Search Syntax Reference
+
+himaya filter syntax for the `search_emails` tool and `/email:search` skill.
+
+### Basic filters
+
+| Example | What it finds |
+|---------|---------------|
+| `subject:budget` | Subject contains "budget" |
+| `from:alice` | Sender contains "alice" |
+| `to:team` | Recipient contains "team" |
+| `body:deadline` | Body contains "deadline" |
+| `date:2026-02-13` | Sent on that date |
+| `after:2026-02-01` | Sent after date |
+| `before:2026-03-01` | Sent before date |
+| `flag:Flagged` | Has specific flag |
+
+### Flag predicates (shortcuts)
+
+| Shorthand | Expands to |
+|-----------|------------|
+| `--unread` | `not flag Seen` |
+| `--flagged` | `flag Flagged` |
+| `--answered` | `flag Answered` |
+
+### Combining filters
+
+| Operator | Example |
+|----------|---------|
+| `and` | `from:alice and subject:budget` |
+| `or` | `subject:invoice or subject:receipt` |
+| `not` | `not flag Seen` |
+| Grouping | `from:alice and (subject:meeting or subject:budget)` |
+
+### Date math
+
+| Pattern | Meaning |
+|---------|---------|
+| `after:2026-01-15` | After January 15, 2026 |
+| `before:2026-02-01` | Before February 1, 2026 |
+| `date:2026-01-20` | On January 20, 2026 |
+
+Himalaya does not support relative date expressions (like `3-days-ago`). Claude translates natural language date references into absolute dates before calling `search_emails`.
+
+### Common search patterns
+
+```
+"Find unread emails from Alice about the budget"
+→ search_emails(query: "from:alice and subject:budget and not flag Seen")
+
+"Emails from last week about invoices"
+→ search_emails(query: "subject:invoice and after:2026-02-03 and before:2026-02-10")
+
+"Flagged emails from my boss"
+→ search_emails(query: "from:boss and flag:Flagged")
+
+"All newsletters from the past month"
+→ search_emails(query: "from:newsletter and after:2026-01-13")
+```
+
+---
+
+## Recipe 15: Integration Recipes
+
+Combine himalaya-mcp with external tools and services.
+
+### Save to Obsidian
+
+```
+You: "Export email 42 and save it to my Obsidian vault"
+
+Claude:
+1. export_to_markdown(id: "42") → generates markdown
+2. copy_to_clipboard(text) → copies to clipboard
+You: paste into Obsidian
+```
+
+For automation, use the `compose_email` tool from a script:
+
+```bash
+# Save directly to vault
+himalaya envelope get 42 --output json | \
+  node -e "process.stdin.on('data', d => {
+    const e = JSON.parse(d);
+    console.log('# ' + e.subject + '\n\n**From:** ' + e.from + '\n**Date:** ' + e.date);
+  })" > ~/vault/email-42.md
+```
+
+### Create Apple Reminder from action item
+
+```
+You: "Create a reminder from the action item in email 42"
+
+Claude:
+1. create_action_item(id: "42") → extract todos
+2. Shows the list: "Review budget spreadsheet, Submit feedback by Friday"
+3. You manually create the reminder, or use Shortcuts automation
+```
+
+### Pipe export to a script
+
+```
+You: "Export email 42 and send it to my notes API"
+
+Claude calls export_to_markdown(id: "42")
+and copy_to_clipboard(text)
+→ You can then pipe it: pbpaste | curl -X POST -d @- https://notes.example.com/import
+```
+
+### Forward to SMS/email gateway
+
+```
+You: "Forward that urgent email to my phone"
+
+1. /email:forward 42 "5551234567@vtext.com"  # VZW SMS gateway
+2. Review and send
+```
+
+**Tip:** Most carriers provide an email-to-SMS gateway (e.g., `number@vtext.com` for Verizon, `number@tmomail.net` for T-Mobile). Check your carrier's gateway address.
+
+---
+
 ## Skill Combination Cheat Sheet
 
 | Goal | Skills/Tools | Flow |
@@ -317,4 +492,10 @@ Every Friday: "/email:search from:newsletter --unread"
 | Team inbox | config → search → draft → move | Add account → triage → reply → file |
 | Vacation OOO | search → read → compose → flag | Assess → draft → filter → mark read |
 | Newsletter triage | stats → search → draft → archive | Analyze → choose → unsubscribe → clean |
+| Thread review | search → threads → action items → reply | Find thread → read → extract → respond |
+| Flag-only triage | inbox → read → flag | Scan → classify → star — no moves |
+| Forward | forward → compose | Read original → draft → approve send |
+| Undo | search → flag/move | Find mistake → reverse action |
+| Integration | export → clipboard → script/app | Export → copy → pipe to tool |
+| Error recovery | doctor → re-run | Diagnose → fix → retry |
 | End of day | stats → triage → manage → stats | Assess → classify → clean → verify |
