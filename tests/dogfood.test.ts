@@ -1417,7 +1417,7 @@ describe("Packaging: package.json distribution fields", () => {
 
   it("has bin entry for CLI", () => {
     expect(pkgJson.bin).toBeDefined();
-    expect(pkgJson.bin["himalaya-mcp"]).toBe("dist/cli/setup.js");
+    expect(pkgJson.bin["himalaya-mcp"]).toBe("dist/cli/index.js");
   });
 
   it("has build:bundle script for production bundling", () => {

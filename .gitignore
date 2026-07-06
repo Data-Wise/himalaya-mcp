@@ -9,3 +9,4 @@ mcpb/dist/
 coverage/
 .turbo/
 site/
+.claude/

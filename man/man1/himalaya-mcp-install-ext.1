@@ -1,0 +1,90 @@
+.\" Man page for himalaya-mcp-install-ext
+.\" Generated: July 2026
+.TH HIMALAYA-MCP-INSTALL-EXT 1 "July 2026" "himalaya-mcp 1.8.0" "User Commands"
+.SH NAME
+himalaya-mcp\-install-ext \- Install or remove the himalaya-mcp Desktop Extension
+.SH SYNOPSIS
+.B himalaya-mcp install-ext
+[\fIfile\fR]
+.br
+.B himalaya-mcp remove-ext
+.SH DESCRIPTION
+.B install-ext
+unpacks a
+.B .mcpb
+package into Claude Desktop's
+.B Claude Extensions
+directory and registers it in
+.BR extensions-installations.json .
+If
+.I file
+is omitted, the command auto-discovers
+.B himalaya-mcp-v*.mcpb
+in the project root (sorted, newest first).
+.PP
+The command uses
+.B npx --yes @anthropic-ai/mcpb unpack
+to perform the unpacking, then writes a default settings file
+(\fB{ isEnabled: true, userConfig: {} }\fR) at
+.B ~/Library/Application Support/Claude/Claude Extensions Settings/himalaya-mcp.json
+on macOS.
+.PP
+.B remove-ext
+deletes the extension directory, the settings file, and the registry
+entry. Idempotent.
+.SH OPTIONS
+.TP
+.I file
+Path to a
+.B .mcpb
+package to install. If omitted, the command searches the
+project root for
+.B himalaya-mcp-v*.mcpb
+and picks the newest version.
+.SH FILES
+.TP
+.I ~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/
+(macOS) Unpacked extension directory.
+.TP
+.I ~/Library/Application Support/Claude/Claude Extensions Settings/himalaya-mcp.json
+(macOS) Settings file (created on install).
+.TP
+.I ~/Library/Application Support/Claude/extensions-installations.json
+(macOS) Extension registry; updated on install/remove.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+.I file
+not found, no
+.B .mcpb
+in project root, unpack failed, or unpacked manifest missing.
+.SH EXAMPLES
+Build and install:
+.RS
+.nf
+npm run build:mcpb
+himalaya-mcp install-ext
+.fi
+.RE
+.PP
+Install a specific file:
+.RS
+.nf
+himalaya-mcp install-ext ~/Downloads/himalaya-mcp-v1.7.0.mcpb
+.fi
+.RE
+.PP
+Remove:
+.RS
+.nf
+himalaya-mcp remove-ext
+.fi
+.RE
+.SH SEE ALSO
+.BR himalaya-mcp (1),
+.BR himalaya-mcp-setup (1)
+.SH AUTHOR
+Data-Wise

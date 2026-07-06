@@ -1,0 +1,97 @@
+.\" Man page for himalaya-mcp-setup
+.\" Generated: July 2026
+.TH HIMALAYA-MCP-SETUP 1 "July 2026" "himalaya-mcp 1.8.0" "User Commands"
+.SH NAME
+himalaya-mcp\-setup \- Manage the himalaya MCP server entry in Claude Desktop's config
+.SH SYNOPSIS
+.B himalaya-mcp setup
+[\fB--check\fR | \fB--remove\fR]
+.SH DESCRIPTION
+Adds, verifies, or removes the
+.B himalaya
+MCP server entry in Claude Desktop's
+.B claude_desktop_config.json
+file.
+.PP
+When called with no flags, the command writes a new
+.B mcpServers.himalaya
+entry pointing at
+.B dist/index.js
+(alongside the CLI binary). The command preserves all
+other
+.B mcpServers
+entries in the file.
+.PP
+This command is the legacy way to integrate himalaya-mcp with
+Claude Desktop.
+For new installs,
+.BR himalaya-mcp-install-ext (the
+.B .mcpb
+Desktop Extension) is preferred.
+.SH SUBCOMMANDS
+.TP
+.B setup
+Add the himalaya MCP server entry. Default when no flag is given.
+.TP
+.B --check\fR, \fBcheck
+Verify Claude Desktop's config exists, contains the himalaya
+entry, and that the entry's
+.B dist/index.js
+path exists on disk.
+Exits 1 on any failure.
+.TP
+.B --remove\fR, \fBremove
+Remove the himalaya MCP server entry. Idempotent: prints
+"himalaya MCP server not in config. Nothing to remove." and exits 0
+if the entry is already absent.
+.SH FILES
+.TP
+.I ~/Library/Application Support/Claude/claude_desktop_config.json
+(macOS)
+.br
+.I ~/.config/Claude/claude_desktop_config.json
+(Linux)
+.br
+.I %APPDATA%\Claude\claude_desktop_config.json
+(Windows)
+.PP
+The MCP server config file that
+.B setup
+modifies and
+.BR --remove
+cleans.
+.SH EXIT STATUS
+.TP
+.B 0
+Success (entry added, removed, or already absent).
+.TP
+.B 1
+.B --check
+found a missing config, missing entry, or missing
+.BR dist/index.js .
+.SH EXAMPLES
+First-time install:
+.RS
+.nf
+himalaya-mcp setup
+.fi
+.RE
+.PP
+Verify the install:
+.RS
+.nf
+himalaya-mcp setup \-\-check
+.fi
+.RE
+.PP
+Uninstall:
+.RS
+.nf
+himalaya-mcp setup \-\-remove
+.fi
+.RE
+.SH SEE ALSO
+.BR himalaya-mcp (1),
+.BR himalaya-mcp-install-ext (1)
+.SH AUTHOR
+Data-Wise

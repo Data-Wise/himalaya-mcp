@@ -1,0 +1,64 @@
+.\" Man page for himalaya-mcp-remove-ext
+.\" Generated: July 2026
+.TH HIMALAYA-MCP-REMOVE-EXT 1 "July 2026" "himalaya-mcp 1.8.0" "User Commands"
+.SH NAME
+himalaya-mcp\-remove-ext \- Remove the himalaya-mcp Desktop Extension
+.SH SYNOPSIS
+.B himalaya-mcp remove-ext
+.SH DESCRIPTION
+Removes the
+.B himalaya-mcp
+Desktop Extension from Claude Desktop. The command deletes:
+.IP \(bu 3
+The extension directory at
+.BR ~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/ .
+.IP \(bu
+The settings file at
+.BR ~/Library/Application Support/Claude/Claude Extensions Settings/himalaya-mcp.json .
+.IP \(bu
+The registry entry in
+.BR ~/Library/Application Support/Claude/extensions-installations.json .
+.PP
+The command is idempotent: if the extension is not installed, it prints
+"himalaya-mcp extension not installed. Nothing to remove." and exits 0.
+.PP
+After removal, restart Claude Desktop to apply the change.
+.SH FILES
+.TP
+.I ~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/
+(macOS) Extension directory, removed if present.
+.TP
+.I ~/Library/Application Support/Claude/Claude Extensions Settings/himalaya-mcp.json
+(macOS) Settings file, removed if present.
+.TP
+.I ~/Library/Application Support/Claude/extensions-installations.json
+(macOS) Registry, entry removed if present.
+.SH EXIT STATUS
+.TP
+.B 0
+Success (or nothing to remove).
+.TP
+.B 1
+Filesystem error during deletion.
+.SH EXAMPLES
+.PP
+Remove the extension:
+.RS
+.nf
+himalaya-mcp remove-ext
+.fi
+.RE
+.PP
+Then fully remove the plugin from Claude Code:
+.RS
+.nf
+himalaya-mcp remove
+himalaya-mcp remove-ext
+brew uninstall himalaya-mcp
+.fi
+.RE
+.SH SEE ALSO
+.BR himalaya-mcp (1),
+.BR himalaya-mcp-install-ext (1)
+.SH AUTHOR
+Data-Wise

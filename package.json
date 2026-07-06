@@ -1,11 +1,11 @@
 {
   "name": "himalaya-mcp",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "MCP server wrapping himalaya CLI for privacy-first email access in Claude",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "himalaya-mcp": "dist/cli/setup.js"
+    "himalaya-mcp": "dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",

@@ -93,9 +93,26 @@ Full documentation at **[data-wise.github.io/himalaya-mcp](https://data-wise.git
 - [Quick Start](https://data-wise.github.io/himalaya-mcp/getting-started/quickstart/)
 - [Tutorials](https://data-wise.github.io/himalaya-mcp/tutorials/)
 - [User Guide](https://data-wise.github.io/himalaya-mcp/guide/guide/)
-- [Command Reference](https://data-wise.github.io/himalaya-mcp/reference/commands/)
-- [Quick Reference Card](https://data-wise.github.io/himalaya-mcp/reference/refcard/)
+- [MCP Tools Reference](https://data-wise.github.io/himalaya-mcp/reference/commands/)
+- [Cheat Sheet](https://data-wise.github.io/himalaya-mcp/reference/cheat-sheet/)
+- [CLI Reference](https://data-wise.github.io/himalaya-mcp/reference/cli/)
 - [Architecture](https://data-wise.github.io/himalaya-mcp/reference/architecture/)
+
+### CLI man pages
+
+The CLI ships with groff man pages following the [flow-cli](https://github.com/Data-Wise/flow-cli) standard:
+
+```bash
+# After brew install himalaya-mcp, man pages are auto-installed to /opt/homebrew/share/man
+man himalaya-mcp
+man himalaya-mcp-doctor
+man himalaya-mcp-setup
+man himalaya-mcp-install-ext
+man himalaya-mcp-remove-ext
+
+# Or from the source repo:
+MANPATH=$(pwd)/man man himalaya-mcp
+```
 
 ## Troubleshooting
 

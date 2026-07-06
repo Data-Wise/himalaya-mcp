@@ -1,0 +1,163 @@
+.\" Man page for himalaya-mcp-doctor
+.\" Generated: July 2026
+.TH HIMALAYA-MCP-DOCTOR 1 "July 2026" "himalaya-mcp 1.8.0" "User Commands"
+.SH NAME
+himalaya-mcp\-doctor \- Diagnose himalaya-mcp installation and per-account connectivity
+.SH SYNOPSIS
+.B himalaya-mcp doctor
+[\fIflags\fR]
+.SH DESCRIPTION
+Runs a comprehensive diagnostic suite across the full himalaya-mcp
+installation stack. Checks are grouped by category and reported
+with pass (\fB✓\fR), warn (\fB!\fR), and fail (\fB✗\fR) indicators.
+.PP
+If a check fails, the
+.BR --fix
+flag can auto-resolve common issues.
+.SH OPTIONS
+.TP
+.B --account \fIname\fR
+Run the per-account reachability probe for the named account only.
+By default, all configured accounts are probed in parallel.
+.TP
+.B --fix
+Auto-fix common issues:
+.RS
+.IP \(bu
+Create the Claude Desktop extension settings file with defaults.
+.IP \(bu
+Set
+.B user_config.himalaya_binary
+to the
+.BR which himalaya
+result.
+.IP \(bu
+Remove stale Claude Code plugin cache directories.
+.RE
+.TP
+.B --json
+Emit a single JSON array of all check results instead of the
+human-readable tree. Each entry has
+.BR name ,
+.BR category ,
+.BR status ,
+.BR message ,
+and
+.B fixAvailable
+fields.
+.SH CHECK CATEGORIES
+.SS Prerequisites
+.TP
+.B Node.js
+Requires version 22 or later.
+.TP
+.B himalaya CLI
+Must be on
+.BR PATH .
+.TP
+.B himalaya config
+Expected at
+.B ~/.config/himalaya/config.toml
+(warn if missing).
+.SS MCP Server
+.TP
+.B dist/index.js
+The bundled MCP server must exist (warn if missing).
+.SS Email
+.TP
+.B Default account
+The
+.B himalaya account list
+output must be parseable.
+.TP
+.B Folder listing\fR, \fBEnvelope listing
+IMAP connectivity via
+.B himalaya folder list
+and
+.B envelope list .
+.SS Desktop Extension
+.TP
+.B Extension installed\fR, \fBmanifest.json
+The
+.B .mcpb
+extension must be unpacked at
+.B ~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/ .
+.TP
+.B user_config.himalaya_binary
+The Claude Desktop extension's
+.B himalaya_binary
+config must point to a real binary on disk.
+.SS Claude Code Plugin
+.TP
+.B Plugin symlink
+The plugin directory at
+.B ~/.claude/plugins/himalaya-mcp
+must point to the Homebrew-installed copy.
+.TP
+.B plugin.json\fR, \fBMarketplace registered
+The plugin manifest must exist and the plugin must be registered
+in
+.BR ~/.claude/local-marketplace/ .
+.SS Plugin Cache
+.TP
+.B Plugin cache
+Reports stale cache directories at
+.B ~/.claude/plugins/cache/himalaya-mcp
+and
+.B ~/.claude/plugins/cache/local-plugins/himalaya-mcp
+if present.
+.SS Environment
+.TP
+.B HIMALAYA_* env vars
+Validates that
+.BR HIMALAYA_BINARY ,
+.BR HIMALAYA_ACCOUNT ,
+.BR HIMALAYA_FOLDER ,
+and
+.B HIMALAYA_TIMEOUT
+are not unset template variables.
+.SS Accounts
+Lists each configured account and reports
+.B reachable
+or
+.B unreachable
+with the raw himalaya stderr on failure.
+.SH EXIT STATUS
+.TP
+.B 0
+All checks passed.
+.TP
+.B 1
+At least one check failed. See output for details.
+.SH EXAMPLES
+Run the full diagnostic:
+.RS
+.nf
+himalaya-mcp doctor
+.fi
+.RE
+.PP
+Diagnose one specific account:
+.RS
+.nf
+himalaya-mcp doctor \-\-account work
+.fi
+.RE
+.PP
+Auto-fix and re-check:
+.RS
+.nf
+himalaya-mcp doctor \-\-fix
+.fi
+.RE
+.PP
+Pipe JSON to jq for machine consumption:
+.RS
+.nf
+himalaya-mcp doctor \-\-json | jq '.[] | select(.status == "fail")'
+.fi
+.RE
+.SH SEE ALSO
+.BR himalaya-mcp (1)
+.SH AUTHOR
+Data-Wise
