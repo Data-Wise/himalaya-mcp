@@ -4,6 +4,77 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.8.0] - 2026-07-06
+
+### Added
+
+- **3 new plugin skills:** `/email:forward` (forward with attribution), `/email:export` (markdown + clipboard + action items), `/email:threads` (conversation view). Total: 15 skills.
+- **7 new workflows:** Forward & Redirect, Thread Conversation, Triage with Auto-Flag, Undo & Rollback, Search Syntax Reference, Integration Recipes (Obsidian, Reminders, SMS), Error Recovery. Total: 23 workflow patterns in workflows.md, 15 recipes in cookbook.md.
+- **4 new automation workflows** in advanced-automation.md: Consolidated Task Extraction, Notification Routing, Smart Folder Rules, and restructured end-of-day reporting.
+- **Cheat sheet** (`docs/reference/cheat-sheet.md`) — one-page quick reference with all CLI commands, MCP tools, prompts, resources, safety gates, and common workflows.
+- **Security & Privacy deep-dive** (`docs/guide/security.md`) — auth flow, threat model, credential storage, safety gates, best practices.
+- **Integrations guide** (`docs/guide/integrations.md`) — Obsidian, Apple Calendar/Reminders, other MCP servers, shell scripts.
+- **Contributing guide** (`docs/guide/contributing.md`) — dev setup, test structure, build commands, documentation inventory.
+- **CLI Reference** (`docs/reference/cli.md`) — dedicated page for `doctor`, `setup`, `install-ext`, `remove-ext`, `--help`, `--version`.
+
+### Changed
+
+- **CLI and MCP tools now documented separately** — `docs/reference/commands.md` is now MCP-only; `docs/reference/cli.md` covers CLI commands. Both referenced from index.md and nav.
+- **Skill count 12 → 15** across all docs, plugin.json, refcard, and help skill.
+- **Digest skill triggers disambiguated** — removed overlap with morning skill ("what happened overnight", "catch me up on email").
+- **Help skill updated** — skills table expanded to 15 entries.
+- **Docs reorganization:** stale specs removed (11 files), test counts fixed (484→507), Search & Manage tutorial created to fill Level 2 gap.
+- **`package.json`** — added `engines: { node: ">=22" }`, `lint` script, `.nvmrc`, `dependabot.yml`.
+
+### Fixed
+
+- **UTC timezone loss in calendar events** — `formatICSDate` now preserves `Z` suffix, preventing events from being created at wrong local time.
+- **Temp directory leaks** in `download_attachment` and `extract_calendar_event` — both now clean up temp dirs in `finally` blocks.
+- **`listAccounts()` timeout** — now has 15s timeout to prevent hang during `doctor`/`health_check`.
+- **Hardcoded `page_size: 50`** — bumped to 200 in `read_thread`, `export_to_markdown`, and `create_action_item` to reduce missed-message risk.
+- **Inconsistent error format** in `read_email`/`read_email_html` — now uses structured `envelopeError()` like all other tools.
+- **Weak email validation** in `compose_email` — `includes("@")` replaced with regex test.
+- **Case-sensitive folder comparison** in client — `"INBOX"` vs `"inbox"` now handled via `.toUpperCase()`.
+- **CI pipeline hardened:** `npm audit`, explicit `permissions: contents: read`, `concurrency` groups, pinned `mkdocs-material` version, scoped docs permissions, reusable workflow pinned to SHA, version input validation.
+
+### Documentation
+
+- Split CLI/MCP reference docs
+- Added cheat sheet, security, integrations, contributing guides
+- Added Search & Manage tutorial (Level 2)
+- Added 7 new workflows (3 to workflows.md, 3 to cookbook.md, 1 search syntax reference)
+- Added 4 advanced automation steps
+- Removed 11 stale spec files
+- Fixed stale test count references (484→507) across 3 files
+
+## [1.8.0] - 2026-07-06
+
+### Added
+
+- **3 new plugin skills:** `/email:forward`, `/email:export`, `/email:threads` (15 total)
+- **7 new workflows:** Forward & Redirect, Thread Conversation, Triage with Auto-Flag, Undo & Rollback, Search Syntax Reference, Integration Recipes, Error Recovery
+- **4 new automation workflows** in advanced-automation.md
+- **Cheat sheet** (`docs/reference/cheat-sheet.md`)
+- **Security & Privacy deep-dive** (`docs/guide/security.md`)
+- **Integrations guide** (`docs/guide/integrations.md`)
+- **Contributing guide** (`docs/guide/contributing.md`)
+- **CLI Reference** (`docs/reference/cli.md`)
+
+### Changed
+
+- CLI and MCP tools now documented separately
+- Skill count 12 → 15 across all docs
+- Digest skill triggers disambiguated from morning
+- Docs reorganization: stale specs removed (11 files), test counts fixed (484→507), Search & Manage tutorial created
+
+### Fixed
+
+- UTC timezone loss in calendar events
+- Temp directory leaks in download_attachment and extract_calendar_event
+- listAccounts() timeout (added 15s timeout)
+- Hardcoded page_size: 50 → 200 in thread and action lookups
+- Weak email validation, case-sensitive folder comparison, many CI pipeline issues
+
 ## [1.7.0] - 2026-06-19
 
 ### Added
