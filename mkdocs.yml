@@ -95,12 +95,16 @@ nav:
       - Export & Save Emails: tutorials/export-save.md
     - "Level 3: Automation":
       - Automate with the Agent: tutorials/automate-agent.md
+      - Advanced Automation: tutorials/advanced-automation.md
   - Guide:
     - User Guide: guide/guide.md
     - Workflows: guide/workflows.md
     - Packaging: guide/packaging.md
     - Plugin Skills & Agent: guide/skills.md
     - Cookbook: guide/cookbook.md
+    - Integrations: guide/integrations.md
+    - Security: guide/security.md
+    - Contributing: guide/contributing.md
     - Troubleshooting: guide/troubleshooting.md
   - Reference:
     - Command Reference: reference/commands.md

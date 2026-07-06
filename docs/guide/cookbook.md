@@ -201,6 +201,108 @@ You: "/email:manage move 42 Delegated"
 
 ---
 
+## Recipe 9: Conference Email Cleanup
+
+Clean up after a conference or event.
+
+```
+You: "Find all emails about the developer conference and archive them"
+
+Step 1: "/email:search from:conf-organizer@conference.com"
+  → Find all conference-related emails
+
+Step 2: "Also search for subject:devcon"
+  → Find related threads
+
+Step 3: "/email:manage move all-results Conference-Archive"
+  → Move to a dedicated folder for reference
+```
+
+**Variation:** Search by date range to catch pre/post-conference email:
+`/email:search after:2026-06-01 before:2026-06-15 --unread`
+
+---
+
+## Recipe 10: Team Inbox Collaboration
+
+Share inbox management across a team using a shared account.
+
+```
+You: "/email:config --add-account"
+  → Add the shared team account
+
+You: "Check the support@ inbox"
+  → list_emails(account: "support")
+
+You: "Flag anything from urgent@clients.com"
+  → search_emails + flag_email
+
+You: "Draft a reply to the most urgent one"
+  → draft_reply → review → send_email(confirm: true)
+
+You: "Move handled emails to Processed folder"
+  → move_email for each resolved item
+```
+
+**Tip:** Use the `account` parameter to tag each operation — the team always knows which inbox is being handled.
+
+---
+
+## Recipe 11: Vacation Auto-Reply Setup
+
+Set up an out-of-office sequence using the compose tool.
+
+```
+You: "I'm on vacation next week. Set up an auto-reply."
+
+Step 1: "/email:search --unread"
+  → See what's waiting
+
+Step 2: "Compose a vacation auto-reply to anyone who emails me"
+  → Claude drafts a polite OOO message
+
+Step 3: Create a filter rule in your email provider,
+        or forward to a colleague for coverage
+
+Step 4: "Mark all unread as seen before I leave"
+  → /email:manage flag [ids] Seen
+```
+
+**Consideration:** himalaya-mcp doesn't set server-side filters. Use your email provider's filtering for true auto-responders. Claude can help draft the response text and subject line.
+
+---
+
+## Recipe 12: Newsletter Triage Pipeline
+
+Tame newsletter overload.
+
+```
+You: "/email:stats"
+  → See your newsletter volume
+
+You: "Find all newsletter senders"
+  → Claude searches recurring sender patterns
+
+You: "Show me the top 5 newsletter senders by volume"
+  → Claude analyzes and presents
+
+You: "Unsubscribe me from the low-value ones"
+  → Claude drafts unsubscribe emails
+  → Review and send each one
+
+You: "Archive all existing newsletters"
+  → /email:manage archive [all-newsletter-ids]
+```
+
+**Suggestion:** After cleaning up, set a weekly routine:
+```
+Every Friday: "/email:search from:newsletter --unread"
+→ Read the 2-3 you care about
+→ "/email:manage archive rest"
+```
+
+---
+
 ## Skill Combination Cheat Sheet
 
 | Goal | Skills/Tools | Flow |
@@ -211,4 +313,8 @@ You: "/email:manage move 42 Delegated"
 | New setup | config → inbox → stats | Configure → test → baseline |
 | Weekly review | stats --weekly → search → manage | Trends → find noise → clean up |
 | Meeting prep | search → summarize → action items → export | Find → understand → extract → notes |
+| Conference cleanup | search → manage → move | Find event → archive → organize |
+| Team inbox | config → search → draft → move | Add account → triage → reply → file |
+| Vacation OOO | search → read → compose → flag | Assess → draft → filter → mark read |
+| Newsletter triage | stats → search → draft → archive | Analyze → choose → unsubscribe → clean |
 | End of day | stats → triage → manage → stats | Assess → classify → clean → verify |
