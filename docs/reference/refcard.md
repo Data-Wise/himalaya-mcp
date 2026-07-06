@@ -101,11 +101,15 @@ Draft      Draft message
 /email:digest       Generate daily priority digest
 /email:reply        Draft reply with safety gate workflow
 /email:compose      Compose new email with safety gate
+/email:forward      Forward email with context and attribution
 /email:attachments  List/download attachments, calendar invites
+/email:export       Export to markdown, clipboard, action items
+/email:threads      View conversation threads chronologically
 /email:search       Search by keyword, sender, flags, date filters
 /email:manage       Bulk flag/unflag/move/archive with confirmation gate
 /email:stats        Inbox statistics, top senders, oldest unread, trends
 /email:config       Setup wizard — provider templates, connection test, doctor
+/email:morning      Morning briefing with urgency classification
 /email:help         Help hub — browse tools, prompts, workflows
 ```
 

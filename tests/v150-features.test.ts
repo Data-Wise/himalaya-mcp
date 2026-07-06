@@ -126,7 +126,7 @@ describe("v1.5.0: plugin.json hook structure", () => {
   it("description reflects updated counts", () => {
     expect(pluginJson.description).toContain("22 tools");
     expect(pluginJson.description).toContain("6 prompts");
-    expect(pluginJson.description).toContain("12 skills");
+    expect(pluginJson.description).toContain("15 skills");
     expect(pluginJson.description).toContain("2 hooks");
   });
 
@@ -163,8 +163,8 @@ describe("v1.5.0: broadened skill descriptions", () => {
 
   it("digest skill has natural language triggers", async () => {
     const desc = await readSkillDescription("digest");
-    expect(desc).toContain("what happened overnight");
-    expect(desc).toContain("catch me up on email");
+    expect(desc).toContain("email digest");
+    expect(desc).toContain("summarize my inbox");
   });
 
   it("compose skill has natural language triggers", async () => {
@@ -210,10 +210,11 @@ describe("v1.5.0: broadened skill descriptions", () => {
     expect(desc).toContain("catch me up on email");
   });
 
-  it("all 12 skills use enhanced description pattern", async () => {
+  it("all 15 skills use enhanced description pattern", async () => {
     const skillNames = [
       "inbox", "triage", "digest", "compose", "reply",
-      "search", "manage", "attachments", "stats", "config",
+      "forward", "attachments", "export", "threads",
+      "search", "manage", "stats", "config",
       "help", "morning",
     ];
     for (const name of skillNames) {

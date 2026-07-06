@@ -35,7 +35,7 @@ Display the hub overview:
 | EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
 | Privacy-first email for Claude — 22 tools, 6 prompts,     |
-| 3 resources, 12 skills, 2 hooks                           |
+| 3 resources, 15 skills, 2 hooks                           |
 +===========================================================+
 |                                                           |
 | TOOLS (22)                                                |
@@ -60,9 +60,10 @@ Display the hub overview:
 | RESOURCES (3)                                             |
 |   email://inbox, email://folders, email://message/{id}    |
 |                                                           |
-| SKILLS (12)                                               |
+| SKILLS (15)                                               |
 |   /email:inbox, /email:triage, /email:digest,             |
 |   /email:reply, /email:compose, /email:attachments,       |
+|   /email:forward, /email:export, /email:threads,          |
 |   /email:search, /email:manage, /email:stats,             |
 |   /email:config, /email:help, /email:morning              |
 |                                                           |
@@ -392,7 +393,10 @@ One-line cheat sheet:
 | /email:digest       | Generate daily digest             |
 | /email:reply        | Draft and send replies            |
 | /email:compose      | Compose new email                 |
+| /email:forward      | Forward email with context        |
 | /email:attachments  | List/download/calendar            |
+| /email:export       | Export to markdown + clipboard    |
+| /email:threads      | Conversation thread view          |
 | /email:search       | Search by keyword/sender/flags    |
 | /email:manage       | Bulk flag/move/archive            |
 | /email:stats        | Inbox statistics + trends         |

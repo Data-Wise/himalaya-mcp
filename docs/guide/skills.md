@@ -1,6 +1,6 @@
 # Plugin Skills & Agent
 
-When installed as a Claude Code plugin, the email plugin provides 12 slash commands (skills), 1 autonomous agent, and 2 hooks.
+When installed as a Claude Code plugin, the email plugin provides 15 slash commands (skills), 1 autonomous agent, and 2 hooks.
 
 ## Skills vs Tools
 
@@ -262,6 +262,48 @@ Want me to:
 
 ---
 
+## /email:forward
+
+Forward an email to another person with attribution and optional context.
+
+**Triggers:** "forward email", "share this email", "send this to someone else", "pass this along"
+
+**What it does:**
+
+1. Reads the original email with `read_email`
+2. Asks for recipient and optional context (if not already provided)
+3. Composes a forward with attribution (original sender, date, subject)
+4. Shows the full preview for your review
+5. Only sends after your explicit confirmation
+
+**Example:**
+
+```
+You: /email:forward 249088 "bob@example.com"
+
+Claude:
+📨 Forward Preview
+To: bob@example.com
+Subject: Fwd: Q1 Budget Review
+
+--- Forwarded message ----------
+From: alice@example.com
+Date: 2026-02-13
+Subject: Q1 Budget Review
+
+Hi team, please review the attached budget...
+
+---
+
+→ "Send" to forward
+→ "Add more context" to edit
+→ "Cancel" to discard
+```
+
+**Safety:** Uses the same two-phase safety gate as compose. Never forwards without your explicit approval.
+
+---
+
 ## /email:attachments
 
 List, download, and process email attachments including calendar invites.
@@ -301,6 +343,102 @@ When a `.ics` attachment is detected:
 1. Extract event details (summary, date/time, location, attendees)
 2. Show event preview
 3. Offer to add to Apple Calendar (macOS only, requires confirmation)
+
+---
+
+## /email:export
+
+Export an email as structured markdown with YAML frontmatter, optionally copying to clipboard and extracting action items.
+
+**Triggers:** "export email", "save email", "export to markdown", "save for later", "clip this email"
+
+**What it does:**
+
+1. Calls `export_to_markdown` to generate structured markdown
+2. If `--action-items`, also calls `create_action_item`
+3. If `--clipboard`, calls `copy_to_clipboard` with the combined output
+4. Presents the exported content for review
+
+**Options:**
+
+| Flag | Behavior |
+|------|----------|
+| `--clipboard` | Also copy to system clipboard |
+| `--action-items` | Also extract todos and deadlines |
+
+**Example:**
+
+```
+You: /email:export 249088 --clipboard --action-items
+
+Claude:
+📄 Export: Q1 Budget Review
+
+Subject: Q1 Budget Review
+From: alice@example.com
+Date: 2026-02-13
+
+[full email body]
+
+Action Items:
+- [ ] Review budget spreadsheet
+- [ ] Submit feedback by Friday
+
+→ Copied to clipboard ✓
+```
+
+---
+
+## /email:threads
+
+View and navigate email conversations grouped by subject line.
+
+**Triggers:** "show threads", "conversation view", "thread view", "group by subject", "show all replies"
+
+**What it does (List mode):**
+
+1. Calls `list_threads` to group emails by normalized subject
+2. Shows a table with subject, participants, message count, and latest date
+3. Offers to read any thread
+
+**What it does (Read mode):**
+
+1. Calls `read_thread` with the thread ID
+2. Shows all messages chronologically with sender, date, and body
+3. Offers to reply, export, or extract action items
+
+**Example (List):**
+
+```
+You: /email:threads
+
+Claude:
+📬 Threads (15 conversations)
+
+| # | Subject              | Participants | Msgs | Latest     |
+|---|----------------------|-------------|------|------------|
+| 1 | Q1 Budget Review     | Alice, Bob  | 4    | 2h ago     |
+| 2 | Project Alpha Update | pm@co, team | 8    | 1d ago     |
+
+→ "Read #1" to see the full thread
+```
+
+**Example (Read):**
+
+```
+You: /email:threads "Q1 Budget Review"
+
+Claude:
+📬 Thread: Q1 Budget Review
+
+Alice — Feb 13, 9:15 AM
+---
+Hi team, please review the attached budget...
+
+Bob — Feb 13, 10:30 AM
+---
+Looks good. A few comments on the marketing line item...
+```
 
 ---
 
@@ -506,11 +644,15 @@ Claude:
 │    /email:digest       Daily summary         │
 │    /email:reply        Draft & send safely   │
 │    /email:compose      Compose new emails    │
+│    /email:forward      Forward with context  │
 │    /email:attachments  Files & calendar      │
+│    /email:export       Markdown + clipboard  │
+│    /email:threads      Conversation view     │
 │    /email:search       Search emails         │
 │    /email:manage       Bulk operations       │
 │    /email:stats        Inbox statistics      │
 │    /email:config       Setup wizard          │
+│    /email:morning      Morning briefing      │
 │    /email:help         This help             │
 │                                              │
 │  Quick actions:                              │
@@ -611,7 +753,9 @@ Both approaches work. Skills provide structured workflows; natural language is m
 | Daily summary | `/email:digest` | "Give me today's email digest" |
 | Reply | `/email:reply 42` | "Reply to that email from Alice" |
 | Search | `/email:search` | "Find emails about the project deadline" |
-| Export | (no skill) | "Export email 42 as markdown" |
+| Forward | `/email:forward` | "Forward email 42 to Bob" |
+| Export | `/email:export` | "Export email 42 as markdown" |
+| Threads | `/email:threads` | "Show me the whole conversation" |
 | Bulk actions | `/email:manage` | "Archive all newsletters" |
 | Inbox stats | `/email:stats` | "How many unread emails?" |
 | Setup email | `/email:config` | "Configure my email" |

@@ -26,7 +26,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 | 22 MCP tools | Yes | Yes |
 | 6 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
-| `/email:*` slash commands | Yes (12 skills) | No |
+| `/email:*` slash commands | Yes (15 skills) | No |
 | Plugin hooks | Yes (2 hooks) | No |
 | Email assistant agent | Yes | No |
 | Natural language ("check my inbox") | Yes | Yes |
@@ -72,7 +72,7 @@ npm install && npm run build
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ```
 
-Restart Claude Code. The plugin provides 12 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`.
+Restart Claude Code. The plugin provides 15 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:forward`, `/email:attachments`, `/email:export`, `/email:threads`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:morning`, `/email:help`.
 
 ### Claude Desktop (.mcpb)
 
