@@ -68,7 +68,7 @@ export class HimalayaClient {
   // if it differs from the implicit INBOX default. Returns the effective folder.
   private applyFolderArg(args: string[], folder: string | undefined): string {
     const f = folder || this.opts.folder;
-    if (f && f !== "INBOX") {
+    if (f && f.toUpperCase() !== "INBOX") {
       assertSafeArg(f, "folder");
       args.push("--folder", f);
     }

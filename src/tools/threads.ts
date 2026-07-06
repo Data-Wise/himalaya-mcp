@@ -81,7 +81,7 @@ export function registerThreadTools(server: McpServer, client: HimalayaClient) {
   }, async (args) => {
     try {
       // Fetch envelopes to find the thread
-      const raw = await client.listEnvelopes(args.folder, 50, undefined, args.account);
+      const raw = await client.listEnvelopes(args.folder, 200, undefined, args.account);
       const result = parseEnvelopes(raw);
 
       if (!result.ok) {

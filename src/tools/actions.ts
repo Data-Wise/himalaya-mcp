@@ -19,7 +19,7 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
   }, async (args) => {
     try {
       // Fetch envelope for metadata
-      const envelopeRaw = await client.listEnvelopes(args.folder, 50, undefined, args.account);
+      const envelopeRaw = await client.listEnvelopes(args.folder, 200, undefined, args.account);
       const envelopeResult = parseEnvelopes(envelopeRaw);
 
       if (!envelopeResult.ok) {
@@ -90,7 +90,7 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
   }, async (args) => {
     try {
       // Fetch envelope for context
-      const envelopeRaw = await client.listEnvelopes(args.folder, 50, undefined, args.account);
+      const envelopeRaw = await client.listEnvelopes(args.folder, 200, undefined, args.account);
       const envelopeResult = parseEnvelopes(envelopeRaw);
 
       let subject = "(unknown subject)";

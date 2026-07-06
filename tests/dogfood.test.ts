@@ -1333,9 +1333,11 @@ describe("Packaging: homebrew-release workflow", () => {
   });
 
   it("calls reusable update-formula workflow", () => {
-    expect(workflowContent).toContain(
-      "Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@main"
+    const refMatch = workflowContent.match(
+      /Data-Wise\/homebrew-tap\/\.github\/workflows\/update-formula\.yml@\w+/
     );
+    expect(refMatch).toBeTruthy();
+    expect(refMatch![0]).not.toContain("@main");
   });
 
   it("references HOMEBREW_TAP_GITHUB_TOKEN secret", () => {

@@ -17,9 +17,13 @@ vi.mock("../src/tools/attachments.js", () => ({
   downloadAndList: (...args: unknown[]) => mockDownloadAndList(...args),
 }));
 
-// Mock readFile for parseICSFile (reads .ics content from disk)
-vi.mock("node:fs/promises", () => ({
-  readFile: vi.fn().mockResolvedValue(`BEGIN:VCALENDAR
+// Mock readFile for parseICSFile (reads .ics content from disk);
+// other fs operations (mkdir, rm, readdir, stat) pass through to real impl
+vi.mock("node:fs/promises", async (importOriginal) => {
+  const actual = await importOriginal() as typeof import("node:fs/promises");
+  return {
+    ...actual,
+    readFile: vi.fn().mockResolvedValue(`BEGIN:VCALENDAR
 BEGIN:VEVENT
 SUMMARY:Team Standup
 DTSTART:20260216T090000
@@ -30,7 +34,8 @@ DESCRIPTION:Daily standup meeting
 UID:abc-123@example.com
 END:VEVENT
 END:VCALENDAR`),
-}));
+  };
+});
 
 // Mock osascript for create_calendar_event
 vi.mock("node:child_process", async (importOriginal) => {
