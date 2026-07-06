@@ -1,0 +1,179 @@
+.\" Man page for himalaya-mcp CLI
+.\" Generated: July 2026
+.TH HIMALAYA-MCP 1 "July 2026" "himalaya-mcp 1.8.0" "User Commands"
+.SH NAME
+himalaya\-mcp \- Privacy-first email MCP server and Claude Code plugin (CLI)
+.SH SYNOPSIS
+.B himalaya-mcp
+[\fIcommand\fR] [\fIflags\fR]
+.SH DESCRIPTION
+.B himalaya-mcp
+is the unified command-line interface for the himalaya-mcp package
+— a privacy-first email MCP server that wraps the
+.B himalaya
+CLI.
+.PP
+The CLI manages Claude Desktop integration, installs/removes the
+.B .mcpb
+Desktop extension, and provides a diagnostic
+.B doctor
+command that probes the full installation stack.
+.PP
+Run with no arguments (or
+.BR setup )
+to add the himalaya MCP server to Claude Desktop's
+configuration.
+.SH COMMANDS
+.SS Setup (Claude Desktop)
+.TP
+.B setup
+Add the himalaya MCP server entry to Claude Desktop's config file.
+This is the default when no command is given.
+.TP
+.B check\fR, \fBsetup --check
+Verify the Claude Desktop config exists and the himalaya entry
+is present with a valid
+.B dist/index.js
+path.
+.TP
+.B remove\fR, \fBsetup --remove
+Remove the himalaya MCP server entry from Claude Desktop config.
+Idempotent: succeeds with a notice if nothing to remove.
+.SS Desktop Extension (.mcpb)
+.TP
+.B install-ext
+[\fIfile\fR]
+Install a
+.B .mcpb
+Desktop extension into Claude Desktop.
+Auto-discovers
+.B himalaya-mcp-v*.mcpb
+in the project root if
+.I file
+is omitted. Re-registers the extension in
+.B extensions-installations.json
+and creates default settings.
+.TP
+.B remove-ext
+Remove the himalaya-mcp Desktop extension directory, settings file,
+and registry entry. Idempotent.
+.SS Diagnostics
+.TP
+.B doctor
+Run the full diagnostic suite: prerequisites, MCP server, email
+connectivity, Desktop extension, Claude Code plugin, plugin cache,
+environment, and per-account reachability.
+.RS
+.TP
+.B --account \fIname\fR
+Run checks for a specific account only.
+.TP
+.B --fix
+Auto-fix common issues (writes default settings, sets
+.B himalaa_binary
+path, prunes stale plugin cache).
+.TP
+.B --json
+Emit machine-readable JSON of all check results.
+.RE
+.SS Meta
+.TP
+.B --help\fR, \fB-h\fR, \fBhelp
+Print versioned usage message on stdout and exit 0.
+.TP
+.B --version\fR, \fB-v\fR, \fBversion
+Print the semantic version on stdout and exit 0.
+.SH FILES
+.TP
+.I ~/Library/Application Support/Claude/claude_desktop_config.json
+(macOS) Claude Desktop MCP server config; modified by
+.BR setup
+and
+.BR remove .
+.TP
+.I ~/Library/Application Support/Claude/Claude Extensions/himalaya-mcp/
+(macOS) Claude Desktop extension directory; created by
+.BR install-ext
+and removed by
+.BR remove-ext .
+.TP
+.I ~/.claude/plugins/himalaya-mcp/
+Claude Code plugin directory (real copy after
+.BR brew upgrade ;
+previously a symlink).
+.TP
+.I ~/.claude/local-marketplace/.claude-plugin/marketplace.json
+Local marketplace manifest populated by
+.BR himalaya-mcp-install .
+.SH ENVIRONMENT
+.TP
+.B HIMALAYA_BINARY
+Path to the
+.B himalaya
+binary (default: looks up
+.B himalaya
+on
+.BR PATH ).
+.TP
+.B HIMALAYA_ACCOUNT
+Default email account name (default: himalaya system default).
+.TP
+.B HIMALAYA_FOLDER
+Default folder (default:
+.BR INBOX ).
+.TP
+.B HIMALAYA_TIMEOUT
+Command timeout in ms (default: 120000, i.e. 2 min; 0 = unlimited).
+.SH EXAMPLES
+First-time install:
+.RS
+.nf
+himalaya-mcp setup
+.fi
+.RE
+.PP
+Verify everything is working:
+.RS
+.nf
+himalaya-mcp doctor
+himalaya-mcp doctor \-\-account work
+himalaya-mcp doctor \-\-fix
+himalaya-mcp doctor \-\-json | jq .
+.fi
+.RE
+.PP
+Install as Claude Desktop Extension:
+.RS
+.nf
+npm run build:mcpb
+himalaya-mcp install-ext
+.fi
+.RE
+.PP
+Uninstall:
+.RS
+.nf
+himalaya-mcp remove-ext
+himalaya-mcp remove
+.fi
+.RE
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Generic failure (check command not found, IMAP auth failed, missing
+prerequisite, etc.). See stderr or
+.B doctor
+output for details.
+.SH SEE ALSO
+.BR himalaya (1),
+.BR claude (1),
+.BR npx (1)
+.PP
+Project home: <https://github.com/Data-Wise/himalaya-mcp>
+.br
+Plugin docs: <https://data-wise.github.io/himalaya-mcp/>
+.SH AUTHOR
+Data-Wise

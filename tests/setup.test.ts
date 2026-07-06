@@ -259,7 +259,7 @@ import { accessSync } from "node:fs";
 
 const execFileAsync = promisify(execFile);
 const PROJECT_ROOT = resolve(__dirname, "..");
-const SETUP_CLI = join(PROJECT_ROOT, "dist", "cli", "setup.js");
+const SETUP_CLI = join(PROJECT_ROOT, "dist", "cli", "index.js");
 // Use accessSync (not mocked) instead of existsSync (mocked by vi.mock)
 const hasBuild = (() => {
   try { accessSync(SETUP_CLI); return true; } catch { return false; }
@@ -293,7 +293,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   it("--help prints versioned help on stdout, exits 0", async () => {
     const { stdout, stderr } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "--help"],
+      ["dist/cli/index.js", "--help"],
       { cwd: PROJECT_ROOT }
     );
 
@@ -309,7 +309,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   it("-h is an alias for --help", async () => {
     const { stdout } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "-h"],
+      ["dist/cli/index.js", "-h"],
       { cwd: PROJECT_ROOT }
     );
     expect(stdout).toContain("Usage:");
@@ -319,7 +319,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   it("help (no dashes) is an alias for --help", async () => {
     const { stdout } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "help"],
+      ["dist/cli/index.js", "help"],
       { cwd: PROJECT_ROOT }
     );
     expect(stdout).toContain("Usage:");
@@ -328,7 +328,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   it("--version prints just the version", async () => {
     const { stdout, stderr } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "--version"],
+      ["dist/cli/index.js", "--version"],
       { cwd: PROJECT_ROOT }
     );
     // Semver shape: N.N.N (no leading 'v', no extra prose)
@@ -339,7 +339,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   it("-v is an alias for --version", async () => {
     const { stdout } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "-v"],
+      ["dist/cli/index.js", "-v"],
       { cwd: PROJECT_ROOT }
     );
     expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
@@ -352,7 +352,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     try {
       const result = await execFileAsync(
         "node",
-        ["dist/cli/setup.js", "totally-not-a-command"],
+        ["dist/cli/index.js", "totally-not-a-command"],
         { cwd: PROJECT_ROOT }
       );
       stdout = result.stdout;
@@ -374,7 +374,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     await rm(tempConfigPath, { force: true });
 
     try {
-      await execFileAsync("node", ["dist/cli/setup.js", "--check"], {
+      await execFileAsync("node", ["dist/cli/index.js", "--check"], {
         cwd: PROJECT_ROOT,
         env: { ...process.env, HOME: tempHome },
       });
@@ -391,7 +391,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     // Run setup
     const { stdout: setupStdout } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "setup"],
+      ["dist/cli/index.js", "setup"],
       {
         cwd: PROJECT_ROOT,
         env: { ...process.env, HOME: tempHome },
@@ -411,7 +411,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     try {
       const { stdout: checkStdout } = await execFileAsync(
         "node",
-        ["dist/cli/setup.js", "--check"],
+        ["dist/cli/index.js", "--check"],
         {
           cwd: PROJECT_ROOT,
           env: { ...process.env, HOME: tempHome },
@@ -428,7 +428,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 
   it("setup --remove removes config", async () => {
     // First, setup the config
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -438,7 +438,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     expect(configBefore.mcpServers?.himalaya).toBeDefined();
 
     // Remove it
-    const { stdout } = await execFileAsync("node", ["dist/cli/setup.js", "--remove"], {
+    const { stdout } = await execFileAsync("node", ["dist/cli/index.js", "--remove"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -453,7 +453,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 
   it("setup resolves dist/index.js path relative to script", async () => {
     // Run setup — the path should resolve to this project's dist/index.js
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -480,11 +480,11 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     await writeFile(tempConfigPath, JSON.stringify(initialConfig, null, 2), "utf-8");
 
     // Run setup twice (simulates install then upgrade)
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -500,7 +500,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 
   it("setup --remove then re-setup works (reinstall flow)", async () => {
     // Install
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -508,7 +508,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     expect(config.mcpServers?.himalaya).toBeDefined();
 
     // Uninstall
-    await execFileAsync("node", ["dist/cli/setup.js", "--remove"], {
+    await execFileAsync("node", ["dist/cli/index.js", "--remove"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -516,7 +516,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     expect(config.mcpServers?.himalaya).toBeUndefined();
 
     // Reinstall
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -527,7 +527,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
 
   it("setup --check reports correct entry point path", async () => {
     // Setup first
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -536,7 +536,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     try {
       const { stdout } = await execFileAsync(
         "node",
-        ["dist/cli/setup.js", "--check"],
+        ["dist/cli/index.js", "--check"],
         {
           cwd: PROJECT_ROOT,
           env: { ...process.env, HOME: tempHome },
@@ -555,7 +555,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     // Remove when nothing exists — should not error
     const { stdout: stdout1 } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "--remove"],
+      ["dist/cli/index.js", "--remove"],
       {
         cwd: PROJECT_ROOT,
         env: { ...process.env, HOME: tempHome },
@@ -564,17 +564,17 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     expect(stdout1).toContain("Nothing to remove");
 
     // Setup then remove twice
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
-    await execFileAsync("node", ["dist/cli/setup.js", "--remove"], {
+    await execFileAsync("node", ["dist/cli/index.js", "--remove"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
     const { stdout: stdout2 } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "--remove"],
+      ["dist/cli/index.js", "--remove"],
       {
         cwd: PROJECT_ROOT,
         env: { ...process.env, HOME: tempHome },
@@ -590,7 +590,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     // Setup should create it
     const { stdout } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "setup"],
+      ["dist/cli/index.js", "setup"],
       {
         cwd: PROJECT_ROOT,
         env: { ...process.env, HOME: tempHome },
@@ -604,7 +604,7 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
   }, 10_000);
 
   it("setup writes valid JSON with proper formatting", async () => {
-    await execFileAsync("node", ["dist/cli/setup.js", "setup"], {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
       cwd: PROJECT_ROOT,
       env: { ...process.env, HOME: tempHome },
     });
@@ -646,7 +646,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
     try {
       const result = await execFileAsync(
         "node",
-        ["dist/cli/setup.js", "doctor"],
+        ["dist/cli/index.js", "doctor"],
         { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
@@ -666,7 +666,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
     try {
       const result = await execFileAsync(
         "node",
-        ["dist/cli/setup.js", "doctor", "--json"],
+        ["dist/cli/index.js", "doctor", "--json"],
         { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
@@ -692,7 +692,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
     try {
       const result = await execFileAsync(
         "node",
-        ["dist/cli/setup.js", "doctor", "--json"],
+        ["dist/cli/index.js", "doctor", "--json"],
         { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
@@ -712,7 +712,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
     try {
       const result = await execFileAsync(
         "node",
-        ["dist/cli/setup.js", "doctor", "--json"],
+        ["dist/cli/index.js", "doctor", "--json"],
         { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
@@ -729,7 +729,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
   it("--help mentions doctor and its flags", async () => {
     const { stdout } = await execFileAsync(
       "node",
-      ["dist/cli/setup.js", "--help"],
+      ["dist/cli/index.js", "--help"],
       { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
     );
 
@@ -803,7 +803,7 @@ describe("Plugin structure validation", () => {
 // doctor multi-account: M1/W2 — per-account reachability section
 // ==============================================================================
 
-import { runDoctor } from "../src/cli/setup";
+import { runDoctor } from "../src/cli/doctor";
 import * as accountsModule from "../src/himalaya/accounts";
 
 describe("doctor multi-account", () => {

@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "himalaya-mcp": "dist/cli/setup.js"
+    "himalaya-mcp": "dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",
