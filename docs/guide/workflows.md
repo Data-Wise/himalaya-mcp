@@ -462,7 +462,7 @@ Mark the other 3 as read and archive?
 
 ## 18. Search and Filter Emails
 
-Use the `/email:search` skill for powerful email search with filter combinations.
+Use the `/email:search` skill for powerful email search with filter combinations. See the [Search & Manage tutorial](../tutorials/search-manage.md) for a step-by-step walkthrough.
 
 **Natural language:** "Find unread emails from Alice about the budget"
 

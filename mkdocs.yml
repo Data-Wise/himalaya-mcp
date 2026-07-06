@@ -91,6 +91,7 @@ nav:
       - Reply to an Email: tutorials/reply-email.md
       - Compose & Send Email: tutorials/compose-email.md
       - Attachments & Calendar: tutorials/attachments-calendar.md
+      - Search & Manage: tutorials/search-manage.md
       - Export & Save Emails: tutorials/export-save.md
     - "Level 3: Automation":
       - Automate with the Agent: tutorials/automate-agent.md
