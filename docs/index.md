@@ -12,13 +12,13 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
 <div class="grid cards" markdown>
 
-- :envelope: **21 MCP Tools**
+- :envelope: **22 MCP Tools**
 
     ---
 
     List, search, read, flag, move, draft reply, send, export, action items, clipboard, folders, attachments, calendar, threads
 
-    [:octicons-arrow-right-24: Command Reference](reference/commands.md)
+    [:octicons-arrow-right-24: MCP Tools](reference/commands.md)
 
 - :brain: **6 MCP Prompts**
 
@@ -26,7 +26,7 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     Triage inbox, summarize email, daily digest, draft reply, morning briefing, inbox check
 
-    [:octicons-arrow-right-24: Prompt Details](reference/commands.md#prompts)
+    [:octicons-arrow-right-24: Prompts](reference/commands.md#prompts)
 
 - :lock: **Two-Phase Send**
 
@@ -162,11 +162,12 @@ You: "/email:help"
 - **[Installation](getting-started/installation.md)** -- detailed setup guide
 - **[Quick Start](getting-started/quickstart.md)** -- first email in 2 minutes
 - **[Tutorials](tutorials/index.md)** -- step-by-step from beginner to automation
-- **[Command Reference](reference/commands.md)** -- all tools, prompts, and resources
+- **[Cheat Sheet](reference/cheat-sheet.md)** -- one-page quick reference
+- **[MCP Tools](reference/commands.md)** -- all 22 tools, 6 prompts, 3 resources
+- **[CLI Reference](reference/cli.md)** -- `doctor`, `setup`, `install-ext`, `remove-ext`
 - **[User Guide](guide/guide.md)** -- complete walkthrough
 - **[Workflows](guide/workflows.md)** -- common email patterns
 - **[Cookbook](guide/cookbook.md)** -- practical recipes combining multiple skills
-- **[Quick Reference](reference/refcard.md)** -- one-page cheat sheet
 - **[Architecture](reference/architecture.md)** -- system design and security
 - **[Desktop Extension](tutorials/desktop-extension.md)** -- install `.mcpb` in Claude Desktop
 - **[Desktop Extensions Reference](reference/desktop-extensions.md)** -- `.mcpb` format details

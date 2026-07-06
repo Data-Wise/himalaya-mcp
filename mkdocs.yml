@@ -107,7 +107,9 @@ nav:
     - Contributing: guide/contributing.md
     - Troubleshooting: guide/troubleshooting.md
   - Reference:
-    - Command Reference: reference/commands.md
+    - Cheat Sheet: reference/cheat-sheet.md
+    - MCP Tools: reference/commands.md
+    - CLI Reference: reference/cli.md
     - Quick Reference: reference/refcard.md
     - Architecture: reference/architecture.md
     - Desktop Extensions: reference/desktop-extensions.md

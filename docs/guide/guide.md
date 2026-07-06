@@ -347,7 +347,7 @@ himalaya-mcp doctor --fix              # Auto-fix common issues
 himalaya-mcp doctor --json             # Machine-readable output
 ```
 
-The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health, per-account email connectivity, Claude Desktop extension state, Claude Code plugin registration, and environment variables. See the [Command Reference](../reference/commands.md#himalaya-mcp-doctor) for full details.
+The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health, per-account email connectivity, Claude Desktop extension state, Claude Code plugin registration, and environment variables. See the [CLI Reference](../reference/cli.md#himalaya-mcp-doctor) for full details.
 
 For in-conversation diagnostics, ask Claude to run a health check — that invokes the `health_check` MCP tool documented above.
 

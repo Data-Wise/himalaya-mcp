@@ -239,7 +239,7 @@ And set `HIMALAYA_TIMEOUT` in the manifest env (requires rebuilding the `.mcpb`)
 
 ## Next Steps
 
-- [Command Reference](../reference/commands.md) -- all 22 tools with parameters and examples
+- [MCP Tools Reference](../reference/commands.md) -- all 22 tools with parameters and examples
 - [Workflows](../guide/workflows.md) -- common email patterns (triage, reply, export)
 - [Troubleshooting](../guide/troubleshooting.md) -- full troubleshooting guide
 - [Desktop Extensions Reference](../reference/desktop-extensions.md) -- `.mcpb` format details
