@@ -12,6 +12,7 @@ import { parseICSFile, createAppleCalendarEvent } from "../adapters/calendar.js"
 import { downloadAndList } from "./attachments.js";
 import { envelopeError } from "./_envelope.js";
 import { join } from "node:path";
+import { rm } from "node:fs/promises";
 
 export function registerCalendarTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("extract_calendar_event", {
@@ -22,11 +23,13 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
+    let destDir: string | undefined;
     try {
-      // Step 1: Download all attachments using shared helper
-      const { destDir, files } = await downloadAndList(client, args.id, args.folder, args.account);
+      const result = await downloadAndList(client, args.id, args.folder, args.account);
+      destDir = result.destDir;
+      const files = result.files;
 
-      // Step 2: Find .ics file among attachments
+      // Find .ics file among attachments
       const icsFile = files.find((f) => f.filename.toLowerCase().endsWith(".ics"));
 
       if (!icsFile) {
@@ -35,7 +38,7 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
         };
       }
 
-      // Step 3: Parse ICS
+      // Parse ICS
       const filePath = join(destDir, icsFile.filename);
       const event = await parseICSFile(filePath);
 
@@ -46,7 +49,7 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
         };
       }
 
-      // Step 4: Format output
+      // Format output
       const lines = [
         `Event: ${event.summary}`,
         `Start: ${event.dtstart}`,
@@ -62,6 +65,10 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
       };
     } catch (err) {
       return envelopeError(err);
+    } finally {
+      if (destDir) {
+        await rm(destDir, { recursive: true, force: true }).catch(() => {});
+      }
     }
   });
 

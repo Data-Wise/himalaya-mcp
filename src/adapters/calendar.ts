@@ -99,16 +99,16 @@ export function unescapeICS(value: string): string {
  * Output: "2026-02-16T09:00:00" or "2026-02-16"
  */
 function formatICSDate(raw: string): string {
-  const clean = raw.replace("Z", "");
+  const isUtc = raw.endsWith("Z");
+  const clean = isUtc ? raw.slice(0, -1) : raw;
   if (clean.length === 8) {
-    // Date only: YYYYMMDD
     return `${clean.slice(0, 4)}-${clean.slice(4, 6)}-${clean.slice(6, 8)}`;
   }
   if (clean.length >= 15) {
-    // DateTime: YYYYMMDDTHHMMSS
-    return `${clean.slice(0, 4)}-${clean.slice(4, 6)}-${clean.slice(6, 8)}T${clean.slice(9, 11)}:${clean.slice(11, 13)}:${clean.slice(13, 15)}`;
+    const local = `${clean.slice(0, 4)}-${clean.slice(4, 6)}-${clean.slice(6, 8)}T${clean.slice(9, 11)}:${clean.slice(11, 13)}:${clean.slice(13, 15)}`;
+    return isUtc ? local + "Z" : local;
   }
-  return raw; // Fallback
+  return raw;
 }
 
 /**

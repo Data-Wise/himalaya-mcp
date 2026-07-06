@@ -144,8 +144,11 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
       };
     }
 
+    let destDir: string | undefined;
     try {
-      const { destDir, files } = await downloadAndList(client, args.id, args.folder, args.account);
+      const result = await downloadAndList(client, args.id, args.folder, args.account);
+      destDir = result.destDir;
+      const files = result.files;
 
       const match = files.find((f) => f.filename === args.filename);
       if (!match) {
@@ -168,6 +171,10 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
       };
     } catch (err) {
       return envelopeError(err);
+    } finally {
+      if (destDir) {
+        await rm(destDir, { recursive: true, force: true }).catch(() => {});
+      }
     }
   });
 }

@@ -195,7 +195,7 @@ The extension works identically in Claude Cowork (the collaborative mode within 
 | 3 MCP resources | Yes | Yes |
 | Interaction style | Natural language | Natural language + `/email:*` skills |
 | Email assistant agent | No | Yes |
-| Slash commands | No | 12 skills (`/email:inbox`, etc.) |
+| Slash commands | No | 15 skills (`/email:inbox`, etc.) |
 
 In Claude Desktop, everything is natural language. Say "check my inbox" instead of `/email:inbox`. The underlying tools are identical.
 
@@ -239,7 +239,7 @@ And set `HIMALAYA_TIMEOUT` in the manifest env (requires rebuilding the `.mcpb`)
 
 ## Next Steps
 
-- [Command Reference](../reference/commands.md) -- all 22 tools with parameters and examples
+- [MCP Tools Reference](../reference/commands.md) -- all 22 tools with parameters and examples
 - [Workflows](../guide/workflows.md) -- common email patterns (triage, reply, export)
 - [Troubleshooting](../guide/troubleshooting.md) -- full troubleshooting guide
 - [Desktop Extensions Reference](../reference/desktop-extensions.md) -- `.mcpb` format details

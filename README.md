@@ -72,7 +72,7 @@ himalaya-mcp doctor    # Verify installation
 ## Testing
 
 ```bash
-npm test              # 484 tests across 23 files (vitest)
+npm test              # 507 tests across 23 files (vitest)
 ```
 
 | Category | Tests | Coverage |

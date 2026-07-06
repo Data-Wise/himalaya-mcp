@@ -462,7 +462,7 @@ Mark the other 3 as read and archive?
 
 ## 18. Search and Filter Emails
 
-Use the `/email:search` skill for powerful email search with filter combinations.
+Use the `/email:search` skill for powerful email search with filter combinations. See the [Search & Manage tutorial](../tutorials/search-manage.md) for a step-by-step walkthrough.
 
 **Natural language:** "Find unread emails from Alice about the budget"
 
@@ -608,6 +608,121 @@ Sent:      23           19           up 21%
 ```
 
 **Tip:** Great for Monday morning email planning -- check stats before diving in.
+
+## 21. Forward and Redirect
+
+Forward an email to someone else with context and attribution.
+
+**Natural language:** "Forward email 42 to bob@example.com with context"
+
+```
+/email:forward 42 "bob@example.com"
+  → read_email(id: "42")
+  → compose_email(to: "bob@example.com", subject: "Fwd: ...", body: ...)
+  → Show preview → "Send" to confirm
+```
+
+**Redirect use cases:**
+
+| Scenario | How |
+|----------|-----|
+| Bounce to colleague | Forward with explanation: "Alice, can you handle this?" |
+| Send to archive | Forward to your own archive address or Evernote |
+| Escalate to manager | Forward with urgency context: "Bob, this needs your approval" |
+
+**Variation — forward multiple:**
+
+```
+You: "Forward all emails about the project to the new team member"
+→ search_emails(query: "subject:project") → /email:forward for each
+```
+
+---
+
+## 22. Undo and Rollback
+
+Recover from recent email operations. Nearly every action is reversible.
+
+**Natural language:** "Undo that last archive" / "Unflag email 42"
+
+| Mistake | Fix | How |
+|---------|-----|-----|
+| Archived by accident | Move back to INBOX | `move_email(id, target_folder: "INBOX")` |
+| Flagged wrong email | Remove flag | `flag_email(id, flags: ["Flagged"], action: "remove")` |
+| Marked as read too soon | Mark unread | `flag_email(id, flags: ["Seen"], action: "remove")` |
+| Moved to wrong folder | Move to correct folder | `move_email(id, target_folder: "CorrectFolder")` |
+| Sent too early | Recall (if supported) | Check your provider's undo-send window or recall feature |
+
+```
+You: "Undo the last archive I did"
+
+Claude:
+Looking for recently archived emails...
+Found email 42 (Q1 Budget Review) archived 2 minutes ago.
+Moving it back to INBOX... done.
+```
+
+**Tip:** himalaya-mcp never deletes — all moves go to Trash or Archive, which are recoverable. For Gmail, the undo-send window is configurable (up to 30 seconds) in Gmail settings.
+
+---
+
+## 23. Error Recovery
+
+When an email operation fails mid-task, here's how to recover.
+
+**Natural language:** "Email failed, what went wrong?"
+
+### Failed send
+
+```
+You: "Send that reply"
+
+Claude: send_email fails with "imap_auth_failed"
+
+Recovery:
+1. himalaya-mcp doctor --account work   # Check account status
+2. If auth error → himalaya-mcp doctor --fix
+3. Re-run send_email(template, confirm: true)
+```
+
+### Timeout during triage
+
+```
+You: "Triage my last 50 emails"
+
+Claude: Times out partway through (too many emails)
+
+Recovery:
+1. Start smaller: /email:triage 20
+2. Process those, then /email:triage 20 more
+3. Or use /email:manage archive to clean processed items first
+```
+
+### Interrupted download
+
+```
+You: "Download the PDF from email 42"
+
+Claude: download_attachment fails with "transient"
+
+Recovery:
+1. The error envelope shows attempt count (auto-retried once)
+2. Re-run: download_attachment(id: "42", filename: "report.pdf")
+3. If still failing, check the file exists on the server via list_attachments
+```
+
+### Error code quick reference
+
+| Code | Meaning | Recoverable | Fix |
+|------|---------|-------------|-----|
+| `imap_auth_failed` | Wrong password or app password expired | Yes | `doctor --fix` or re-configure account |
+| `account_not_found` | Account name doesn't match config | Yes | Use `list_folders` to verify account name |
+| `folder_not_found` | Folder name doesn't exist | Yes | Use `list_folders` to verify folder name |
+| `transient` | Network glitch, server timeout | Yes | Auto-retried once; re-run the operation |
+| `parse_error` | himalaya returned unexpected output | No | Check himalaya version; report bug |
+| `himalaya_not_installed` | Binary missing | Yes | `brew install himalaya` |
+
+---
 
 ## Diagnosing email problems
 

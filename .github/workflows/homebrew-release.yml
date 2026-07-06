@@ -13,6 +13,10 @@ on:
         description: 'Auto-merge the formula PR'
         required: false
         type: boolean
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
         default: true
 
 jobs:
@@ -47,6 +51,10 @@ jobs:
           else
             VERSION="${GIT_REF#refs/tags/}"
             VERSION="${VERSION#v}"
+          fi
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Invalid version: $VERSION (expected semver like 1.2.3)"
+            exit 1
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -242,7 +250,7 @@ jobs:
   update-homebrew:
     name: Update Homebrew Formula
     needs: [prepare, verify-tap-auth]
-    uses: Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@main
+    uses: Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@d8c339b1a7e6ea3b5cb0c9aa0f223bf2a39cf825
     with:
       formula_name: himalaya-mcp
       version: ${{ needs.prepare.outputs.version }}

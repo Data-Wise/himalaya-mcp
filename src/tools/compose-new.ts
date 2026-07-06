@@ -49,7 +49,8 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
   }, async (args) => {
-    if (!args.to.includes("@")) {
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!EMAIL_RE.test(args.to)) {
       return {
         content: [{
           type: "text" as const,

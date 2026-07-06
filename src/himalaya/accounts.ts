@@ -11,6 +11,7 @@ import { loadConfig } from "../config.js";
 import { HimalayaError, parseError } from "./errors.js";
 
 const execFileAsync = promisify(execFile);
+const ACCOUNT_TIMEOUT = 15_000;
 
 export interface Account {
   name: string;
@@ -27,7 +28,7 @@ export async function listAccounts(): Promise<Account[]> {
   const binary = loadConfig().binary ?? "himalaya";
   let stdout: string;
   try {
-    const result = await execFileAsync(binary, ["account", "list", "-o", "json"]);
+    const result = await execFileAsync(binary, ["account", "list", "-o", "json"], { timeout: ACCOUNT_TIMEOUT });
     stdout = result.stdout;
   } catch (err: unknown) {
     if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {
