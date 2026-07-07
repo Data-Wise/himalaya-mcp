@@ -25,7 +25,7 @@
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
 - v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
-- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 507 tests (23 test files)
+- Total: 26 tools, 6 prompts, 3 resources, 12 skills, 507 tests (23 test files)
 
 ## Just Completed
 
@@ -51,7 +51,7 @@
 - Branch: `dev` (in sync with main — v1.7.0 released)
 - v1.8.0 released: GitHub (tag + .mcpb), Homebrew formula auto-pushed, docs site deploying
 - Skills: 15 skills using `skills/*/SKILL.md` subdirectory format
-- Tools: 22 MCP tools, 6 prompts, 3 resources
+- Tools: 26 MCP tools, 6 prompts, 3 resources
 - Tests: 507 passing across 23 test files
 - Tutorials: 13 across 3 levels
 - Bundle: 604KB (esbuild), .mcpb: 151KB

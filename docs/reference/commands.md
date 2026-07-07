@@ -1,6 +1,6 @@
 # MCP Tools Reference
 
-Complete reference for all 22 MCP tools, 6 prompts, and 3 resources.
+Complete reference for all 26 MCP tools, 6 prompts, and 3 resources.
 
 !!! tip "See also"
     **[Tutorials](../tutorials/index.md)** for step-by-step walkthroughs | **[Workflows](../guide/workflows.md)** for common email patterns
@@ -86,6 +86,59 @@ Search emails using himalaya filter syntax.
 
 ---
 
+#### `get_unread_count`
+
+Get the number of unread emails in a folder. Uses himalaya's server-side filter (`not flag Seen`) for fast counting even in large mailboxes.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"How many unread emails do I have?"
+→ get_unread_count()
+
+"Unread count in my work inbox"
+→ get_unread_count(account: "work")
+
+"Check for unread in Archive"
+→ get_unread_count(folder: "Archive")
+```
+
+**Output:** A plain number.
+
+**Related:** [inbox_check prompt](#inbox_check-prompt), [list_emails](#list_emails)
+
+---
+
+#### `list_starred`
+
+List all flagged/starred emails in a folder. Convenience wrapper over searching with `flag Flagged`. Returns envelopes with flag, subject, sender, and date.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Show my starred emails"
+→ list_starred()
+
+"Starred emails from my work account"
+→ list_starred(account: "work")
+```
+
+**Output:** One line per starred email with ID, sender, subject, and date.
+
+**Related:** [flag_email](#flag_email), [search_emails](#search_emails)
+
+---
+
 ### Reading
 
 #### `read_email`
@@ -135,6 +188,54 @@ Read an email message body as HTML. Useful for formatted emails with tables, ima
 **When to use:** Prefer `read_email` for most messages. Use `read_email_html` when the plain text version is empty or poorly formatted (newsletters, marketing emails, HTML-only senders).
 
 **Related:** [read_email](#read_email)
+
+---
+
+#### `read_email_raw`
+
+Read the raw MIME source of an email. Returns the full, unedited message including all headers. Useful for debugging, email forensics, and .eml export.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | — | Email message ID |
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Show the raw source of email 42"
+→ read_email_raw(id: "42")
+
+"Dump raw MIME of the newsletter"
+→ read_email_raw(id: "88")
+```
+
+**Related:** [read_email](#read_email), [render_email](#render_email)
+
+---
+
+#### `render_email`
+
+Read an email body rendered as clean markdown. For HTML emails, converts to markdown for a clean reading experience. For plain text emails, returns the body as-is.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | — | Email message ID |
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Show email 42 as clean markdown"
+→ render_email(id: "42")
+
+"Read the newsletter without HTML clutter"
+→ render_email(id: "88")
+```
+
+**Related:** [read_email](#read_email), [read_email_html](#read_email_html)
 
 ---
 

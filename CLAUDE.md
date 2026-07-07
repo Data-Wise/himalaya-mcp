@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 1.8.0
-- **Current Phase:** All phases complete (22 tools, 6 prompts, 3 resources, 15 skills, 507 tests)
+- **Current Phase:** All phases complete (26 tools, 6 prompts, 3 resources, 15 skills, 507 tests)
 
 ### What It Does
 
@@ -108,7 +108,7 @@ himalaya-mcp/
 └── tsconfig.json
 ```
 
-### Implemented MCP Tools (22)
+### Implemented MCP Tools (26)
 
 | Tool | Description |
 |------|-------------|
@@ -116,12 +116,16 @@ himalaya-mcp/
 | `search_emails` | Search via himalaya filter syntax (subject, from, body, etc.) |
 | `read_email` | Read message body (plain text) |
 | `read_email_html` | Read message body (HTML) |
+| `read_email_raw` | Read raw MIME source of an email |
+| `render_email` | Read email body rendered as clean markdown |
 | `flag_email` | Add/remove flags (Seen, Flagged, Answered, etc.) |
+| `get_unread_count` | Get unread email count for a folder |
 | `move_email` | Move email to target folder |
 | `draft_reply` | Generate reply template with DRAFT markers |
 | `send_email` | Send email with two-phase safety gate (preview then confirm) |
 | `compose_email` | Compose and send new email with two-phase safety gate |
 | `list_folders` | List all email folders/mailboxes |
+| `list_starred` | List flagged/starred emails |
 | `create_folder` | Create a new email folder |
 | `delete_folder` | Delete folder with two-phase safety gate |
 | `list_attachments` | List attachments for an email (filename, MIME, size) |

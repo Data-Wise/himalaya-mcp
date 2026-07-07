@@ -18,7 +18,7 @@ Single entry point for discovering all email commands, tools, prompts, and workf
 
 ```
 /email:help                  # Overview of all capabilities
-/email:help tools            # All 22 MCP tools with usage
+/email:help tools            # All 26 MCP tools with usage
 /email:help prompts          # All 6 MCP prompts
 /email:help resources        # All 3 MCP resources
 /email:help <command>        # Detail for a specific tool (e.g. "search_emails")
@@ -38,7 +38,7 @@ Display the hub overview:
 | 3 resources, 15 skills, 2 hooks                           |
 +===========================================================+
 |                                                           |
-| TOOLS (22)                                                |
+| TOOLS (26)                                                |
 |   Inbox ....... list_emails, search_emails                |
 |   Read ........ read_email, read_email_html               |
 |   Folders ..... list_folders, create_folder,              |
