@@ -1515,8 +1515,8 @@ describe("Packaging: mcpb/manifest.json", () => {
     expect(manifest.compatibility.runtimes.node).toBe(">=22.0.0");
   });
 
-  it("lists exactly 25 tools", () => {
-    expect(manifest.tools).toHaveLength(25);
+  it("lists exactly 26 tools", () => {
+    expect(manifest.tools).toHaveLength(26);
   });
 
   it("lists exactly 6 prompts", () => {
@@ -1557,6 +1557,7 @@ describe("Packaging: mcpb/manifest.json", () => {
       "list_attachments",
       "list_emails",
       "list_folders",
+      "list_starred",
       "list_threads",
       "move_email",
       "read_email",

@@ -28,6 +28,7 @@ import { registerHealthTools } from "./tools/health.js";
 import { registerUnreadTools } from "./tools/unread.js";
 import { registerReadRawTools } from "./tools/read-raw.js";
 import { registerRenderTools } from "./tools/render.js";
+import { registerStarredTools } from "./tools/list-starred.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
 import { registerMorningPrompt } from "./prompts/morning.js";
 import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
@@ -58,6 +59,7 @@ registerClipboardTools(server);
 registerUnreadTools(server, client);
 registerReadRawTools(server, client);
 registerRenderTools(server, client);
+registerStarredTools(server, client);
 
 // Register resources
 registerResources(server, client);

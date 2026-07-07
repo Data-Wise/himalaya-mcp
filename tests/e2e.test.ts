@@ -231,6 +231,7 @@ describe("E2E: MCP Server Headless", () => {
       "list_attachments",
       "list_emails",
       "list_folders",
+      "list_starred",
       "list_threads",
       "move_email",
       "read_email",

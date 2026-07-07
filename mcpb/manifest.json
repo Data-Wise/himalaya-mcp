@@ -154,6 +154,10 @@
       "description": "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events."
     },
     {
+      "name": "list_starred",
+      "description": "List all flagged/starred emails. Returns envelopes with flag, subject, sender, and date. Uses server-side filtering for fast results."
+    },
+    {
       "name": "list_threads",
       "description": "List email threads (conversations) in a folder. Groups related emails by subject line. Returns threads sorted by most recent activity, with participant list and message count."
     },
