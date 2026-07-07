@@ -35,6 +35,7 @@ import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
 
 export const VERSION = "1.8.1";
 export const NAME = "himalaya-mcp";
+export const TOOL_COUNT = 26;
 
 const server = new McpServer({
   name: NAME,
