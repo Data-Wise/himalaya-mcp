@@ -42,8 +42,8 @@ Get comfortable reading and navigating your email through Claude.
 |----------|------|-------------------|
 | [Read Your First Email](read-first-email.md) | 2 min | List inbox, read messages, HTML vs plain text |
 | [Multi-Account Email](multi-account.md) | 3 min | Switch accounts, cross-account queries, defaults |
-| [Diagnose Email Issues](diagnose-issues.md) | 5 min | `health_check`, `doctor --account`, error-code decoding |
-| [Desktop Extension](desktop-extension.md) | 5 min | Install .mcpb, configure, use in Claude Desktop/Cowork |
+| [Diagnose Email Issues](../getting-started/diagnose-issues.md) | 5 min | `health_check`, `doctor --account`, error-code decoding |
+| [Desktop Extension](../getting-started/desktop-extension.md) | 5 min | Install .mcpb, configure, use in Claude Desktop/Cowork |
 
 ### Level 2: Productivity
 

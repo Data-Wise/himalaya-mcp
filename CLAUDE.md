@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 1.8.0
-- **Current Phase:** All phases complete (22 tools, 6 prompts, 3 resources, 15 skills, 507 tests)
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 569 tests)
 
 ### What It Does
 
@@ -108,7 +108,7 @@ himalaya-mcp/
 └── tsconfig.json
 ```
 
-### Implemented MCP Tools (22)
+### Implemented MCP Tools (29)
 
 | Tool | Description |
 |------|-------------|
@@ -116,13 +116,20 @@ himalaya-mcp/
 | `search_emails` | Search via himalaya filter syntax (subject, from, body, etc.) |
 | `read_email` | Read message body (plain text) |
 | `read_email_html` | Read message body (HTML) |
+| `read_email_raw` | Read raw MIME source of an email |
+| `render_email` | Read email body rendered as clean markdown |
 | `flag_email` | Add/remove flags (Seen, Flagged, Answered, etc.) |
+| `get_unread_count` | Get unread email count for a folder |
 | `move_email` | Move email to target folder |
 | `draft_reply` | Generate reply template with DRAFT markers |
 | `send_email` | Send email with two-phase safety gate (preview then confirm) |
+| `snooze_email` | Snooze email until specified time |
 | `compose_email` | Compose and send new email with two-phase safety gate |
 | `list_folders` | List all email folders/mailboxes |
+| `list_snoozed_emails` | List snoozed emails and their unsnooze times |
+| `list_starred` | List flagged/starred emails |
 | `create_folder` | Create a new email folder |
+| `create_reminder` | Create reminder in Apple Reminders (macOS) |
 | `delete_folder` | Delete folder with two-phase safety gate |
 | `list_attachments` | List attachments for an email (filename, MIME, size) |
 | `download_attachment` | Download attachment to temp directory |
@@ -135,7 +142,7 @@ himalaya-mcp/
 | `copy_to_clipboard` | Copy text to system clipboard (pbcopy/xclip) |
 | `health_check` | Per-account IMAP diagnostics (overall + per-account status, hint, attempts) |
 
-### Implemented MCP Prompts (6)
+### Implemented MCP Prompts (7)
 
 | Prompt | Description |
 |--------|-------------|
@@ -145,6 +152,7 @@ himalaya-mcp/
 | `draft_reply` | Reply composition with tone/safety guidance |
 | `morning_briefing` | Morning email briefing with urgency classification |
 | `inbox_check` | Quick inbox status with highlights and next actions |
+| `weekly_email_digest` | Weekly email digest grouped by priority and day |
 
 ### Implemented MCP Resources (3)
 
@@ -221,8 +229,8 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (507 tests across 23 test files)
-npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~604KB)
+npm test                         # Run vitest (569 tests across 31 test files)
+npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~883KB)
 node dist/index.js               # Run MCP server directly
 ```
 

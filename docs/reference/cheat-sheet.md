@@ -23,19 +23,23 @@ himalaya-mcp doctor                                   # Verify everything
 | `himalaya-mcp --help` | Show help |
 | `himalaya-mcp --version` | Show version |
 
-## MCP Tools (22)
+## MCP Tools (29)
 
 ```
 list_emails         List inbox/folder emails
 search_emails       Search by subject, from, body
 read_email          Read plain text body
 read_email_html     Read HTML body
+read_email_raw      Read raw MIME source
+render_email        Read as clean markdown
 flag_email          Add/remove flags (Seen, Flagged, etc.)
+get_unread_count    Get unread count in folder
 move_email          Move to another folder
 compose_email       Compose + send new email (safety gate)
 draft_reply         Generate reply draft (never sends)
 send_email          Send template (confirm=true required)
 list_folders        List all folders
+list_starred        List flagged/starred emails
 create_folder       Create new folder
 delete_folder       Delete folder (safety gate)
 list_attachments    List email attachments
@@ -123,9 +127,9 @@ Multi-acct: Any tool + account="work" | account="personal"
 
 ```
 npm run build           tsc (dev)
-npm run build:bundle    esbuild (~604KB)
-npm run build:mcpb      .mcpb extension (~151KB)
-npm test                507 tests (vitest)
+npm run build:bundle    esbuild (~883KB)
+npm run build:mcpb      .mcpb extension (~247KB)
+npm test                569 tests (vitest)
 ```
 
 ## Resources

@@ -92,7 +92,7 @@ Edit this file directly and restart Claude Desktop to apply changes.
 
 ## Step 3: Restart Claude Desktop
 
-After installing or updating the extension, restart Claude Desktop. The extension registers 22 tools, 6 prompts, and 3 resources.
+After installing or updating the extension, restart Claude Desktop. The extension registers 29 tools, 7 prompts, and 3 resources.
 
 ## Step 4: Try It
 
@@ -190,12 +190,12 @@ The extension works identically in Claude Cowork (the collaborative mode within 
 
 | Feature | Claude Desktop | Claude Code |
 |---------|---------------|-------------|
-| 22 MCP tools | Yes | Yes |
-| 6 MCP prompts | Yes | Yes |
+| 29 MCP tools | Yes | Yes |
+| 7 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
 | Interaction style | Natural language | Natural language + `/email:*` skills |
 | Email assistant agent | No | Yes |
-| Slash commands | No | 15 skills (`/email:inbox`, etc.) |
+| Slash commands | No | 16 skills (`/email:inbox`, etc.) |
 
 In Claude Desktop, everything is natural language. Say "check my inbox" instead of `/email:inbox`. The underlying tools are identical.
 
@@ -239,7 +239,7 @@ And set `HIMALAYA_TIMEOUT` in the manifest env (requires rebuilding the `.mcpb`)
 
 ## Next Steps
 
-- [MCP Tools Reference](../reference/commands.md) -- all 22 tools with parameters and examples
+- [MCP Tools Reference](../reference/commands.md) -- all 29 tools with parameters and examples
 - [Workflows](../guide/workflows.md) -- common email patterns (triage, reply, export)
 - [Troubleshooting](../guide/troubleshooting.md) -- full troubleshooting guide
 - [Desktop Extensions Reference](../reference/desktop-extensions.md) -- `.mcpb` format details

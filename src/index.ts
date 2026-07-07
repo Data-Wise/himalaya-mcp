@@ -25,12 +25,20 @@ import { registerAttachmentTools } from "./tools/attachments.js";
 import { registerCalendarTools } from "./tools/calendar.js";
 import { registerThreadTools } from "./tools/threads.js";
 import { registerHealthTools } from "./tools/health.js";
+import { registerUnreadTools } from "./tools/unread.js";
+import { registerReadRawTools } from "./tools/read-raw.js";
+import { registerRenderTools } from "./tools/render.js";
+import { registerStarredTools } from "./tools/list-starred.js";
+import { registerReminderTools } from "./tools/reminders.js";
+import { registerSnoozeTools } from "./tools/snooze.js";
+import { registerWeeklyDigestPrompt } from "./prompts/weekly-digest.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
 import { registerMorningPrompt } from "./prompts/morning.js";
 import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
 
 export const VERSION = "1.8.1";
 export const NAME = "himalaya-mcp";
+export const TOOL_COUNT = 29;
 
 const server = new McpServer({
   name: NAME,
@@ -52,6 +60,12 @@ registerCalendarTools(server, client);
 registerThreadTools(server, client);
 registerHealthTools(server, client);
 registerClipboardTools(server);
+registerUnreadTools(server, client);
+registerReadRawTools(server, client);
+registerRenderTools(server, client);
+registerStarredTools(server, client);
+registerReminderTools(server);
+registerSnoozeTools(server);
 
 // Register resources
 registerResources(server, client);
@@ -63,6 +77,7 @@ registerDigestPrompt(server);
 registerReplyPrompt(server);
 registerMorningPrompt(server);
 registerInboxCheckPrompt(server);
+registerWeeklyDigestPrompt(server);
 
 // Start server
 async function main() {

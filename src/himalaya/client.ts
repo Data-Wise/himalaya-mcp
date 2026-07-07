@@ -166,6 +166,20 @@ export class HimalayaClient {
   }
 
   /**
+   * Get the unread count for a folder.
+   * Uses himalaya filter syntax: `not flag Seen`.
+   */
+  async getUnreadCount(folder?: string, account?: string): Promise<number> {
+    const raw = await this.searchEnvelopes("not flag Seen", folder, account);
+    const { parseEnvelopes } = await import("./parser.js");
+    const result = parseEnvelopes(raw);
+    if (result.ok) {
+      return result.data.length;
+    }
+    return 0;
+  }
+
+  /**
    * Search envelopes with a query.
    * Uses himalaya filter syntax (positional args):
    *   "subject foo", "from bar", "body baz"

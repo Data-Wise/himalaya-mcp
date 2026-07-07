@@ -86,8 +86,20 @@
       "description": "Read an email message body as HTML. Useful for formatted emails."
     },
     {
+      "name": "read_email_raw",
+      "description": "Read the raw MIME source of an email. Returns the full, unedited message including all headers. Useful for debugging and email forensics."
+    },
+    {
+      "name": "render_email",
+      "description": "Read an email body rendered as clean markdown. For HTML emails, converts to markdown for a clean reading experience. For plain text emails, returns the body as-is."
+    },
+    {
       "name": "flag_email",
       "description": "Add or remove flags on an email. Common flags: Seen, Flagged, Answered, Deleted, Draft. Use 'add' to set flags, 'remove' to clear them."
+    },
+    {
+      "name": "get_unread_count",
+      "description": "Get the number of unread emails in a folder. Uses himalaya's server-side filter for fast counting even in large mailboxes."
     },
     {
       "name": "move_email",
@@ -102,6 +114,10 @@
       "description": "Send an email template. SAFETY: requires confirm=true to actually send. Without confirm, returns a preview. Always show the user the preview and get their approval before sending with confirm=true."
     },
     {
+      "name": "snooze_email",
+      "description": "Snooze an email until a specified time. Supports ISO dates and shorthand: 2h, 1d, tomorrow, monday."
+    },
+    {
       "name": "compose_email",
       "description": "Compose and send a new email (not a reply). SAFETY: requires confirm=true to actually send. Without confirm, returns a preview for user review."
     },
@@ -112,6 +128,10 @@
     {
       "name": "create_folder",
       "description": "Create a new email folder/mailbox."
+    },
+    {
+      "name": "create_reminder",
+      "description": "Create a reminder in Apple Reminders (macOS only). Use for action items, follow-ups, and tasks extracted from email."
     },
     {
       "name": "delete_folder",
@@ -140,6 +160,14 @@
     {
       "name": "create_action_item",
       "description": "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events."
+    },
+    {
+      "name": "list_snoozed_emails",
+      "description": "List all snoozed emails. Shows active snoozes (not yet expired) and expired snoozes ready to revisit."
+    },
+    {
+      "name": "list_starred",
+      "description": "List all flagged/starred emails. Returns envelopes with flag, subject, sender, and date. Uses server-side filtering for fast results."
     },
     {
       "name": "list_threads",
@@ -208,6 +236,12 @@
         "folder"
       ],
       "text": "Quick check on my inbox with unread count, flagged highlights, and suggested next actions."
+    },
+    {
+      "name": "weekly_email_digest",
+      "description": "Create a markdown digest of this week's important emails, grouped by priority and day.",
+      "arguments": [],
+      "text": "Create a weekly email digest grouping emails by day and priority."
     }
   ]
 }

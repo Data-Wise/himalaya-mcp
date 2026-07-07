@@ -23,10 +23,10 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 | Feature | Claude Code | Claude Desktop |
 |---------|-------------|----------------|
-| 22 MCP tools | Yes | Yes |
-| 6 MCP prompts | Yes | Yes |
+| 29 MCP tools | Yes | Yes |
+| 7 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
-| `/email:*` slash commands | Yes (15 skills) | No |
+| `/email:*` slash commands | Yes (16 skills) | No |
 | Plugin hooks | Yes (2 hooks) | No |
 | Email assistant agent | Yes | No |
 | Natural language ("check my inbox") | Yes | Yes |
@@ -35,7 +35,7 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 
 **In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.
 
-**In Claude Desktop**, you get the full MCP server -- all 22 tools, 6 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
+**In Claude Desktop**, you get the full MCP server -- all 29 tools, 7 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
 
 !!! tip "Which should I use?"
     Use **Claude Code** if you want the structured skill workflows and the email assistant agent. Use **Claude Desktop** if you prefer the desktop UI or want email access alongside other MCP servers.
@@ -72,7 +72,7 @@ npm install && npm run build
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ```
 
-Restart Claude Code. The plugin provides 15 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:forward`, `/email:attachments`, `/email:export`, `/email:threads`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:morning`, `/email:help`.
+Restart Claude Code. The plugin provides 16 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:forward`, `/email:attachments`, `/email:export`, `/email:threads`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:morning`, `/email:help`, `/email:respond`.
 
 ### Claude Desktop (.mcpb)
 
@@ -129,7 +129,7 @@ The `setup` command writes a server entry into Claude Desktop's config file. It 
 }
 ```
 
-Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 22 tools, 6 prompts, and 3 resources.
+Claude Desktop reads this on startup and spawns `node dist/index.js` as a subprocess. The MCP server communicates over stdin/stdout using JSON-RPC, exposing all 29 tools, 7 prompts, and 3 resources.
 
 #### Using himalaya-mcp in Claude Desktop
 
@@ -203,7 +203,7 @@ Example with env vars:
 }
 ```
 
-## MCP Tools (22)
+## MCP Tools (29)
 
 ### Reading
 
@@ -365,7 +365,7 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 507 tests across 23 files (vitest)
+npm test    # 569 tests across 31 files (vitest)
 ```
 
 Test breakdown:
@@ -381,7 +381,7 @@ Test breakdown:
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
 | `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
-| `prompts.test.ts` | 15 | All 6 prompts register and return correct text |
+| `prompts.test.ts` | 24 | All 7 prompts register and return correct text |
 | `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
 | `dogfood.test.ts` | 142 | Realistic Claude usage scenarios + packaging validation |
