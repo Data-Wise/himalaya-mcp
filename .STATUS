@@ -35,7 +35,11 @@
 
 ## Just Completed
 
+<<<<<<< HEAD
 - 2026-07-07: PR #76 created — Ported all flow-cli `em` commands to himalaya-mcp (7 new tools, 1 prompt, 1 skill). Phase 1: `getTrashFolder()`, `get_unread_count`, `read_email_raw`, `render_email`, `list_starred`, count-sync test. Phase 2: `create_reminder` (Apple Reminders), `snooze_email`/`list_snoozed_emails` (JSON-backed), `weekly_email_digest` prompt, `triage_inbox` enhancement, `create_action_item` extension. Phase 3: `/email:respond` skill. Migration docs: guide + tutorial. Nav reorganized with task-grouped Tutorials and Guides/Operations split. 517 tests passing.
+=======
+- 2026-07-06: Released v1.8.1 — 5 groff man pages, CLI modular refactor (5 modules), fixed bin script arg forwarding, fixed man page install with Dir.glob. All 507 tests passing.
+>>>>>>> main
 - 2026-07-06: Released v1.8.0 — 3 new skills (forward, export, threads), 7 new workflows, adversarial audit (21 fixes), cheat sheet, split CLI/MCP tools, security deep-dive, contributing guide
 - 2026-06-19: Released v1.7.0 — attachment support (compose_email + send_email, MML format), 3 community security fixes (flag injection, ICS escapes, Zod dep). GitHub release + Homebrew auto-pushed + docs deploying.
 - 2026-05-13: Released v1.6.2 — first release with FULLY clean Homebrew pipeline (Upload MCPB ✓, no manual fallback, no duplicate-asset cosmetic failure). PR #62 merged, tag v1.6.2, auto-pushed to data-wise/tap.
@@ -105,5 +109,10 @@ himalaya-mcp doctor --fix
 
 ---
 
+<<<<<<< HEAD
 **Last Updated:** 2026-07-07
 **Status:** PR #76 ready for review — 7 new tools, 1 prompt, 1 skill from em commands porting
+=======
+**Last Updated:** 2026-07-06
+**Status:** v1.8.1 released — GitHub + Homebrew (man pages working) + docs site
+>>>>>>> main

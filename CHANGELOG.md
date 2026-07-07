@@ -30,6 +30,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **Stale count references** — corrected outdated tool/prompt/skill/test counts across README, CLAUDE.md, docs, and test scripts.
 - **Orphan doc pages** — removed duplicate `docs/tutorials/desktop-extension.md`, `docs/tutorials/diagnose-issues.md`, and merged `docs/reference/refcard.md` into Cheat Sheet.
 
+## [1.8.1] - 2026-07-06
+
+### Added
+
+- **5 groff man pages:** `himalaya-mcp(1)`, `himalaya-mcp-doctor(1)`, `himalaya-mcp-setup(1)`, `himalaya-mcp-install-ext(1)`, `himalaya-mcp-remove-ext(1)`. Run `man himalaya-mcp` after install.
+- **CLI modular refactor:** Split monolithic `setup.ts` (998 lines) into 5 focused modules: `index.ts` (dispatcher), `shared.ts` (utilities), `setup.ts` (check/remove), `doctor.ts` (diagnostics), `extension.ts` (install/remove .mcpb).
+
+### Fixed
+
+- **Homebrew bin script:** Forward arguments (`"$@"`) so `himalaya-mcp --help`, `--version`, `doctor` work correctly.
+- **Homebrew man page install:** Use `Dir.glob` with explicit `libexec` base path for reliable installation.
+- **`isMain` function:** Changed to accept caller's `import.meta.url` to work across CLI modules.
+- **Version assertions:** Updated hardcoded "1.8.0" references in tests for consistency.
+
 ## [1.8.0] - 2026-07-06
 
 ### Added
