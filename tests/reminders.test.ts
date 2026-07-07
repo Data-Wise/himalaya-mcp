@@ -44,7 +44,8 @@ describe("create_reminder", () => {
     expect(typeof handler).toBe("function");
   });
 
-  it("on macOS, calls createReminder with title and notes", async () => {
+  it("calls createReminder with title and notes", async () => {
+    vi.stubGlobal("process", { ...process, platform: "darwin" });
     const { createReminder } = await import("../src/adapters/reminders.js");
     vi.mocked(createReminder).mockClear();
     vi.mocked(createReminder).mockResolvedValue(undefined);
@@ -68,9 +69,11 @@ describe("create_reminder", () => {
     );
     expect(result.content[0].text).toContain("Buy groceries");
     expect(result.isError).toBeUndefined();
+    vi.unstubAllGlobals();
   });
 
   it("calls createReminder with dueDate when provided", async () => {
+    vi.stubGlobal("process", { ...process, platform: "darwin" });
     const { createReminder } = await import("../src/adapters/reminders.js");
     vi.mocked(createReminder).mockClear();
 
@@ -92,9 +95,11 @@ describe("create_reminder", () => {
         priority: 1,
       }),
     );
+    vi.unstubAllGlobals();
   });
 
   it("handles reminder creation errors", async () => {
+    vi.stubGlobal("process", { ...process, platform: "darwin" });
     const { createReminder } = await import("../src/adapters/reminders.js");
     vi.mocked(createReminder).mockRejectedValue(new Error("AppleScript error"));
 
@@ -105,5 +110,6 @@ describe("create_reminder", () => {
     const result = await handler({ title: "Task", notes: undefined, dueDate: undefined, priority: undefined });
 
     expect(result.isError).toBe(true);
+    vi.unstubAllGlobals();
   });
 });
