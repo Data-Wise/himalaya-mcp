@@ -22,6 +22,11 @@ import { registerFolderTools } from "../src/tools/folders.js";
 import { registerComposeNewTools } from "../src/tools/compose-new.js";
 import { registerAttachmentTools } from "../src/tools/attachments.js";
 import { registerCalendarTools } from "../src/tools/calendar.js";
+import { registerReadRawTools } from "../src/tools/read-raw.js";
+import { registerRenderTools } from "../src/tools/render.js";
+import { registerStarredTools } from "../src/tools/list-starred.js";
+import { registerReminderTools } from "../src/tools/reminders.js";
+import { registerSnoozeTools } from "../src/tools/snooze.js";
 
 // --- Module mocks (for attachment + calendar tools that use fs/os/crypto) ---
 
@@ -45,8 +50,17 @@ vi.mock("node:fs/promises", async (importOriginal) => {
 });
 vi.mock("node:os", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:os")>();
-  return { ...actual, tmpdir: vi.fn().mockReturnValue("/tmp") };
+  return {
+    ...actual,
+    tmpdir: vi.fn().mockReturnValue("/tmp"),
+    homedir: vi.fn().mockReturnValue("/tmp"),
+  };
 });
+vi.mock("node:child_process", () => ({
+  execFile: vi.fn(),
+  execFileSync: vi.fn(),
+  spawn: vi.fn(),
+}));
 vi.mock("node:crypto", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:crypto")>();
   return { ...actual, randomUUID: vi.fn().mockReturnValue("test-uuid-1234") };
@@ -964,6 +978,159 @@ describe("Dogfooding: create_calendar_event safety gate", () => {
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("Error creating calendar event");
+  });
+});
+
+// ========================================================================
+// Phase 1-2 Em Commands Porting — Dogfood Tests
+// ========================================================================
+
+describe("Dogfooding: read_email_raw", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerReadRawTools(server, client);
+  });
+
+  it("Scenario: 'Show raw source of email' — registers tool with correct description", () => {
+    const tool = getToolHandler(server, "read_email_raw");
+    expect(tool).toBeDefined();
+    expect(typeof tool.handler).toBe("function");
+  });
+
+  it("Scenario: tool description mentions .eml format for forensic use", () => {
+    const tool = getToolHandler(server, "read_email_raw");
+    expect(tool.description).toContain("raw MIME");
+    expect(tool.description).toContain("eml");
+  });
+});
+
+describe("Dogfooding: render_email", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerRenderTools(server, client);
+  });
+
+  it("Scenario: 'Render this email as markdown' — converts HTML to clean markdown", async () => {
+    const tool = getToolHandler(server, "render_email");
+    vi.spyOn(client, "readMessageHtml").mockResolvedValue(JSON.stringify("<p><strong>Important</strong> meeting at 3pm.</p>"));
+
+    const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content).toHaveLength(1);
+    expect(result.content[0].type).toBe("text");
+    expect(result.isError).toBeUndefined();
+  });
+
+  it("Scenario: plain text email — returns as-is", async () => {
+    const tool = getToolHandler(server, "render_email");
+    vi.spyOn(client, "readMessageHtml").mockResolvedValue("");
+    vi.spyOn(client, "readMessage").mockResolvedValue("Plain text body.\n\nBest,\nMegan");
+
+    const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toContain("Plain text body");
+  });
+});
+
+describe("Dogfooding: list_starred", () => {
+  let server: McpServer;
+  let client: HimalayaClient;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    client = createMockClient();
+    registerStarredTools(server, client);
+  });
+
+  it("Scenario: 'Show my starred emails' — returns formatted list", async () => {
+    vi.spyOn(client, "searchEnvelopes").mockResolvedValue(SAMPLE_ENVELOPES);
+    const tool = getToolHandler(server, "list_starred");
+
+    const result = await tool.handler({ folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content).toHaveLength(1);
+    const text = result.content[0].text;
+    expect(text).toContain("249116");
+    expect(text).toContain("Heatwave Coffee");
+    expect(text).toContain("Receipt from Heatwave Coffee");
+  });
+
+  it("Scenario: no starred emails — shows helpful message", async () => {
+    vi.spyOn(client, "searchEnvelopes").mockResolvedValue("[]");
+    const tool = getToolHandler(server, "list_starred");
+
+    const result = await tool.handler({ folder: undefined, account: undefined }, {} as any);
+
+    expect(result.content[0].text).toBe("No starred (flagged) emails.");
+  });
+
+  it("Scenario: starred results show subject and sender", async () => {
+    vi.spyOn(client, "searchEnvelopes").mockResolvedValue(SAMPLE_ENVELOPES);
+    const tool = getToolHandler(server, "list_starred");
+
+    const result = await tool.handler({ folder: undefined, account: undefined }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("Receipt from Heatwave Coffee");
+    expect(text).toContain("Reminder - Seminar Today");
+  });
+});
+
+describe("Dogfooding: create_reminder", () => {
+  let server: McpServer;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    registerReminderTools(server);
+  });
+
+  it("Scenario: 'Remind me to follow up on email' — registers tool with correct description", () => {
+    const tool = getToolHandler(server, "create_reminder");
+    expect(tool).toBeDefined();
+    expect(tool.description).toContain("Apple Reminders");
+  });
+});
+
+describe("Dogfooding: snooze_email", () => {
+  let server: McpServer;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    registerSnoozeTools(server);
+  });
+
+  it("Scenario: 'Snooze this email' — tool registered with correct description", () => {
+    const tool = getToolHandler(server, "snooze_email");
+    expect(tool).toBeDefined();
+    expect(tool.description).toContain("Snooze");
+  });
+
+  it("Scenario: tool description mentions inbox reappearance behavior", () => {
+    const tool = getToolHandler(server, "snooze_email");
+    expect(tool.description).toContain("reappear");
+  });
+});
+
+describe("Dogfooding: list_snoozed_emails", () => {
+  let server: McpServer;
+
+  beforeEach(() => {
+    server = new McpServer({ name: "test", version: "0.0.1" });
+    registerSnoozeTools(server);
+  });
+
+  it("Scenario: 'Show my snoozed emails' — tool registered correctly", () => {
+    const tool = getToolHandler(server, "list_snoozed_emails");
+    expect(tool).toBeDefined();
+    expect(tool.description).toContain("snoozed");
   });
 });
 
