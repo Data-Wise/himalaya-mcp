@@ -7,10 +7,13 @@
  *   HIMALAYA_ACCOUNT — default account name
  *   HIMALAYA_FOLDER  — default folder (default: "INBOX")
  *   HIMALAYA_TIMEOUT — command timeout in ms (default: 120000; 0 = unlimited)
- *   HIMALAYA_FROM    — sender email address for compose/send (required for sending)
+ *   HIMALAYA_FROM    — sender email address for compose/send
+ *                       Falls back to himalaya config.toml (default account email)
+ *                       if not explicitly set.
  */
 
 import type { HimalayaClientOptions } from "./himalaya/types.js";
+import { resolveFromAddress } from "./himalaya/config-toml.js";
 
 /** Return the value only if it's a real string (not an unresolved template variable). */
 function resolvedEnv(key: string): string | undefined {
@@ -38,7 +41,13 @@ export function loadConfig(): HimalayaClientOptions {
   }
 
   const from = resolvedEnv("HIMALAYA_FROM");
-  if (from) config.from = from;
+  if (from) {
+    config.from = from;
+  } else {
+    // Fall back to himalaya config.toml (default account's email)
+    const derived = resolveFromAddress(config.account);
+    if (derived) config.from = derived;
+  }
 
   return config;
 }

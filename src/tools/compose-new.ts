@@ -64,7 +64,7 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       return {
         content: [{
           type: "text" as const,
-          text: "HIMALAYA_FROM is not set. Set it to your email address to compose new emails.",
+          text: "No sender address configured. Set HIMALAYA_FROM env var, or add `email = \"you@example.com\"` to your default account in ~/.config/himalaya/config.toml.",
         }],
         isError: true,
       };
