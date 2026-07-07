@@ -23,7 +23,7 @@ himalaya-mcp doctor                                   # Verify everything
 | `himalaya-mcp --help` | Show help |
 | `himalaya-mcp --version` | Show version |
 
-## MCP Tools (26)
+## MCP Tools (29)
 
 ```
 list_emails         List inbox/folder emails

@@ -1515,12 +1515,12 @@ describe("Packaging: mcpb/manifest.json", () => {
     expect(manifest.compatibility.runtimes.node).toBe(">=22.0.0");
   });
 
-  it("lists exactly 26 tools", () => {
-    expect(manifest.tools).toHaveLength(26);
+  it("lists exactly 29 tools", () => {
+    expect(manifest.tools).toHaveLength(29);
   });
 
-  it("lists exactly 6 prompts", () => {
-    expect(manifest.prompts).toHaveLength(6);
+  it("lists exactly 7 prompts", () => {
+    expect(manifest.prompts).toHaveLength(7);
   });
 
   it("every tool has name and description", () => {
@@ -1546,6 +1546,7 @@ describe("Packaging: mcpb/manifest.json", () => {
       "create_action_item",
       "create_calendar_event",
       "create_folder",
+      "create_reminder",
       "delete_folder",
       "download_attachment",
       "draft_reply",
@@ -1557,6 +1558,7 @@ describe("Packaging: mcpb/manifest.json", () => {
       "list_attachments",
       "list_emails",
       "list_folders",
+      "list_snoozed_emails",
       "list_starred",
       "list_threads",
       "move_email",
@@ -1567,6 +1569,7 @@ describe("Packaging: mcpb/manifest.json", () => {
       "render_email",
       "search_emails",
       "send_email",
+      "snooze_email",
     ]);
   });
 
@@ -1579,6 +1582,7 @@ describe("Packaging: mcpb/manifest.json", () => {
       "morning_briefing",
       "summarize_email",
       "triage_inbox",
+      "weekly_email_digest",
     ]);
   });
 

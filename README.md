@@ -4,7 +4,7 @@ Privacy-first email for Claude -- MCP server and Claude Code plugin (`email`) wr
 
 ## Features
 
-- **26 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar, threads, health check, get_unread_count, read_email_raw, render_email, list_starred
+- **29 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar, threads, health check, get_unread_count, read_email_raw, render_email, list_starred, create_reminder, snooze_email, list_snoozed_emails
 - **6 MCP prompts**: triage inbox, summarize email, daily digest, draft reply, morning briefing, inbox check
 - **3 MCP resources**: inbox, message by ID, folders
 - **12 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`, `/email:morning`

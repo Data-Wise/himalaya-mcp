@@ -29,7 +29,7 @@ himalaya-mcp --help             Grouped usage (also: -h, help)
 himalaya-mcp --version          Print just the semver (also: -v, version)
 ```
 
-## Tools (26)
+## Tools (29)
 
 ```
 list_emails         [folder] [page_size] [page] [account]     List envelopes

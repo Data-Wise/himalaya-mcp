@@ -12,7 +12,7 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
 <div class="grid cards" markdown>
 
-- :envelope: **26 MCP Tools**
+- :envelope: **29 MCP Tools**
 
     ---
 
@@ -68,7 +68,7 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 flowchart LR
     A["`**Claude**
     Code / Desktop`"] -->|MCP JSON-RPC| B["`**himalaya-mcp**
-    26 tools · 6 prompts`"]
+    29 tools · 7 prompts`"]
     B -->|execFile| C["`**himalaya CLI**
     --output json`"]
     C -->|IMAP/SMTP| D["`**Mail Server**

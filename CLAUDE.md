@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 1.8.0
-- **Current Phase:** All phases complete (26 tools, 6 prompts, 3 resources, 15 skills, 507 tests)
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 15 skills, 507 tests)
 
 ### What It Does
 
@@ -108,7 +108,7 @@ himalaya-mcp/
 └── tsconfig.json
 ```
 
-### Implemented MCP Tools (26)
+### Implemented MCP Tools (29)
 
 | Tool | Description |
 |------|-------------|
@@ -123,10 +123,13 @@ himalaya-mcp/
 | `move_email` | Move email to target folder |
 | `draft_reply` | Generate reply template with DRAFT markers |
 | `send_email` | Send email with two-phase safety gate (preview then confirm) |
+| `snooze_email` | Snooze email until specified time |
 | `compose_email` | Compose and send new email with two-phase safety gate |
 | `list_folders` | List all email folders/mailboxes |
+| `list_snoozed_emails` | List snoozed emails and their unsnooze times |
 | `list_starred` | List flagged/starred emails |
 | `create_folder` | Create a new email folder |
+| `create_reminder` | Create reminder in Apple Reminders (macOS) |
 | `delete_folder` | Delete folder with two-phase safety gate |
 | `list_attachments` | List attachments for an email (filename, MIME, size) |
 | `download_attachment` | Download attachment to temp directory |
@@ -139,7 +142,7 @@ himalaya-mcp/
 | `copy_to_clipboard` | Copy text to system clipboard (pbcopy/xclip) |
 | `health_check` | Per-account IMAP diagnostics (overall + per-account status, hint, attempts) |
 
-### Implemented MCP Prompts (6)
+### Implemented MCP Prompts (7)
 
 | Prompt | Description |
 |--------|-------------|
@@ -149,6 +152,7 @@ himalaya-mcp/
 | `draft_reply` | Reply composition with tone/safety guidance |
 | `morning_briefing` | Morning email briefing with urgency classification |
 | `inbox_check` | Quick inbox status with highlights and next actions |
+| `weekly_email_digest` | Weekly email digest grouped by priority and day |
 
 ### Implemented MCP Resources (3)
 

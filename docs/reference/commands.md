@@ -1,6 +1,6 @@
 # MCP Tools Reference
 
-Complete reference for all 26 MCP tools, 6 prompts, and 3 resources.
+Complete reference for all 29 MCP tools, 7 prompts, and 3 resources.
 
 !!! tip "See also"
     **[Tutorials](../tutorials/index.md)** for step-by-step walkthroughs | **[Workflows](../guide/workflows.md)** for common email patterns

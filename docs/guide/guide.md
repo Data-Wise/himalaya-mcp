@@ -203,7 +203,7 @@ Example with env vars:
 }
 ```
 
-## MCP Tools (26)
+## MCP Tools (29)
 
 ### Reading
 

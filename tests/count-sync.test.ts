@@ -28,6 +28,6 @@ describe("tool count sync", () => {
     //   - docs/reference/commands.md
     //   - docs/reference/cheat-sheet.md
     //   - docs/index.md grid cards
-    expect(TOOL_COUNT).toBe(26);
+    expect(TOOL_COUNT).toBe(29);
   });
 });
