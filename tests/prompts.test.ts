@@ -4,6 +4,7 @@ import { registerTriagePrompt } from "../src/prompts/triage.js";
 import { registerSummarizePrompt } from "../src/prompts/summarize.js";
 import { registerDigestPrompt } from "../src/prompts/digest.js";
 import { registerReplyPrompt } from "../src/prompts/reply.js";
+import { registerWeeklyDigestPrompt } from "../src/prompts/weekly-digest.js";
 
 // Spy on registerPrompt to verify registration without running a full server
 function createMockServer() {
@@ -176,6 +177,105 @@ describe("MCP Prompts", () => {
       const text = result.messages[0].content.text;
       expect(text).toContain("confirm=true");
       expect(text).toContain("approval");
+    });
+  });
+
+  describe("weekly_email_digest", () => {
+    it("registers with correct name", () => {
+      const { server, prompts } = createMockServer();
+      registerWeeklyDigestPrompt(server);
+
+      expect(prompts.has("weekly_email_digest")).toBe(true);
+    });
+
+    it("returns messages with instructions for weekly digest workflow", async () => {
+      const { server, prompts } = createMockServer();
+      registerWeeklyDigestPrompt(server);
+
+      const { cb } = prompts.get("weekly_email_digest")!;
+      const result = await cb({});
+
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].role).toBe("user");
+      expect(result.messages[0].content.text).toContain("weekly email digest");
+    });
+
+    it("mentions list_emails and read_email tools", async () => {
+      const { server, prompts } = createMockServer();
+      registerWeeklyDigestPrompt(server);
+
+      const { cb } = prompts.get("weekly_email_digest")!;
+      const result = await cb({});
+      const text = result.messages[0].content.text;
+
+      expect(text).toContain("list_emails");
+      expect(text).toContain("read_email");
+    });
+
+    it("includes formatting guidance for markdown digest", async () => {
+      const { server, prompts } = createMockServer();
+      registerWeeklyDigestPrompt(server);
+
+      const { cb } = prompts.get("weekly_email_digest")!;
+      const result = await cb({});
+      const text = result.messages[0].content.text;
+
+      expect(text).toContain("##");
+      expect(text).toContain("### 🔴 Requires Action");
+      expect(text).toContain("### 🟡 FYI / Review");
+    });
+
+    it("includes summary section guidance", async () => {
+      const { server, prompts } = createMockServer();
+      registerWeeklyDigestPrompt(server);
+
+      const { cb } = prompts.get("weekly_email_digest")!;
+      const result = await cb({});
+      const text = result.messages[0].content.text;
+
+      expect(text).toContain("Total emails");
+      expect(text).toContain("Requires action");
+    });
+  });
+
+  describe("triage_inbox (enhanced)", () => {
+    it("includes Priority and Category dimensions in prompt", async () => {
+      const { server, prompts } = createMockServer();
+      registerTriagePrompt(server);
+
+      const { cb } = prompts.get("triage_inbox")!;
+      const result = await cb({ count: undefined });
+      const text = result.messages[0].content.text;
+
+      expect(text).toContain("Priority:");
+      expect(text).toContain("Category:");
+      expect(text).toContain("High | Medium | Low");
+      expect(text).toContain("Meeting | Task | Newsletter | Notification | Receipt | Travel | Social | Other");
+    });
+
+    it("mentions flags and folder moves in suggested actions", async () => {
+      const { server, prompts } = createMockServer();
+      registerTriagePrompt(server);
+
+      const { cb } = prompts.get("triage_inbox")!;
+      const result = await cb({ count: undefined });
+      const text = result.messages[0].content.text;
+
+      expect(text).toContain("Flagged");
+      expect(text).toContain("Archive");
+      expect(text).toContain("Trash");
+    });
+
+    it("includes structured table format in prompt", async () => {
+      const { server, prompts } = createMockServer();
+      registerTriagePrompt(server);
+
+      const { cb } = prompts.get("triage_inbox")!;
+      const result = await cb({ count: undefined });
+      const text = result.messages[0].content.text;
+
+      expect(text).toContain("| ID | From | Subject | Class | Priority | Category |");
+      expect(text).toContain("Do NOT flag or move anything without my confirmation");
     });
   });
 });

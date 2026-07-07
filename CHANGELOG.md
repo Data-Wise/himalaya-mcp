@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.9.0] - 2026-07-07
+
+### Added
+
+- **7 new MCP tools:** `get_unread_count`, `read_email_raw`, `render_email`, `list_starred`, `create_reminder`, `snooze_email`, `list_snoozed_emails`.
+- **1 new MCP prompt:** `weekly_email_digest` — weekly variant of the daily digest.
+- **1 new plugin skill:** `/email:respond` — batch draft-reply workflow with per-draft approval.
+- **`getTrashFolder()` utility** — provider-agnostic trash folder resolution (Gmail `[Gmail]/Trash`, Exchange `Deleted Items`, fallback `Trash`).
+- **Apple Reminders adapter** — `create_reminder` adds tasks to Apple Reminders.app (macOS).
+- **JSON-backed snooze persistence** — `snooze_email` / `list_snoozed_emails` with ISO and shorthand time formats (`tomorrow`, `monday`, `2h`, `1d`).
+- **`create_action_item` extension** — new `destination` parameter for file capture.
+- **`triage_inbox` enhancement** — added Priority (High/Medium/Low) and Category (Meeting/Task/Newsletter/Notification/Receipt/Travel/Social/Other) dimensions.
+- **Migration documentation** — `docs/guide/migrating-from-em.md` command map and `docs/tutorials/migrating-from-em.md` walkthrough for flow-cli `em` users.
+- **Count-sync test** — `TOOL_COUNT` constant and `tests/count-sync.test.ts` prevent silent drift between registered tools and docs.
+
+### Changed
+
+- **Tool count 22 → 29**, **prompt count 6 → 7**, **skill count 15 → 16** across all docs, plugin manifests, and help skill.
+- **Docs site reorganized** — Tutorials grouped by task (Read & Browse / Respond & Organize / Compose & Automate), Guides split into Guides + Operations, Quick Reference merged into Cheat Sheet.
+- **Desktop Extension and Diagnose Issues docs moved** from `docs/tutorials/` to `docs/getting-started/`.
+
+### Fixed
+
+- **Stale count references** — corrected outdated tool/prompt/skill/test counts across README, CLAUDE.md, docs, and test scripts.
+- **Orphan doc pages** — removed duplicate `docs/tutorials/desktop-extension.md`, `docs/tutorials/diagnose-issues.md`, and merged `docs/reference/refcard.md` into Cheat Sheet.
+
+## [1.8.1] - 2026-07-06
+
+### Added
+
+- **5 groff man pages:** `himalaya-mcp(1)`, `himalaya-mcp-doctor(1)`, `himalaya-mcp-setup(1)`, `himalaya-mcp-install-ext(1)`, `himalaya-mcp-remove-ext(1)`. Run `man himalaya-mcp` after install.
+- **CLI modular refactor:** Split monolithic `setup.ts` (998 lines) into 5 focused modules: `index.ts` (dispatcher), `shared.ts` (utilities), `setup.ts` (check/remove), `doctor.ts` (diagnostics), `extension.ts` (install/remove .mcpb).
+
+### Fixed
+
+- **Homebrew bin script:** Forward arguments (`"$@"`) so `himalaya-mcp --help`, `--version`, `doctor` work correctly.
+- **Homebrew man page install:** Use `Dir.glob` with explicit `libexec` base path for reliable installation.
+- **`isMain` function:** Changed to accept caller's `import.meta.url` to work across CLI modules.
+- **Version assertions:** Updated hardcoded "1.8.0" references in tests for consistency.
+
 ## [1.8.0] - 2026-07-06
 
 ### Added

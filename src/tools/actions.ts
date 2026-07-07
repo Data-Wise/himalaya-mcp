@@ -86,6 +86,7 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
       id: z.string().describe("Email message ID"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
+      destination: z.string().optional().describe("File path to save action items (optional). Writes a markdown file with extracted action items."),
     },
   }, async (args) => {
     try {
@@ -117,30 +118,40 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
         };
       }
 
-      // Return email context for Claude to extract action items
+      const actionItemsText = [
+        "Extract action items from this email:",
+        "",
+        `**Subject:** ${subject}`,
+        `**From:** ${from}`,
+        `**Date:** ${date}`,
+        "",
+        "**Body:**",
+        bodyResult.data || "(empty body)",
+        "",
+        "---",
+        "",
+        "Please identify:",
+        "- [ ] Action items / tasks",
+        "- [ ] Deadlines or due dates",
+        "- [ ] Commitments made by sender",
+        "- [ ] Questions that need answers",
+        "- [ ] Meetings or events mentioned",
+      ].join("\n");
+
+      // Save to file if destination is specified
+      if (args.destination) {
+        try {
+          const { writeFileSync, mkdirSync } = await import("node:fs");
+          const { dirname } = await import("node:path");
+          mkdirSync(dirname(args.destination), { recursive: true });
+          writeFileSync(args.destination, actionItemsText, "utf-8");
+        } catch {
+          // File write failure is non-fatal — return the content anyway
+        }
+      }
+
       return {
-        content: [{
-          type: "text" as const,
-          text: [
-            "Extract action items from this email:",
-            "",
-            `**Subject:** ${subject}`,
-            `**From:** ${from}`,
-            `**Date:** ${date}`,
-            "",
-            "**Body:**",
-            bodyResult.data || "(empty body)",
-            "",
-            "---",
-            "",
-            "Please identify:",
-            "- [ ] Action items / tasks",
-            "- [ ] Deadlines or due dates",
-            "- [ ] Commitments made by sender",
-            "- [ ] Questions that need answers",
-            "- [ ] Meetings or events mentioned",
-          ].join("\n"),
-        }],
+        content: [{ type: "text" as const, text: actionItemsText }],
       };
     } catch (err) {
       return envelopeError(err);

@@ -1038,14 +1038,14 @@ The client applies locale fallbacks: `es-UY` -> `es-MX` -> `es-ES` -> `en-US` (d
 }
 ```
 
-### Full-featured: himalaya-mcp (manifest_version 0.3, 22 tools, 6 prompts)
+### Full-featured: himalaya-mcp (manifest_version 0.3, 29 tools, 7 prompts)
 
 ```json
 {
   "manifest_version": "0.3",
   "name": "himalaya-mcp",
   "display_name": "Himalaya Email",
-  "version": "1.7.0",
+  "version": "1.8.1",
   "description": "Privacy-first email for Claude via the himalaya CLI.",
   "author": { "name": "Data-Wise", "url": "https://github.com/Data-Wise" },
   "server": {
@@ -1066,8 +1066,8 @@ The client applies locale fallbacks: `es-UY` -> `es-MX` -> `es-ES` -> `en-US` (d
     "himalaya_account": { "type": "string", "title": "Default Account", "required": false },
     "himalaya_folder": { "type": "string", "title": "Default Folder", "default": "INBOX", "required": false }
   },
-  "tools": [ /* 22 tools */ ],
-  "prompts": [ /* 6 prompts with arguments and text */ ],
+  "tools": [ /* 29 tools */ ],
+  "prompts": [ /* 7 prompts with arguments and text */ ],
   "compatibility": { "platforms": ["darwin"], "runtimes": { "node": ">=22.0.0" } }
 }
 ```

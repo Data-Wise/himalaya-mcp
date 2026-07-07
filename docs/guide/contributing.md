@@ -7,8 +7,8 @@ git clone https://github.com/Data-Wise/himalaya-mcp.git
 cd himalaya-mcp
 npm install
 npm run build              # TypeScript compilation
-npm run build:bundle       # esbuild single-file bundle (~604KB)
-npm test                   # Run all 507 tests
+npm run build:bundle       # esbuild single-file bundle (~883KB)
+npm test                   # Run all 569 tests
 ```
 
 ## Project Structure
@@ -18,11 +18,11 @@ src/                        # TypeScript source
   index.ts                  # MCP server entry point
   config.ts                 # Env-based configuration
   himalaya/                 # Subprocess wrapper + parsers
-  tools/                    # 22 MCP tool handlers
-  prompts/                  # 6 MCP prompt handlers
+  tools/                    # 29 MCP tool handlers
+  prompts/                  # 7 MCP prompt handlers
   resources/                # 3 MCP resource handlers
   adapters/                 # clipboard, calendar
-tests/                      # 507 tests across 23 files
+tests/                      # 569 tests across 31 files
 dist/                       # Build output
 himalaya-mcp-plugin/        # Claude Code plugin definition
 ```
@@ -90,7 +90,7 @@ If you add or change a feature:
 | `docs/guide/packaging.md` | Distribution details |
 | `docs/guide/skills.md` | Plugin skills reference |
 | `docs/reference/commands.md` | Full command reference |
-| `docs/reference/refcard.md` | Quick reference |
+| `docs/reference/cheat-sheet.md` | Quick reference |
 | `docs/reference/architecture.md` | System design |
 | `docs/reference/desktop-extensions.md` | .mcpb format |
 

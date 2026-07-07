@@ -4,10 +4,10 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: active
-## Focus: v1.8.0 released
-## Phase: Post-release
-## Priority: 2
-## Progress: 100
+## Focus: v1.9.0 release
+## Phase: Release
+## Priority: 1
+## Progress: 50
 
 ## Completed
 
@@ -25,10 +25,21 @@
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
 - v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
-- Total: 22 tools, 6 prompts, 3 resources, 12 skills, 507 tests (23 test files)
+- Total: 29 tools, 7 prompts, 3 resources, 16 skills, 569 tests (31 test files)
+- **em Commands Porting (PR #76)**: Ported all flow-cli `em` commands to MCP tools/skills/prompts
+  - Phase 1: `getTrashFolder()` utility, `get_unread_count`, `read_email_raw`, `render_email`, `list_starred`, count-sync test
+  - Phase 2: `create_reminder` (Apple Reminders), `snooze_email`/`list_snoozed_emails` (JSON-backed), `weekly_email_digest` prompt, `triage_inbox` enhancement, `create_action_item` extension
+  - Phase 3: `/email:respond` skill (batch draft-reply workflow)
+  - Docs: Migration guide + tutorial, nav reorganization (task-grouped Tutorials, Guides/Operations split)
+  - 7 new tools, 1 new prompt, 1 new skill; 517 tests passing
 
 ## Just Completed
 
+<<<<<<< HEAD
+- 2026-07-07: PR #76 created — Ported all flow-cli `em` commands to himalaya-mcp (7 new tools, 1 prompt, 1 skill). Phase 1: `getTrashFolder()`, `get_unread_count`, `read_email_raw`, `render_email`, `list_starred`, count-sync test. Phase 2: `create_reminder` (Apple Reminders), `snooze_email`/`list_snoozed_emails` (JSON-backed), `weekly_email_digest` prompt, `triage_inbox` enhancement, `create_action_item` extension. Phase 3: `/email:respond` skill. Migration docs: guide + tutorial. Nav reorganized with task-grouped Tutorials and Guides/Operations split. 517 tests passing.
+=======
+- 2026-07-06: Released v1.8.1 — 5 groff man pages, CLI modular refactor (5 modules), fixed bin script arg forwarding, fixed man page install with Dir.glob. All 507 tests passing.
+>>>>>>> main
 - 2026-07-06: Released v1.8.0 — 3 new skills (forward, export, threads), 7 new workflows, adversarial audit (21 fixes), cheat sheet, split CLI/MCP tools, security deep-dive, contributing guide
 - 2026-06-19: Released v1.7.0 — attachment support (compose_email + send_email, MML format), 3 community security fixes (flag injection, ICS escapes, Zod dep). GitHub release + Homebrew auto-pushed + docs deploying.
 - 2026-05-13: Released v1.6.2 — first release with FULLY clean Homebrew pipeline (Upload MCPB ✓, no manual fallback, no duplicate-asset cosmetic failure). PR #62 merged, tag v1.6.2, auto-pushed to data-wise/tap.
@@ -48,13 +59,13 @@
 
 ## Current State
 
-- Branch: `dev` (in sync with main — v1.7.0 released)
+- Branch: `feature/port-em-commands-p1` (PR #76 awaiting review)
 - v1.8.0 released: GitHub (tag + .mcpb), Homebrew formula auto-pushed, docs site deploying
-- Skills: 15 skills using `skills/*/SKILL.md` subdirectory format
-- Tools: 22 MCP tools, 6 prompts, 3 resources
-- Tests: 507 passing across 23 test files
-- Tutorials: 13 across 3 levels
-- Bundle: 604KB (esbuild), .mcpb: 151KB
+- Skills: 16 skills using `skills/*/SKILL.md` subdirectory format
+- Tools: 29 MCP tools, 7 prompts, 3 resources
+- Tests: 517 passing across 26 test files
+- Tutorials: 15 across 3 levels (Read & Browse, Respond & Organize, Compose & Automate)
+- Bundle: 883KB (esbuild), .mcpb: 153KB
 
 ## Install
 
@@ -83,8 +94,9 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- All infrastructure healthy. v1.8.0 shipped.
-- Optional: brainstorm v1.9.0 scope when ready.
+- Review and merge PR #76 into `dev`
+- After merge: bump version to v1.9.0, run release workflow
+- Optional: brainstorm additional features for v1.10.0
 
 ## Future
 
@@ -97,5 +109,10 @@ himalaya-mcp doctor --fix
 
 ---
 
+<<<<<<< HEAD
+**Last Updated:** 2026-07-07
+**Status:** PR #76 ready for review — 7 new tools, 1 prompt, 1 skill from em commands porting
+=======
 **Last Updated:** 2026-07-06
-**Status:** v1.8.0 released — GitHub + Homebrew + docs site
+**Status:** v1.8.1 released — GitHub + Homebrew (man pages working) + docs site
+>>>>>>> main

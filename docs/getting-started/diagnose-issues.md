@@ -1,6 +1,6 @@
 # Diagnose Email Issues
 
-**Level 1** | **Time:** 5 minutes | **Builds on:** [Multi-Account Email](multi-account.md)
+**Time:** 5 minutes | **Builds on:** [Multi-Account Email](../tutorials/multi-account.md)
 
 When something stops working — auth fails, an account goes dark, a folder disappears — himalaya-mcp gives you two ways in: ask Claude (`health_check` tool), or run the CLI (`himalaya-mcp doctor`).
 
@@ -113,4 +113,4 @@ flowchart TD
 
 ---
 
-**Next:** [Triage Your Inbox](triage-inbox.md) (Level 2) | **Back to:** [Tutorials](index.md)
+**Next:** [Triage Your Inbox](../tutorials/triage-inbox.md) | **Back to:** [Tutorials](../tutorials/index.md)

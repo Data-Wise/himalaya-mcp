@@ -192,7 +192,7 @@ describe("E2E: MCP Server Headless", () => {
 
     expect(initResult.result).toBeDefined();
     expect(initResult.result.serverInfo.name).toBe("himalaya-mcp");
-    expect(initResult.result.serverInfo.version).toBe("1.8.1");
+    expect(initResult.result.serverInfo.version).toBe("1.9.0");
 
     // Send initialized notification
     sendNotification("notifications/initialized");
@@ -209,7 +209,7 @@ describe("E2E: MCP Server Headless", () => {
 
   // --- Tool listing ---
 
-  it("lists all 22 registered tools", async () => {
+  it("lists all 29 registered tools", async () => {
     const result = await sendRequest("tools/list");
     const tools = result.result.tools;
     const toolNames = tools.map((t: any) => t.name).sort();
@@ -220,23 +220,30 @@ describe("E2E: MCP Server Headless", () => {
       "create_action_item",
       "create_calendar_event",
       "create_folder",
+      "create_reminder",
       "delete_folder",
       "download_attachment",
       "draft_reply",
       "export_to_markdown",
       "extract_calendar_event",
       "flag_email",
+      "get_unread_count",
       "health_check",
       "list_attachments",
       "list_emails",
       "list_folders",
+      "list_snoozed_emails",
+      "list_starred",
       "list_threads",
       "move_email",
       "read_email",
       "read_email_html",
+      "read_email_raw",
       "read_thread",
+      "render_email",
       "search_emails",
       "send_email",
+      "snooze_email",
     ]);
   });
 
@@ -250,7 +257,7 @@ describe("E2E: MCP Server Headless", () => {
 
   // --- Prompt listing ---
 
-  it("lists all 6 registered prompts", async () => {
+  it("lists all 7 registered prompts", async () => {
     const result = await sendRequest("prompts/list");
     const prompts = result.result.prompts;
     const promptNames = prompts.map((p: any) => p.name).sort();
@@ -262,6 +269,7 @@ describe("E2E: MCP Server Headless", () => {
       "morning_briefing",
       "summarize_email",
       "triage_inbox",
+      "weekly_email_digest",
     ]);
   });
 
