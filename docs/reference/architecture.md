@@ -12,8 +12,8 @@
 │   ┌─────────────┐   MCP Protocol   ┌──────────────────────┐    │
 │   │ MCP Client  │◄────────────────►│ himalaya-mcp         │    │
 │   └─────────────┘   (JSON-RPC)     │                      │    │
-│                                     │  Tools (26)          │    │
-│                                     │  Prompts (6)         │    │
+│                                     │  Tools (29)          │    │
+│                                     │  Prompts (7)         │    │
 │                                     │  Resources (3)       │    │
 │                                     └──────────┬───────────┘    │
 │                                                │                │
@@ -209,7 +209,7 @@ plugin/
     help.md           /email:help — help hub
 
   agents/
-    email-assistant.md  Autonomous triage agent (all 26 tools)
+    email-assistant.md  Autonomous triage agent (all 29 tools)
 
 .mcp.json             MCP server config (node dist/index.js)
 ```

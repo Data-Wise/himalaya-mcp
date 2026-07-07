@@ -82,6 +82,6 @@ Found 5 emails in INBOX:
 ## Next Steps
 
 - [Tutorials](../tutorials/index.md) -- step-by-step from beginner to automation
-- [User Guide](../guide/guide.md) -- all 26 tools, 6 prompts, 3 resources
+- [User Guide](../guide/guide.md) -- all 29 tools, 7 prompts, 3 resources
 - [Workflows](../guide/workflows.md) -- triage, reply, digest, export patterns
-- [Quick Reference](../reference/refcard.md) -- one-page cheat sheet
+- [Cheat Sheet](../reference/cheat-sheet.md) -- one-page quick reference

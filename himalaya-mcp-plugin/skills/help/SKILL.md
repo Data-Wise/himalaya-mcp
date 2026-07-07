@@ -19,7 +19,7 @@ Single entry point for discovering all email commands, tools, prompts, and workf
 ```
 /email:help                  # Overview of all capabilities
 /email:help tools            # All 29 MCP tools with usage
-/email:help prompts          # All 6 MCP prompts
+/email:help prompts          # All 7 MCP prompts
 /email:help resources        # All 3 MCP resources
 /email:help <command>        # Detail for a specific tool (e.g. "search_emails")
 /email:help workflows        # Common workflow patterns
@@ -35,37 +35,42 @@ Display the hub overview:
 | EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
 | Privacy-first email for Claude — 29 tools, 7 prompts,     |
-| 3 resources, 15 skills, 2 hooks                           |
+| 3 resources, 16 skills, 2 hooks                           |
 +===========================================================+
 |                                                           |
 | TOOLS (29)                                                |
 |   Inbox ....... list_emails, search_emails                |
-|   Read ........ read_email, read_email_html               |
+|   Read ........ read_email, read_email_html,              |
+|                 read_email_raw, render_email               |
+|   Info ........ get_unread_count, list_starred            |
 |   Folders ..... list_folders, create_folder,              |
 |                 delete_folder                              |
 |   Manage ...... flag_email, move_email                    |
+|   Snooze ...... snooze_email, list_snoozed_emails         |
 |   Compose ..... compose_email, draft_reply, send_email    |
 |   Attachments . list_attachments, download_attachment      |
 |   Calendar .... extract_calendar_event,                   |
 |                 create_calendar_event                      |
 |   Threads ..... list_threads, read_thread                 |
 |   Actions ..... export_to_markdown, create_action_item    |
-|   Adapters .... copy_to_clipboard                         |
+|   Adapters .... copy_to_clipboard, create_reminder        |
 |   Diagnostics . health_check                              |
 |                                                           |
-| PROMPTS (6)                                               |
+| PROMPTS (7)                                               |
 |   triage_inbox, summarize_email, daily_email_digest,      |
-|   draft_reply, morning_briefing, inbox_check              |
+|   weekly_email_digest, draft_reply, morning_briefing,     |
+|   inbox_check                                               |
 |                                                           |
 | RESOURCES (3)                                             |
 |   email://inbox, email://folders, email://message/{id}    |
 |                                                           |
-| SKILLS (15)                                               |
+| SKILLS (16)                                               |
 |   /email:inbox, /email:triage, /email:digest,             |
 |   /email:reply, /email:compose, /email:attachments,       |
 |   /email:forward, /email:export, /email:threads,          |
 |   /email:search, /email:manage, /email:stats,             |
-|   /email:config, /email:help, /email:morning              |
+|   /email:config, /email:help, /email:morning,             |
+|   /email:respond                                          |
 |                                                           |
 | HOOKS (2)                                                 |
 |   session ...... Context injection at conversation start   |
@@ -81,7 +86,7 @@ Display the hub overview:
 
 ## When Invoked with "tools"
 
-Display all 26 tools grouped by category:
+Display all 29 tools grouped by category:
 
 ```
 +-----------------------------------------------------------+
@@ -102,6 +107,16 @@ Display all 26 tools grouped by category:
 |     Syntax: subject, from, to, body, date, before,        |
 |             after, flag — combine with and/or/not          |
 |                                                           |
+|   get_unread_count                                        |
+|     Get number of unread emails in a folder               |
+|     Params: folder?, account?                             |
+|     Example: "How many unread emails do I have?"          |
+|                                                           |
+|   list_starred                                            |
+|     List flagged/starred emails                           |
+|     Params: folder?, account?                             |
+|     Example: "Show my starred emails"                     |
+|                                                           |
 | READING                                                   |
 |                                                           |
 |   read_email                                              |
@@ -112,6 +127,16 @@ Display all 26 tools grouped by category:
 |     Read message body (HTML)                              |
 |     Params: id (required), folder?, account?              |
 |     Use for: newsletters, formatted emails                |
+|                                                           |
+|   read_email_raw                                          |
+|     Read raw MIME source including headers                |
+|     Params: id (required), folder?, account?              |
+|     Use for: forensics, .eml export                       |
+|                                                           |
+|   render_email                                            |
+|     Read body as clean markdown                           |
+|     Params: id (required), folder?, account?              |
+|     Use for: HTML emails without clutter                  |
 |                                                           |
 | FOLDERS                                                   |
 |                                                           |
@@ -139,6 +164,18 @@ Display all 26 tools grouped by category:
 |     Move to folder: Archive, Trash, Spam, etc.            |
 |     Params: id, target_folder (required),                 |
 |             folder?, account?                             |
+|                                                           |
+| SNOOZE                                                    |
+|                                                           |
+|   snooze_email                                            |
+|     Snooze email until specified time                     |
+|     Params: id, snoozeUntil (required), folder?,          |
+|             account?, subject?                            |
+|     Shorthand: tomorrow, monday, 2h, 1d                   |
+|                                                           |
+|   list_snoozed_emails                                     |
+|     List active and expired snoozes                       |
+|     Params: none                                          |
 |                                                           |
 | COMPOSE                                                   |
 |                                                           |
@@ -206,6 +243,11 @@ Display all 26 tools grouped by category:
 |     Copy text to system clipboard                         |
 |     Params: text (required)                               |
 |                                                           |
+|   create_reminder                                         |
+|     Create reminder in Apple Reminders (macOS)            |
+|     Params: title (required), notes?, dueDate?,           |
+|             priority?                                     |
+|                                                           |
 | DIAGNOSTICS                                               |
 |                                                           |
 |   health_check                                            |
@@ -220,7 +262,7 @@ Display all 26 tools grouped by category:
 
 ## When Invoked with "prompts"
 
-Display all 6 prompts:
+Display all 7 prompts:
 
 ```
 +-----------------------------------------------------------+
@@ -242,6 +284,11 @@ Display all 6 prompts:
 |     Markdown digest grouped by priority                   |
 |     Params: (none)                                        |
 |     "Give me today's email digest"                        |
+|                                                           |
+|   weekly_email_digest                                     |
+|     Markdown digest grouped by day and priority           |
+|     Params: (none)                                        |
+|     "Give me this week's email digest"                    |
 |                                                           |
 |   draft_reply                                             |
 |     Guided reply with tone control                        |
@@ -358,6 +405,10 @@ One-line cheat sheet:
 | search_emails         | Search by subject/from/body/date  |
 | read_email            | Read plain text body              |
 | read_email_html       | Read HTML body                    |
+| read_email_raw        | Read raw MIME source              |
+| render_email          | Read as clean markdown            |
+| get_unread_count      | Count unread emails in folder     |
+| list_starred          | List flagged/starred emails       |
 | list_folders          | List all email folders            |
 | create_folder         | Create new folder                 |
 | delete_folder         | Delete folder (confirm=true)      |
@@ -370,6 +421,9 @@ One-line cheat sheet:
 | download_attachment   | Download specific attachment      |
 | extract_calendar_event| Parse ICS calendar invite         |
 | create_calendar_event | Add to Apple Calendar (macOS)     |
+| snooze_email          | Snooze email until time           |
+| list_snoozed_emails   | List active/expired snoozes       |
+| create_reminder       | Apple Reminders (macOS)           |
 | export_to_markdown    | Email → markdown + frontmatter    |
 | list_threads          | List conversation threads         |
 | read_thread           | Read all messages in thread       |
@@ -382,6 +436,7 @@ One-line cheat sheet:
 | triage_inbox      | Classify inbox emails                 |
 | summarize_email   | One-line summary + actions            |
 | daily_email_digest| Priority-grouped digest               |
+| weekly_email_digest| Week grouped by day and priority     |
 | draft_reply       | Guided reply composition              |
 | morning_briefing  | Morning briefing + urgency            |
 | inbox_check       | Quick inbox status + highlights       |
@@ -402,6 +457,7 @@ One-line cheat sheet:
 | /email:stats        | Inbox statistics + trends         |
 | /email:config       | Setup wizard + diagnostics        |
 | /email:morning      | Morning briefing + follow-ups     |
+| /email:respond      | Batch draft replies               |
 | /email:help         | This help hub                     |
 +-----------------------------------------------------------+
 ```

@@ -209,7 +209,7 @@ fi
 
 # ───────────────────────────────────────────────────────────────────────
 
-section "5. MCP Server Source (21 tools)"
+section "5. MCP Server Source (29 tools)"
 
 TOOL_FILES=(inbox.ts read.ts manage.ts compose.ts compose-new.ts folders.ts attachments.ts calendar.ts actions.ts)
 for tf in "${TOOL_FILES[@]}"; do
@@ -303,7 +303,7 @@ assert_file_exists "CLAUDE.md" "CLAUDE.md"
 assert_file_exists "CHANGELOG.md" "CHANGELOG.md"
 assert_file_exists "docs/index.md" "docs site index"
 assert_file_exists "docs/getting-started/installation.md" "installation guide"
-assert_file_exists "docs/reference/refcard.md" "reference card"
+assert_file_exists "docs/reference/cheat-sheet.md" "cheat sheet"
 
 # ───────────────────────────────────────────────────────────────────────
 

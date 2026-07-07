@@ -25,7 +25,7 @@
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
 - v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
-- Total: 29 tools, 7 prompts, 3 resources, 12 skills, 507 tests (23 test files)
+- Total: 29 tools, 7 prompts, 3 resources, 16 skills, 569 tests (31 test files)
 - **em Commands Porting (PR #76)**: Ported all flow-cli `em` commands to MCP tools/skills/prompts
   - Phase 1: `getTrashFolder()` utility, `get_unread_count`, `read_email_raw`, `render_email`, `list_starred`, count-sync test
   - Phase 2: `create_reminder` (Apple Reminders), `snooze_email`/`list_snoozed_emails` (JSON-backed), `weekly_email_digest` prompt, `triage_inbox` enhancement, `create_action_item` extension

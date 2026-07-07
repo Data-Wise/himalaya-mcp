@@ -766,9 +766,9 @@ describe("Plugin structure validation", () => {
     expect(data.plugins[0].name).toBe("email");
   });
 
-  it("all 15 skills exist as SKILL.md subdirectories and are non-empty", async () => {
+  it("all 16 skills exist as SKILL.md subdirectories and are non-empty", async () => {
     const skillsDir = join(pluginRoot, "skills");
-    const expected = ["inbox", "triage", "digest", "reply", "compose", "forward", "attachments", "export", "threads", "help", "search", "manage", "stats", "config", "morning"];
+    const expected = ["inbox", "triage", "digest", "reply", "compose", "forward", "attachments", "export", "threads", "help", "search", "manage", "stats", "config", "morning", "respond"];
     for (const skill of expected) {
       const content = await readFile(join(skillsDir, skill, "SKILL.md"), "utf-8");
       expect(content.length).toBeGreaterThan(100);
