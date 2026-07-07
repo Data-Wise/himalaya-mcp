@@ -34,7 +34,7 @@ Display the hub overview:
 +-----------------------------------------------------------+
 | EMAIL HELP HUB                                            |
 +-----------------------------------------------------------+
-| Privacy-first email for Claude — 22 tools, 6 prompts,     |
+| Privacy-first email for Claude — 23 tools, 6 prompts,     |
 | 3 resources, 15 skills, 2 hooks                           |
 +===========================================================+
 |                                                           |
@@ -81,7 +81,7 @@ Display the hub overview:
 
 ## When Invoked with "tools"
 
-Display all 22 tools grouped by category:
+Display all 23 tools grouped by category:
 
 ```
 +-----------------------------------------------------------+

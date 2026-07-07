@@ -90,6 +90,10 @@
       "description": "Add or remove flags on an email. Common flags: Seen, Flagged, Answered, Deleted, Draft. Use 'add' to set flags, 'remove' to clear them."
     },
     {
+      "name": "get_unread_count",
+      "description": "Get the number of unread emails in a folder. Uses himalaya's server-side filter for fast counting even in large mailboxes."
+    },
+    {
       "name": "move_email",
       "description": "Move an email to a different folder. Common targets: Archive, Trash, Spam, Sent, Drafts."
     },

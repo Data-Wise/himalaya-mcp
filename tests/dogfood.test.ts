@@ -1515,8 +1515,8 @@ describe("Packaging: mcpb/manifest.json", () => {
     expect(manifest.compatibility.runtimes.node).toBe(">=22.0.0");
   });
 
-  it("lists exactly 22 tools", () => {
-    expect(manifest.tools).toHaveLength(22);
+  it("lists exactly 23 tools", () => {
+    expect(manifest.tools).toHaveLength(23);
   });
 
   it("lists exactly 6 prompts", () => {
@@ -1552,6 +1552,7 @@ describe("Packaging: mcpb/manifest.json", () => {
       "export_to_markdown",
       "extract_calendar_event",
       "flag_email",
+      "get_unread_count",
       "health_check",
       "list_attachments",
       "list_emails",
