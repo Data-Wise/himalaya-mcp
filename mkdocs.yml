@@ -76,33 +76,36 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Getting Started:
+  - Get Started:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md
+    - Desktop Extension: getting-started/desktop-extension.md
+    - Diagnose Issues: getting-started/diagnose-issues.md
   - Tutorials:
     - Overview: tutorials/index.md
-    - "Level 1: Getting Started":
+    - Read & Browse:
       - Read Your First Email: tutorials/read-first-email.md
       - Multi-Account Email: tutorials/multi-account.md
-      - Diagnose Email Issues: tutorials/diagnose-issues.md
-      - Desktop Extension: tutorials/desktop-extension.md
-    - "Level 2: Productivity":
+    - Respond & Organize:
       - Triage Your Inbox: tutorials/triage-inbox.md
       - Reply to an Email: tutorials/reply-email.md
-      - Compose & Send Email: tutorials/compose-email.md
-      - Attachments & Calendar: tutorials/attachments-calendar.md
       - Search & Manage: tutorials/search-manage.md
       - Export & Save Emails: tutorials/export-save.md
-    - "Level 3: Automation":
+    - Compose & Automate:
+      - Compose & Send Email: tutorials/compose-email.md
+      - Attachments & Calendar: tutorials/attachments-calendar.md
       - Automate with the Agent: tutorials/automate-agent.md
       - Advanced Automation: tutorials/advanced-automation.md
-  - Guide:
+    - Migrating from em: tutorials/migrating-from-em.md
+  - Guides:
     - User Guide: guide/guide.md
-    - Workflows: guide/workflows.md
-    - Packaging: guide/packaging.md
+    - Common Workflows: guide/workflows.md
     - Plugin Skills & Agent: guide/skills.md
     - Cookbook: guide/cookbook.md
     - Integrations: guide/integrations.md
+    - Migrating from em: guide/migrating-from-em.md
+  - Operations:
+    - Packaging: guide/packaging.md
     - Security: guide/security.md
     - Contributing: guide/contributing.md
     - Troubleshooting: guide/troubleshooting.md
@@ -110,7 +113,6 @@ nav:
     - Cheat Sheet: reference/cheat-sheet.md
     - MCP Tools: reference/commands.md
     - CLI Reference: reference/cli.md
-    - Quick Reference: reference/refcard.md
     - Architecture: reference/architecture.md
     - Desktop Extensions: reference/desktop-extensions.md
     - ".mcpb Format": reference/mcpb-format-reference.md
