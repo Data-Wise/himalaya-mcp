@@ -50,6 +50,11 @@
 - 2026-07-07: PR #78 (fix/reminders-ci) merged to main — process.platform mocking for Linux CI
 - 2026-07-07: CLI plugin packaging — installed marketplace plugin via `claude plugin install email`, verified skills load
 - 2026-07-07: Docs site updated — fixed stale references in cheat sheet, guide, cookbook, workflows, architecture; deployed via mkdocs gh-deploy
+- 2026-07-07: Merged Dependabot PRs #72 (MCP SDK 1.29, Zod 4.4) and #73 (TypeScript 6.0, Vitest 4.1, esbuild 0.28)
+- 2026-07-07: Regression tests 569/569 pass on updated deps
+- 2026-07-07: Closed stale Issue #74 (attachment support — already implemented)
+- 2026-07-07: Cleaned stale worktrees and branches (3 local, 2 remote, 1 worktree)
+- 2026-07-07: Created git/clean skill (filed as feature request on opencode-resources#18)
 
 ## Current State
 
@@ -107,5 +112,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-07-07
-**Status:** v1.9.0 released — all features complete. 29 tools, 7 prompts, 3 resources, 16 skills, 569 tests.
+**Last Updated:** 2026-07-07 (session 2)
+**Status:** v1.9.0 released — maintenance. Dependencies bumped (TS 6.0, Vitest 4.1, esbuild 0.28, MCP SDK 1.29, Zod 4.4). Stale branches/worktrees cleaned. All 569 tests passing.
