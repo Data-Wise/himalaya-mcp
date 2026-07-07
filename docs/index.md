@@ -20,11 +20,11 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     [:octicons-arrow-right-24: MCP Tools](reference/commands.md)
 
-- :brain: **6 MCP Prompts**
+- :brain: **7 MCP Prompts**
 
     ---
 
-    Triage inbox, summarize email, daily digest, draft reply, morning briefing, inbox check
+    Triage inbox, summarize email, daily digest, weekly digest, draft reply, morning briefing, inbox check
 
     [:octicons-arrow-right-24: Prompts](reference/commands.md#prompts)
 
@@ -91,6 +91,8 @@ When installed as a Claude Code plugin, these slash commands are available:
 | `/email:digest` | Generate daily priority digest |
 | `/email:reply` | Draft and send with safety gate |
 | `/email:compose` | Compose new emails with safety gate |
+| `/email:respond` | Read, understand, and reply to emails |
+| `/email:morning` | Morning briefing with urgency classification |
 | `/email:attachments` | List, download, and calendar invites |
 | `/email:forward` | Forward email with context and attribution |
 | `/email:export` | Export to markdown with YAML frontmatter |

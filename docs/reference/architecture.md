@@ -52,7 +52,7 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
   │   ├─ .mcp.json
   │   ├─ plugin/skills/*/SKILL.md
   │   ├─ plugin/agents/*.md
-  │   └─ dist/index.js (esbuild bundle, 604KB)
+  │   └─ dist/index.js (esbuild bundle, ~883KB)
   │
   └─ post_install → himalaya-mcp-install
       ├─ symlink → ~/.claude/plugins/himalaya-mcp
@@ -67,7 +67,7 @@ src/index.ts (16 files)
   │
   ├─ npm run build          → dist/*.js + .d.ts (development)
   │
-  └─ npm run build:bundle   → dist/index.js (604KB, production)
+  └─ npm run build:bundle   → dist/index.js (~883KB, production)
       esbuild --bundle --platform=node --target=node22 --format=esm --minify
       Inlines: @modelcontextprotocol/sdk, zod, content-type, raw-body
 ```
@@ -77,8 +77,9 @@ src/index.ts (16 files)
 ```
 .github/workflows/
 ├── ci.yml                 Push/PR to main|dev — lint, typecheck, build, test, bundle, validate plugin
-├── docs.yml               Push to main — deploy GitHub Pages
-└── homebrew-release.yml   Release published — validate → compute SHA → update homebrew-tap formula
+├── docs.yml               Push to main (docs/**) — deploy GitHub Pages
+├── homebrew-release.yml   Release published — validate → compute SHA → update homebrew-tap formula
+└── aggregator-sync.yml    Release published — sync marketplace listing to Data-Wise/claude-plugins
 ```
 
 **Release flow:**
@@ -109,20 +110,29 @@ src/
 │   │                     execFile("himalaya", [...args, "--output", "json"])
 │   ├── parser.ts         parseEnvelopes, parseMessageBody, parseFolders
 │   │                     formatEnvelope — human-readable one-liner
+│   ├── thread-parser.ts  Thread/conversation grouping by subject line
 │   ├── errors.ts         MCPError envelope, HimalayaError class,
 │   │                     classifyStderr (stderr-pattern → stable code)
 │   ├── accounts.ts       discoverAccounts — `himalaya account list -o json`
+│   ├── trash.ts          getTrashFolder — provider-agnostic trash detection
 │   └── types.ts          Envelope, Folder, HimalayaClientOptions, *Params
 │
 ├── tools/
 │   ├── inbox.ts          list_emails, search_emails
 │   ├── read.ts           read_email, read_email_html
+│   ├── read-raw.ts       read_email_raw
+│   ├── render.ts         render_email
+│   ├── unread.ts         get_unread_count
+│   ├── list-starred.ts   list_starred
 │   ├── manage.ts         flag_email, move_email
 │   ├── compose.ts        draft_reply, send_email (safety gate)
 │   ├── compose-new.ts    compose_email (new messages, safety gate)
 │   ├── folders.ts        list_folders, create_folder, delete_folder
 │   ├── attachments.ts    list_attachments, download_attachment
 │   ├── calendar.ts       extract_calendar_event, create_calendar_event
+│   ├── threads.ts        list_threads, read_thread
+│   ├── reminders.ts      create_reminder (Apple Reminders)
+│   ├── snooze.ts         snooze_email, list_snoozed_emails
 │   ├── health.ts         health_check — per-account IMAP reachability
 │   └── actions.ts        export_to_markdown, create_action_item
 │
@@ -130,13 +140,17 @@ src/
 │   ├── triage.ts         triage_inbox — classify actionable/FYI/skip
 │   ├── summarize.ts      summarize_email — one-sentence + action items
 │   ├── digest.ts         daily_email_digest — priority-grouped markdown
-│   └── reply.ts          draft_reply — guided reply composition
+│   ├── weekly-digest.ts  weekly_email_digest — digest grouped by day
+│   ├── reply.ts          draft_reply — guided reply composition
+│   ├── morning.ts        morning_briefing — urgency classification
+│   └── inbox-check.ts    inbox_check — quick inbox status
 │
 ├── resources/
 │   └── index.ts          email://inbox, email://message/{id}, email://folders
 │
 ├── adapters/
 │   ├── clipboard.ts      copy_to_clipboard — pbcopy (macOS) / xclip (Linux)
+│   ├── reminders.ts      Apple Reminders adapter (osascript)
 │   └── calendar.ts       ICS parser + Apple Calendar (osascript)
 │
 └── cli/
@@ -201,7 +215,12 @@ plugin/
     digest.md         /email:digest — daily summary
     reply.md          /email:reply — draft with safety gate
     compose.md        /email:compose — compose new emails
+    respond.md        /email:respond — read, understand, and reply
+    morning.md        /email:morning — morning briefing
     attachments.md    /email:attachments — files and calendar
+    forward.md        /email:forward — forward with attribution
+    export.md         /email:export — export to markdown
+    threads.md        /email:threads — conversation threads
     search.md         /email:search — search with filters
     manage.md         /email:manage — bulk operations
     stats.md          /email:stats — inbox statistics

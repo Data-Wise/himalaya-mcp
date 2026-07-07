@@ -451,8 +451,19 @@ You: "Create a reminder from the action item in email 42"
 
 Claude:
 1. create_action_item(id: "42") → extract todos
-2. Shows the list: "Review budget spreadsheet, Submit feedback by Friday"
-3. You manually create the reminder, or use Shortcuts automation
+2. create_reminder(title: "Review budget spreadsheet", notes: "From email 42 - Q1 Budget Review", due_date: "2026-02-14")
+3. Reminder created in Apple Reminders
+```
+
+**Works with Snooze too:** Snooze an email and create a reminder to follow up:
+
+```
+You: "Remind me about email 42 next Tuesday"
+
+Claude:
+1. snooze_email(id: "42", snooze_until: "2026-03-03T09:00:00") → snoozes the email
+2. create_reminder(title: "Follow up on email from Alice", due_date: "2026-03-03")
+3. Both operations complete: email hidden until Tuesday, reminder set
 ```
 
 ### Pipe export to a script

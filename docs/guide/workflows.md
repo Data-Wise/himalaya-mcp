@@ -724,6 +724,112 @@ Recovery:
 
 ---
 
+## 24. Snooze and Remind
+
+Temporarily hide an email and set a reminder to revisit it.
+
+**Natural language:** "Snooze email 42 until next Tuesday"
+
+**What happens:**
+
+1. `snooze_email(id: "42", snooze_until: "2026-03-03T09:00:00")` -- marks the email as snoozed
+2. Optionally: `create_reminder(title: "Follow up on email from Alice", due_date: "2026-03-03")` -- Apple Reminder
+
+**Snooze patterns:**
+
+```
+"Snooze email 42 until tomorrow morning"
+→ snooze_email(id: "42", snooze_until: "2026-07-08T09:00:00")
+
+"Remind me about this next Monday"
+→ snooze_email(id: "42", snooze_until: "2026-07-13T09:00:00")
+
+"What emails are snoozed?"
+→ list_snoozed_emails() → shows snoozed emails with unsnooze times
+```
+
+**Create a standalone reminder:**
+
+```
+"Remind me to check the budget report at 3pm"
+→ create_reminder(title: "Check budget report", due_date: "2026-07-07T15:00:00")
+```
+
+!!! note "macOS only"
+    `create_reminder` uses AppleScript to interact with Apple Reminders. Only available on macOS.
+
+---
+
+## 25. View Starred Emails
+
+Quickly find all flagged/starred emails.
+
+**Natural language:** "Show my starred emails"
+
+```
+list_starred()
+→ Returns flagged emails with subject, sender, and date
+
+list_starred(account: "work")
+→ Starred emails in a specific account
+
+list_starred(folder: "INBOX")
+→ Starred emails in a specific folder
+```
+
+**Use case:** Weekly review of everything you've starred for follow-up.
+
+---
+
+## 26. Read Email as Clean Markdown
+
+View HTML email rendered as markdown for cleaner reading.
+
+**Natural language:** "Show email 42 as markdown"
+
+```
+render_email(id: "42")
+→ Returns the email body rendered as clean markdown
+  (HTML emails are converted; plain text is returned as-is)
+```
+
+**When to use:** Preferred over `read_email_html` for newsletters, marketing emails, or any HTML-heavy message where you want clean text without clutter.
+
+---
+
+## 27. View Raw MIME Source
+
+Inspect the raw, unedited email source including all headers.
+
+**Natural language:** "Show me the raw source of email 42"
+
+```
+read_email_raw(id: "42")
+→ Returns the full MIME source with all headers
+```
+
+**Use cases:** Debugging email delivery, email forensics, exporting `.eml` files, verifying SPF/DKIM headers.
+
+---
+
+## 28. Check Unread Count
+
+Quickly check how many unread emails you have without fetching full envelopes.
+
+**Natural language:** "How many unread emails do I have?"
+
+```
+get_unread_count()
+→ Returns a single number: 12
+
+get_unread_count(folder: "INBOX")
+get_unread_count(account: "work")
+```
+
+**Why it's fast:** Uses himalaya's server-side filter (`not flag Seen`) — no envelope data is fetched, just a count.
+
+---
+
 ## Diagnosing email problems
 
 When an email tool fails, the structured error envelope tells Claude (and you) what went wrong and how to fix it.

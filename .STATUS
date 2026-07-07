@@ -3,11 +3,11 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: active
-## Focus: v1.9.0 release
-## Phase: Release
-## Priority: 1
-## Progress: 50
+## Status: released
+## Focus: v1.9.0
+## Phase: Maintenance
+## Priority: 2
+## Progress: 100
 
 ## Completed
 
@@ -21,51 +21,46 @@
 - Phase 6b: Compose — compose_email (new messages, two-phase safety gate)
 - Phase 6c: Attachments — list_attachments, download_attachment
 - Phase 6d: Calendar — extract_calendar_event, create_calendar_event (ICS + Apple Calendar)
-- Plugin Packaging: esbuild bundle (595KB), Homebrew formula, marketplace.json, CLI setup
+- Plugin Packaging: esbuild bundle, Homebrew formula, marketplace.json, CLI setup
 - .mcpb Packaging: Desktop Extension, install-ext/remove-ext CLI, doctor command
 - v1.5.0: SessionStart hook, broadened skill descriptions, thread view, morning briefing, inbox check
 - v1.6.0: Reliability & Diagnostics — structured error envelope, transient retry, multi-account doctor, health_check tool, troubleshooting guide
-- Total: 29 tools, 7 prompts, 3 resources, 16 skills, 569 tests (31 test files)
-- **em Commands Porting (PR #76)**: Ported all flow-cli `em` commands to MCP tools/skills/prompts
+- v1.7.0: Attachment support (compose_email + send_email, MML format), 3 security fixes (flag injection, ICS escapes, Zod dep)
+- v1.8.0: 3 new skills (forward, export, threads), 7 new workflows, adversarial audit (21 fixes), cheat sheet, split CLI/MCP tools, security deep-dive, contributing guide
+- v1.8.1: 5 groff man pages, CLI modular refactor (5 modules), fixed bin script arg forwarding, fixed man page install
+- **em Commands Porting (PR #76 → v1.9.0)**: Ported all flow-cli `em` commands to MCP tools/skills/prompts
   - Phase 1: `getTrashFolder()` utility, `get_unread_count`, `read_email_raw`, `render_email`, `list_starred`, count-sync test
   - Phase 2: `create_reminder` (Apple Reminders), `snooze_email`/`list_snoozed_emails` (JSON-backed), `weekly_email_digest` prompt, `triage_inbox` enhancement, `create_action_item` extension
   - Phase 3: `/email:respond` skill (batch draft-reply workflow)
   - Docs: Migration guide + tutorial, nav reorganization (task-grouped Tutorials, Guides/Operations split)
-  - 7 new tools, 1 new prompt, 1 new skill; 517 tests passing
+  - 7 new tools, 1 new prompt, 1 new skill
+- **v1.9.0 Release (PR #77)**: dev→main merge, GitHub release v1.9.0 with .mcpb asset, Homebrew formula auto-pushed, marketplace auto-synced
+- **v1.9.0 CI Fix (PR #78)**: Fixed reminders.test.ts failing on Linux CI (process.platform mocking)
 
 ## Just Completed
 
-<<<<<<< HEAD
-- 2026-07-07: PR #76 created — Ported all flow-cli `em` commands to himalaya-mcp (7 new tools, 1 prompt, 1 skill). Phase 1: `getTrashFolder()`, `get_unread_count`, `read_email_raw`, `render_email`, `list_starred`, count-sync test. Phase 2: `create_reminder` (Apple Reminders), `snooze_email`/`list_snoozed_emails` (JSON-backed), `weekly_email_digest` prompt, `triage_inbox` enhancement, `create_action_item` extension. Phase 3: `/email:respond` skill. Migration docs: guide + tutorial. Nav reorganized with task-grouped Tutorials and Guides/Operations split. 517 tests passing.
-=======
-- 2026-07-06: Released v1.8.1 — 5 groff man pages, CLI modular refactor (5 modules), fixed bin script arg forwarding, fixed man page install with Dir.glob. All 507 tests passing.
->>>>>>> main
-- 2026-07-06: Released v1.8.0 — 3 new skills (forward, export, threads), 7 new workflows, adversarial audit (21 fixes), cheat sheet, split CLI/MCP tools, security deep-dive, contributing guide
-- 2026-06-19: Released v1.7.0 — attachment support (compose_email + send_email, MML format), 3 community security fixes (flag injection, ICS escapes, Zod dep). GitHub release + Homebrew auto-pushed + docs deploying.
-- 2026-05-13: Released v1.6.2 — first release with FULLY clean Homebrew pipeline (Upload MCPB ✓, no manual fallback, no duplicate-asset cosmetic failure). PR #62 merged, tag v1.6.2, auto-pushed to data-wise/tap.
-- 2026-05-13: Added "Diagnose Email Issues" Level 1 tutorial — walks through health_check, doctor --account, --fix, error-code decoding.
-- 2026-05-13: PR #61 merged to dev — CLI ergonomics: first-class --help / --version, grouped help sections, exit 1 on unknown command. 484 tests passing (+5).
-- 2026-05-12: Released v1.6.0 — GitHub release (tag v1.6.0, .mcpb attached) + Homebrew formula (manual fallback) + docs site auto-deploy
-- 2026-05-12: PR #58 release merge — dev → main, all CI green; tap formula bumped manually (Homebrew CI auth still pending fix)
-- 2026-05-12: PR #57 merged to dev (v1.6.0 reliability) — merge commit e48a52b
-- 2026-05-12: PR #57 review fixes — parse_error envelope, parallel health probing, structured listAccounts errors, doctor --json per-account section, broader auth regex, defensive retry-loop throw, CI flake fix (beforeAll 60s→120s)
-- 2026-05-11: v1.6.0 implementation — errors.ts, retry policy, accounts.ts, health_check tool, multi-account doctor
-- 2026-05-11: v1.6.0 docs — troubleshooting.md, guide/refcard/architecture/workflows updates
-- 2026-05-11: v1.6.0 dogfood scenarios — 20 reliability scenarios (1 skipped)
-- 2026-05-11: v1.6.0 version bump — manifests, CHANGELOG, CLAUDE.md, .STATUS
-- 2026-05-12: Fixed Homebrew CI auth permanently — set APP_ID + APP_PRIVATE_KEY on himalaya-mcp (App ID 2874502). Verified via workflow_dispatch → PR #106 on tap merged (fixed stale generator manifest v1.4.1 → v1.6.0). Next release won't need manual fallback.
-- 2026-05-12: PR #59 merged to dev (v1.6.1 followups) — round-trip envelope e2e tests (Scenario 17 retired) + Homebrew workflow auth pre-check job
-- 2026-03-24: Released v1.5.0 — GitHub release + Homebrew formula + docs site
+- 2026-07-07: Fully released v1.9.0 — 29 tools, 7 prompts, 3 resources, 16 skills, 569 tests (31 files). All em commands ported, documented, and shipped.
+- 2026-07-07: PR #76 review — pre-merge validations (build, bundle, 569 tests, mkdocs strict, .mcpb), count inconsistency fixes, orphan page deletion
+- 2026-07-07: PR #76 squash-merged to dev
+- 2026-07-07: Version bumped 1.8.1→1.9.0 across 20+ files
+- 2026-07-07: PR #77 (dev→main) merged with merge-commit, conflict resolved
+- 2026-07-07: GitHub release v1.9.0 created with .mcpb asset uploaded
+- 2026-07-07: Homebrew formula auto-pushed via CI (homebrew-release.yml)
+- 2026-07-07: Marketplace listing auto-synced (aggregator-sync.yml) — email plugin v1.9.0
+- 2026-07-07: PR #78 (fix/reminders-ci) merged to main — process.platform mocking for Linux CI
+- 2026-07-07: CLI plugin packaging — installed marketplace plugin via `claude plugin install email`, verified skills load
+- 2026-07-07: Docs site updated — fixed stale references in cheat sheet, guide, cookbook, workflows, architecture; deployed via mkdocs gh-deploy
 
 ## Current State
 
-- Branch: `feature/port-em-commands-p1` (PR #76 awaiting review)
-- v1.8.0 released: GitHub (tag + .mcpb), Homebrew formula auto-pushed, docs site deploying
-- Skills: 16 skills using `skills/*/SKILL.md` subdirectory format
-- Tools: 29 MCP tools, 7 prompts, 3 resources
-- Tests: 517 passing across 26 test files
-- Tutorials: 15 across 3 levels (Read & Browse, Respond & Organize, Compose & Automate)
-- Bundle: 883KB (esbuild), .mcpb: 153KB
+- Branch: `dev`
+- Version: 1.9.0 (released)
+- All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
+- Tests: 569 passing across 31 test files
+- Plugin: `email` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
+- Homebrew: data-wise/tap/himalaya-mcp at v1.9.0
+- Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/
+- Bundle: ~883KB (esbuild), .mcpb: ~247KB
 
 ## Install
 
@@ -94,9 +89,13 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Review and merge PR #76 into `dev`
-- After merge: bump version to v1.9.0, run release workflow
-- Optional: brainstorm additional features for v1.10.0
+- All features complete. Project in maintenance mode.
+- Possible future directions:
+  - Bundled .mcpb variant with universal himalaya binary (~19 MB)
+  - Code signing + notarization (Apple Developer, $99/yr)
+  - Official Anthropic extension directory listing
+  - Obsidian adapter — export emails to vault as markdown notes
+  - Templates — reusable email templates for common replies
 
 ## Future
 
@@ -104,15 +103,9 @@ himalaya-mcp doctor --fix
 - Code signing + notarization (Apple Developer, $99/yr)
 - Official Anthropic extension directory listing
 - Obsidian adapter — export emails to vault as markdown notes
-- Apple ecosystem — Notes/Reminders integration via AppleScript
 - Templates — reusable email templates for common replies
 
 ---
 
-<<<<<<< HEAD
 **Last Updated:** 2026-07-07
-**Status:** PR #76 ready for review — 7 new tools, 1 prompt, 1 skill from em commands porting
-=======
-**Last Updated:** 2026-07-06
-**Status:** v1.8.1 released — GitHub + Homebrew (man pages working) + docs site
->>>>>>> main
+**Status:** v1.9.0 released — all features complete. 29 tools, 7 prompts, 3 resources, 16 skills, 569 tests.

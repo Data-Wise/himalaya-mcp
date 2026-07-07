@@ -294,7 +294,7 @@ Returns `overall` status (`healthy` / `degraded` / `broken`) plus a per-account 
 
 If any tool fails, also see the [troubleshooting guide](troubleshooting.md).
 
-## MCP Prompts (6)
+## MCP Prompts (7)
 
 Prompts guide Claude's reasoning for email tasks. Use them via the MCP prompt interface or through the plugin skills.
 
@@ -303,6 +303,7 @@ Prompts guide Claude's reasoning for email tasks. Use them via the MCP prompt in
 | `triage_inbox` | Classify emails as actionable/FYI/skip, suggest flags and moves | `count` (default: 10) |
 | `summarize_email` | One-sentence summary + action items + priority | `id`, `folder` |
 | `daily_email_digest` | Markdown digest grouped by priority (action/FYI/low) | (none) |
+| `weekly_email_digest` | Weekly digest grouped by priority and day | (none) |
 | `draft_reply` | Compose a reply with tone guidance and safety reminders | `id`, `tone`, `instructions` |
 | `morning_briefing` | Morning email briefing with urgency classification | `account` |
 | `inbox_check` | Quick inbox status with highlights and next actions | `folder`, `account` |
@@ -373,7 +374,7 @@ Test breakdown:
 | File | Tests | What it covers |
 |------|-------|----------------|
 | `parser.test.ts` | 13 | JSON response parsing, formatEnvelope |
-| `client.test.ts` | 12 | Subprocess wrapper, argument building |
+| `client.test.ts` | 15 | Subprocess wrapper, retry policy, argument building |
 | `manage.test.ts` | 7 | flag_email, move_email client methods |
 | `compose.test.ts` | 13 | draft_reply, send_email safety gate + attachment tests |
 | `compose-new.test.ts` | 12 | compose_email safety gate + attachment tests |
@@ -381,9 +382,23 @@ Test breakdown:
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
 | `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
+| `threads.test.ts` | 30 | Thread parser + tool registration |
 | `prompts.test.ts` | 24 | All 7 prompts register and return correct text |
 | `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `dogfood.test.ts` | 142 | Realistic Claude usage scenarios + packaging validation |
-| `e2e.test.ts` | 39 | Full MCP server pipeline + .mcpb build pipeline |
-| `setup.test.ts` | 36 | CLI setup/check/remove, install/upgrade E2E, doctor command |
+| `errors.test.ts` | 18 | MCPError envelope + stderr classifier |
+| `retry.test.ts` | 4 | Transient retry policy |
+| `accounts.test.ts` | 6 | Multi-account discovery |
+| `health.test.ts` | 5 | health_check tool |
+| `trash.test.ts` | 5 | getTrashFolder |
+| `unread.test.ts` | 4 | get_unread_count |
+| `read-raw.test.ts` | 5 | read_email_raw |
+| `render.test.ts` | 5 | render_email |
+| `list-starred.test.ts` | 6 | list_starred |
+| `reminders.test.ts` | 7 | create_reminder |
+| `snooze.test.ts` | 12 | snooze_email, list_snoozed_emails |
+| `dogfood.test.ts` | 153 | Realistic Claude usage scenarios |
+| `dogfood-reliability.test.ts` | 20 | Reliability scenarios |
+| `setup.test.ts` | 45 | Setup CLI + multi-account doctor E2E |
+| `e2e.test.ts` | 39 | Full MCP server pipeline + .mcpb build |
+| `v150-features.test.ts` | 36 | v1.5.0 integration tests |
