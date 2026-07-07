@@ -237,6 +237,7 @@ describe("E2E: MCP Server Headless", () => {
       "read_email_html",
       "read_email_raw",
       "read_thread",
+      "render_email",
       "search_emails",
       "send_email",
     ]);
