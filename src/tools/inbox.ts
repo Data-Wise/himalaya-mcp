@@ -41,9 +41,9 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
   });
 
   server.registerTool("search_emails", {
-    description: "Search emails using himalaya filter syntax. Examples: 'subject invoice', 'from paypal', 'subject meeting and from boss'. Operators: and, or, not. Conditions: subject, from, to, body, date, before, after, flag.",
+    description: "Search emails using himalaya filter syntax. Omitting a condition prefix defaults to subject-only search. Examples: 'subject invoice', 'from paypal', 'body invoice', 'subject meeting and from boss'. Operators: and, or, not. Conditions: subject, from, to, body, date, before, after, flag.",
     inputSchema: {
-      query: z.string().describe("Search query in himalaya filter syntax (e.g. 'subject invoice', 'from alice and subject meeting')"),
+      query: z.string().describe("Search query in himalaya filter syntax (e.g. 'subject invoice', 'from alice and subject meeting', 'body invoice'). Use 'body <word>' to search email body text."),
       folder: z.string().optional().describe("Folder to search in (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },

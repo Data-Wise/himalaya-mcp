@@ -240,6 +240,26 @@ describe("Dogfooding: search_emails", () => {
     const text = result.content[0].text;
     expect(text).toContain("3 emails matching");
   });
+
+  it("Scenario: 'Search for invoice in body' — passes body query", async () => {
+    const tool = getToolHandler(server, "search_emails");
+    await tool.handler({ query: "body invoice", folder: undefined, account: undefined }, {} as any);
+
+    expect(client.searchEnvelopes).toHaveBeenCalledWith("body invoice", undefined, undefined);
+  });
+
+  it("tool description documents body search and subject-only default", () => {
+    const tool = getToolHandler(server, "search_emails");
+    expect(tool.description).toContain("body");
+    expect(tool.description).toContain("subject-only");
+  });
+
+  it("query parameter description mentions body search", () => {
+    const tool = getToolHandler(server, "search_emails");
+    const queryDesc = tool.inputSchema.shape?.query?.description || tool.inputSchema?.query?.description || "";
+    expect(queryDesc).toContain("body");
+    expect(queryDesc).toContain("body <word>");
+  });
 });
 
 describe("Dogfooding: read_email", () => {
