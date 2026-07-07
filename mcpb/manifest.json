@@ -86,6 +86,10 @@
       "description": "Read an email message body as HTML. Useful for formatted emails."
     },
     {
+      "name": "read_email_raw",
+      "description": "Read the raw MIME source of an email. Returns the full, unedited message including all headers. Useful for debugging and email forensics."
+    },
+    {
       "name": "flag_email",
       "description": "Add or remove flags on an email. Common flags: Seen, Flagged, Answered, Deleted, Draft. Use 'add' to set flags, 'remove' to clear them."
     },

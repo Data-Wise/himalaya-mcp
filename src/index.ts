@@ -26,6 +26,7 @@ import { registerCalendarTools } from "./tools/calendar.js";
 import { registerThreadTools } from "./tools/threads.js";
 import { registerHealthTools } from "./tools/health.js";
 import { registerUnreadTools } from "./tools/unread.js";
+import { registerReadRawTools } from "./tools/read-raw.js";
 import { registerReplyPrompt } from "./prompts/reply.js";
 import { registerMorningPrompt } from "./prompts/morning.js";
 import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
@@ -54,6 +55,7 @@ registerThreadTools(server, client);
 registerHealthTools(server, client);
 registerClipboardTools(server);
 registerUnreadTools(server, client);
+registerReadRawTools(server, client);
 
 // Register resources
 registerResources(server, client);
