@@ -39,6 +39,10 @@
 
 ## Just Completed
 
+- 2026-07-09: GRILL'd GitHub issue #67 (plugin name `email` vs. repo name `himalaya-mcp` mismatch) — reopened once with new context (idea-refine on an ecosystem-wide fix). Final: document the divergence, don't rename — renaming would break all 16 `/email:*` commands plus the pre-send safety-hook matcher. Decision ledger: `docs/specs/GRILL-plugin-name-issue-67-2026-07-09.md`.
+- 2026-07-09: Drafted `docs/specs/SPEC-plugin-name-issue-67-2026-07-09.md` — ready-to-drive plan (extend `plugin.json`/`marketplace.json` description fields, close #67). Not yet driven.
+- 2026-07-09: idea-refined a cross-repo "forever fix" (one reusable aggregator-sync workflow in craft, replacing N copy-pasted per-repo workflows) — parked pending craft's ongoing refactor. See `docs/ideas/aggregator-sync-reusable-workflow.md`.
+- 2026-07-09: Ran `/doctor` — fixed a broken `UserPromptSubmit` hook, disabled 21 unused plugins/MCP servers/skills, scoped 3 misplaced research-only rule files, switched default permission mode to `auto`.
 - 2026-07-07: Fully released v1.9.0 — 29 tools, 7 prompts, 3 resources, 16 skills, 569 tests (31 files). All em commands ported, documented, and shipped.
 - 2026-07-07: PR #76 review — pre-merge validations (build, bundle, 569 tests, mkdocs strict, .mcpb), count inconsistency fixes, orphan page deletion
 - 2026-07-07: PR #76 squash-merged to dev
@@ -94,8 +98,10 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- All features complete. Project in maintenance mode.
-- Possible future directions:
+- Drive `docs/specs/SPEC-plugin-name-issue-67-2026-07-09.md` (`/craft:orch:drive`) — extend
+  `plugin.json`/`marketplace.json` descriptions, close issue #67. Direct edit on `dev` + PR, no
+  worktree needed (existing-file edit only).
+- Otherwise: all features complete, project in maintenance mode. Possible future directions:
   - Bundled .mcpb variant with universal himalaya binary (~19 MB)
   - Code signing + notarization (Apple Developer, $99/yr)
   - Official Anthropic extension directory listing
@@ -112,5 +118,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-07-07 (session 2)
-**Status:** v1.9.0 released — maintenance. Dependencies bumped (TS 6.0, Vitest 4.1, esbuild 0.28, MCP SDK 1.29, Zod 4.4). Stale branches/worktrees cleaned. All 569 tests passing.
+**Last Updated:** 2026-07-09 (session 3)
+**Status:** v1.9.0 released — maintenance. Issue #67 (plugin name mismatch) grilled and spec'd — doc-only fix ready to drive, cross-repo "forever fix" parked pending craft's refactor. `/doctor` cleanup applied.
