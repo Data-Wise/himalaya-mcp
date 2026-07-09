@@ -209,7 +209,7 @@ default = true
         expect(client.sendTemplate).not.toHaveBeenCalled();
       });
 
-      it("no <#part> sections when attachments is empty", async () => {
+      it("no <#part> sections when attachments is empty and body is plain text", async () => {
         const tool = getToolHandler(server, "compose_email");
         const result = await tool.handler({
           to: "alice@example.com", subject: "Test", body: "Body",
@@ -217,6 +217,58 @@ default = true
         }, {} as any);
 
         expect(result.content[0].text).not.toContain("<#part");
+      });
+    });
+
+    describe("HTML email", () => {
+      it("wraps HTML body in <#part type=\"text/html\">", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        const htmlBody = "<html><body><h1>Hello</h1><p>World</p></body></html>";
+        const result = await tool.handler({
+          to: "alice@example.com", subject: "Test", body: htmlBody,
+          cc: undefined, bcc: undefined, attachments: undefined, confirm: undefined, account: undefined,
+        }, {} as any);
+
+        const text = result.content[0].text;
+        expect(text).toContain('<#part type="text/html">');
+        expect(text).toContain("<h1>Hello</h1>");
+        expect(text).not.toContain('<#part type="text/plain">');
+      });
+
+      it("explicit html=true forces HTML wrapping even for non-HTML body", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        const result = await tool.handler({
+          to: "alice@example.com", subject: "Test", body: "Plain text",
+          cc: undefined, bcc: undefined, html: true, attachments: undefined, confirm: undefined, account: undefined,
+        }, {} as any);
+
+        const text = result.content[0].text;
+        expect(text).toContain('<#part type="text/html">');
+      });
+
+      it("plain text body without html flag has no part wrappers", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        const result = await tool.handler({
+          to: "alice@example.com", subject: "Test", body: "Just plain text",
+          cc: undefined, bcc: undefined, attachments: undefined, confirm: undefined, account: undefined,
+        }, {} as any);
+
+        const text = result.content[0].text;
+        expect(text).not.toContain("<#part type=");
+      });
+
+      it("sends HTML email when confirm=true", async () => {
+        const tool = getToolHandler(server, "compose_email");
+        const htmlBody = "<html><body><h1>Hi</h1></body></html>";
+        await tool.handler({
+          to: "alice@example.com", subject: "Test", body: htmlBody,
+          cc: undefined, bcc: undefined, attachments: undefined, confirm: true, account: undefined,
+        }, {} as any);
+
+        expect(client.sendTemplate).toHaveBeenCalled();
+        const [templateArg] = (client.sendTemplate as ReturnType<typeof vi.fn>).mock.calls[0];
+        expect(templateArg).toContain('<#part type="text/html">');
+        expect(templateArg).not.toContain('<#part type="text/plain">');
       });
     });
   });

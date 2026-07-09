@@ -31,6 +31,8 @@ Write and send a new email (not a reply) with safety gates.
 4. Ask for feedback — user can edit recipients, subject, body, or approve
 5. Only call `compose_email` with `confirm=true` after explicit user approval
 
+**HTML emails:** When the body contains HTML content (auto-detected), the email is sent as multipart/alternative with both HTML and plain text parts, ensuring proper rendering in email clients. Set `html=true` to force HTML mode for HTML fragment bodies that wouldn't be auto-detected.
+
 ## Safety Rules
 
 - NEVER send without explicit "yes" / "send it" / "looks good" from the user
