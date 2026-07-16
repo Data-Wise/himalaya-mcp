@@ -18,7 +18,7 @@ describe("render_email", () => {
   it("converts HTML to markdown when HTML body is available", async () => {
     const server = { registerTool: vi.fn() };
     const client = new HimalayaClient({ from: "test@example.com" });
-    vi.spyOn(client, "readMessageHtml").mockResolvedValue(JSON.stringify("<p>Hello <strong>world</strong></p>"));
+    vi.spyOn(client, "readMessageHtml").mockResolvedValue("<p>Hello <strong>world</strong></p>");
     registerRenderTools(server as unknown as McpServer, client);
 
     const handler = (server.registerTool as ReturnType<typeof vi.fn>).mock.calls[0][2];

@@ -13,7 +13,19 @@ vi.mock("node:child_process", async () => {
   return { execFile: fn };
 });
 
+vi.mock("node:fs", () => ({
+  readFileSync: vi.fn(),
+  rmSync: vi.fn(),
+  mkdtempSync: vi.fn(),
+}));
+
+vi.mock("node:os", () => ({
+  tmpdir: vi.fn().mockReturnValue("/tmp"),
+}));
+
 import { execFile } from "node:child_process";
+import * as fs from "node:fs";
+import * as os from "node:os";
 
 const mockExecFile = vi.mocked(execFile);
 // Access the promisified version that client.ts actually calls
@@ -186,6 +198,27 @@ describe("HimalayaClient", () => {
         expect.arrayContaining(["message", "read", "12345"]),
         expect.any(Object),
       );
+    });
+
+    it("readMessageHtml uses message export instead of removed --html flag", async () => {
+      setupMock("");
+      vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/himalaya-mcp-html-test");
+      vi.mocked(fs.readFileSync).mockReturnValue("<p>Test HTML content</p>");
+      vi.mocked(fs.rmSync).mockImplementation(() => {});
+      vi.mocked(os.tmpdir).mockReturnValue("/tmp");
+
+      const client = new HimalayaClient();
+      const result = await client.readMessageHtml("12345");
+
+      expect(result).toBe("<p>Test HTML content</p>");
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["message", "export", "--destination", "/tmp/himalaya-mcp-html-test", "12345"]),
+        expect.any(Object),
+      );
+      // Ensure the old --html flag is NOT used
+      const args = mockExecFileAsync.mock.calls[0][1] as string[];
+      expect(args).not.toContain("--html");
     });
 
     it("listFolders calls folder list", async () => {

@@ -133,7 +133,7 @@ function createMockClient(): HimalayaClient {
   vi.spyOn(client, "searchEnvelopes").mockResolvedValue(EMPTY_SEARCH);
   vi.spyOn(client, "readMessage").mockResolvedValue(SAMPLE_MESSAGE);
   vi.spyOn(client, "readMessageHtml").mockResolvedValue(
-    JSON.stringify("<p>Dear colleague,</p><p>Seminar at 3:30pm.</p>")
+    "<p>Dear colleague,</p><p>Seminar at 3:30pm.</p>"
   );
   vi.spyOn(client, "flagMessage").mockResolvedValue("{}");
   vi.spyOn(client, "moveMessage").mockResolvedValue("{}");
@@ -1020,7 +1020,7 @@ describe("Dogfooding: render_email", () => {
 
   it("Scenario: 'Render this email as markdown' — converts HTML to clean markdown", async () => {
     const tool = getToolHandler(server, "render_email");
-    vi.spyOn(client, "readMessageHtml").mockResolvedValue(JSON.stringify("<p><strong>Important</strong> meeting at 3pm.</p>"));
+    vi.spyOn(client, "readMessageHtml").mockResolvedValue("<p><strong>Important</strong> meeting at 3pm.</p>");
 
     const result = await tool.handler({ id: "249088", folder: undefined, account: undefined }, {} as any);
 
