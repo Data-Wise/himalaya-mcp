@@ -41,9 +41,9 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
   });
 
   server.registerTool("search_emails", {
-    description: "Search emails using himalaya filter syntax. Examples: 'subject invoice', 'from paypal', 'subject meeting and from boss'. Operators: and, or, not. Conditions: subject, from, to, body, date, before, after, flag.",
+    description: "Search emails using himalaya filter syntax. Combine conditions with `and`/`or` (REQUIRED between every condition pair — omitting them causes parse errors like 'expected `and`'). Multi-word values use backslash-escaped spaces (`subject quarterly\\ report`). Conditions: subject, from, to, body, date, before, after, flag. Examples: 'from paypal', 'subject invoice and after 2026-01-01', 'from alice and subject meeting', 'not body spam'.",
     inputSchema: {
-      query: z.string().describe("Search query in himalaya filter syntax (e.g. 'subject invoice', 'from alice and subject meeting')"),
+      query: z.string().describe("Search query in himalaya filter syntax. Use `and`/`or` between every condition pair (e.g. 'from alice and after 2026-07-01', NOT 'from alice after 2026-07-01'). Multi-word values need backslash-escaped spaces (e.g. 'subject festival\\ of\\ running'). Use 'body <word>' to search email body text. Conditions: subject, from, to, body, date, before, after, flag."),
       folder: z.string().optional().describe("Folder to search in (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
