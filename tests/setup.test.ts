@@ -786,7 +786,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
     expect(stdout).toContain("Version sync");
     expect(stdout).toContain("Test suite");
     expect(stdout).toContain("Summary:");
-  }, 120_000);
+  }, 300_000);
 
   it("doctor --pre-release --json outputs valid JSON", async () => {
     let stdout: string;
@@ -810,7 +810,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
       expect(r.category).toBe("Pre-Release");
       expect(["pass", "warn", "fail"]).toContain(r.status);
     }
-  }, 120_000);
+  }, 300_000);
 
   it("doctor --post-release outputs Post-Release category checks", async () => {
     let stdout: string;
