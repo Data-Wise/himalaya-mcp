@@ -59,11 +59,14 @@
 - 2026-07-07: Closed stale Issue #74 (attachment support — already implemented)
 - 2026-07-07: Cleaned stale worktrees and branches (3 local, 2 remote, 1 worktree)
 - 2026-07-07: Created git/clean skill (filed as feature request on opencode-resources#18)
+- 2026-07-21: Plugin rename brainstorm — 7 options explored, Option 1 (rename to `himalaya-mcp`) selected, then refined to `himalaya` + `email` server for cleaner tool names
+- 2026-07-21: SPEC written (334 lines, 8 phases) + grill (15 fixes applied). Key decisions: plugin=`himalaya`, server=`email`, tool=`mcp__plugin_himalaya_email__*`, version=2.0.0
+- 2026-07-21: Adversarial review — 15 consistency/breaking/verification/goal/outcome fixes applied. Doc scope expanded from 11 to 18+ files (skills.md 764 lines, cookbook.md 512 lines)
 
 ## Current State
 
-- Branch: `dev`
-- Version: 1.9.0 (released)
+- Branch: `dev` (feature work on `feature/rename-plugin-email` worktree)
+- Version: 1.9.0 (released), 2.0.0 in progress
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
 - Tests: 569 passing across 31 test files
 - Plugin: `email` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
@@ -98,9 +101,12 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- Drive `docs/specs/SPEC-plugin-name-issue-67-2026-07-09.md` (`/craft:orch:drive`) — extend
-  `plugin.json`/`marketplace.json` descriptions, close issue #67. Direct edit on `dev` + PR, no
-  worktree needed (existing-file edit only).
+- **In progress:** Drive `docs/specs/SPEC-rename-plugin-email-2026-07-21.md` — rename plugin
+  `email` → `himalaya` (closes #67). Worktree: `feature/rename-plugin-email`. Version bump
+  to 2.0.0. 8 phases: spike → JSON configs → tests → 16 skills → 18+ doc files → migration
+  guide → .mcpb rebuild → PR. Spec + grill committed and pushed.
+- **Post-merge:** File PR on `Data-Wise/claude-plugins` to revert aggregator workaround
+  from `claude-plugins#9` (aggregator entry `email` → `himalaya`).
 - Otherwise: all features complete, project in maintenance mode. Possible future directions:
   - Bundled .mcpb variant with universal himalaya binary (~19 MB)
   - Code signing + notarization (Apple Developer, $99/yr)
@@ -118,5 +124,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-07-09 (session 3)
-**Status:** v1.9.0 released — maintenance. Issue #67 (plugin name mismatch) grilled and spec'd — doc-only fix ready to drive, cross-repo "forever fix" parked pending craft's refactor. `/doctor` cleanup applied.
+**Last Updated:** 2026-07-21 (session 4)
+**Status:** v1.9.0 released. Plugin rename `email` → `himalaya` (v2.0.0) in progress on `feature/rename-plugin-email`. Spec + grill committed, pushed, ready to drive. 8 phases, 18+ doc files, dedicated agents for skills.md (764 lines) and cookbook.md (512 lines).
