@@ -9,16 +9,16 @@ Practical recipes combining multiple skills and tools for common email scenarios
 Start your week with a structured email review.
 
 ```
-You: "/email:stats"
+You: "/himalaya:stats"
 → See unread count, volume, top senders
 
-You: "/email:triage"
+You: "/himalaya:triage"
 → Classify inbox: actionable / FYI / skip
 
-You: "/email:manage archive" (for skip emails)
+You: "/himalaya:manage archive" (for skip emails)
 → Bulk archive low-priority items
 
-You: "/email:digest"
+You: "/himalaya:digest"
 → Generate priority digest for the week
 ```
 
@@ -31,22 +31,22 @@ You: "/email:digest"
 Aggressively clear your inbox to zero unread.
 
 ```
-Step 1: "/email:stats"
+Step 1: "/himalaya:stats"
   → Know the scope: "47 unread, oldest 12 days"
 
-Step 2: "/email:triage 50"
+Step 2: "/himalaya:triage 50"
   → Classify all 50 emails at once
 
 Step 3: "Archive all skip emails"
-  → /email:manage archive [skip IDs]
+  → /himalaya:manage archive [skip IDs]
 
 Step 4: "Mark all FYI as read"
-  → /email:manage flag [fyi IDs] (Seen)
+  → /himalaya:manage flag [fyi IDs] (Seen)
 
 Step 5: "Draft replies for actionable emails"
-  → /email:reply for each actionable email
+  → /himalaya:reply for each actionable email
 
-Step 6: "/email:stats"
+Step 6: "/himalaya:stats"
   → Verify: "0 unread"
 ```
 
@@ -59,7 +59,7 @@ Step 6: "/email:stats"
 Find, review, and act on specific emails.
 
 ```
-You: "/email:search from:client --unread"
+You: "/himalaya:search from:client --unread"
 → Find all unread client emails
 
 You: "Read #1"
@@ -68,15 +68,15 @@ You: "Read #1"
 You: "Summarize #2 and #3"
 → Get quick summaries of the rest
 
-You: "/email:manage flag 1,2,3"
+You: "/himalaya:manage flag 1,2,3"
 → Star them all for follow-up
 ```
 
 **Variations:**
 
-- By date: `/email:search from:boss after:2026-02-20`
-- By topic: `/email:search budget --flagged`
-- Unread only: `/email:search --unread`
+- By date: `/himalaya:search from:boss after:2026-02-20`
+- By topic: `/himalaya:search budget --flagged`
+- Unread only: `/himalaya:search --unread`
 
 ---
 
@@ -85,7 +85,7 @@ You: "/email:manage flag 1,2,3"
 Set up himalaya from scratch using the config wizard.
 
 ```
-You: "/email:config"
+You: "/himalaya:config"
 
 Claude walks you through:
 1. Check himalaya installed
@@ -96,17 +96,17 @@ Claude walks you through:
 6. Test IMAP/SMTP connection
 7. Run doctor check
 
-You: "/email:inbox"
+You: "/himalaya:inbox"
 → First email check with new account!
 ```
 
 **Adding a second account:**
 
 ```
-You: "/email:config --add-account"
+You: "/himalaya:config --add-account"
 → Same wizard, appends to existing config
 
-You: "/email:inbox" (uses default account)
+You: "/himalaya:inbox" (uses default account)
 You: "Check my work inbox" (uses account: "work")
 ```
 
@@ -117,7 +117,7 @@ You: "Check my work inbox" (uses account: "work")
 Track your email patterns over time.
 
 ```
-You: "/email:stats --weekly"
+You: "/himalaya:stats --weekly"
 
 Weekly Comparison
            This week    Last week    Change
@@ -127,10 +127,10 @@ Unread:    12           8            up 50%
 You: "Who's sending me the most email?"
 → Top senders breakdown
 
-You: "/email:search from:newsletter"
+You: "/himalaya:search from:newsletter"
 → Find all newsletters
 
-You: "/email:manage archive" (newsletter IDs)
+You: "/himalaya:manage archive" (newsletter IDs)
 → Clean up recurring noise
 ```
 
@@ -143,7 +143,7 @@ You: "/email:manage archive" (newsletter IDs)
 Gather all context before a meeting.
 
 ```
-You: "/email:search from:alice Q1 budget"
+You: "/himalaya:search from:alice Q1 budget"
 → Find all relevant threads
 
 You: "Summarize each of these"
@@ -163,19 +163,19 @@ You: "Export all as markdown and copy to clipboard"
 Quick cleanup before signing off.
 
 ```
-You: "/email:stats"
+You: "/himalaya:stats"
 → See what came in today
 
 You: "Triage today's unread"
 → Quick classification
 
-You: "/email:manage flag" (tomorrow's priorities)
+You: "/himalaya:manage flag" (tomorrow's priorities)
 → Star what needs attention tomorrow
 
-You: "/email:manage archive" (handled items)
+You: "/himalaya:manage archive" (handled items)
 → Clean up processed emails
 
-You: "/email:stats"
+You: "/himalaya:stats"
 → Confirm inbox is under control
 ```
 
@@ -186,7 +186,7 @@ You: "/email:stats"
 Process emails that need someone else's attention.
 
 ```
-You: "/email:triage"
+You: "/himalaya:triage"
 → Identify emails that need delegation
 
 You: "Draft a forward of #42 to bob@team.com with context"
@@ -195,7 +195,7 @@ You: "Draft a forward of #42 to bob@team.com with context"
 You: "Extract the action items from #42"
 → Create a todo list for the delegate
 
-You: "/email:manage move 42 Delegated"
+You: "/himalaya:manage move 42 Delegated"
 → Move to a tracking folder
 ```
 
@@ -208,18 +208,18 @@ Clean up after a conference or event.
 ```
 You: "Find all emails about the developer conference and archive them"
 
-Step 1: "/email:search from:conf-organizer@conference.com"
+Step 1: "/himalaya:search from:conf-organizer@conference.com"
   → Find all conference-related emails
 
 Step 2: "Also search for subject:devcon"
   → Find related threads
 
-Step 3: "/email:manage move all-results Conference-Archive"
+Step 3: "/himalaya:manage move all-results Conference-Archive"
   → Move to a dedicated folder for reference
 ```
 
 **Variation:** Search by date range to catch pre/post-conference email:
-`/email:search after:2026-06-01 before:2026-06-15 --unread`
+`/himalaya:search after:2026-06-01 before:2026-06-15 --unread`
 
 ---
 
@@ -228,7 +228,7 @@ Step 3: "/email:manage move all-results Conference-Archive"
 Share inbox management across a team using a shared account.
 
 ```
-You: "/email:config --add-account"
+You: "/himalaya:config --add-account"
   → Add the shared team account
 
 You: "Check the support@ inbox"
@@ -255,7 +255,7 @@ Set up an out-of-office sequence using the compose tool.
 ```
 You: "I'm on vacation next week. Set up an auto-reply."
 
-Step 1: "/email:search --unread"
+Step 1: "/himalaya:search --unread"
   → See what's waiting
 
 Step 2: "Compose a vacation auto-reply to anyone who emails me"
@@ -265,7 +265,7 @@ Step 3: Create a filter rule in your email provider,
         or forward to a colleague for coverage
 
 Step 4: "Mark all unread as seen before I leave"
-  → /email:manage flag [ids] Seen
+  → /himalaya:manage flag [ids] Seen
 ```
 
 **Consideration:** himalaya-mcp doesn't set server-side filters. Use your email provider's filtering for true auto-responders. Claude can help draft the response text and subject line.
@@ -277,7 +277,7 @@ Step 4: "Mark all unread as seen before I leave"
 Tame newsletter overload.
 
 ```
-You: "/email:stats"
+You: "/himalaya:stats"
   → See your newsletter volume
 
 You: "Find all newsletter senders"
@@ -291,14 +291,14 @@ You: "Unsubscribe me from the low-value ones"
   → Review and send each one
 
 You: "Archive all existing newsletters"
-  → /email:manage archive [all-newsletter-ids]
+  → /himalaya:manage archive [all-newsletter-ids]
 ```
 
 **Suggestion:** After cleaning up, set a weekly routine:
 ```
-Every Friday: "/email:search from:newsletter --unread"
+Every Friday: "/himalaya:search from:newsletter --unread"
 → Read the 2-3 you care about
-→ "/email:manage archive rest"
+→ "/himalaya:manage archive rest"
 ```
 
 ---
@@ -310,7 +310,7 @@ Read a full email thread chronologically, identify participants, extract action 
 ```
 You: "Show me the whole budget review conversation and what still needs doing"
 
-Step 1: "/email:search subject:budget"
+Step 1: "/himalaya:search subject:budget"
   → Find all budget-related emails
 
 Step 2: "Read the thread 'Q1 Budget Review'"
@@ -337,7 +337,7 @@ A lighter triage variant that only flags — no moves, no archives, no deletions
 ```
 You: "Read my last 20 emails, flag what needs attention, and leave everything else alone"
 
-Step 1: "/email:inbox 20"
+Step 1: "/himalaya:inbox 20"
   → See what's waiting
 
 Step 2: "Read #1, #4, #7 — they look important"
@@ -358,7 +358,7 @@ Result: Important emails are starred, FYIs are marked read, newsletters are unto
 
 ## Search Syntax Reference
 
-himaya filter syntax for the `search_emails` tool and `/email:search` skill.
+himaya filter syntax for the `search_emails` tool and `/himalaya:search` skill.
 
 ### Basic filters
 
@@ -481,7 +481,7 @@ and copy_to_clipboard(text)
 ```
 You: "Forward that urgent email to my phone"
 
-1. /email:forward 42 "5551234567@vtext.com"  # VZW SMS gateway
+1. /himalaya:forward 42 "5551234567@vtext.com"  # VZW SMS gateway
 2. Review and send
 ```
 

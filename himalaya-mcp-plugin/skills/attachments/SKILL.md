@@ -12,16 +12,16 @@ triggers:
   - get the attachment
 ---
 
-# /email:attachments - Email Attachments
+# /himalaya:attachments - Email Attachments
 
 List, download, and process email attachments including calendar invites.
 
 ## Usage
 
 ```
-/email:attachments <id>           # List attachments for an email
-/email:attachments <id> download  # Download a specific attachment
-/email:attachments <id> calendar  # Extract calendar event from ICS
+/himalaya:attachments <id>           # List attachments for an email
+/himalaya:attachments <id> download  # Download a specific attachment
+/himalaya:attachments <id> calendar  # Extract calendar event from ICS
 ```
 
 ## When Invoked

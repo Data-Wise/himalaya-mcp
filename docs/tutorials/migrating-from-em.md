@@ -137,7 +137,7 @@ Then: "Add this event to my calendar" (calls `create_calendar_event` with review
 
 **Old way:** `em respond`
 
-**New way:** "Draft replies for all my actionable emails" (`/email:respond`)
+**New way:** "Draft replies for all my actionable emails" (`/himalaya:respond`)
 
 Claude generates drafts for each actionable email, presents a summary, and lets you approve individually.
 

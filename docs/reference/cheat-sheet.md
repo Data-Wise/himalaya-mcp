@@ -98,12 +98,12 @@ Draft      Draft message
 ## Plugin Skills (16)
 
 ```
-/email:inbox        /email:triage      /email:digest
-/email:reply        /email:compose     /email:respond
-/email:morning      /email:attachments /email:forward
-/email:export       /email:threads     /email:search
-/email:manage       /email:stats       /email:config
-/email:help
+/himalaya:inbox        /himalaya:triage      /himalaya:digest
+/himalaya:reply        /himalaya:compose     /himalaya:respond
+/himalaya:morning      /himalaya:attachments /himalaya:forward
+/himalaya:export       /himalaya:threads     /himalaya:search
+/himalaya:manage       /himalaya:stats       /himalaya:config
+/himalaya:help
 ```
 
 ## Env Vars
@@ -122,7 +122,7 @@ Triage:     list → read → flag / move
 Reply:      read → draft → review → send(confirm)
 Compose:    compose(preview) → review → compose(confirm)
 Search:     search → read → flag/reply
-Bulk:       /email:manage [action] [ids]
+Bulk:       /himalaya:manage [action] [ids]
 Export:     read → export_to_markdown → copy_to_clipboard
 Calendar:   list_attachments → extract → create(confirm)
 Multi-acct: Any tool + account="work" | account="personal"

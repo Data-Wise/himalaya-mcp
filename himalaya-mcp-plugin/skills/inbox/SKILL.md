@@ -13,16 +13,16 @@ triggers:
   - check messages
 ---
 
-# /email:inbox - Check Email Inbox
+# /himalaya:inbox - Check Email Inbox
 
 List recent emails from your inbox via the himalaya MCP server.
 
 ## Usage
 
 ```
-/email:inbox              # Last 10 emails
-/email:inbox 20           # Last 20 emails
-/email:inbox "subject"    # Search by subject
+/himalaya:inbox              # Last 10 emails
+/himalaya:inbox 20           # Last 20 emails
+/himalaya:inbox "subject"    # Search by subject
 ```
 
 ## When Invoked
@@ -31,8 +31,8 @@ List recent emails from your inbox via the himalaya MCP server.
 2. Display summary table: sender, subject, date, flags
 3. Offer to:
    - Read any specific email (`read_email`)
-   - Triage inbox (`/email:triage`)
-   - Reply to an email (`/email:reply`)
+   - Triage inbox (`/himalaya:triage`)
+   - Reply to an email (`/himalaya:reply`)
    - Copy email to clipboard (`copy_to_clipboard`)
    - Extract action items (`create_action_item`)
 
@@ -48,5 +48,5 @@ List recent emails from your inbox via the himalaya MCP server.
 ...
 
 → "Read #1" to view full email
-→ "/email:triage" to classify all
+→ "/himalaya:triage" to classify all
 ```

@@ -2,7 +2,7 @@
  * himalaya-mcp doctor — diagnose installation and per-account connectivity.
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, realpathSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { execFileSync } from "node:child_process";
@@ -39,6 +39,8 @@ export interface DoctorOptions {
   account?: string;
   fix?: boolean;
   json?: boolean;
+  preRelease?: boolean;
+  postRelease?: boolean;
   includeBaseChecks?: boolean;
   probeAccount?: (name: string) => Promise<AccountHealth> | AccountHealth;
 }
@@ -334,6 +336,182 @@ function checkEnvironment(): CheckResult[] {
   return results;
 }
 
+function checkPreRelease(): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  const pkgPath = join(process.cwd(), "package.json");
+  const pluginPath = join(process.cwd(), "himalaya-mcp-plugin", ".claude-plugin", "plugin.json");
+  const changelogPath = join(process.cwd(), "CHANGELOG.md");
+  const indexPath = join(process.cwd(), "src", "index.ts");
+
+  // 1. Build exists
+  const entryPoint = findServerEntry();
+  if (existsSync(entryPoint)) {
+    const size = readFileSync(entryPoint).length;
+    results.push({ name: "Build exists", category: "Pre-Release", status: "pass", message: `dist/index.js (${Math.round(size / 1024)} KB)` });
+  } else {
+    results.push({ name: "Build exists", category: "Pre-Release", status: "fail", message: "dist/index.js not found. Run: npm run build:bundle" });
+  }
+
+  // 2. TypeScript compiles
+  const tscResult = execQuiet("npx", ["tsc", "--noEmit"]);
+  if (tscResult.ok) {
+    results.push({ name: "TypeScript", category: "Pre-Release", status: "pass", message: "compiles clean" });
+  } else {
+    results.push({ name: "TypeScript", category: "Pre-Release", status: "fail", message: `compile errors: ${tscResult.stderr.slice(0, 120)}` });
+  }
+
+  // 3. Version consistency
+  if (existsSync(pkgPath) && existsSync(pluginPath)) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version: string };
+      const plugin = JSON.parse(readFileSync(pluginPath, "utf-8")) as { version: string };
+      if (pkg.version === plugin.version) {
+        results.push({ name: "Version sync", category: "Pre-Release", status: "pass", message: `package.json = plugin.json = ${pkg.version}` });
+      } else {
+        results.push({ name: "Version sync", category: "Pre-Release", status: "fail", message: `package.json (${pkg.version}) ≠ plugin.json (${plugin.version})` });
+      }
+    } catch {
+      results.push({ name: "Version sync", category: "Pre-Release", status: "warn", message: "Could not parse version files" });
+    }
+  }
+
+  // 4. src/index.ts VERSION matches package.json
+  if (existsSync(indexPath) && existsSync(pkgPath)) {
+    try {
+      const indexContent = readFileSync(indexPath, "utf-8");
+      const versionMatch = indexContent.match(/VERSION\s*=\s*"([^"]+)"/);
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version: string };
+      if (versionMatch && versionMatch[1] === pkg.version) {
+        results.push({ name: "src/index.ts VERSION", category: "Pre-Release", status: "pass", message: `${versionMatch[1]} matches package.json` });
+      } else {
+        results.push({ name: "src/index.ts VERSION", category: "Pre-Release", status: "fail", message: `VERSION="${versionMatch?.[1]}" ≠ package.json (${pkg.version})` });
+      }
+    } catch {
+      results.push({ name: "src/index.ts VERSION", category: "Pre-Release", status: "warn", message: "Could not verify" });
+    }
+  }
+
+  // 5. CHANGELOG has entry for current version
+  if (existsSync(changelogPath) && existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version: string };
+      const changelog = readFileSync(changelogPath, "utf-8");
+      if (changelog.includes(`[${pkg.version}]`) || changelog.includes("[Unreleased]")) {
+        results.push({ name: "CHANGELOG", category: "Pre-Release", status: "pass", message: `has entry for v${pkg.version} or [Unreleased]` });
+      } else {
+        results.push({ name: "CHANGELOG", category: "Pre-Release", status: "warn", message: `no entry for v${pkg.version}` });
+      }
+    } catch {
+      results.push({ name: "CHANGELOG", category: "Pre-Release", status: "warn", message: "Could not verify" });
+    }
+  }
+
+  // 6. Git working tree clean
+  const gitStatus = execQuiet("git", ["status", "--porcelain"]);
+  if (gitStatus.ok) {
+    const dirty = gitStatus.stdout.trim().split("\n").filter(l => l.trim()).length;
+    if (dirty === 0) {
+      results.push({ name: "Git status", category: "Pre-Release", status: "pass", message: "working tree clean" });
+    } else {
+      results.push({ name: "Git status", category: "Pre-Release", status: "warn", message: `${dirty} uncommitted change(s)` });
+    }
+  }
+
+  // 7. Test suite passes
+  const testResult = execQuiet("npx", ["vitest", "run", "--reporter=verbose"]);
+  if (testResult.ok && testResult.stdout.includes("Tests") && !testResult.stdout.includes("failed")) {
+    const match = testResult.stdout.match(/(\d+) passed/);
+    const count = match ? match[1] : "?";
+    results.push({ name: "Test suite", category: "Pre-Release", status: "pass", message: `${count} tests pass` });
+  } else {
+    const failMatch = testResult.stdout.match(/(\d+) failed/);
+    const failCount = failMatch ? failMatch[1] : "?";
+    results.push({ name: "Test suite", category: "Pre-Release", status: "fail", message: `${failCount} test(s) failing` });
+  }
+
+  return results;
+}
+
+function checkPostRelease(): CheckResult[] {
+  const results: CheckResult[] = [];
+
+  // 1. Plugin symlink exists
+  const symlinkPath = join(homedir(), ".claude", "plugins", "himalaya-mcp");
+  if (existsSync(symlinkPath)) {
+    results.push({ name: "Plugin installed", category: "Post-Release", status: "pass", message: symlinkPath });
+  } else {
+    results.push({ name: "Plugin installed", category: "Post-Release", status: "fail", message: "Not installed. Run: claude plugin install himalaya" });
+    return results;
+  }
+
+  // 2. plugin.json exists and is valid
+  const pluginJsonPath = join(symlinkPath, ".claude-plugin", "plugin.json");
+  if (existsSync(pluginJsonPath)) {
+    try {
+      const plugin = JSON.parse(readFileSync(pluginJsonPath, "utf-8")) as { name: string; version: string };
+      results.push({ name: "plugin.json", category: "Post-Release", status: "pass", message: `name=${plugin.name} v${plugin.version}` });
+    } catch {
+      results.push({ name: "plugin.json", category: "Post-Release", status: "fail", message: "Invalid JSON" });
+    }
+  } else {
+    results.push({ name: "plugin.json", category: "Post-Release", status: "fail", message: "Missing" });
+  }
+
+  // 3. MCP server process check (try to start and send initialize)
+  const entryPoint = findServerEntry();
+  if (existsSync(entryPoint)) {
+    try {
+      const initMsg = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "doctor", version: "1.0.0" } } });
+      const result = execFileSync("node", [entryPoint], {
+        input: `Content-Length: ${Buffer.byteLength(initMsg)}\r\n\r\n${initMsg}`,
+        timeout: 5_000,
+        stdio: "pipe",
+      }).toString();
+      if (result.includes('"result"') || result.includes('"serverInfo"')) {
+        results.push({ name: "MCP handshake", category: "Post-Release", status: "pass", message: "initialize response received" });
+      } else {
+        results.push({ name: "MCP handshake", category: "Post-Release", status: "warn", message: "Unexpected response" });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      results.push({ name: "MCP handshake", category: "Post-Release", status: "fail", message: `Failed: ${msg.slice(0, 100)}` });
+    }
+  } else {
+    results.push({ name: "MCP handshake", category: "Post-Release", status: "fail", message: "Skipped — dist/index.js not found" });
+  }
+
+  // 4. Marketplace entry
+  const marketplacePath = join(homedir(), ".claude", "local-marketplace", ".claude-plugin", "marketplace.json");
+  if (existsSync(marketplacePath)) {
+    try {
+      const raw = readFileSync(marketplacePath, "utf-8");
+      if (raw.includes("himalaya")) {
+        results.push({ name: "Marketplace", category: "Post-Release", status: "pass", message: "registered in local-marketplace" });
+      } else {
+        results.push({ name: "Marketplace", category: "Post-Release", status: "warn", message: "Not found in marketplace.json" });
+      }
+    } catch {
+      results.push({ name: "Marketplace", category: "Post-Release", status: "warn", message: "Could not read marketplace.json" });
+    }
+  } else {
+    results.push({ name: "Marketplace", category: "Post-Release", status: "warn", message: "local-marketplace not found" });
+  }
+
+  // 5. Skills directory
+  const skillsPath = join(symlinkPath, "skills");
+  if (existsSync(skillsPath)) {
+    const skillDirs = readdirSync(skillsPath, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .length;
+    results.push({ name: "Skills", category: "Post-Release", status: "pass", message: `${skillDirs} skill directories found` });
+  } else {
+    results.push({ name: "Skills", category: "Post-Release", status: "warn", message: "skills/ directory not found" });
+  }
+
+  return results;
+}
+
 function readRegistry(): { extensions: Record<string, unknown> } {
   if (!existsSync(INSTALLATIONS_PATH)) return { extensions: {} };
   try {
@@ -373,17 +551,23 @@ export function checkAccountHealth(name: string): AccountHealth {
 
 export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
   const includeBase = opts.includeBaseChecks !== false;
-  const results: CheckResult[] = includeBase
-    ? [
-        ...checkPrerequisites(),
-        ...checkMcpServer(),
-        ...checkEmailConnectivity(),
-        ...checkDesktopExtension(),
-        ...checkCodePlugin(),
-        ...checkPluginCache(),
-        ...checkEnvironment(),
-      ]
-    : [];
+  let results: CheckResult[] = [];
+
+  if (opts.preRelease) {
+    results = checkPreRelease();
+  } else if (opts.postRelease) {
+    results = checkPostRelease();
+  } else if (includeBase) {
+    results = [
+      ...checkPrerequisites(),
+      ...checkMcpServer(),
+      ...checkEmailConnectivity(),
+      ...checkDesktopExtension(),
+      ...checkCodePlugin(),
+      ...checkPluginCache(),
+      ...checkEnvironment(),
+    ];
+  }
 
   if (opts.fix) {
     for (const r of results) {
@@ -425,34 +609,36 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
     else fail++;
   }
 
-  lines.push("");
-  lines.push("  Accounts");
   let accountsToCheck: Account[] = [];
-  if (opts.account) {
-    accountsToCheck = [{ name: opts.account, isDefault: false }];
-  } else {
-    try {
-      accountsToCheck = await listAccounts();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      lines.push(`  ${icons.fail} Could not list accounts: ${msg}`);
-      accountsToCheck = [];
-      fail++;
-    }
-  }
-
-  const probe = opts.probeAccount ?? checkAccountHealth;
   let anyAccountFailed = false;
-  for (const acc of accountsToCheck) {
-    const status = await probe(acc.name);
-    if (status.reachable) {
-      lines.push(`  ${icons.pass} ${acc.name}: reachable`);
-      pass++;
+  if (!opts.preRelease && !opts.postRelease) {
+    lines.push("");
+    lines.push("  Accounts");
+    if (opts.account) {
+      accountsToCheck = [{ name: opts.account, isDefault: false }];
     } else {
-      anyAccountFailed = true;
-      lines.push(`  ${icons.fail} ${acc.name}: ${status.error}`);
-      if (status.hint) lines.push(`    Hint: ${status.hint}`);
-      fail++;
+      try {
+        accountsToCheck = await listAccounts();
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        lines.push(`  ${icons.fail} Could not list accounts: ${msg}`);
+        accountsToCheck = [];
+        fail++;
+      }
+    }
+
+    const probe = opts.probeAccount ?? checkAccountHealth;
+    for (const acc of accountsToCheck) {
+      const status = await probe(acc.name);
+      if (status.reachable) {
+        lines.push(`  ${icons.pass} ${acc.name}: reachable`);
+        pass++;
+      } else {
+        anyAccountFailed = true;
+        lines.push(`  ${icons.fail} ${acc.name}: ${status.error}`);
+        if (status.hint) lines.push(`    Hint: ${status.hint}`);
+        fail++;
+      }
     }
   }
 
@@ -468,15 +654,23 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
 }
 
 async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; failed: number }> {
-  const results: CheckResult[] = [
-    ...checkPrerequisites(),
-    ...checkMcpServer(),
-    ...checkEmailConnectivity(),
-    ...checkDesktopExtension(),
-    ...checkCodePlugin(),
-    ...checkPluginCache(),
-    ...checkEnvironment(),
-  ];
+  let results: CheckResult[] = [];
+
+  if (opts.preRelease) {
+    results = checkPreRelease();
+  } else if (opts.postRelease) {
+    results = checkPostRelease();
+  } else {
+    results = [
+      ...checkPrerequisites(),
+      ...checkMcpServer(),
+      ...checkEmailConnectivity(),
+      ...checkDesktopExtension(),
+      ...checkCodePlugin(),
+      ...checkPluginCache(),
+      ...checkEnvironment(),
+    ];
+  }
 
   if (opts.fix) {
     for (const r of results) {
@@ -493,30 +687,32 @@ async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; fai
   }
 
   let accountsToCheck: Account[] = [];
-  if (opts.account) {
-    accountsToCheck = [{ name: opts.account, isDefault: false }];
-  } else {
-    try {
-      accountsToCheck = await listAccounts();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
+  if (!opts.preRelease && !opts.postRelease) {
+    if (opts.account) {
+      accountsToCheck = [{ name: opts.account, isDefault: false }];
+    } else {
+      try {
+        accountsToCheck = await listAccounts();
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({
+          name: "list",
+          category: "Accounts",
+          status: "fail",
+          message: `Could not list accounts: ${msg}`,
+        });
+      }
+    }
+    const probe = opts.probeAccount ?? checkAccountHealth;
+    for (const acc of accountsToCheck) {
+      const status = await probe(acc.name);
       results.push({
-        name: "list",
+        name: acc.name,
         category: "Accounts",
-        status: "fail",
-        message: `Could not list accounts: ${msg}`,
+        status: status.reachable ? "pass" : "fail",
+        message: status.reachable ? "reachable" : (status.error ?? "unreachable"),
       });
     }
-  }
-  const probe = opts.probeAccount ?? checkAccountHealth;
-  for (const acc of accountsToCheck) {
-    const status = await probe(acc.name);
-    results.push({
-      name: acc.name,
-      category: "Accounts",
-      status: status.reachable ? "pass" : "fail",
-      message: status.reachable ? "reachable" : (status.error ?? "unreachable"),
-    });
   }
 
   const failed = results.filter(r => r.status === "fail").length;
@@ -535,7 +731,7 @@ async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; fai
 }
 
 /** Thin CLI wrapper around runDoctor / runDoctorJson. */
-export async function doctor(flags: { fix: boolean; json: boolean; account?: string }): Promise<void> {
+export async function doctor(flags: { fix: boolean; json: boolean; account?: string; preRelease?: boolean; postRelease?: boolean }): Promise<void> {
   if (flags.json) {
     const { output, failed } = await runDoctorJson(flags);
     console.log(output);

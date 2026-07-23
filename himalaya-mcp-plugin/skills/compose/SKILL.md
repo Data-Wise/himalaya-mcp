@@ -12,15 +12,15 @@ triggers:
   - new message
 ---
 
-# /email:compose - Compose New Email
+# /himalaya:compose - Compose New Email
 
 Write and send a new email (not a reply) with safety gates.
 
 ## Usage
 
 ```
-/email:compose                           # Interactive compose
-/email:compose to@example.com "Subject"  # Quick compose with recipient and subject
+/himalaya:compose                           # Interactive compose
+/himalaya:compose to@example.com "Subject"  # Quick compose with recipient and subject
 ```
 
 ## When Invoked

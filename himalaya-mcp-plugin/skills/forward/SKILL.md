@@ -11,16 +11,16 @@ triggers:
   - redirect this email
 ---
 
-# /email:forward - Forward Email
+# /himalaya:forward - Forward Email
 
 Forward an email to another person with optional context.
 
 ## Usage
 
 ```
-/email:forward <id>                      # Forward email by ID
-/email:forward <id> "bob@example.com"    # Forward to specific recipient
-/email:forward <id> "bob@example.com" "Please review this"   # With context
+/himalaya:forward <id>                      # Forward email by ID
+/himalaya:forward <id> "bob@example.com"    # Forward to specific recipient
+/himalaya:forward <id> "bob@example.com" "Please review this"   # With context
 ```
 
 ## When Invoked

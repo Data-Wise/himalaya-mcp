@@ -10,20 +10,20 @@ triggers:
   - how do I use email
 ---
 
-# /email:help - Email Help Hub
+# /himalaya:help - Email Help Hub
 
 Single entry point for discovering all email commands, tools, prompts, and workflows.
 
 ## Usage
 
 ```
-/email:help                  # Overview of all capabilities
-/email:help tools            # All 29 MCP tools with usage
-/email:help prompts          # All 7 MCP prompts
-/email:help resources        # All 3 MCP resources
-/email:help <command>        # Detail for a specific tool (e.g. "search_emails")
-/email:help workflows        # Common workflow patterns
-/email:help quick            # One-line reference table
+/himalaya:help                  # Overview of all capabilities
+/himalaya:help tools            # All 29 MCP tools with usage
+/himalaya:help prompts          # All 7 MCP prompts
+/himalaya:help resources        # All 3 MCP resources
+/himalaya:help <command>        # Detail for a specific tool (e.g. "search_emails")
+/himalaya:help workflows        # Common workflow patterns
+/himalaya:help quick            # One-line reference table
 ```
 
 ## When Invoked (No Args) — Overview
@@ -65,22 +65,22 @@ Display the hub overview:
 |   email://inbox, email://folders, email://message/{id}    |
 |                                                           |
 | SKILLS (16)                                               |
-|   /email:inbox, /email:triage, /email:digest,             |
-|   /email:reply, /email:compose, /email:attachments,       |
-|   /email:forward, /email:export, /email:threads,          |
-|   /email:search, /email:manage, /email:stats,             |
-|   /email:config, /email:help, /email:morning,             |
-|   /email:respond                                          |
+|   /himalaya:inbox, /himalaya:triage, /himalaya:digest,             |
+|   /himalaya:reply, /himalaya:compose, /himalaya:attachments,       |
+|   /himalaya:forward, /himalaya:export, /himalaya:threads,          |
+|   /himalaya:search, /himalaya:manage, /himalaya:stats,             |
+|   /himalaya:config, /himalaya:help, /himalaya:morning,             |
+|   /himalaya:respond                                          |
 |                                                           |
 | HOOKS (2)                                                 |
 |   session ...... Context injection at conversation start   |
 |   pre-send .... Preview gate before send/compose          |
 |                                                           |
 +-----------------------------------------------------------+
-| /email:help tools        Detailed tool reference          |
-| /email:help prompts      Prompt usage guide               |
-| /email:help workflows    Common email patterns            |
-| /email:help quick        One-line cheat sheet             |
+| /himalaya:help tools        Detailed tool reference          |
+| /himalaya:help prompts      Prompt usage guide               |
+| /himalaya:help workflows    Common email patterns            |
+| /himalaya:help quick        One-line cheat sheet             |
 +-----------------------------------------------------------+
 ```
 
@@ -256,7 +256,7 @@ Display all 29 tools grouped by category:
 |     Example: "Run a health check on my email accounts"    |
 |                                                           |
 +-----------------------------------------------------------+
-| /email:help <tool_name>   Detail for specific tool        |
+| /himalaya:help <tool_name>   Detail for specific tool        |
 +-----------------------------------------------------------+
 ```
 
@@ -443,22 +443,22 @@ One-line cheat sheet:
 +-------------------+---------------------------------------+
 | Skill               | What it does                    |
 |-----------------------+-----------------------------------|
-| /email:inbox        | Check inbox interactively         |
-| /email:triage       | AI-powered triage                 |
-| /email:digest       | Generate daily digest             |
-| /email:reply        | Draft and send replies            |
-| /email:compose      | Compose new email                 |
-| /email:forward      | Forward email with context        |
-| /email:attachments  | List/download/calendar            |
-| /email:export       | Export to markdown + clipboard    |
-| /email:threads      | Conversation thread view          |
-| /email:search       | Search by keyword/sender/flags    |
-| /email:manage       | Bulk flag/move/archive            |
-| /email:stats        | Inbox statistics + trends         |
-| /email:config       | Setup wizard + diagnostics        |
-| /email:morning      | Morning briefing + follow-ups     |
-| /email:respond      | Batch draft replies               |
-| /email:help         | This help hub                     |
+| /himalaya:inbox        | Check inbox interactively         |
+| /himalaya:triage       | AI-powered triage                 |
+| /himalaya:digest       | Generate daily digest             |
+| /himalaya:reply        | Draft and send replies            |
+| /himalaya:compose      | Compose new email                 |
+| /himalaya:forward      | Forward email with context        |
+| /himalaya:attachments  | List/download/calendar            |
+| /himalaya:export       | Export to markdown + clipboard    |
+| /himalaya:threads      | Conversation thread view          |
+| /himalaya:search       | Search by keyword/sender/flags    |
+| /himalaya:manage       | Bulk flag/move/archive            |
+| /himalaya:stats        | Inbox statistics + trends         |
+| /himalaya:config       | Setup wizard + diagnostics        |
+| /himalaya:morning      | Morning briefing + follow-ups     |
+| /himalaya:respond      | Batch draft replies               |
+| /himalaya:help         | This help hub                     |
 +-----------------------------------------------------------+
 ```
 
@@ -466,7 +466,7 @@ One-line cheat sheet:
 
 Show detailed info for that tool including all parameters, examples, and related commands. Pull from the tool registration in source code.
 
-Example for `/email:help search_emails`:
+Example for `/himalaya:help search_emails`:
 
 ```
 +-----------------------------------------------------------+

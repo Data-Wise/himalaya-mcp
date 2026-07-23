@@ -262,7 +262,7 @@ brew install himalaya-mcp
 
 # Claude Code plugin (from GitHub marketplace — requires brew install node himalaya)
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 
 # Claude Desktop (.mcpb extension — download from GitHub Releases, double-click)
 # Or legacy MCP server config:
@@ -288,7 +288,7 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 | 0–6d | Core features, plugin, packaging, desktop extension | Done |
 | **em Port P1** | Trash utility, unread count, read_raw, render, list_starred | Done |
 | **em Port P2** | Apple Reminders, snooze, weekly digest, triage enhancement | Done |
-| **em Port P3** | /email:respond skill | Done |
+| **em Port P3** | /himalaya:respond skill | Done |
 | **em Port Docs** | Migration guide + tutorial, nav reorganization | Done |
 
 ---

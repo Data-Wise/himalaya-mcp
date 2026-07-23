@@ -145,7 +145,7 @@ npm run build
 
 ### Skills not loading
 
-If `/email:*` slash commands don't appear after install, there are two common causes:
+If `/himalaya:*` slash commands don't appear after install, there are two common causes:
 
 **1. Stale plugin cache**
 

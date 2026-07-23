@@ -193,11 +193,11 @@ The extension works identically in Claude Cowork (the collaborative mode within 
 | 29 MCP tools | Yes | Yes |
 | 7 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
-| Interaction style | Natural language | Natural language + `/email:*` skills |
+| Interaction style | Natural language | Natural language + `/himalaya:*` skills |
 | Email assistant agent | No | Yes |
-| Slash commands | No | 16 skills (`/email:inbox`, etc.) |
+| Slash commands | No | 16 skills (`/himalaya:inbox`, etc.) |
 
-In Claude Desktop, everything is natural language. Say "check my inbox" instead of `/email:inbox`. The underlying tools are identical.
+In Claude Desktop, everything is natural language. Say "check my inbox" instead of `/himalaya:inbox`. The underlying tools are identical.
 
 ## Troubleshooting
 
