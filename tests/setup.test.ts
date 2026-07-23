@@ -746,13 +746,34 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
 // ==============================================================================
 
 describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
+  // Isolate HOME so checkPostRelease()'s "Plugin installed" check doesn't
+  // depend on the developer's real ~/.claude/plugins/himalaya-mcp symlink,
+  // which never exists in CI. Seed a fake plugin install so the full
+  // Post-Release check suite runs (plugin.json, MCP handshake, etc.)
+  // instead of early-returning on a missing symlink.
+  let tempHome: string;
+
+  beforeEach(async () => {
+    tempHome = await mkdtemp(join(tmpdir(), "himalaya-doctor-release-test-"));
+    const pluginDir = join(tempHome, ".claude", "plugins", "himalaya-mcp");
+    await mkdir(join(pluginDir, ".claude-plugin"), { recursive: true });
+    await writeFile(
+      join(pluginDir, ".claude-plugin", "plugin.json"),
+      JSON.stringify({ name: "himalaya", version: "2.0.0" }, null, 2)
+    );
+  });
+
+  afterEach(async () => {
+    if (tempHome) await rm(tempHome, { recursive: true, force: true });
+  });
+
   it("doctor --pre-release outputs Pre-Release category checks", async () => {
     let stdout: string;
     try {
       const result = await execFileAsync(
         "node",
         ["dist/cli/index.js", "doctor", "--pre-release"],
-        { cwd: PROJECT_ROOT }
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
     } catch (err: unknown) {
@@ -773,7 +794,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
       const result = await execFileAsync(
         "node",
         ["dist/cli/index.js", "doctor", "--pre-release", "--json"],
-        { cwd: PROJECT_ROOT }
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
     } catch (err: unknown) {
@@ -797,7 +818,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
       const result = await execFileAsync(
         "node",
         ["dist/cli/index.js", "doctor", "--post-release"],
-        { cwd: PROJECT_ROOT }
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
     } catch (err: unknown) {
@@ -817,7 +838,7 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
       const result = await execFileAsync(
         "node",
         ["dist/cli/index.js", "doctor", "--post-release", "--json"],
-        { cwd: PROJECT_ROOT }
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
       );
       stdout = result.stdout;
     } catch (err: unknown) {
