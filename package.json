@@ -13,6 +13,7 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "test": "vitest",
+    "test:coverage": "vitest run --coverage",
     "test:e2e": "npm run build && node tests/e2e.mjs",
     "lint": "npm run build",
     "build:mcpb": "bash scripts/build-mcpb.sh",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
+    "@vitest/coverage-v8": "^4.1.10",
     "esbuild": "^0.28.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"

@@ -9,6 +9,7 @@
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
+import { parseEnvelopes } from "../himalaya/parser.js";
 import { envelopeError } from "./_envelope.js";
 
 export function registerUnreadTools(server: McpServer, client: HimalayaClient) {
@@ -20,7 +21,9 @@ export function registerUnreadTools(server: McpServer, client: HimalayaClient) {
     },
   }, async (args) => {
     try {
-      const count = await client.getUnreadCount(args.folder, args.account);
+      const raw = await client.searchEnvelopes("not flag Seen", args.folder, args.account);
+      const result = parseEnvelopes(raw);
+      const count = result.ok ? result.data.length : 0;
       return {
         content: [{ type: "text" as const, text: String(count) }],
       };
