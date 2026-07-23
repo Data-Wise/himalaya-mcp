@@ -52,7 +52,6 @@ if [ -f "$MCPB_FILE" ]; then
   SIZE_KB=$((SIZE / 1024))
   echo ""
   echo "==> Built: $OUTPUT_NAME (${SIZE_KB} KB)"
-  npx @anthropic-ai/mcpb info "$MCPB_FILE"
 else
   echo "ERROR: No .mcpb file found after pack"
   exit 1
