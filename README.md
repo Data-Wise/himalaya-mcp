@@ -35,7 +35,7 @@ himalaya-mcp doctor    # Verify installation
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 ```
 
 ```bash
