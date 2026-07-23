@@ -742,6 +742,101 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
 });
 
 // ==============================================================================
+// E2E: doctor --pre-release / --post-release
+// ==============================================================================
+
+describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
+  it("doctor --pre-release outputs Pre-Release category checks", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--pre-release"],
+        { cwd: PROJECT_ROOT }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    expect(stdout).toContain("Pre-Release");
+    expect(stdout).toContain("Build exists");
+    expect(stdout).toContain("TypeScript");
+    expect(stdout).toContain("Version sync");
+    expect(stdout).toContain("Test suite");
+    expect(stdout).toContain("Summary:");
+  }, 120_000);
+
+  it("doctor --pre-release --json outputs valid JSON", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--pre-release", "--json"],
+        { cwd: PROJECT_ROOT }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    const results = JSON.parse(stdout) as Array<{ name: string; category: string; status: string }>;
+    expect(Array.isArray(results)).toBe(true);
+    expect(results.length).toBeGreaterThan(3);
+
+    for (const r of results) {
+      expect(r.name).toBeDefined();
+      expect(r.category).toBe("Pre-Release");
+      expect(["pass", "warn", "fail"]).toContain(r.status);
+    }
+  }, 120_000);
+
+  it("doctor --post-release outputs Post-Release category checks", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--post-release"],
+        { cwd: PROJECT_ROOT }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    expect(stdout).toContain("Post-Release");
+    expect(stdout).toContain("Plugin installed");
+    expect(stdout).toContain("plugin.json");
+    expect(stdout).toContain("MCP handshake");
+    expect(stdout).toContain("Summary:");
+  }, 30_000);
+
+  it("doctor --post-release --json outputs valid JSON", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--post-release", "--json"],
+        { cwd: PROJECT_ROOT }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    const results = JSON.parse(stdout) as Array<{ name: string; category: string; status: string }>;
+    expect(Array.isArray(results)).toBe(true);
+    expect(results.length).toBeGreaterThan(2);
+
+    for (const r of results) {
+      expect(r.name).toBeDefined();
+      expect(r.category).toBe("Post-Release");
+      expect(["pass", "warn", "fail"]).toContain(r.status);
+    }
+  }, 30_000);
+});
+
+// ==============================================================================
 // E2E: Plugin structure validation
 // Tests that the plugin directory contains everything Claude Code expects.
 // ==============================================================================
