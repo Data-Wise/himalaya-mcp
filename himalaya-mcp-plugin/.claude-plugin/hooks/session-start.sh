@@ -1,7 +1,7 @@
 #!/bin/bash
 # SessionStart hook: inject email context into every conversation
-# This tells Claude that email tools are available without needing /email:* commands
+# This tells Claude that email tools are available without needing /himalaya:* commands
 
 cat <<'EOF'
-{"additionalContext": "Email plugin (himalaya-mcp) is active. When the user mentions email, inbox, messages, triage, or mail — use the himalaya MCP tools directly. Available skills: /email:inbox (check email), /email:triage (classify inbox), /email:digest (daily summary), /email:compose (new email), /email:reply (reply to email), /email:search (find emails), /email:manage (flag/move/archive), /email:attachments (list/download), /email:stats (inbox analytics), /email:config (setup), /email:help (commands reference)."}
+{"additionalContext": "Email plugin (himalaya-mcp) is active. When the user mentions email, inbox, messages, triage, or mail — use the himalaya MCP tools directly. Available skills: /himalaya:inbox (check email), /himalaya:triage (classify inbox), /himalaya:digest (daily summary), /himalaya:compose (new email), /himalaya:reply (reply to email), /himalaya:search (find emails), /himalaya:manage (flag/move/archive), /himalaya:attachments (list/download), /himalaya:stats (inbox analytics), /himalaya:config (setup), /himalaya:help (commands reference)."}
 EOF

@@ -41,22 +41,22 @@ brew install himalaya-mcp
 
 Restart Claude Code. The **`email`** plugin gives you:
 
-- `/email:inbox` -- list recent emails
-- `/email:triage` -- classify and organize
-- `/email:digest` -- daily priority digest
-- `/email:reply` -- draft with safety gate
-- `/email:compose` -- compose new emails
-- `/email:respond` -- read, understand, and reply
-- `/email:morning` -- morning briefing
-- `/email:attachments` -- list, download, calendar invites
-- `/email:forward` -- forward with attribution
-- `/email:export` -- export to markdown
-- `/email:threads` -- conversation threads
-- `/email:search` -- search by keyword, sender, flags
-- `/email:manage` -- bulk flag/move/archive
-- `/email:stats` -- inbox statistics and trends
-- `/email:config` -- setup wizard
-- `/email:help` -- help hub
+- `/himalaya:inbox` -- list recent emails
+- `/himalaya:triage` -- classify and organize
+- `/himalaya:digest` -- daily priority digest
+- `/himalaya:reply` -- draft with safety gate
+- `/himalaya:compose` -- compose new emails
+- `/himalaya:respond` -- read, understand, and reply
+- `/himalaya:morning` -- morning briefing
+- `/himalaya:attachments` -- list, download, calendar invites
+- `/himalaya:forward` -- forward with attribution
+- `/himalaya:export` -- export to markdown
+- `/himalaya:threads` -- conversation threads
+- `/himalaya:search` -- search by keyword, sender, flags
+- `/himalaya:manage` -- bulk flag/move/archive
+- `/himalaya:stats` -- inbox statistics and trends
+- `/himalaya:config` -- setup wizard
+- `/himalaya:help` -- help hub
 
 **Verify:**
 
@@ -255,7 +255,7 @@ ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
 
 ### Skills not loading (Homebrew install)
 
-If `/email:*` skills don't appear after Homebrew install:
+If `/himalaya:*` skills don't appear after Homebrew install:
 
 1. Check skills path: `ls ~/.claude/plugins/himalaya-mcp/skills/`
 2. If missing, upgrade: `brew upgrade himalaya-mcp`

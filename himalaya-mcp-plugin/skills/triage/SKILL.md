@@ -11,16 +11,16 @@ triggers:
   - sort my messages
 ---
 
-# /email:triage - AI Email Triage
+# /himalaya:triage - AI Email Triage
 
 Classify inbox emails using Claude's reasoning via MCP prompts.
 
 ## Usage
 
 ```
-/email:triage             # Triage last 10 emails
-/email:triage 20          # Triage last 20
-/email:triage --folder Sent  # Triage specific folder
+/himalaya:triage             # Triage last 10 emails
+/himalaya:triage 20          # Triage last 20
+/himalaya:triage --folder Sent  # Triage specific folder
 ```
 
 ## When Invoked

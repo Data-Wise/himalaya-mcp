@@ -26,14 +26,14 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 | 29 MCP tools | Yes | Yes |
 | 7 MCP prompts | Yes | Yes |
 | 3 MCP resources | Yes | Yes |
-| `/email:*` slash commands | Yes (16 skills) | No |
+| `/himalaya:*` slash commands | Yes (16 skills) | No |
 | Plugin hooks | Yes (2 hooks) | No |
 | Email assistant agent | Yes | No |
 | Natural language ("check my inbox") | Yes | Yes |
 | Two-phase send safety gate | Yes | Yes |
 | Env var configuration | Yes | Yes |
 
-**In Claude Code**, the plugin system provides slash-command skills (`/email:inbox`, `/email:triage`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.
+**In Claude Code**, the plugin system provides slash-command skills (`/himalaya:inbox`, `/himalaya:triage`, `/himalaya:search`, `/himalaya:manage`, `/himalaya:stats`, `/himalaya:config`, etc.) that orchestrate multi-step workflows, plus an autonomous email assistant agent and a pre-send confirmation hook. These are Claude Code-only features defined in the plugin manifest.
 
 **In Claude Desktop**, you get the full MCP server -- all 29 tools, 7 prompts, and 3 resources work identically. You interact using natural language instead of slash commands. Say "check my inbox" and Claude calls `list_emails` directly. The two-phase send safety gate works the same way.
 
@@ -72,7 +72,7 @@ npm install && npm run build
 ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
 ```
 
-Restart Claude Code. The plugin provides 16 skills: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:forward`, `/email:attachments`, `/email:export`, `/email:threads`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:morning`, `/email:help`, `/email:respond`.
+Restart Claude Code. The plugin provides 16 skills: `/himalaya:inbox`, `/himalaya:triage`, `/himalaya:digest`, `/himalaya:reply`, `/himalaya:compose`, `/himalaya:forward`, `/himalaya:attachments`, `/himalaya:export`, `/himalaya:threads`, `/himalaya:search`, `/himalaya:manage`, `/himalaya:stats`, `/himalaya:config`, `/himalaya:morning`, `/himalaya:help`, `/himalaya:respond`.
 
 ### Claude Desktop (.mcpb)
 

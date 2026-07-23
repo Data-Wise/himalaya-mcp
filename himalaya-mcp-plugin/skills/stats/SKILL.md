@@ -11,16 +11,16 @@ triggers:
   - unread count
 ---
 
-# /email:stats - Inbox Statistics
+# /himalaya:stats - Inbox Statistics
 
 Get a quick overview of your inbox: unread count, volume, top senders, and oldest unread.
 
 ## Usage
 
 ```
-/email:stats                # Current inbox snapshot
-/email:stats --weekly       # Include week-over-week comparison
-/email:stats --folder Sent  # Stats for a specific folder
+/himalaya:stats                # Current inbox snapshot
+/himalaya:stats --weekly       # Include week-over-week comparison
+/himalaya:stats --folder Sent  # Stats for a specific folder
 ```
 
 ## When Invoked
@@ -61,8 +61,8 @@ Oldest unread: 12 days ago
   Subject: Benefits enrollment deadline
 
 → "Read oldest unread" to view it
-→ "/email:triage" to classify unread
-→ "/email:manage archive" to bulk archive
+→ "/himalaya:triage" to classify unread
+→ "/himalaya:manage archive" to bulk archive
 ```
 
 ## Weekly Comparison (--weekly)
@@ -79,5 +79,5 @@ Top senders this week:
   1. boss@company.com — 6 emails
   ...
 
-→ Unread trending up — consider /email:triage
+→ Unread trending up — consider /himalaya:triage
 ```

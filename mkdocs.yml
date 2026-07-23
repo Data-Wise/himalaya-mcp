@@ -80,6 +80,7 @@ nav:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md
     - Desktop Extension: getting-started/desktop-extension.md
+    - Migrate Plugin Name: getting-started/migrate-plugin-name.md
     - Diagnose Issues: getting-started/diagnose-issues.md
   - Tutorials:
     - Overview: tutorials/index.md

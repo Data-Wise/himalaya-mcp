@@ -210,22 +210,22 @@ triage_inbox prompt
 
 plugin/
   skills/
-    inbox.md          /email:inbox — list recent emails
-    triage.md         /email:triage — classify and organize
-    digest.md         /email:digest — daily summary
-    reply.md          /email:reply — draft with safety gate
-    compose.md        /email:compose — compose new emails
-    respond.md        /email:respond — read, understand, and reply
-    morning.md        /email:morning — morning briefing
-    attachments.md    /email:attachments — files and calendar
-    forward.md        /email:forward — forward with attribution
-    export.md         /email:export — export to markdown
-    threads.md        /email:threads — conversation threads
-    search.md         /email:search — search with filters
-    manage.md         /email:manage — bulk operations
-    stats.md          /email:stats — inbox statistics
-    config.md         /email:config — setup wizard
-    help.md           /email:help — help hub
+    inbox.md          /himalaya:inbox — list recent emails
+    triage.md         /himalaya:triage — classify and organize
+    digest.md         /himalaya:digest — daily summary
+    reply.md          /himalaya:reply — draft with safety gate
+    compose.md        /himalaya:compose — compose new emails
+    respond.md        /himalaya:respond — read, understand, and reply
+    morning.md        /himalaya:morning — morning briefing
+    attachments.md    /himalaya:attachments — files and calendar
+    forward.md        /himalaya:forward — forward with attribution
+    export.md         /himalaya:export — export to markdown
+    threads.md        /himalaya:threads — conversation threads
+    search.md         /himalaya:search — search with filters
+    manage.md         /himalaya:manage — bulk operations
+    stats.md          /himalaya:stats — inbox statistics
+    config.md         /himalaya:config — setup wizard
+    help.md           /himalaya:help — help hub
 
   agents/
     email-assistant.md  Autonomous triage agent (all 29 tools)

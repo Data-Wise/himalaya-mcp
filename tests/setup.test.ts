@@ -753,7 +753,7 @@ describe("Plugin structure validation", () => {
 
   it("plugin.json has required fields", async () => {
     const data = JSON.parse(await readFile(pluginJson, "utf-8"));
-    expect(data.name).toBe("email");
+    expect(data.name).toBe("himalaya");
     expect(data.version).toBeDefined();
     expect(data.description).toBeDefined();
     expect(data.author).toBeDefined();
@@ -763,7 +763,7 @@ describe("Plugin structure validation", () => {
     const data = JSON.parse(await readFile(marketplaceJson, "utf-8"));
     expect(data.plugins).toBeDefined();
     expect(data.plugins.length).toBeGreaterThan(0);
-    expect(data.plugins[0].name).toBe("email");
+    expect(data.plugins[0].name).toBe("himalaya");
   });
 
   it("all 16 skills exist as SKILL.md subdirectories and are non-empty", async () => {
@@ -785,8 +785,8 @@ describe("Plugin structure validation", () => {
     const mcpJson = JSON.parse(
       await readFile(resolve(__dirname, "..", ".mcp.json"), "utf-8")
     );
-    expect(mcpJson.mcpServers?.himalaya).toBeDefined();
-    expect(mcpJson.mcpServers.himalaya.args[0]).toContain("dist/index.js");
+    expect(mcpJson.mcpServers?.email).toBeDefined();
+    expect(mcpJson.mcpServers.email.args[0]).toContain("dist/index.js");
   });
 
   it("version consistency across all manifests", async () => {

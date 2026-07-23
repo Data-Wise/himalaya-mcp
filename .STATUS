@@ -4,7 +4,7 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: released
-## Focus: v1.9.0
+## Focus: v2.0.0
 ## Phase: Maintenance
 ## Priority: 2
 ## Progress: 100
@@ -69,7 +69,7 @@
 - Version: 1.9.0 (released), 2.0.0 in progress
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
 - Tests: 569 passing across 31 test files
-- Plugin: `email` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
+- Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
 - Homebrew: data-wise/tap/himalaya-mcp at v1.9.0
 - Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/
 - Bundle: ~883KB (esbuild), .mcpb: ~247KB
@@ -83,7 +83,7 @@ brew install himalaya-mcp
 
 # Claude Code plugin (from GitHub)
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 
 # Claude Desktop (.mcpb extension)
 # Download .mcpb from GitHub Releases, double-click to install
@@ -124,5 +124,5 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-07-21 (session 4)
-**Status:** v1.9.0 released. Plugin rename `email` → `himalaya` (v2.0.0) in progress on `feature/rename-plugin-email`. Spec + grill committed, pushed, ready to drive. 8 phases, 18+ doc files, dedicated agents for skills.md (764 lines) and cookbook.md (512 lines).
+**Last Updated:** 2026-07-23
+**Status:** v2.0.0 — plugin renamed from `email` to `himalaya` (issue #67). All docs, tests, configs updated. PR #93 open, all tests passing.

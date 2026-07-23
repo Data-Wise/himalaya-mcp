@@ -27,7 +27,7 @@ The email-assistant agent can be configured to run scheduled tasks. On macOS, th
     <array>
         <string>/usr/local/bin/claude</string>
         <string>--execute</string>
-        <string>Run /email:triage for my work inbox and summarize</string>
+        <string>Run /himalaya:triage for my work inbox and summarize</string>
     </array>
     <key>StartCalendarInterval</key>
     <dict>

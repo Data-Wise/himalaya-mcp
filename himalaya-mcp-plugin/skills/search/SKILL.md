@@ -12,18 +12,18 @@ triggers:
   - look for that email from
 ---
 
-# /email:search - Search Emails
+# /himalaya:search - Search Emails
 
 Search your email using himalaya's filter syntax with a friendly interface.
 
 ## Usage
 
 ```
-/email:search meeting            # Search by keyword (subject/body)
-/email:search from:alice         # Search by sender
-/email:search --unread           # Only unread messages
-/email:search --flagged          # Only starred/flagged messages
-/email:search from:boss meeting  # Combine sender + keyword
+/himalaya:search meeting            # Search by keyword (subject/body)
+/himalaya:search from:alice         # Search by sender
+/himalaya:search --unread           # Only unread messages
+/himalaya:search --flagged          # Only starred/flagged messages
+/himalaya:search from:boss meeting  # Combine sender + keyword
 ```
 
 ## When Invoked
@@ -55,7 +55,7 @@ Search your email using himalaya's filter syntax with a friendly interface.
 
 → "Read #1" to view full email
 → "Refine: after Feb 20" to narrow results
-→ "/email:triage" to classify these results
+→ "/himalaya:triage" to classify these results
 ```
 
 ## No Results

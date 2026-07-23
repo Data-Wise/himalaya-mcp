@@ -12,17 +12,17 @@ triggers:
   - save for later
 ---
 
-# /email:export - Export Email
+# /himalaya:export - Export Email
 
 Save an email as structured markdown with YAML frontmatter, with optional clipboard copy.
 
 ## Usage
 
 ```
-/email:export <id>                       # Export to markdown
-/email:export <id> --clipboard           # Export and copy to clipboard
-/email:export <id> --action-items        # Also extract action items
-/email:export <id> --clipboard --action-items  # Full pipeline
+/himalaya:export <id>                       # Export to markdown
+/himalaya:export <id> --clipboard           # Export and copy to clipboard
+/himalaya:export <id> --action-items        # Also extract action items
+/himalaya:export <id> --clipboard --action-items  # Full pipeline
 ```
 
 ## When Invoked
