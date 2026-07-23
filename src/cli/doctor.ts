@@ -45,9 +45,9 @@ export interface DoctorOptions {
   probeAccount?: (name: string) => Promise<AccountHealth> | AccountHealth;
 }
 
-function execQuiet(bin: string, args: string[]): { ok: boolean; stdout: string; stderr: string } {
+function execQuiet(bin: string, args: string[], timeout = 10_000): { ok: boolean; stdout: string; stderr: string } {
   try {
-    const stdout = execFileSync(bin, args, { timeout: 10_000, stdio: "pipe" }).toString().trim();
+    const stdout = execFileSync(bin, args, { timeout, stdio: "pipe" }).toString().trim();
     return { ok: true, stdout, stderr: "" };
   } catch (err: unknown) {
     const stderr = err instanceof Error ? err.message : String(err);
@@ -354,7 +354,7 @@ function checkPreRelease(): CheckResult[] {
   }
 
   // 2. TypeScript compiles
-  const tscResult = execQuiet("npx", ["tsc", "--noEmit"]);
+  const tscResult = execQuiet("npx", ["tsc", "--noEmit"], 60_000);
   if (tscResult.ok) {
     results.push({ name: "TypeScript", category: "Pre-Release", status: "pass", message: "compiles clean" });
   } else {
@@ -419,9 +419,9 @@ function checkPreRelease(): CheckResult[] {
   }
 
   // 7. Test suite passes
-  const testResult = execQuiet("npx", ["vitest", "run", "--reporter=verbose"]);
-  if (testResult.ok && testResult.stdout.includes("Tests") && !testResult.stdout.includes("failed")) {
-    const match = testResult.stdout.match(/(\d+) passed/);
+  const testResult = execQuiet("npx", ["vitest", "run", "--reporter=verbose"], 180_000);
+  if (testResult.ok) {
+    const match = testResult.stdout.match(/Tests\s+(\d+) passed/);
     const count = match ? match[1] : "?";
     results.push({ name: "Test suite", category: "Pre-Release", status: "pass", message: `${count} tests pass` });
   } else {
