@@ -397,8 +397,8 @@ function checkPreRelease(): CheckResult[] {
     try {
       const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version: string };
       const changelog = readFileSync(changelogPath, "utf-8");
-      if (changelog.includes(`[${pkg.version}]`) || changelog.includes("[Unreleased]")) {
-        results.push({ name: "CHANGELOG", category: "Pre-Release", status: "pass", message: `has entry for v${pkg.version} or [Unreleased]` });
+      if (changelog.includes(`[${pkg.version}]`)) {
+        results.push({ name: "CHANGELOG", category: "Pre-Release", status: "pass", message: `has entry for v${pkg.version}` });
       } else {
         results.push({ name: "CHANGELOG", category: "Pre-Release", status: "warn", message: `no entry for v${pkg.version}` });
       }

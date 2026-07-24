@@ -11,6 +11,10 @@ VERSION=$(node -p "require('$PROJECT_ROOT/package.json').version")
 
 echo "==> Building himalaya-mcp v${VERSION} .mcpb bundle"
 
+# Clear stale .mcpb output so the last-resort fallback below can't pick up a
+# leftover file from a prior failed run.
+rm -f "$PROJECT_ROOT"/*.mcpb
+
 # Step 1: Build esbuild bundle
 echo "  [1/4] Building esbuild bundle..."
 npm run build:bundle --prefix "$PROJECT_ROOT"
