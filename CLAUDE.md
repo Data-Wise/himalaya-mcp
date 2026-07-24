@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 2.0.0
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 569 tests)
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 573 tests)
 
 ### What It Does
 
@@ -247,7 +247,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (569 tests across 31 test files)
+npm test                         # Run vitest (573 tests across 31 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~883KB)
 node dist/index.js               # Run MCP server directly
 ```
@@ -275,9 +275,20 @@ himalaya-mcp doctor --fix        # Auto-fix common issues
 
 ### Dev Setup (local development)
 
+himalaya-mcp is Homebrew-distributed, so local Claude Code installs should track
+the Cellar install (auto-updates on `brew upgrade`), not this dev repo directly —
+same pattern as craft/rforge/scholar. Point the `local-plugins` marketplace entry
+at the Cellar path:
+
 ```bash
-ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
+rm -rf ~/.claude/local-marketplace/himalaya-mcp
+ln -s /opt/homebrew/opt/himalaya-mcp/libexec ~/.claude/local-marketplace/himalaya-mcp
 ```
+
+Symlinking straight to `~/projects/dev-tools/himalaya-mcp` (the old instruction here)
+shows unreleased/WIP repo content as if it were the installed plugin, and doesn't
+match where `local-plugins` actually resolves it from — only use that for testing
+unreleased changes, not as the default dev setup.
 
 ---
 
