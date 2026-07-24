@@ -45,8 +45,10 @@ async function runCli(): Promise<void> {
   } else if (command === "doctor") {
     const fix = args.includes("--fix");
     const json = args.includes("--json");
+    const preRelease = args.includes("--pre-release");
+    const postRelease = args.includes("--post-release");
     const account = parseAccountFlag(args);
-    await doctor({ fix, json, account });
+    await doctor({ fix, json, account, preRelease, postRelease });
   } else if (!command || command === "setup") {
     setup();
   } else {

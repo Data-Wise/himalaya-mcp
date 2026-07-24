@@ -6,7 +6,7 @@
 
 ## What is himalaya-mcp?
 
-himalaya-mcp gives Claude the ability to read, triage, compose, and manage email -- all without sending your credentials to the cloud. It wraps the local himalaya CLI as a subprocess, exposing email operations through the [Model Context Protocol](https://modelcontextprotocol.io/). Install as the **`email`** plugin in Claude Code for `/email:*` slash commands.
+himalaya-mcp gives Claude the ability to read, triage, compose, and manage email -- all without sending your credentials to the cloud. It wraps the local himalaya CLI as a subprocess, exposing email operations through the [Model Context Protocol](https://modelcontextprotocol.io/). Install as the **`email`** plugin in Claude Code for `/himalaya:*` slash commands.
 
 ## Key Features
 
@@ -20,11 +20,11 @@ himalaya-mcp gives Claude the ability to read, triage, compose, and manage email
 
     [:octicons-arrow-right-24: MCP Tools](reference/commands.md)
 
-- :brain: **6 MCP Prompts**
+- :brain: **7 MCP Prompts**
 
     ---
 
-    Triage inbox, summarize email, daily digest, draft reply, morning briefing, inbox check
+    Triage inbox, summarize email, daily digest, weekly digest, draft reply, morning briefing, inbox check
 
     [:octicons-arrow-right-24: Prompts](reference/commands.md#prompts)
 
@@ -86,20 +86,22 @@ When installed as a Claude Code plugin, these slash commands are available:
 
 | Skill | Description |
 |-------|-------------|
-| `/email:inbox` | Check inbox, list recent emails |
-| `/email:triage` | AI-powered email classification |
-| `/email:digest` | Generate daily priority digest |
-| `/email:reply` | Draft and send with safety gate |
-| `/email:compose` | Compose new emails with safety gate |
-| `/email:attachments` | List, download, and calendar invites |
-| `/email:forward` | Forward email with context and attribution |
-| `/email:export` | Export to markdown with YAML frontmatter |
-| `/email:threads` | View and navigate conversation threads |
-| `/email:search` | Search by keyword, sender, flags, dates |
-| `/email:manage` | Bulk flag, move, archive with confirmation |
-| `/email:stats` | Inbox statistics, top senders, trends |
-| `/email:config` | Setup wizard with provider templates |
-| `/email:help` | Help hub -- browse all tools, prompts, workflows |
+| `/himalaya:inbox` | Check inbox, list recent emails |
+| `/himalaya:triage` | AI-powered email classification |
+| `/himalaya:digest` | Generate daily priority digest |
+| `/himalaya:reply` | Draft and send with safety gate |
+| `/himalaya:compose` | Compose new emails with safety gate |
+| `/himalaya:respond` | Read, understand, and reply to emails |
+| `/himalaya:morning` | Morning briefing with urgency classification |
+| `/himalaya:attachments` | List, download, and calendar invites |
+| `/himalaya:forward` | Forward email with context and attribution |
+| `/himalaya:export` | Export to markdown with YAML frontmatter |
+| `/himalaya:threads` | View and navigate conversation threads |
+| `/himalaya:search` | Search by keyword, sender, flags, dates |
+| `/himalaya:manage` | Bulk flag, move, archive with confirmation |
+| `/himalaya:stats` | Inbox statistics, top senders, trends |
+| `/himalaya:config` | Setup wizard with provider templates |
+| `/himalaya:help` | Help hub -- browse all tools, prompts, workflows |
 
 ## Quick Start
 
@@ -118,7 +120,7 @@ Prerequisites: `brew install node himalaya` (not bundled with GitHub install).
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 ```
 
 ### From Source
@@ -157,7 +159,7 @@ You: "Check my inbox"
 You: "Triage my last 10 emails"
 You: "Reply to the meeting email"
 You: "Give me today's email digest"
-You: "/email:help"
+You: "/himalaya:help"
 ```
 
 ## Next Steps

@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.0] - 2026-07-23
+
+### Changed (BREAKING)
+
+- **Plugin renamed** from `email` to `himalaya` (issue #67). Install command: `claude plugin install himalaya`.
+- **Skill commands** changed from `/email:*` to `/himalaya:*`.
+- **Tool names** changed from `mcp__plugin_email_himalaya__*` to `mcp__plugin_himalaya_email__*`.
+- **Hook matcher** changed from `mcp__plugin_email_himalaya` to `mcp__plugin_himalaya_email`.
+
+### Added
+
+- Migration guide: `docs/getting-started/migrate-plugin-name.md`.
+
+### Fixed
+
+- `doctor --pre-release` exec timeout is now configurable (was hardcoded 10s, too short for `tsc`/`vitest`); test-suite check no longer reports false failures via substring matching.
+
 ## [1.9.0] - 2026-07-07
 
 ### Added

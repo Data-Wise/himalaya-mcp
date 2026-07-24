@@ -12,7 +12,7 @@ set -eo pipefail
 #
 # Install: Add to .claude/settings.json or project .claude/settings.local.json:
 #   "PreToolUse": [{
-#     "matcher": "mcp__plugin_email_himalaya",
+#     "matcher": "mcp__plugin_himalaya_email",
 #     "hooks": [{
 #       "type": "command",
 #       "command": "/bin/bash \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/pre-send.sh\"",

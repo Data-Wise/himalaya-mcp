@@ -1,6 +1,6 @@
 ---
 name: digest
-description: This skill should be used when the user asks for "email digest", "daily digest", "email summary", "email roundup", "summarize my inbox", "what did I miss", "summary of recent emails", or wants a quick summary of recent messages. Generates a markdown digest grouped by priority. For a full morning briefing with calendar events and action items, use /email:morning instead.
+description: This skill should be used when the user asks for "email digest", "daily digest", "email summary", "email roundup", "summarize my inbox", "what did I miss", "summary of recent emails", or wants a quick summary of recent messages. Generates a markdown digest grouped by priority. For a full morning briefing with calendar events and action items, use /himalaya:morning instead.
 triggers:
   - email digest
   - daily digest
@@ -10,16 +10,16 @@ triggers:
   - what did I miss
 ---
 
-# /email:digest - Daily Email Digest
+# /himalaya:digest - Daily Email Digest
 
 Generate a markdown summary of today's important emails.
 
 ## Usage
 
 ```
-/email:digest             # Today's digest
-/email:digest --days 3    # Last 3 days
-/email:digest --export    # Save to markdown file
+/himalaya:digest             # Today's digest
+/himalaya:digest --days 3    # Last 3 days
+/himalaya:digest --export    # Save to markdown file
 ```
 
 ## When Invoked

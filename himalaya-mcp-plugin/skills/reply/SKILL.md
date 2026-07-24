@@ -12,17 +12,17 @@ triggers:
   - respond to that
 ---
 
-# /email:reply - Draft Email Reply
+# /himalaya:reply - Draft Email Reply
 
 Compose a professional reply to an email with safety gates.
 
 ## Usage
 
 ```
-/email:reply <id>                    # Reply to email by ID
-/email:reply <id> --tone casual      # Set reply tone
-/email:reply <id> --all              # Reply to all recipients
-/email:reply <id> "Confirm meeting"  # Include specific instructions
+/himalaya:reply <id>                    # Reply to email by ID
+/himalaya:reply <id> --tone casual      # Set reply tone
+/himalaya:reply <id> --all              # Reply to all recipients
+/himalaya:reply <id> "Confirm meeting"  # Include specific instructions
 ```
 
 ## When Invoked

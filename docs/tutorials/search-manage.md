@@ -39,13 +39,13 @@ Search supports combined filters:
 ## Step 3: Bulk manage results
 
 ```
-You: "/email:manage flag 1,3"
+You: "/himalaya:manage flag 1,3"
 ```
 
 Flags emails 1 and 3 for follow-up.
 
 ```
-You: "/email:manage archive 2"
+You: "/himalaya:manage archive 2"
 ```
 
 Archives the newsletter result.
@@ -65,7 +65,7 @@ Claude chains search into bulk management:
 ## What you learned
 
 - `search_emails` uses himalaya filter syntax (`from:`, `subject:`, `after:`, etc.)
-- `/email:manage` handles batch flag, move, and archive operations
+- `/himalaya:manage` handles batch flag, move, and archive operations
 - Search + manage chaining is the most powerful email workflow
 - Bulk operations on 5+ emails trigger a confirmation gate
 

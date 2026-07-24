@@ -14,18 +14,18 @@ triggers:
   - star this email
 ---
 
-# /email:manage - Bulk Email Management
+# /himalaya:manage - Bulk Email Management
 
 Perform batch operations on multiple emails: flag, unflag, move, archive.
 
 ## Usage
 
 ```
-/email:manage flag 1,2,5          # Flag specific email IDs
-/email:manage unflag 3,7          # Remove flags from emails
-/email:manage move 1,2,3 Archive  # Move emails to Archive
-/email:manage archive 4,5,6       # Shortcut for move to Archive
-/email:manage move all-unread Spam  # Move all unread to Spam
+/himalaya:manage flag 1,2,5          # Flag specific email IDs
+/himalaya:manage unflag 3,7          # Remove flags from emails
+/himalaya:manage move 1,2,3 Archive  # Move emails to Archive
+/himalaya:manage archive 4,5,6       # Shortcut for move to Archive
+/himalaya:manage move all-unread Spam  # Move all unread to Spam
 ```
 
 ## When Invoked
@@ -76,5 +76,5 @@ Emails processed: 7/7
   [7] github@co — Issue closed → Archive ✓
 
 → "Undo" to move these back to INBOX
-→ "/email:inbox" to check remaining emails
+→ "/himalaya:inbox" to check remaining emails
 ```

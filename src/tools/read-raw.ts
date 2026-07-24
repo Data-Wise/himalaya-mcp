@@ -10,9 +10,13 @@ import { z } from "zod/v4";
 import { readFileSync, rmSync, mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
 import { envelopeError } from "./_envelope.js";
+
+const execFileAsync = promisify(execFile);
 
 export function registerReadRawTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("read_email_raw", {
@@ -26,17 +30,14 @@ export function registerReadRawTools(server: McpServer, client: HimalayaClient) 
     const tmpDir = mkdtempSync(join(tmpdir(), "himalaya-mcp-raw-"));
     const emlPath = join(tmpDir, `${args.id}.eml`);
     try {
-      const binary = (client as any).opts?.binary ?? "himalaya";
+      const binary = client.binary;
 
       // Build the export command: export --full --destination <path> <id>
       const cmdArgs: string[] = ["message", "export", "--full", "--destination", emlPath];
-      const account = args.account || (client as any).opts?.account || "";
+      const account = args.account || client.account || "";
       if (account) cmdArgs.push("--account", account);
       cmdArgs.push(args.id);
 
-      const { execFile } = await import("node:child_process");
-      const { promisify } = await import("node:util");
-      const execFileAsync = promisify(execFile);
       await execFileAsync(binary, cmdArgs, { timeout: 30_000 });
 
       const raw = readFileSync(emlPath, "utf-8");

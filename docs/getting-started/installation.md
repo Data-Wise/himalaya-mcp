@@ -34,24 +34,29 @@ brew install himalaya-mcp
 **What happens automatically:**
 
 1. Installs himalaya CLI + Node.js as dependencies
-2. Builds the esbuild bundle (604KB, no node_modules shipped)
+2. Builds the esbuild bundle (~883KB, no node_modules shipped)
 3. Symlinks plugin to `~/.claude/plugins/himalaya-mcp`
 4. Registers in local marketplace
 5. Auto-runs install script (enables in Claude Code settings if Claude not running)
 
 Restart Claude Code. The **`email`** plugin gives you:
 
-- `/email:inbox` -- list recent emails
-- `/email:triage` -- classify and organize
-- `/email:digest` -- daily priority digest
-- `/email:reply` -- draft with safety gate
-- `/email:compose` -- compose new emails
-- `/email:attachments` -- list, download, calendar invites
-- `/email:search` -- search by keyword, sender, flags
-- `/email:manage` -- bulk flag/move/archive
-- `/email:stats` -- inbox statistics and trends
-- `/email:config` -- setup wizard
-- `/email:help` -- help hub
+- `/himalaya:inbox` -- list recent emails
+- `/himalaya:triage` -- classify and organize
+- `/himalaya:digest` -- daily priority digest
+- `/himalaya:reply` -- draft with safety gate
+- `/himalaya:compose` -- compose new emails
+- `/himalaya:respond` -- read, understand, and reply
+- `/himalaya:morning` -- morning briefing
+- `/himalaya:attachments` -- list, download, calendar invites
+- `/himalaya:forward` -- forward with attribution
+- `/himalaya:export` -- export to markdown
+- `/himalaya:threads` -- conversation threads
+- `/himalaya:search` -- search by keyword, sender, flags
+- `/himalaya:manage` -- bulk flag/move/archive
+- `/himalaya:stats` -- inbox statistics and trends
+- `/himalaya:config` -- setup wizard
+- `/himalaya:help` -- help hub
 
 **Verify:**
 
@@ -78,7 +83,7 @@ brew uninstall himalaya-mcp
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 ```
 
 **Verify:**
@@ -229,7 +234,7 @@ If `brew install` or `brew upgrade` takes a very long time, Claude Code may be h
 
 ```bash
 # If brew hangs, press Ctrl+C then:
-claude plugin install email@local-plugins
+claude plugin install himalaya@local-plugins
 ```
 
 This is fixed in the latest formula -- JSON file writes are skipped when Claude is running.
@@ -246,11 +251,11 @@ ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp
 
 1. Restart Claude Code
 2. Check if plugin is enabled: `claude plugin list`
-3. Manually enable: `claude plugin install email@local-plugins`
+3. Manually enable: `claude plugin install himalaya@local-plugins`
 
 ### Skills not loading (Homebrew install)
 
-If `/email:*` skills don't appear after Homebrew install:
+If `/himalaya:*` skills don't appear after Homebrew install:
 
 1. Check skills path: `ls ~/.claude/plugins/himalaya-mcp/skills/`
 2. If missing, upgrade: `brew upgrade himalaya-mcp`

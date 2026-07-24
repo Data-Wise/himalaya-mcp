@@ -7,7 +7,7 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 1.9.0
+- **Version:** 2.0.0
 - **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 569 tests)
 
 ### What It Does
@@ -40,10 +40,15 @@ himalaya-mcp/
 │   │   ├── thread-parser.ts     # Thread/conversation grouping by subject line
 │   │   ├── errors.ts            # MCPError envelope, HimalayaError, stderr classifier
 │   │   ├── accounts.ts          # Multi-account discovery (himalaya account list -o json)
+│   │   ├── trash.ts             # Provider-agnostic trash folder (Gmail/Exchange/fallback)
 │   │   └── types.ts             # TypeScript types (Envelope, Thread, Folder, params, etc.)
 │   ├── tools/
 │   │   ├── inbox.ts             # list_emails, search_emails
 │   │   ├── read.ts              # read_email, read_email_html
+│   │   ├── read-raw.ts          # read_email_raw
+│   │   ├── render.ts            # render_email
+│   │   ├── unread.ts            # get_unread_count
+│   │   ├── list-starred.ts      # list_starred
 │   │   ├── manage.ts            # flag_email, move_email
 │   │   ├── compose.ts           # draft_reply, send_email (two-phase safety gate)
 │   │   ├── compose-new.ts       # compose_email (new messages, safety gate)
@@ -51,12 +56,16 @@ himalaya-mcp/
 │   │   ├── attachments.ts       # list_attachments, download_attachment
 │   │   ├── calendar.ts          # extract_calendar_event, create_calendar_event
 │   │   ├── threads.ts           # list_threads, read_thread (conversation view)
+│   │   ├── reminders.ts         # create_reminder (Apple Reminders)
+│   │   ├── snooze.ts            # snooze_email, list_snoozed_emails
 │   │   ├── health.ts            # health_check (per-account diagnostics)
-│   │   └── actions.ts           # export_to_markdown, create_action_item
+│   │   ├── actions.ts           # export_to_markdown, create_action_item
+│   │   └── _envelope.ts         # Shared error wrapper
 │   ├── prompts/
 │   │   ├── triage.ts            # triage_inbox prompt
 │   │   ├── summarize.ts         # summarize_email prompt
 │   │   ├── digest.ts            # daily_email_digest prompt
+│   │   ├── weekly-digest.ts     # weekly_email_digest prompt
 │   │   ├── reply.ts             # draft_reply prompt
 │   │   ├── morning.ts           # morning_briefing prompt
 │   │   └── inbox-check.ts       # inbox_check prompt
@@ -64,22 +73,23 @@ himalaya-mcp/
 │   │   └── index.ts             # email://inbox, email://message/{id}, email://folders
 │   └── adapters/
 │       ├── clipboard.ts         # copy_to_clipboard (pbcopy/xclip)
+│       ├── reminders.ts         # Apple Reminders adapter (osascript)
 │       └── calendar.ts          # ICS parser + Apple Calendar (osascript)
 ├── himalaya-mcp-plugin/
 │   ├── .claude-plugin/
 │   │   └── plugin.json          # Claude Code plugin manifest
-│   ├── skills/                  # Claude Code plugin skills (12: inbox, triage, digest, compose, reply, search, manage, attachments, stats, config, help, morning)
+│   ├── skills/                  # Claude Code plugin skills (16: inbox, triage, digest, compose, reply, respond, forward, attachments, export, threads, search, manage, stats, config, help, morning)
 │   ├── agents/                  # Plugin agents (email-assistant)
-│   └── hooks/                   # Plugin hooks
+│   └── hooks/                   # Plugin hooks (SessionStart, PreToolUse)
 ├── .claude-plugin/
 │   └── marketplace.json         # Marketplace manifest (source: ./himalaya-mcp-plugin)
 ├── .mcp.json                    # MCP server config (uses ${CLAUDE_PLUGIN_ROOT})
 ├── docs/
-│   ├── guide.md                 # User guide (setup, tools, prompts, resources)
-│   ├── REFCARD.md               # Quick reference card
-│   ├── workflows.md             # Common email workflow patterns
-│   ├── architecture.md          # System design, module map, data flow
-│   └── specs/                   # Design specs
+│   ├── index.md                 # Home page
+│   ├── getting-started/         # Installation, quickstart, desktop extension, diagnose
+│   ├── tutorials/               # Step-by-step tutorials (Read & Browse, Respond & Organize, Compose & Automate)
+│   ├── guide/                   # User guide, workflows, skills, cookbook, integrations, migration
+│   └── reference/               # Commands, cheat-sheet, architecture, CLI, desktop extensions
 ├── tests/
 │   ├── parser.test.ts                  # 13 parser tests
 │   ├── client.test.ts                  # 15 client tests (subprocess mock + retry)
@@ -92,18 +102,26 @@ himalaya-mcp/
 │   ├── actions.test.ts                 # 6 export/action tests
 │   ├── threads.test.ts                 # 30 thread parser + tool registration tests
 │   ├── morning.test.ts                 # 13 morning/inbox-check prompt tests
-│   ├── prompts.test.ts                 # 15 prompt registration tests
+│   ├── prompts.test.ts                 # 24 prompt registration tests
 │   ├── config.test.ts                  # 9 config tests
 │   ├── clipboard.test.ts               # 4 clipboard tests
 │   ├── errors.test.ts                  # 18 MCPError envelope + stderr classifier tests
 │   ├── retry.test.ts                   # 4 transient retry policy tests
 │   ├── accounts.test.ts                # 6 multi-account discovery tests
 │   ├── health.test.ts                  # 5 health_check tool tests
-│   ├── dogfood.test.ts                 # 142 dogfooding tests (realistic Claude usage)
-│   ├── dogfood-reliability.test.ts     # 20 reliability scenarios (all passing; Scenario 17 round-trip moved to e2e.test.ts)
-│   ├── setup.test.ts                   # 40 setup CLI + multi-account doctor E2E tests
-│   ├── e2e.test.ts                     # 39 E2E tests (headless MCP server pipeline + structured envelope round-trip + .mcpb build)
-│   └── v150-features.test.ts           # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
+│   ├── trash.test.ts                   # 5 getTrashFolder tests
+│   ├── unread.test.ts                  # 4 get_unread_count tests
+│   ├── count-sync.test.ts             # 1 TOOL_COUNT drift test
+│   ├── read-raw.test.ts               # 5 read_email_raw tests
+│   ├── render.test.ts                 # 5 render_email tests
+│   ├── list-starred.test.ts           # 6 list_starred tests
+│   ├── reminders.test.ts              # 7 create_reminder tests
+│   ├── snooze.test.ts                 # 12 snooze_email/list_snoozed_emails tests
+│   ├── dogfood.test.ts                # 153 dogfooding tests (realistic Claude usage)
+│   ├── dogfood-reliability.test.ts    # 20 reliability scenarios
+│   ├── setup.test.ts                  # 45 setup CLI + multi-account doctor E2E tests
+│   ├── e2e.test.ts                    # 39 E2E tests (headless MCP server pipeline + .mcpb build)
+│   └── v150-features.test.ts          # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
 ├── package.json
 └── tsconfig.json
 ```
@@ -244,7 +262,7 @@ brew install himalaya-mcp
 
 # Claude Code plugin (from GitHub marketplace — requires brew install node himalaya)
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 
 # Claude Desktop (.mcpb extension — download from GitHub Releases, double-click)
 # Or legacy MCP server config:
@@ -267,16 +285,11 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| 0. Setup & Specs | Repo, structure, specs | Done |
-| 1. Core Read (MVP) | list, search, read tools + resources | Done |
-| 2. Triage + Export | flag, move, export_to_markdown, MCP prompts | Done |
-| 3. Compose + Actions | draft_reply, send_email (safety gate), create_action_item | Done |
-| 4. Clipboard + Config | copy_to_clipboard adapter, env-based config | Done |
-| 5. Plugin Skills | /email:* skills, agent updates, reply skill | Done |
-| 6a. Folders | list_folders, create_folder, delete_folder | Done |
-| 6b. Compose New | compose_email (new messages, safety gate) | Done |
-| 6c. Attachments | list_attachments, download_attachment | Done |
-| 6d. Calendar | extract_calendar_event, create_calendar_event (ICS + Apple Calendar) | Done |
+| 0–6d | Core features, plugin, packaging, desktop extension | Done |
+| **em Port P1** | Trash utility, unread count, read_raw, render, list_starred | Done |
+| **em Port P2** | Apple Reminders, snooze, weekly digest, triage enhancement | Done |
+| **em Port P3** | /himalaya:respond skill | Done |
+| **em Port Docs** | Migration guide + tutorial, nav reorganization | Done |
 
 ---
 
@@ -286,7 +299,7 @@ ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
 2. **Prompt-based triage** — Claude IS the AI; MCP prompts guide it, no embedded AI
 3. **Safety gates** — send_email returns preview, requires explicit confirmation
 4. **Tools + Resources** — Tools for actions, resources for browsing
-5. **Plugin-first** — Claude Code plugin bundles MCP server; extract for Desktop later
+5. **Plugin-first** — Claude Code plugin bundles MCP server; Desktop extension via `.mcpb`
 
 ---
 
@@ -300,4 +313,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-05-11
+**Last Updated:** 2026-07-07

@@ -6,15 +6,15 @@ When installed as a Claude Code plugin, the email plugin provides 15 slash comma
 
 | Layer | What | How to use | Example |
 |-------|------|-----------|---------|
-| **Skills** | High-level workflows | Say the command or natural language | `/email:inbox` or "check my inbox" |
+| **Skills** | High-level workflows | Say the command or natural language | `/himalaya:inbox` or "check my inbox" |
 | **Tools** | Atomic operations | Claude calls them automatically | `list_emails(page_size: 10)` |
 | **Prompts** | AI guidance templates | Referenced by skills and tools | `triage_inbox` prompt |
 
-Skills orchestrate multiple tools. When you say `/email:triage`, the skill instructs Claude to call `list_emails`, then `read_email` on each, then classify results.
+Skills orchestrate multiple tools. When you say `/himalaya:triage`, the skill instructs Claude to call `list_emails`, then `read_email` on each, then classify results.
 
 ---
 
-## /email:inbox
+## /himalaya:inbox
 
 Check your inbox and list recent emails.
 
@@ -29,7 +29,7 @@ Check your inbox and list recent emails.
 **Example:**
 
 ```
-You: /email:inbox
+You: /himalaya:inbox
 
 Claude:
 Found 5 emails in INBOX:
@@ -54,7 +54,7 @@ Would you like me to:
 
 ---
 
-## /email:triage
+## /himalaya:triage
 
 AI-powered email classification. Reads each email and sorts into actionable categories.
 
@@ -72,7 +72,7 @@ AI-powered email classification. Reads each email and sorts into actionable cate
 **Example:**
 
 ```
-You: /email:triage
+You: /himalaya:triage
 
 Claude:
 Triaging last 10 emails...
@@ -98,7 +98,7 @@ Shall I:
 
 ---
 
-## /email:digest
+## /himalaya:digest
 
 Generate a daily priority digest in markdown format.
 
@@ -142,7 +142,7 @@ Stats: 9 emails | 2 action | 3 FYI | 4 low
 
 ---
 
-## /email:reply
+## /himalaya:reply
 
 Draft and send email replies with safety confirmation.
 
@@ -159,7 +159,7 @@ Draft and send email replies with safety confirmation.
 **Example:**
 
 ```
-You: /email:reply 249088
+You: /himalaya:reply 249088
 
 Claude:
 Reading email 249088 from Alice...
@@ -208,7 +208,7 @@ Want me to:
 
 ---
 
-## /email:compose
+## /himalaya:compose
 
 Compose and send a new email from scratch with safety confirmation.
 
@@ -225,7 +225,7 @@ Compose and send a new email from scratch with safety confirmation.
 **Example:**
 
 ```
-You: /email:compose
+You: /himalaya:compose
 
 Claude:
 Who should I send this to?
@@ -262,7 +262,7 @@ Want me to:
 
 ---
 
-## /email:forward
+## /himalaya:forward
 
 Forward an email to another person with attribution and optional context.
 
@@ -279,7 +279,7 @@ Forward an email to another person with attribution and optional context.
 **Example:**
 
 ```
-You: /email:forward 249088 "bob@example.com"
+You: /himalaya:forward 249088 "bob@example.com"
 
 Claude:
 📨 Forward Preview
@@ -304,7 +304,7 @@ Hi team, please review the attached budget...
 
 ---
 
-## /email:attachments
+## /himalaya:attachments
 
 List, download, and process email attachments including calendar invites.
 
@@ -320,7 +320,7 @@ List, download, and process email attachments including calendar invites.
 **Example:**
 
 ```
-You: /email:attachments 249088
+You: /himalaya:attachments 249088
 
 Claude:
 Email 249088 has 3 attachments:
@@ -346,7 +346,7 @@ When a `.ics` attachment is detected:
 
 ---
 
-## /email:export
+## /himalaya:export
 
 Export an email as structured markdown with YAML frontmatter, optionally copying to clipboard and extracting action items.
 
@@ -369,7 +369,7 @@ Export an email as structured markdown with YAML frontmatter, optionally copying
 **Example:**
 
 ```
-You: /email:export 249088 --clipboard --action-items
+You: /himalaya:export 249088 --clipboard --action-items
 
 Claude:
 📄 Export: Q1 Budget Review
@@ -389,7 +389,7 @@ Action Items:
 
 ---
 
-## /email:threads
+## /himalaya:threads
 
 View and navigate email conversations grouped by subject line.
 
@@ -410,7 +410,7 @@ View and navigate email conversations grouped by subject line.
 **Example (List):**
 
 ```
-You: /email:threads
+You: /himalaya:threads
 
 Claude:
 📬 Threads (15 conversations)
@@ -426,7 +426,7 @@ Claude:
 **Example (Read):**
 
 ```
-You: /email:threads "Q1 Budget Review"
+You: /himalaya:threads "Q1 Budget Review"
 
 Claude:
 📬 Thread: Q1 Budget Review
@@ -442,7 +442,7 @@ Looks good. A few comments on the marketing line item...
 
 ---
 
-## /email:search
+## /himalaya:search
 
 Search emails by keyword, sender, flags, or date.
 
@@ -458,7 +458,7 @@ Search emails by keyword, sender, flags, or date.
 **Example:**
 
 ```
-You: /email:search from:alice meeting
+You: /himalaya:search from:alice meeting
 
 Claude:
 Found 3 emails matching "from:alice meeting":
@@ -484,7 +484,7 @@ Would you like me to:
 
 ---
 
-## /email:manage
+## /himalaya:manage
 
 Bulk email operations -- flag, unflag, move, archive.
 
@@ -500,7 +500,7 @@ Bulk email operations -- flag, unflag, move, archive.
 **Example:**
 
 ```
-You: /email:manage move 1,2,3 Archive
+You: /himalaya:manage move 1,2,3 Archive
 
 Claude:
 Moving 3 emails to Archive...
@@ -520,7 +520,7 @@ Done. 3 emails moved to Archive.
 
 ---
 
-## /email:stats
+## /himalaya:stats
 
 Inbox statistics -- unread count, top senders, trends.
 
@@ -554,7 +554,7 @@ Inbox Stats -- 2026-02-13
 
 ---
 
-## /email:config
+## /himalaya:config
 
 Setup wizard for email configuration.
 
@@ -572,14 +572,14 @@ Setup wizard for email configuration.
 
 | Mode | Usage |
 |------|-------|
-| Wizard (default) | `/email:config` |
-| Validate existing config | `/email:config --check` |
-| Add another account | `/email:config --add-account` |
+| Wizard (default) | `/himalaya:config` |
+| Validate existing config | `/himalaya:config --check` |
+| Add another account | `/himalaya:config --add-account` |
 
 **Example:**
 
 ```
-You: /email:config
+You: /himalaya:config
 
 Claude:
 Email Setup Wizard
@@ -604,12 +604,12 @@ Step 3/5  Gmail setup
 Step 4/5  Testing connection...      OK
 Step 5/5  Running doctor check...    All checks passed
 
-Setup complete. Try /email:inbox to check your mail.
+Setup complete. Try /himalaya:inbox to check your mail.
 ```
 
 ---
 
-## /email:help
+## /himalaya:help
 
 Help hub for the email plugin. Browse all available tools, prompts, resources, and workflows.
 
@@ -619,18 +619,18 @@ Help hub for the email plugin. Browse all available tools, prompts, resources, a
 
 | Command | Shows |
 |---------|-------|
-| `/email:help` | Overview of all capabilities |
-| `/email:help tools` | All 29 MCP tools with parameters |
-| `/email:help prompts` | All 7 MCP prompts |
-| `/email:help resources` | All 3 MCP resources |
-| `/email:help workflows` | Common email workflow patterns |
-| `/email:help quick` | One-page quick reference |
-| `/email:help [tool-name]` | Detailed help for a specific tool |
+| `/himalaya:help` | Overview of all capabilities |
+| `/himalaya:help tools` | All 29 MCP tools with parameters |
+| `/himalaya:help prompts` | All 7 MCP prompts |
+| `/himalaya:help resources` | All 3 MCP resources |
+| `/himalaya:help workflows` | Common email workflow patterns |
+| `/himalaya:help quick` | One-page quick reference |
+| `/himalaya:help [tool-name]` | Detailed help for a specific tool |
 
 **Example:**
 
 ```
-You: /email:help
+You: /himalaya:help
 
 Claude:
 ┌──────────────────────────────────────────────┐
@@ -639,21 +639,21 @@ Claude:
 ├──────────────────────────────────────────────┤
 │                                              │
 │  Skills:                                     │
-│    /email:inbox        Check your inbox      │
-│    /email:triage       Classify emails       │
-│    /email:digest       Daily summary         │
-│    /email:reply        Draft & send safely   │
-│    /email:compose      Compose new emails    │
-│    /email:forward      Forward with context  │
-│    /email:attachments  Files & calendar      │
-│    /email:export       Markdown + clipboard  │
-│    /email:threads      Conversation view     │
-│    /email:search       Search emails         │
-│    /email:manage       Bulk operations       │
-│    /email:stats        Inbox statistics      │
-│    /email:config       Setup wizard          │
-│    /email:morning      Morning briefing      │
-│    /email:help         This help             │
+│    /himalaya:inbox        Check your inbox      │
+│    /himalaya:triage       Classify emails       │
+│    /himalaya:digest       Daily summary         │
+│    /himalaya:reply        Draft & send safely   │
+│    /himalaya:compose      Compose new emails    │
+│    /himalaya:forward      Forward with context  │
+│    /himalaya:attachments  Files & calendar      │
+│    /himalaya:export       Markdown + clipboard  │
+│    /himalaya:threads      Conversation view     │
+│    /himalaya:search       Search emails         │
+│    /himalaya:manage       Bulk operations       │
+│    /himalaya:stats        Inbox statistics      │
+│    /himalaya:config       Setup wizard          │
+│    /himalaya:morning      Morning briefing      │
+│    /himalaya:help         This help             │
 │                                              │
 │  Quick actions:                              │
 │    "Check my inbox"                          │
@@ -662,7 +662,7 @@ Claude:
 │    "Export email 42 as markdown"             │
 │    "Find emails from alice about budget"     │
 │                                              │
-│  Type /email:help [topic] for details        │
+│  Type /himalaya:help [topic] for details        │
 └──────────────────────────────────────────────┘
 ```
 
@@ -748,17 +748,17 @@ Both approaches work. Skills provide structured workflows; natural language is m
 
 | Want to... | Skill | Natural language |
 |-----------|-------|-----------------|
-| Check inbox | `/email:inbox` | "What's in my inbox?" |
-| Triage | `/email:triage` | "Organize my last 20 emails" |
-| Daily summary | `/email:digest` | "Give me today's email digest" |
-| Reply | `/email:reply 42` | "Reply to that email from Alice" |
-| Search | `/email:search` | "Find emails about the project deadline" |
-| Forward | `/email:forward` | "Forward email 42 to Bob" |
-| Export | `/email:export` | "Export email 42 as markdown" |
-| Threads | `/email:threads` | "Show me the whole conversation" |
-| Bulk actions | `/email:manage` | "Archive all newsletters" |
-| Inbox stats | `/email:stats` | "How many unread emails?" |
-| Setup email | `/email:config` | "Configure my email" |
+| Check inbox | `/himalaya:inbox` | "What's in my inbox?" |
+| Triage | `/himalaya:triage` | "Organize my last 20 emails" |
+| Daily summary | `/himalaya:digest` | "Give me today's email digest" |
+| Reply | `/himalaya:reply 42` | "Reply to that email from Alice" |
+| Search | `/himalaya:search` | "Find emails about the project deadline" |
+| Forward | `/himalaya:forward` | "Forward email 42 to Bob" |
+| Export | `/himalaya:export` | "Export email 42 as markdown" |
+| Threads | `/himalaya:threads` | "Show me the whole conversation" |
+| Bulk actions | `/himalaya:manage` | "Archive all newsletters" |
+| Inbox stats | `/himalaya:stats` | "How many unread emails?" |
+| Setup email | `/himalaya:config` | "Configure my email" |
 | Full processing | (agent) | "Handle my email" |
 
 Natural language can combine operations: "Find the budget email from Alice, summarize it, and draft a reply saying I approve." Skills are for when you want a predictable, structured workflow.

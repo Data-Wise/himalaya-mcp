@@ -11,6 +11,10 @@ VERSION=$(node -p "require('$PROJECT_ROOT/package.json').version")
 
 echo "==> Building himalaya-mcp v${VERSION} .mcpb bundle"
 
+# Clear stale .mcpb output so the last-resort fallback below can't pick up a
+# leftover file from a prior failed run.
+rm -f "$PROJECT_ROOT"/*.mcpb
+
 # Step 1: Build esbuild bundle
 echo "  [1/4] Building esbuild bundle..."
 npm run build:bundle --prefix "$PROJECT_ROOT"
@@ -30,22 +34,28 @@ npx @anthropic-ai/mcpb pack "$MCPB_DIR/"
 
 # mcpb pack outputs to CWD as <dirname>.mcpb — rename to versioned filename
 OUTPUT_NAME="himalaya-mcp-v${VERSION}.mcpb"
-PACK_OUTPUT="$PROJECT_ROOT/mcpb.mcpb"
-
-if [ -f "$PACK_OUTPUT" ]; then
-  mv "$PACK_OUTPUT" "$PROJECT_ROOT/$OUTPUT_NAME"
-elif [ -f "$PROJECT_ROOT/himalaya-mcp-${VERSION}.mcpb" ]; then
-  mv "$PROJECT_ROOT/himalaya-mcp-${VERSION}.mcpb" "$PROJECT_ROOT/$OUTPUT_NAME"
-fi
-
 MCPB_FILE="$PROJECT_ROOT/$OUTPUT_NAME"
+
+# Check all possible output locations from mcpb pack
+if [ -f "$MCPB_FILE" ]; then
+  : # already in place
+elif [ -f "$PROJECT_ROOT/mcpb.mcpb" ]; then
+  mv "$PROJECT_ROOT/mcpb.mcpb" "$MCPB_FILE"
+elif [ -f "$PROJECT_ROOT/himalaya-mcp-${VERSION}.mcpb" ]; then
+  mv "$PROJECT_ROOT/himalaya-mcp-${VERSION}.mcpb" "$MCPB_FILE"
+else
+  # Last resort: find any .mcpb file that was just created
+  FOUND=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.mcpb" -newer "$MCPB_DIR/manifest.json" 2>/dev/null | head -1)
+  if [ -n "$FOUND" ]; then
+    mv "$FOUND" "$MCPB_FILE"
+  fi
+fi
 
 if [ -f "$MCPB_FILE" ]; then
   SIZE=$(wc -c < "$MCPB_FILE" | tr -d ' ')
   SIZE_KB=$((SIZE / 1024))
   echo ""
   echo "==> Built: $OUTPUT_NAME (${SIZE_KB} KB)"
-  npx @anthropic-ai/mcpb info "$MCPB_FILE"
 else
   echo "ERROR: No .mcpb file found after pack"
   exit 1

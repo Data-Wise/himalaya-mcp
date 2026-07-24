@@ -1,5 +1,8 @@
 # Migrating from `em` to himalaya-mcp
 
+!!! note "Plugin renamed in v2.0.0"
+    The plugin name changed from `email` to `himalaya` in v2.0.0. Skill commands are now `/himalaya:*` instead of `/email:*`. See [Migrate to Plugin Name `himalaya`](../getting-started/migrate-plugin-name.md) for details.
+
 Both `em` (flow-cli's email dispatcher) and himalaya-mcp wrap the same himalaya CLI backend. They serve different interfaces: `em` is a terminal-native email client with fzf, `$EDITOR`, and interactive workflows; himalaya-mcp is a conversational email interface where Claude is the assistant.
 
 You can use both side by side — they share the same config file (`~/.config/himalaya/config.toml`).
@@ -16,7 +19,7 @@ You can use both side by side — they share the same config file (`~/.config/hi
 | `em read --raw <ID>` | "Show raw source of email" | Uses `read_email_raw` |
 | `em send` | "Send Alice an email..." | Two-phase: preview then confirm |
 | `em reply <ID>` | "Reply to email ID saying..." | Uses `draft_reply` + `send_email` |
-| `em forward <ID>` | "Forward email ID to..." | Uses `/email:forward` skill |
+| `em forward <ID>` | "Forward email ID to..." | Uses `/himalaya:forward` skill |
 | `em find <query>` | "Search emails for query" | Uses `search_emails` |
 | `em unread` | "How many unread emails?" | Uses `get_unread_count` |
 | `em delete <ID>` | "Move email 42 to trash" | Uses `move_email` |
@@ -36,7 +39,7 @@ You can use both side by side — they share the same config file (`~/.config/hi
 | `em calendar <ID>` | "Extract calendar invite from email ID" | Uses `extract_calendar_event` |
 | `em digest` | "Give me a daily digest" | Uses `daily_email_digest` prompt |
 | `em digest --week` | "Give me a weekly digest" | Uses `weekly_email_digest` prompt |
-| `em respond` | "Draft replies for all my actionable emails" | Uses `/email:respond` skill |
+| `em respond` | "Draft replies for all my actionable emails" | Uses `/himalaya:respond` skill |
 | `em doctor` | "Run a health check" | Uses `health_check` tool or CLI `himalaya-mcp doctor` |
 | `em classify <ID>` | "Triage my inbox" | Uses `triage_inbox` prompt |
 | `em summarize <ID>` | "Summarize email ID" | Uses `summarize_email` prompt |

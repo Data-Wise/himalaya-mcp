@@ -13,16 +13,16 @@ triggers:
   - read the whole thread
 ---
 
-# /email:threads - Email Threads
+# /himalaya:threads - Email Threads
 
 View and navigate email conversations grouped by subject line.
 
 ## Usage
 
 ```
-/email:threads                        # List conversation threads
-/email:threads 20                     # List last 20 threads (page size)
-/email:threads <thread_id>            # Read all messages in a thread
+/himalaya:threads                        # List conversation threads
+/himalaya:threads 20                     # List last 20 threads (page size)
+/himalaya:threads <thread_id>            # Read all messages in a thread
 ```
 
 ## When Invoked (List Mode)
@@ -76,5 +76,5 @@ Thanks Bob, updated. Can everyone approve by Friday?
 
 You — Feb 13, 2:00 PM
 ---
-Approved from my side. (via /email:reply)
+Approved from my side. (via /himalaya:reply)
 ```
