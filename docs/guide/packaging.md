@@ -156,15 +156,20 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
 
 ```json
 {
-  "name": "himalaya-mcp-marketplace",
+  "name": "himalaya-mcp",
   "owner": { "name": "Data-Wise" },
+  "metadata": {
+    "description": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
+    "version": "2.0.0"
+  },
   "plugins": [{
-    "name": "email",
+    "name": "himalaya",
     "source": "./himalaya-mcp-plugin",
     "description": "Privacy-first email MCP server wrapping himalaya CLI",
     "category": "productivity",
     "tags": ["email", "mcp", "himalaya", "privacy"]
-  }]
+  }],
+  "version": "2.0.0"
 }
 ```
 
