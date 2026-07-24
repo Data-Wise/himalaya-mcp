@@ -68,7 +68,7 @@
 - Branch: `dev` (clean, no active worktree)
 - Version: 2.0.0 merged to `dev` (PR #93 rename + PR #94 doctor fix); PR #95 (`dev`→`main`) open, CI green
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 573 passing across 31 test files
+- Tests: 575 passing across 31 test files
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
 - Homebrew: data-wise/tap/himalaya-mcp at v1.9.0 (v2.0.0 pending release merge)
 - Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/
