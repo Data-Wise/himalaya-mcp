@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [2.0.0] - 2026-07-23
 
 ### Changed (BREAKING)
 
@@ -16,6 +16,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ### Added
 
 - Migration guide: `docs/getting-started/migrate-plugin-name.md`.
+
+### Fixed
+
+- `doctor --pre-release` exec timeout is now configurable (was hardcoded 10s, too short for `tsc`/`vitest`); test-suite check no longer reports false failures via substring matching.
 
 ## [1.9.0] - 2026-07-07
 
