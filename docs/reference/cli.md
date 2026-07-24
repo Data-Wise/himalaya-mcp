@@ -44,6 +44,8 @@ himalaya-mcp doctor                    # Run all checks (per-account by default)
 himalaya-mcp doctor --account <name>   # Scope to one configured account
 himalaya-mcp doctor --fix              # Auto-fix common issues
 himalaya-mcp doctor --json             # Machine-readable output
+himalaya-mcp doctor --pre-release      # Maintainer-only: build/version/CHANGELOG/test gate before a release
+himalaya-mcp doctor --post-release     # Maintainer-only: verify plugin install + MCP handshake after a release
 ```
 
 ### Check categories
@@ -66,10 +68,21 @@ himalaya-mcp doctor --json             # Machine-readable output
 | Settings file missing | Create default settings (enabled, empty config) |
 | Stale plugin cache | Remove cached metadata from `~/.claude/plugins/cache/` |
 
+### Pre-release / post-release checks
+
+Two maintainer-only modes support the release pipeline rather than end-user diagnostics:
+
+| Flag | Category | Checks |
+|------|----------|--------|
+| `--pre-release` | Pre-Release | Build exists, TypeScript compiles, version sync (package.json ↔ plugin.json ↔ `src/index.ts`), CHANGELOG has an entry for the current version, git tree clean, full test suite passes |
+| `--post-release` | Post-Release | Plugin symlink installed, `plugin.json` valid, MCP server handshake succeeds, marketplace registration present, skills directory populated |
+
+Both support `--json` and skip the per-account connectivity checks entirely (`--account` is ignored in these modes).
+
 ### Sample output
 
 ```
-himalaya-mcp doctor v1.7.0
+himalaya-mcp doctor
 
   Prerequisites
   ✓ Node.js 22.14.0

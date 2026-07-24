@@ -49,6 +49,7 @@ create_calendar_event   Add to Apple Calendar (macOS)
 list_threads        List conversation threads
 read_thread         Read all messages in a thread
 snooze_email        Snooze email until specified time
+list_snoozed_emails List snoozed emails and unsnooze times
 create_reminder     Create reminder in Apple Reminders
 export_to_markdown  Email → markdown + YAML frontmatter
 create_action_item  Extract todos and deadlines
