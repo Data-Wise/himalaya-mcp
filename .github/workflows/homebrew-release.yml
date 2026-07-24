@@ -250,7 +250,7 @@ jobs:
   update-homebrew:
     name: Update Homebrew Formula
     needs: [prepare, verify-tap-auth]
-    uses: Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@e50f83d6fa9bf3eda3f4d7c289455677c4b1856d
+    uses: Data-Wise/homebrew-tap/.github/workflows/update-formula.yml@26932f8f41e40adb22dfd573e76409ee0e4c5b13
     with:
       formula_name: himalaya-mcp
       version: ${{ needs.prepare.outputs.version }}
