@@ -120,7 +120,7 @@ Prerequisites: `brew install node himalaya` (not bundled with GitHub install).
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 ```
 
 ### From Source

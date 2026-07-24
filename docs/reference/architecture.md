@@ -40,7 +40,7 @@
 ```
 Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (Claude Desktop)
   brew install himalaya-mcp           claude plugin marketplace add ...     Download .mcpb from GitHub Releases
-  │                                   claude plugin install email           Double-click to install in Desktop
+  │                                   claude plugin install himalaya           Double-click to install in Desktop
   ├─ depends_on "himalaya"            │                                     │
   ├─ depends_on "node"                └─ Copies plugin to cache             ├─ ~150 KB package (bundled server)
                                                                             ├─ Configurable: binary path, account, folder

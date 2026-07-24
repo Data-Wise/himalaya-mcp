@@ -5,7 +5,7 @@
 ```
 brew tap data-wise/tap && brew install himalaya-mcp   # Homebrew (recommended)
 claude plugin marketplace add Data-Wise/himalaya-mcp  # GitHub (requires node+himalaya)
-claude plugin install email                           # ...then install plugin
+claude plugin install himalaya                           # ...then install plugin
 himalaya-mcp install-ext                              # Desktop extension
 himalaya-mcp doctor                                   # Verify everything
 ```

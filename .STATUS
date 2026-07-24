@@ -125,4 +125,4 @@ himalaya-mcp doctor --fix
 ---
 
 **Last Updated:** 2026-07-23
-**Status:** v2.0.0 — plugin renamed from `email` to `himalaya` (issue #67). All docs, tests, configs updated. PR #93 open, all tests passing.
+**Status:** v2.0.0 — plugin renamed from `email` to `himalaya`. PR #93 merged to `dev`; issue #67 closed. Follow-up doctor.ts fix (PR #94) also merged to `dev`. Pending: `dev`→`main` release; `claude-plugins` PR #30 (aggregator sync) held until then.
