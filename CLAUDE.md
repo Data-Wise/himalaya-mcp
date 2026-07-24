@@ -275,9 +275,20 @@ himalaya-mcp doctor --fix        # Auto-fix common issues
 
 ### Dev Setup (local development)
 
+himalaya-mcp is Homebrew-distributed, so local Claude Code installs should track
+the Cellar install (auto-updates on `brew upgrade`), not this dev repo directly —
+same pattern as craft/rforge/scholar. Point the `local-plugins` marketplace entry
+at the Cellar path:
+
 ```bash
-ln -s ~/projects/dev-tools/himalaya-mcp ~/.claude/plugins/himalaya-mcp
+rm -rf ~/.claude/local-marketplace/himalaya-mcp
+ln -s /opt/homebrew/opt/himalaya-mcp/libexec ~/.claude/local-marketplace/himalaya-mcp
 ```
+
+Symlinking straight to `~/projects/dev-tools/himalaya-mcp` (the old instruction here)
+shows unreleased/WIP repo content as if it were the installed plugin, and doesn't
+match where `local-plugins` actually resolves it from — only use that for testing
+unreleased changes, not as the default dev setup.
 
 ---
 
