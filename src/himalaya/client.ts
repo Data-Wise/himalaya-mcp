@@ -4,6 +4,9 @@
  */
 
 import { execFile, spawn } from "node:child_process";
+import { readFileSync, rmSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { promisify } from "node:util";
 import type { HimalayaClientOptions } from "./types.js";
 import { classifyStderr, HimalayaError } from "./errors.js";
@@ -208,12 +211,29 @@ export class HimalayaClient {
     return this.exec(args, { folder: f, account });
   }
 
-  /** Read a message body (HTML). */
+  /** Read a message body (HTML).
+   *
+   * himalaya v1.2.0 removed the --html flag from `message read`.
+   * Instead, use `message export` (without --full) which exports
+   * MIME parts as separate files: index.html for HTML, plain.txt for text.
+   */
   async readMessageHtml(id: string, folder?: string, account?: string): Promise<string> {
     assertSafeArg(id, "id");
-    const args = ["message", "read", "--html", id];
-    const f = this.applyFolderArg(args, folder);
-    return this.exec(args, { folder: f, account });
+    const tmpDir = mkdtempSync(join(tmpdir(), "himalaya-mcp-html-"));
+    try {
+      const args = ["message", "export"];
+      const f = folder || this.opts.folder;
+      if (f && f.toUpperCase() !== "INBOX") {
+        args.push("--folder", f);
+      }
+      args.push("--destination", tmpDir, id);
+      // Note: exec() already appends --account and --output json
+      await this.exec(args, { folder: f, account });
+      const htmlPath = join(tmpDir, "index.html");
+      return readFileSync(htmlPath, "utf-8");
+    } finally {
+      try { rmSync(tmpDir, { recursive: true }); } catch { /* ignore */ }
+    }
   }
 
   /** Add or remove flags on a message. */
