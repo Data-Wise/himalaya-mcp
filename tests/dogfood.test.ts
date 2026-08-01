@@ -1818,7 +1818,7 @@ describe("Packaging: release includes mcpb", () => {
   });
 
   it("release workflow uploads mcpb artifact", () => {
-    expect(releaseContent).toContain("upload-artifact@v4");
+    expect(releaseContent).toContain("upload-artifact@v7");
     expect(releaseContent).toContain("mcpb-bundle");
   });
 
