@@ -32,23 +32,28 @@ npx --yes @anthropic-ai/mcpb validate "$MCPB_DIR/"
 echo "  [4/4] Packing .mcpb..."
 npx @anthropic-ai/mcpb pack "$MCPB_DIR/"
 
-# mcpb pack outputs to CWD as <dirname>.mcpb — rename to versioned filename
+# mcpb pack writes synchronously to <packed-dir-basename>.mcpb in the CWD
+# (here: mcpb.mcpb, since we pack the "mcpb/" dir) — this is deterministic,
+# not a naming fallback guess. The retry below exists only because GH Actions
+# runners have occasionally shown a read-after-write visibility lag on this
+# immediate stat check right after a large minify+zip (observed once in
+# release CI, gone on retry with identical code/inputs — not reproducible
+# locally). Retry, don't add more filename guesses.
 OUTPUT_NAME="himalaya-mcp-v${VERSION}.mcpb"
 MCPB_FILE="$PROJECT_ROOT/$OUTPUT_NAME"
+PACKED_FILE="$PROJECT_ROOT/mcpb.mcpb"
 
-# Check all possible output locations from mcpb pack
-if [ -f "$MCPB_FILE" ]; then
-  : # already in place
-elif [ -f "$PROJECT_ROOT/mcpb.mcpb" ]; then
-  mv "$PROJECT_ROOT/mcpb.mcpb" "$MCPB_FILE"
-elif [ -f "$PROJECT_ROOT/himalaya-mcp-${VERSION}.mcpb" ]; then
-  mv "$PROJECT_ROOT/himalaya-mcp-${VERSION}.mcpb" "$MCPB_FILE"
-else
-  # Last resort: find any .mcpb file that was just created
-  FOUND=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.mcpb" -newer "$MCPB_DIR/manifest.json" 2>/dev/null | head -1)
-  if [ -n "$FOUND" ]; then
-    mv "$FOUND" "$MCPB_FILE"
+FOUND=""
+for attempt in 1 2 3 4 5; do
+  if [ -f "$PACKED_FILE" ]; then
+    FOUND="$PACKED_FILE"
+    break
   fi
+  sleep 0.5
+done
+
+if [ -n "$FOUND" ]; then
+  mv "$FOUND" "$MCPB_FILE"
 fi
 
 if [ -f "$MCPB_FILE" ]; then

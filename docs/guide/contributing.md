@@ -8,7 +8,7 @@ cd himalaya-mcp
 npm install
 npm run build              # TypeScript compilation
 npm run build:bundle       # esbuild single-file bundle (~883KB)
-npm test                   # Run all 569 tests
+npm test                   # Run all 573 tests
 ```
 
 ## Project Structure
@@ -22,7 +22,7 @@ src/                        # TypeScript source
   prompts/                  # 7 MCP prompt handlers
   resources/                # 3 MCP resource handlers
   adapters/                 # clipboard, calendar
-tests/                      # 569 tests across 31 files
+tests/                      # 573 tests across 31 files
 dist/                       # Build output
 himalaya-mcp-plugin/        # Claude Code plugin definition
 ```
@@ -30,8 +30,8 @@ himalaya-mcp-plugin/        # Claude Code plugin definition
 ## Running Tests
 
 ```bash
-npm test                    # Full suite (vitest)
-npm test -- --run           # Single run (no watch)
+npm test                    # Full suite, single run (vitest run)
+npm run test:watch          # Watch mode for interactive dev
 npx vitest tests/client.test.ts  # Single file
 npx vitest -t "send_email"       # Single test name match
 ```
