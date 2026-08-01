@@ -44,7 +44,7 @@ jobs:
 
       - name: Check out aggregator
         if: steps.guard.outputs.skip != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: Data-Wise/claude-plugins
           token: ${{ steps.app-token.outputs.token }}
