@@ -1,0 +1,329 @@
+# AGENTS.md
+
+## Project Overview
+
+**himalaya-mcp** — Privacy-first email MCP server and Codex plugin wrapping the himalaya CLI.
+
+- **Architecture:** TypeScript MCP server + Codex plugin
+- **Backend:** himalaya CLI (subprocess with JSON output)
+- **Platforms:** Codex (plugin), Codex Desktop/Cowork (MCP server)
+- **Version:** 2.0.0
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 575 tests)
+
+### What It Does
+
+Exposes email operations as MCP tools, resources, and prompts so Codex can:
+- List, search, and read emails (tools + resources)
+- Triage inbox: classify, summarize, flag (prompts + tools)
+- Compose and send with safety gates (tools)
+- Export to markdown, clipboard, Obsidian, Apple ecosystem (adapters)
+
+### Why himalaya
+
+- Local auth (no OAuth tokens sent to cloud)
+- Multi-account IMAP/SMTP support
+- `--output json` mode for trivial parsing
+- Already in the developer's stack (`em` dispatcher in flow-cli)
+
+---
+
+## Project Structure
+
+```
+himalaya-mcp/
+├── src/
+│   ├── index.ts                 # MCP server entry point
+│   ├── config.ts                # Env-based configuration (HIMALAYA_BINARY, etc.)
+│   ├── himalaya/
+│   │   ├── client.ts            # Subprocess wrapper (execFile, no shell injection) + retry policy
+│   │   ├── parser.ts            # JSON response parser + formatEnvelope helper
+│   │   ├── thread-parser.ts     # Thread/conversation grouping by subject line
+│   │   ├── errors.ts            # MCPError envelope, HimalayaError, stderr classifier
+│   │   ├── accounts.ts          # Multi-account discovery (himalaya account list -o json)
+│   │   ├── trash.ts             # Provider-agnostic trash folder (Gmail/Exchange/fallback)
+│   │   └── types.ts             # TypeScript types (Envelope, Thread, Folder, params, etc.)
+│   ├── tools/
+│   │   ├── inbox.ts             # list_emails, search_emails
+│   │   ├── read.ts              # read_email, read_email_html
+│   │   ├── read-raw.ts          # read_email_raw
+│   │   ├── render.ts            # render_email
+│   │   ├── unread.ts            # get_unread_count
+│   │   ├── list-starred.ts      # list_starred
+│   │   ├── manage.ts            # flag_email, move_email
+│   │   ├── compose.ts           # draft_reply, send_email (two-phase safety gate)
+│   │   ├── compose-new.ts       # compose_email (new messages, safety gate)
+│   │   ├── folders.ts           # list_folders, create_folder, delete_folder
+│   │   ├── attachments.ts       # list_attachments, download_attachment
+│   │   ├── calendar.ts          # extract_calendar_event, create_calendar_event
+│   │   ├── threads.ts           # list_threads, read_thread (conversation view)
+│   │   ├── reminders.ts         # create_reminder (Apple Reminders)
+│   │   ├── snooze.ts            # snooze_email, list_snoozed_emails
+│   │   ├── health.ts            # health_check (per-account diagnostics)
+│   │   ├── actions.ts           # export_to_markdown, create_action_item
+│   │   └── _envelope.ts         # Shared error wrapper
+│   ├── prompts/
+│   │   ├── triage.ts            # triage_inbox prompt
+│   │   ├── summarize.ts         # summarize_email prompt
+│   │   ├── digest.ts            # daily_email_digest prompt
+│   │   ├── weekly-digest.ts     # weekly_email_digest prompt
+│   │   ├── reply.ts             # draft_reply prompt
+│   │   ├── morning.ts           # morning_briefing prompt
+│   │   └── inbox-check.ts       # inbox_check prompt
+│   ├── resources/
+│   │   └── index.ts             # email://inbox, email://message/{id}, email://folders
+│   └── adapters/
+│       ├── clipboard.ts         # copy_to_clipboard (pbcopy/xclip)
+│       ├── reminders.ts         # Apple Reminders adapter (osascript)
+│       └── calendar.ts          # ICS parser + Apple Calendar (osascript)
+├── himalaya-mcp-plugin/
+│   ├── .claude-plugin/
+│   │   └── plugin.json          # Plugin manifest
+│   ├── skills/                  # Plugin skills (16: inbox, triage, digest, compose, reply, respond, forward, attachments, export, threads, search, manage, stats, config, help, morning)
+│   ├── agents/                  # Plugin agents (email-assistant)
+│   └── hooks/                   # Plugin hooks (SessionStart, PreToolUse)
+├── .claude-plugin/
+│   └── marketplace.json         # Marketplace manifest (source: ./himalaya-mcp-plugin)
+├── .mcp.json                    # MCP server config (uses ${CLAUDE_PLUGIN_ROOT})
+├── docs/
+│   ├── index.md                 # Home page
+│   ├── getting-started/         # Installation, quickstart, desktop extension, diagnose
+│   ├── tutorials/               # Step-by-step tutorials (Read & Browse, Respond & Organize, Compose & Automate)
+│   ├── guide/                   # User guide, workflows, skills, cookbook, integrations, migration
+│   └── reference/               # Commands, cheat-sheet, architecture, CLI, desktop extensions
+├── tests/
+│   ├── parser.test.ts                  # 13 parser tests
+│   ├── client.test.ts                  # 15 client tests (subprocess mock + retry)
+│   ├── manage.test.ts                  # 7 manage tools tests
+│   ├── compose.test.ts                 # 13 compose tools tests
+│   ├── compose-new.test.ts             # 12 compose_email tests
+│   ├── folders.test.ts                 # 12 folder tools tests
+│   ├── attachments.test.ts             # 10 attachment tools tests
+│   ├── calendar.test.ts                # 18 calendar tests (ICS parser + tools + escaping)
+│   ├── actions.test.ts                 # 6 export/action tests
+│   ├── threads.test.ts                 # 30 thread parser + tool registration tests
+│   ├── morning.test.ts                 # 13 morning/inbox-check prompt tests
+│   ├── prompts.test.ts                 # 24 prompt registration tests
+│   ├── config.test.ts                  # 9 config tests
+│   ├── clipboard.test.ts               # 4 clipboard tests
+│   ├── errors.test.ts                  # 18 MCPError envelope + stderr classifier tests
+│   ├── retry.test.ts                   # 4 transient retry policy tests
+│   ├── accounts.test.ts                # 6 multi-account discovery tests
+│   ├── health.test.ts                  # 5 health_check tool tests
+│   ├── trash.test.ts                   # 5 getTrashFolder tests
+│   ├── unread.test.ts                  # 4 get_unread_count tests
+│   ├── count-sync.test.ts             # 1 TOOL_COUNT drift test
+│   ├── read-raw.test.ts               # 5 read_email_raw tests
+│   ├── render.test.ts                 # 5 render_email tests
+│   ├── list-starred.test.ts           # 6 list_starred tests
+│   ├── reminders.test.ts              # 7 create_reminder tests
+│   ├── snooze.test.ts                 # 12 snooze_email/list_snoozed_emails tests
+│   ├── dogfood.test.ts                # 153 dogfooding tests (realistic Codex usage)
+│   ├── dogfood-reliability.test.ts    # 20 reliability scenarios
+│   ├── setup.test.ts                  # 45 setup CLI + multi-account doctor E2E tests
+│   ├── e2e.test.ts                    # 39 E2E tests (headless MCP server pipeline + .mcpb build)
+│   └── v150-features.test.ts          # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
+├── package.json
+└── tsconfig.json
+```
+
+### Implemented MCP Tools (29)
+
+| Tool | Description |
+|------|-------------|
+| `list_emails` | List envelopes in a folder (paginated, multi-account) |
+| `search_emails` | Search via himalaya filter syntax (subject, from, body, etc.) |
+| `read_email` | Read message body (plain text) |
+| `read_email_html` | Read message body (HTML) |
+| `read_email_raw` | Read raw MIME source of an email |
+| `render_email` | Read email body rendered as clean markdown |
+| `flag_email` | Add/remove flags (Seen, Flagged, Answered, etc.) |
+| `get_unread_count` | Get unread email count for a folder |
+| `move_email` | Move email to target folder |
+| `draft_reply` | Generate reply template with DRAFT markers |
+| `send_email` | Send email with two-phase safety gate (preview then confirm) |
+| `snooze_email` | Snooze email until specified time |
+| `compose_email` | Compose and send new email with two-phase safety gate |
+| `list_folders` | List all email folders/mailboxes |
+| `list_snoozed_emails` | List snoozed emails and their unsnooze times |
+| `list_starred` | List flagged/starred emails |
+| `create_folder` | Create a new email folder |
+| `create_reminder` | Create reminder in Apple Reminders (macOS) |
+| `delete_folder` | Delete folder with two-phase safety gate |
+| `list_attachments` | List attachments for an email (filename, MIME, size) |
+| `download_attachment` | Download attachment to temp directory |
+| `extract_calendar_event` | Parse ICS calendar invite from email attachment |
+| `create_calendar_event` | Add event to Apple Calendar with safety gate (macOS) |
+| `export_to_markdown` | Convert email to markdown with YAML frontmatter |
+| `create_action_item` | Extract action items and context from email |
+| `list_threads` | List email threads (conversations) grouped by subject |
+| `read_thread` | Read all messages in a thread chronologically |
+| `copy_to_clipboard` | Copy text to system clipboard (pbcopy/xclip) |
+| `health_check` | Per-account IMAP diagnostics (overall + per-account status, hint, attempts) |
+
+### Implemented MCP Prompts (7)
+
+| Prompt | Description |
+|--------|-------------|
+| `triage_inbox` | Guide Codex to classify emails as actionable/FYI/skip |
+| `summarize_email` | One-sentence summary + action items |
+| `daily_email_digest` | Markdown digest grouped by priority |
+| `draft_reply` | Reply composition with tone/safety guidance |
+| `morning_briefing` | Morning email briefing with urgency classification |
+| `inbox_check` | Quick inbox status with highlights and next actions |
+| `weekly_email_digest` | Weekly email digest grouped by priority and day |
+
+### Implemented MCP Resources (3)
+
+| Resource | URI |
+|----------|-----|
+| Inbox listing | `email://inbox` |
+| Message by ID | `email://message/{id}` |
+| Folder list | `email://folders` |
+
+---
+
+## Git Workflow
+
+```text
+main (protected) ← PR only, never direct commits
+  ↑
+dev (integration) ← Plan here, branch from here
+  ↑
+feature/* (worktrees) ← All implementation work
+```
+
+### Workflow Steps
+
+| Step | Action | Command |
+|------|--------|---------|
+| 1. Plan | Analyze on `dev`, wait for approval | `git checkout dev` |
+| 2. Branch | Create worktree for isolation | `/craft:git:worktree feature/<name>` |
+| 3. Develop | Conventional commits (`feat:`, `fix:`, etc.) | Small, atomic commits |
+| 4. Integrate | Test → rebase → PR to dev | `gh pr create --base dev` |
+| 5. Release | PR from dev to main | `gh pr create --base main --head dev` |
+
+### Constraints
+
+- **CRITICAL**: Always start work from `dev` branch
+- **Never** commit directly to `main`
+- **Never** write feature code on `dev`
+- **Always** verify branch: `git branch --show-current`
+
+### Branch Protection
+
+| Branch | Code Files | .md Files | Git Operations |
+|--------|-----------|-----------|----------------|
+| `main` | BLOCKED | BLOCKED | Commit/push BLOCKED |
+| `dev` | New: BLOCKED, Existing: allowed | ALLOWED | Commit/push allowed |
+| `feature/*` | ALLOWED | ALLOWED | All allowed |
+
+### Quick Reference
+
+| Action | Command |
+|--------|---------|
+| Create worktree | `git worktree add ~/.git-worktrees/himalaya-mcp/feature-<name> -b feature/<name> dev` |
+| List worktrees | `git worktree list` |
+| Create PR | `gh pr create --base dev` |
+| Release | `gh pr create --base main --head dev` |
+| Clean merged | `git worktree remove <path> && git branch -d feature/<name>` |
+
+---
+
+## Development
+
+### Prerequisites
+
+- Node.js 22+ (or Bun)
+- himalaya CLI (`brew install himalaya`)
+- TypeScript 5.7+
+
+### Setup
+
+```bash
+npm install
+npm run build
+```
+
+### Testing
+
+```bash
+npm test                         # Run vitest (575 tests across 31 test files)
+npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~883KB)
+node dist/index.js               # Run MCP server directly
+```
+
+### Install
+
+```bash
+# Homebrew (recommended — installs himalaya + Node.js automatically)
+# post_install auto-runs install script (symlink, marketplace, auto-enable)
+brew tap data-wise/tap
+brew install himalaya-mcp
+
+# Claude Code plugin (from GitHub marketplace — requires brew install node himalaya)
+# (Codex has no equivalent marketplace/plugin-install command as of this writing;
+# Codex users should install via the MCP server config below instead.)
+claude plugin marketplace add Data-Wise/himalaya-mcp
+claude plugin install himalaya
+
+# Claude Desktop (.mcpb extension — download from GitHub Releases, double-click)
+# Or legacy MCP server config:
+himalaya-mcp setup
+
+# Diagnose installation
+himalaya-mcp doctor              # Check all settings
+himalaya-mcp doctor --fix        # Auto-fix common issues
+```
+
+### Dev Setup (local development)
+
+himalaya-mcp is Homebrew-distributed, so local Claude Code installs should track
+the Cellar install (auto-updates on `brew upgrade`), not this dev repo directly —
+same pattern as craft/rforge/scholar. Point the `local-plugins` marketplace entry
+at the Cellar path:
+
+```bash
+rm -rf ~/.claude/local-marketplace/himalaya-mcp
+ln -s /opt/homebrew/opt/himalaya-mcp/libexec ~/.claude/local-marketplace/himalaya-mcp
+```
+
+Symlinking straight to `~/projects/dev-tools/himalaya-mcp` (the old instruction here)
+shows unreleased/WIP repo content as if it were the installed plugin, and doesn't
+match where `local-plugins` actually resolves it from — only use that for testing
+unreleased changes, not as the default dev setup.
+
+---
+
+## Implementation Phases
+
+| Phase | Scope | Status |
+|-------|-------|--------|
+| 0–6d | Core features, plugin, packaging, desktop extension | Done |
+| **em Port P1** | Trash utility, unread count, read_raw, render, list_starred | Done |
+| **em Port P2** | Apple Reminders, snooze, weekly digest, triage enhancement | Done |
+| **em Port P3** | /himalaya:respond skill | Done |
+| **em Port Docs** | Migration guide + tutorial, nav reorganization | Done |
+
+---
+
+## Design Decisions
+
+1. **Subprocess over library** — Wrap himalaya CLI, don't reimplement IMAP
+2. **Prompt-based triage** — Codex IS the AI; MCP prompts guide it, no embedded AI
+3. **Safety gates** — send_email returns preview, requires explicit confirmation
+4. **Tools + Resources** — Tools for actions, resources for browsing
+5. **Plugin-first** — Codex plugin bundles MCP server; Desktop extension via `.mcpb`
+
+---
+
+## Relationship to flow-cli
+
+himalaya-mcp does NOT replace the `em` dispatcher. They serve different contexts:
+- `em` = terminal-native, fzf picker, interactive ZSH workflow
+- himalaya-mcp = AI-native, Codex as the interface, MCP protocol
+
+Both wrap the same himalaya CLI and can coexist.
+
+---
+
+**Last Updated:** 2026-07-07
