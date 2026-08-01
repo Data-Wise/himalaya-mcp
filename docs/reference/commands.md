@@ -59,12 +59,20 @@ Search emails using himalaya filter syntax.
 | `from` | `from alice` | Sender contains "alice" |
 | `to` | `to team` | Recipient contains "team" |
 | `body` | `body deadline` | Body contains "deadline" |
-| `date` | `date 2026-02-13` | Sent on date |
+| `date` | `date 2026-02-13` | Sent on date (exact match) |
 | `before` | `before 2026-02-01` | Sent before date |
 | `after` | `after 2026-01-01` | Sent after date |
-| `flag` | `flag Flagged` | Has specific flag |
+| `flag` | `flag Flagged` | Has specific flag (`Seen`, `Flagged`, `Answered`, `Deleted`, `Draft`) |
 
-**Operators:** `and`, `or`, `not`
+**Grammar rules:**
+
+- `and` / `or` are **REQUIRED between every condition pair** — omitting them causes parse errors. `from alice after 2026-07-01` is invalid; use `from alice and after 2026-07-01`.
+- `not` negates any condition: `not flag Seen`, `not from spammer`, `not body spam`.
+- Multi-word values need backslash-escaped spaces: `subject quarterly\ report`.
+- Bare words default to subject-only search; use `body <word>` for body text.
+- Sort results with `order by <date|from|to|subject> <asc|desc>`: `order by date desc`.
+
+**Bare-word normalization:** single-word queries without a condition are automatically wrapped with `subject` (e.g. `toilet` → `subject toilet`), since himalaya's parser chokes on unqualified terms. Qualified, multi-word, and operator-containing queries pass through unchanged.
 
 **Examples:**
 
@@ -80,6 +88,9 @@ Search emails using himalaya filter syntax.
 
 "Search Sent folder for budget emails"
 → search_emails(query: "subject budget", folder: "Sent")
+
+"Latest invoices, newest first"
+→ search_emails(query: "subject invoice and after 2026-01-01 order by date desc")
 ```
 
 **Related:** [list_emails](#list_emails), [read_email](#read_email)
@@ -186,6 +197,8 @@ Read an email message body as HTML. Useful for formatted emails with tables, ima
 ```
 
 **When to use:** Prefer `read_email` for most messages. Use `read_email_html` when the plain text version is empty or poorly formatted (newsletters, marketing emails, HTML-only senders).
+
+**Compatibility:** Works with himalaya v1.2.0+, which removed the old `--html` flag. The tool exports the message and reads its HTML part, so no flag compatibility is needed.
 
 **Related:** [read_email](#read_email)
 

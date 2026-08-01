@@ -39,6 +39,30 @@
 
 ## Just Completed
 
+- 2026-08-01: Full PR triage + merge session — reviewed all 8 open PRs, merged 5 into their
+  bases: #69 (search trailingArgs fix → dev), #81 (tsconfig `types: ["node"]` → main), #105
+  (re-land of #92 search docs → main), #106 (re-land of #89 readMessageHtml message-export
+  fix → main), #107 (re-land of #70 stderr-surfacing + normalizeSearchQuery → dev). Closed
+  #92/#89/#70 with pointer comments crediting @igitur. Re-land pattern (igitur's fork forbids
+  maintainer edits, and its stale fork-base lockfile fails CI audit): fetch `pull/N/head`,
+  re-apply the reviewed value-add hunks onto a fresh main-repo branch, open a replacement PR,
+  merge, close the original with a pointer. #70's redundant trailingArgs hunk (already merged
+  via #69) was dropped; dev's rich #105 search_emails description and `f.toUpperCase() !==
+  "INBOX"` were kept.
+- 2026-08-01: PR #104 (`.mcpb` pack race) COMPLETED and merged — `npm overrides` (`postcss
+  ^8.5.18`, `tmp ^0.2.7`) verified: `npm audit --audit-level=high` clears (only pre-existing
+  `@hono/node-server` moderate from #102 remains; `tmp` 0.2.7 is forced past `^0.0.33` but
+  API-compatible and runtime-verified via `tmpNameSync`); `pack` script aligned to `bash
+  scripts/build-mcpb.sh`; 575 tests passed via `--pool=forks`. Merged squash (3aa5f49),
+  worktree cleaned.
+- 2026-08-01: dev fully synced with main (0 commits behind) — merge-commit sync-backs
+  (7b61393, e9be26f, 7b28a7d) brought #83-87/#102/#81/#105/#106 into dev; verified
+  `git rev-list --count origin/dev..origin/main` = 0.
+- 2026-08-01: AGENTS.md committed (24a0c58) as a standalone Codex-oriented parallel to
+  CLAUDE.md — intentional platform divergence (Codex vs Claude tooling), not a pointer.
+- 2026-08-01: Fixed a duplicate `"types": ["node"]` key in tsconfig.json (merge artifact from
+  the #81 sync-back, present on origin/dev) — removed the line-15 duplicate; committed as part
+  of #107.
 - 2026-07-31/08-01: PR triage + merge session — reviewed and merged #83 (checkout v7), #84
   (setup-node v7), #86 (download-artifact v8, hit a real `.mcpb` build-detection flake, passed
   on 3rd CI retry), #85 (setup-python v7, real merge conflict with #83 in `docs.yml`, resolved
@@ -57,12 +81,9 @@
   races a GH Actions write-visibility lag before the script's poll+`mv` step. Fix: pass the
   final filename directly via `pack`'s second positional arg, eliminating the race by
   construction. Plan at `~/.claude/plans/shimmering-wibbling-frost.md`; implemented as PR #104
-  on `feature/mcpb-pack-race` — core fix landed and CI-green, but pinning `@anthropic-ai/mcpb`
-  as a devDependency (to prevent future silent CLI-behavior drift) pulled in the CLI's own
-  vulnerable transitive deps (`tmp`, plus re-triggering `postcss`/`@hono/node-server`). An
-  `npm overrides` fix was in progress, uncommitted, when the session driving it was killed for
-  an unrelated reason (runaway `npm test` loop, ~56 stacked processes, no relation to the code
-  itself) — **PR #104 still needs that override fix finished, verified, and pushed.**
+  on `feature/mcpb-pack-race` — MERGED (see 2026-08-01 entry above); pinning
+  `@anthropic-ai/mcpb` as a devDependency pulled in the CLI's own vulnerable transitive deps
+  (`tmp`, plus re-triggering `postcss`/`@hono/node-server`), resolved via `npm overrides`.
 - 2026-08-01: Fixed a real test bug found via adversarial review of #87: `tests/dogfood.test.ts`
   hardcoded `expect(releaseContent).toContain("upload-artifact@v4")` — updated to `v7` to match.
 
@@ -92,19 +113,20 @@
 
 ## Current State
 
-- Branch: `dev` (clean except untracked `AGENTS.md` — fixed but not yet committed)
-- Version: 2.0.0 released (main). **`dev` is currently 3 ahead / 9 behind `origin/main`** —
-  today's PR batch (#83–87, #102) all merged to `main` directly (Dependabot's default target),
-  not `dev`. `dev` needs a sync-back before its next feature work branches from a stale base.
+- Branch: `dev` @ ed5d869, synced with `origin/main` (0 commits behind, verified via
+  `git rev-list --count origin/dev..origin/main` = 0). Working tree clean.
+- Version: 2.0.0 released. `dev` carries #69/#81/#105/#106/#107 ahead of the v2.0.0 release
+  (next release candidate content).
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 573 passing across 31 test files (corrected from stale 575 in CLAUDE.md/.STATUS —
-  verified via direct `npm test` runs this session)
+- Tests: ~601 passing across 32 test files (575 baseline + 26 from #70 re-land: 3 stderr
+  tests in client.test.ts, 23 normalizeSearchQuery tests in new tests/inbox.test.ts; verified
+  via `npx vitest list`)
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
 - Homebrew: data-wise/tap/himalaya-mcp — verify current version after v2.0.0 release sync
 - Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/
 - Bundle: ~883KB (esbuild), .mcpb: ~247KB
-- Open PR #104 (`.mcpb` pack race fix) needs its `npm overrides` audit-fix step finished (see
-  Just Completed above)
+- Open PRs: #79 (derive HIMALAYA_FROM from config.toml), #82 (HTML compose_email —
+  BLOCKED: manifest.json regression deletes 8 tools), #97 (TypeScript 7 bump — deferred).
 
 ## Install
 
@@ -133,17 +155,16 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- **Pending:** Finish PR #104's `npm overrides` fix (`postcss`, `tmp`) for the vulnerable
-  transitive deps that pinning `@anthropic-ai/mcpb` introduced — verify `npm audit
-  --audit-level=high` actually clears (note `tmp`'s advisory says "no fix available," so the
-  override needs confirming it patches the real code path, not just satisfies a version range),
-  then commit, push, and re-run CI before merging.
-- **Pending:** Sync `dev` from `main` (9 commits behind) before branching new feature work.
-- **Pending:** Decide `AGENTS.md` maintenance model (standalone doc kept in sync vs. thin
-  pointer to CLAUDE.md) and commit it either way — currently fixed but untracked.
-- **Remaining open PRs, untouched this session:** #97 (TypeScript 6→7 major bump — needs care),
-  #92/#89/#82/#81/#79/#70/#69 (contributor fixes/features — need real code review, not just
-  dependency-bump triage).
+- **Pending:** PR #79 (derive `HIMALAYA_FROM` from config.toml, base=main) — needs a rebase
+  onto current dev and a fix for the unguarded `readFileSync` in `src/himalaya/config-toml.ts`
+  (missing/unparseable config.toml must not crash `loadConfig()`). The tsconfig
+  `types: ["node"]` conflict with #81 is now moot (#81 merged).
+- **Pending:** PR #82 (HTML compose_email, base=main) — BLOCKED: its `mcpb/manifest.json`
+  diff deletes 8 tools + 1 prompt (stale-drift against an old base). Needs a rebase + manifest
+  restoration, and the SKILL.md text must be reconciled with the HTML-only (no text/plain
+  fallback) behavior.
+- **Pending:** PR #97 (TypeScript 6→7 major bump, Dependabot) — deferred; project pins
+  `typescript ^6.0.3`, needs a deliberate review.
 - Otherwise: all features complete, project in maintenance mode. Possible future directions:
   - Bundled .mcpb variant with universal himalaya binary (~19 MB)
   - Code signing + notarization (Apple Developer, $99/yr)
@@ -162,7 +183,9 @@ himalaya-mcp doctor --fix
 ---
 
 **Last Updated:** 2026-08-01
-**Status:** v2.0.0 released and in maintenance. Today's session: merged a 6-PR Dependabot/CI
-batch (#83–87, #102), fixed a real `.mcpb` packaging CI race (PR #104, needs one more
-audit-override fix before merge), fixed `AGENTS.md` drift. Open: PR #104 override fix, `dev`→
-`main` sync, 8 untouched contributor/dependency PRs.
+**Status:** v2.0.0 released and in maintenance. This session: completed and merged PR #104
+(`.mcpb` pack race + audit overrides), then reviewed all 8 remaining PRs and merged 5
+(#69/#81/#105/#106/#107 — including re-lands of #92/#89/#70 with pointers to the originals),
+synced `dev` with `main` (0 behind), committed AGENTS.md, and updated this status + docs.
+Open: PR #79 (needs rebase + config-toml readFileSync guard), #82 (BLOCKED manifest
+regression), #97 (TS7 deferred).
