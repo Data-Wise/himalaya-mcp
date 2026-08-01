@@ -18,7 +18,7 @@
     "test:e2e": "npm run build && node tests/e2e.mjs",
     "lint": "npm run build",
     "build:mcpb": "bash scripts/build-mcpb.sh",
-    "pack": "npx @anthropic-ai/mcpb pack"
+    "pack": "bash scripts/build-mcpb.sh"
   },
   "keywords": [
     "mcp",
@@ -38,10 +38,15 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2",
     "@types/node": "^26.1.1",
     "@vitest/coverage-v8": "^4.1.10",
     "esbuild": "^0.28.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "postcss": "^8.5.18",
+    "tmp": "^0.2.7"
   }
 }

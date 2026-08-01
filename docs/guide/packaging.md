@@ -196,8 +196,7 @@ This runs `scripts/build-mcpb.sh` which:
 1. Builds the esbuild bundle (`dist/index.js`)
 2. Copies the bundle to `mcpb/dist/`
 3. Validates the manifest (`npx @anthropic-ai/mcpb validate mcpb/`)
-4. Packs the archive (`npx @anthropic-ai/mcpb pack mcpb/`)
-5. Renames to `himalaya-mcp-v{version}.mcpb`
+4. Packs directly to `himalaya-mcp-v{version}.mcpb` (`npx @anthropic-ai/mcpb pack mcpb/ himalaya-mcp-v{version}.mcpb`)
 
 ### Install (GUI)
 

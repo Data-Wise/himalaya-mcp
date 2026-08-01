@@ -206,10 +206,10 @@ Checks: required fields, type correctness, prompt `text` fields, user_config typ
 ### Packing
 
 ```bash
-npx @anthropic-ai/mcpb pack mcpb/
+npx @anthropic-ai/mcpb pack mcpb/ himalaya-mcp-v2.0.0.mcpb
 ```
 
-Creates `mcpb.mcpb` in the current directory (named after the directory, not the extension name).
+The optional second argument is an explicit output path; without it, `pack` writes `mcpb.mcpb` in the current directory (named after the directory, not the extension name). This repo's `scripts/build-mcpb.sh` always supplies the explicit output path so the final filename is written directly, with no intermediate name and no rename step.
 
 ## Installation Mechanism
 
