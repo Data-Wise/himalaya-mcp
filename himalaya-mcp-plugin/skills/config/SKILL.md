@@ -12,16 +12,16 @@ triggers:
   - which email account
 ---
 
-# /email:config - Email Setup Wizard
+# /himalaya:config - Email Setup Wizard
 
 Check himalaya installation, configure email accounts, and verify connectivity.
 
 ## Usage
 
 ```
-/email:config                # Full setup wizard (interactive)
-/email:config --check        # Validate current setup without changes
-/email:config --add-account  # Add an additional email account
+/himalaya:config                # Full setup wizard (interactive)
+/himalaya:config --check        # Validate current setup without changes
+/himalaya:config --add-account  # Add an additional email account
 ```
 
 ## When Invoked (No Args) — Setup Wizard
@@ -188,8 +188,8 @@ IMAP ............ connected
 SMTP ............ connected
 MCP server ...... running
 
-→ Try "/email:inbox" to check your email
-→ Try "/email:stats" for inbox overview
+→ Try "/himalaya:inbox" to check your email
+→ Try "/himalaya:stats" for inbox overview
 ```
 
 ## When Invoked with --check
@@ -229,5 +229,5 @@ Accounts configured:
   • work — user@company.com
 
 → Use "account: work" parameter with any tool to access work email
-→ "/email:inbox" defaults to gmail (default account)
+→ "/himalaya:inbox" defaults to gmail (default account)
 ```

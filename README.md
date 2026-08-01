@@ -7,7 +7,7 @@ Privacy-first email for Claude -- MCP server and Claude Code plugin (`email`) wr
 - **29 MCP tools**: list, search, read, flag, move, compose, draft reply, send (with safety gate), export, action items, clipboard, folders, attachments, calendar, threads, health check, get_unread_count, read_email_raw, render_email, list_starred, create_reminder, snooze_email, list_snoozed_emails
 - **7 MCP prompts**: triage inbox, summarize email, daily digest, weekly digest, draft reply, morning briefing, inbox check
 - **3 MCP resources**: inbox, message by ID, folders
-- **16 plugin skills**: `/email:inbox`, `/email:triage`, `/email:digest`, `/email:reply`, `/email:compose`, `/email:attachments`, `/email:search`, `/email:manage`, `/email:stats`, `/email:config`, `/email:help`, `/email:morning`, `/email:forward`, `/email:export`, `/email:threads`, `/email:respond`
+- **16 plugin skills**: `/himalaya:inbox`, `/himalaya:triage`, `/himalaya:digest`, `/himalaya:reply`, `/himalaya:compose`, `/himalaya:attachments`, `/himalaya:search`, `/himalaya:manage`, `/himalaya:stats`, `/himalaya:config`, `/himalaya:help`, `/himalaya:morning`, `/himalaya:forward`, `/himalaya:export`, `/himalaya:threads`, `/himalaya:respond`
 - **Multi-account**: per-call account switching via `--account`
 - **Reliability**: account-aware diagnostics via the `health_check` tool and multi-account `doctor`; structured error envelopes with one-line fix hints
 - **Safe subprocess**: uses `execFile` (no shell injection)
@@ -35,7 +35,7 @@ himalaya-mcp doctor    # Verify installation
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 ```
 
 ```bash
@@ -72,7 +72,7 @@ himalaya-mcp doctor    # Verify installation
 ## Testing
 
 ```bash
-npm test              # 569 tests across 31 files (vitest)
+npm test              # 573 tests across 31 files (vitest)
 ```
 
 | Category | Tests | Coverage |

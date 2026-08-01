@@ -5,7 +5,7 @@
 ```
 brew tap data-wise/tap && brew install himalaya-mcp   # Homebrew (recommended)
 claude plugin marketplace add Data-Wise/himalaya-mcp  # GitHub (requires node+himalaya)
-claude plugin install email                           # ...then install plugin
+claude plugin install himalaya                           # ...then install plugin
 himalaya-mcp install-ext                              # Desktop extension
 himalaya-mcp doctor                                   # Verify everything
 ```
@@ -48,18 +48,21 @@ extract_calendar_event  Parse ICS invite from email
 create_calendar_event   Add to Apple Calendar (macOS)
 list_threads        List conversation threads
 read_thread         Read all messages in a thread
+snooze_email        Snooze email until specified time
+create_reminder     Create reminder in Apple Reminders
 export_to_markdown  Email → markdown + YAML frontmatter
 create_action_item  Extract todos and deadlines
 copy_to_clipboard   Copy text to clipboard
 health_check        Diagnose account connectivity
 ```
 
-## MCP Prompts (6)
+## MCP Prompts (7)
 
 ```
 triage_inbox        Classify emails: actionable/FYI/skip
 summarize_email     One-sentence summary + action items
 daily_email_digest  Priority-grouped markdown digest
+weekly_email_digest  Weekly digest grouped by day
 draft_reply         Guided reply composition
 morning_briefing    Morning briefing with urgency
 inbox_check         Quick inbox status + highlights
@@ -92,13 +95,15 @@ Deleted    Marked for deletion
 Draft      Draft message
 ```
 
-## Plugin Skills (12)
+## Plugin Skills (16)
 
 ```
-/email:inbox        /email:triage      /email:digest
-/email:reply        /email:compose     /email:attachments
-/email:search       /email:manage      /email:stats
-/email:config       /email:help        /email:morning
+/himalaya:inbox        /himalaya:triage      /himalaya:digest
+/himalaya:reply        /himalaya:compose     /himalaya:respond
+/himalaya:morning      /himalaya:attachments /himalaya:forward
+/himalaya:export       /himalaya:threads     /himalaya:search
+/himalaya:manage       /himalaya:stats       /himalaya:config
+/himalaya:help
 ```
 
 ## Env Vars
@@ -117,7 +122,7 @@ Triage:     list → read → flag / move
 Reply:      read → draft → review → send(confirm)
 Compose:    compose(preview) → review → compose(confirm)
 Search:     search → read → flag/reply
-Bulk:       /email:manage [action] [ids]
+Bulk:       /himalaya:manage [action] [ids]
 Export:     read → export_to_markdown → copy_to_clipboard
 Calendar:   list_attachments → extract → create(confirm)
 Multi-acct: Any tool + account="work" | account="personal"
@@ -129,7 +134,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 npm run build           tsc (dev)
 npm run build:bundle    esbuild (~883KB)
 npm run build:mcpb      .mcpb extension (~247KB)
-npm test                569 tests (vitest)
+npm test                573 tests (vitest)
 ```
 
 ## Resources

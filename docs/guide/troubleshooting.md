@@ -145,7 +145,7 @@ npm run build
 
 ### Skills not loading
 
-If `/email:*` slash commands don't appear after install, there are two common causes:
+If `/himalaya:*` slash commands don't appear after install, there are two common causes:
 
 **1. Stale plugin cache**
 
@@ -205,7 +205,7 @@ The marketplace install clones the full repo. Skills live at `himalaya-mcp-plugi
 ls ~/.claude/plugins/himalaya-mcp/skills/
 ```
 
-If missing, re-install: `claude plugin install email@himalaya-mcp`
+If missing, re-install: `claude plugin install himalaya@himalaya-mcp`
 
 ### MCP tools not available (GitHub Marketplace install)
 
@@ -266,7 +266,7 @@ cat ~/.claude/local-marketplace/marketplace.json
 If missing, register manually:
 
 ```bash
-claude plugin install email@local-plugins
+claude plugin install himalaya@local-plugins
 ```
 
 **4. Restart Claude Code** -- plugin discovery only runs at startup.
@@ -413,5 +413,5 @@ DEBUG=* node dist/index.js
 ### Run tests to verify installation
 
 ```bash
-npm test    # 569 tests
+npm test    # 573 tests
 ```

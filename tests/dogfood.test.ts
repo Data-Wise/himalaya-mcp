@@ -1168,7 +1168,7 @@ describe("Packaging: plugin manifest structure", () => {
   );
 
   it("has required top-level fields", () => {
-    expect(pluginJson.name).toBe("email");
+    expect(pluginJson.name).toBe("himalaya");
     expect(pluginJson.version).toBeTruthy();
     expect(pluginJson.description).toBeTruthy();
   });
@@ -1294,7 +1294,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("fully-qualified send_email with confirm='true' → shows preview", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_name: "mcp__plugin_himalaya_email__send_email",
       tool_input: { to: "alice@example.com", subject: "Meeting", body: "Hi Alice", confirm: "true" },
     });
     expect(r.status).toBe(0);
@@ -1306,7 +1306,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("fully-qualified compose_email with confirm='true' → shows preview", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__compose_email",
+      tool_name: "mcp__plugin_himalaya_email__compose_email",
       tool_input: { to: "bob@example.com", subject: "Hello", body: "Line1\nLine2\nLine3", confirm: "true" },
     });
     expect(r.status).toBe(0);
@@ -1328,7 +1328,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("shows CC line when CC field present", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_name: "mcp__plugin_himalaya_email__send_email",
       tool_input: { to: "a@b.com", cc: "cc@b.com", subject: "S", body: "B", confirm: "true" },
     });
     expect(r.stderr).toContain("CC:");
@@ -1337,7 +1337,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("omits CC line when CC field absent", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_name: "mcp__plugin_himalaya_email__send_email",
       tool_input: { to: "a@b.com", subject: "S", body: "B", confirm: "true" },
     });
     expect(r.stderr).not.toContain("CC:");
@@ -1345,7 +1345,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("body >3 lines → shows first 3 lines + truncation notice", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__compose_email",
+      tool_name: "mcp__plugin_himalaya_email__compose_email",
       tool_input: {
         to: "a@b.com", subject: "S", confirm: "true",
         body: "Line1\nLine2\nLine3\nLine4\nLine5",
@@ -1359,7 +1359,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("body <=3 lines → shows full body, no truncation notice", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_name: "mcp__plugin_himalaya_email__send_email",
       tool_input: { to: "a@b.com", subject: "S", body: "Only two\nlines", confirm: "true" },
     });
     expect(r.stderr).toContain("Only two");
@@ -1369,7 +1369,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("empty body → no body lines in preview", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_name: "mcp__plugin_himalaya_email__send_email",
       tool_input: { to: "a@b.com", subject: "S", body: "", confirm: "true" },
     });
     expect(r.stderr).toContain("Email Send Preview");
@@ -1378,7 +1378,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("missing to/subject → shows '<not set>' placeholders", () => {
     const r = runHook({
-      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_name: "mcp__plugin_himalaya_email__send_email",
       tool_input: { confirm: "true" },
     });
     expect(r.stderr).toContain("<not set>");
@@ -1392,7 +1392,7 @@ describe("Packaging: pre-send hook", () => {
 
   it("confirm=true send → creates audit log with correct content", () => {
     runHook({
-      tool_name: "mcp__plugin_email_himalaya__send_email",
+      tool_name: "mcp__plugin_himalaya_email__send_email",
       tool_input: { to: "log@test.com", subject: "Audit Test", body: "Body", confirm: "true" },
     });
     const logPath = join(tempHome, ".himalaya-mcp", "sent.log");
@@ -1401,7 +1401,7 @@ describe("Packaging: pre-send hook", () => {
     expect(content).toContain("date:");
     expect(content).toContain("to: log@test.com");
     expect(content).toContain("subject: Audit Test");
-    expect(content).toContain("tool: mcp__plugin_email_himalaya__send_email");
+    expect(content).toContain("tool: mcp__plugin_himalaya_email__send_email");
   });
 
   it("confirm=false → no audit log created", () => {
@@ -1432,7 +1432,7 @@ describe("Packaging: marketplace.json", () => {
     expect(marketplace.owner.name).toBe("Data-Wise");
     expect(marketplace.plugins).toBeDefined();
     expect(marketplace.plugins.length).toBe(1);
-    expect(marketplace.plugins[0].name).toBe("email");
+    expect(marketplace.plugins[0].name).toBe("himalaya");
     expect(marketplace.plugins[0].source).toBe("./himalaya-mcp-plugin");
     expect(marketplace.plugins[0].description).toBeTruthy();
   });
@@ -1447,9 +1447,9 @@ describe("Packaging: .mcp.json", () => {
 
   it("declares himalaya server with CLAUDE_PLUGIN_ROOT", () => {
     const mcpJson = JSON.parse(readFileSync(mcpJsonPath, "utf-8"));
-    expect(mcpJson.mcpServers?.himalaya).toBeDefined();
-    expect(mcpJson.mcpServers.himalaya.command).toBe("node");
-    expect(mcpJson.mcpServers.himalaya.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
+    expect(mcpJson.mcpServers?.email).toBeDefined();
+    expect(mcpJson.mcpServers.email.command).toBe("node");
+    expect(mcpJson.mcpServers.email.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
   });
 
   it("is the sole MCP server declaration (not duplicated in plugin.json)", () => {
@@ -1818,7 +1818,7 @@ describe("Packaging: release includes mcpb", () => {
   });
 
   it("release workflow uploads mcpb artifact", () => {
-    expect(releaseContent).toContain("upload-artifact@v4");
+    expect(releaseContent).toContain("upload-artifact@v7");
     expect(releaseContent).toContain("mcpb-bundle");
   });
 

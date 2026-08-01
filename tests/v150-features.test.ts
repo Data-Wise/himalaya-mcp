@@ -56,17 +56,17 @@ describe("v1.5.0: SessionStart hook", () => {
     const { stdout } = await execFileAsync("/bin/bash", [hookPath]);
     const { additionalContext } = JSON.parse(stdout.trim());
     const expectedSkills = [
-      "/email:inbox",
-      "/email:triage",
-      "/email:digest",
-      "/email:compose",
-      "/email:reply",
-      "/email:search",
-      "/email:manage",
-      "/email:attachments",
-      "/email:stats",
-      "/email:config",
-      "/email:help",
+      "/himalaya:inbox",
+      "/himalaya:triage",
+      "/himalaya:digest",
+      "/himalaya:compose",
+      "/himalaya:reply",
+      "/himalaya:search",
+      "/himalaya:manage",
+      "/himalaya:attachments",
+      "/himalaya:stats",
+      "/himalaya:config",
+      "/himalaya:help",
     ];
     for (const skill of expectedSkills) {
       expect(additionalContext).toContain(skill);
@@ -130,8 +130,8 @@ describe("v1.5.0: plugin.json hook structure", () => {
     expect(pluginJson.description).toContain("2 hooks");
   });
 
-  it("version is 1.9.0", () => {
-    expect(pluginJson.version).toBe("1.9.0");
+  it("version is 2.0.0", () => {
+    expect(pluginJson.version).toBe("2.0.0");
   });
 });
 

@@ -3,7 +3,7 @@
  * Uses execFile (not exec) to prevent shell injection.
  */
 
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import type { HimalayaClientOptions } from "./types.js";
 import { classifyStderr, HimalayaError } from "./errors.js";
@@ -62,6 +62,16 @@ export class HimalayaClient {
   /** Sender email address (from HIMALAYA_FROM env var). */
   get from(): string {
     return this.opts.from;
+  }
+
+  /** Path to the himalaya binary. */
+  get binary(): string {
+    return this.opts.binary;
+  }
+
+  /** Default account name (may be empty). */
+  get account(): string {
+    return this.opts.account;
   }
 
   // Resolve the effective folder, validate it, and append --folder to `args`
@@ -163,20 +173,6 @@ export class HimalayaClient {
       args.push("--page", String(page));
     }
     return this.exec(args, { folder: f, account });
-  }
-
-  /**
-   * Get the unread count for a folder.
-   * Uses himalaya filter syntax: `not flag Seen`.
-   */
-  async getUnreadCount(folder?: string, account?: string): Promise<number> {
-    const raw = await this.searchEnvelopes("not flag Seen", folder, account);
-    const { parseEnvelopes } = await import("./parser.js");
-    const result = parseEnvelopes(raw);
-    if (result.ok) {
-      return result.data.length;
-    }
-    return 0;
   }
 
   /**
@@ -284,8 +280,6 @@ export class HimalayaClient {
         `Refusing to pass it to himalaya.`,
       );
     }
-
-    const { spawn } = await import("node:child_process");
 
     const args = ["template", "send", "--output", "json"];
     const acct = account || this.opts.account;

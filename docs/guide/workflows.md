@@ -462,13 +462,13 @@ Mark the other 3 as read and archive?
 
 ## 18. Search and Filter Emails
 
-Use the `/email:search` skill for powerful email search with filter combinations. See the [Search & Manage tutorial](../tutorials/search-manage.md) for a step-by-step walkthrough.
+Use the `/himalaya:search` skill for powerful email search with filter combinations. See the [Search & Manage tutorial](../tutorials/search-manage.md) for a step-by-step walkthrough.
 
 **Natural language:** "Find unread emails from Alice about the budget"
 
 **What happens:**
 
-1. `/email:search` parses your query into himalaya filter syntax
+1. `/himalaya:search` parses your query into himalaya filter syntax
 2. `search_emails(query: "from alice and subject budget and not flag Seen")` -- combined filters
 3. Results displayed as a table with ID, From, Subject, Date, Flags
 4. Offers to read, triage, or act on results
@@ -499,18 +499,18 @@ Search: "from alice, unread" (3 results)
 
 → "Read #1" to view full email
 → "Flag all" to star these
-→ "/email:manage archive 1,2,3" to bulk archive
+→ "/himalaya:manage archive 1,2,3" to bulk archive
 ```
 
 ## 19. Bulk Email Management
 
-Use `/email:manage` for batch operations on multiple emails.
+Use `/himalaya:manage` for batch operations on multiple emails.
 
 **Natural language:** "Move emails 1, 2, 5 to Archive"
 
 **What happens:**
 
-1. `/email:manage` parses the action and target list
+1. `/himalaya:manage` parses the action and target list
 2. Shows confirmation gate for operations on >5 emails
 3. Executes operations with progress display
 4. Shows summary
@@ -518,11 +518,11 @@ Use `/email:manage` for batch operations on multiple emails.
 **Batch patterns:**
 
 ```
-Flag specific:    /email:manage flag 1,2,5
-Unflag:           /email:manage unflag 3,7
-Move to folder:   /email:manage move 1,2,3 Archive
-Archive shortcut: /email:manage archive 4,5,6
-All unread:       /email:manage move all-unread Spam
+Flag specific:    /himalaya:manage flag 1,2,5
+Unflag:           /himalaya:manage unflag 3,7
+Move to folder:   /himalaya:manage move 1,2,3 Archive
+Archive shortcut: /himalaya:manage archive 4,5,6
+All unread:       /himalaya:manage move all-unread Spam
 ```
 
 **Example interaction:**
@@ -544,7 +544,7 @@ You: "yes"
 
 Moved 8 emails to Archive
 
-→ "/email:inbox" to check remaining emails
+→ "/himalaya:inbox" to check remaining emails
 → "Undo" to move these back to INBOX
 ```
 
@@ -556,13 +556,13 @@ You: "Find all emails from newsletter@dev.to and archive them"
 
 ## 20. Inbox Statistics and Trends
 
-Use `/email:stats` for a quick overview of your inbox health.
+Use `/himalaya:stats` for a quick overview of your inbox health.
 
 **Natural language:** "How many unread emails do I have?"
 
 **What happens:**
 
-1. `/email:stats` calls `list_emails` and `search_emails` to gather data
+1. `/himalaya:stats` calls `list_emails` and `search_emails` to gather data
 2. Computes unread count, today's volume, top senders, oldest unread
 3. Displays formatted statistics
 4. Optional `--weekly` for trend comparison
@@ -570,7 +570,7 @@ Use `/email:stats` for a quick overview of your inbox health.
 **Example interaction:**
 
 ```
-You: "/email:stats"
+You: "/himalaya:stats"
 
 Claude:
 Inbox Stats
@@ -588,13 +588,13 @@ Oldest unread: 12 days ago
   Subject: Benefits enrollment deadline
 
 → "Read oldest unread" to view it
-→ "/email:triage" to classify unread
+→ "/himalaya:triage" to classify unread
 ```
 
 **Weekly comparison:**
 
 ```
-You: "/email:stats --weekly"
+You: "/himalaya:stats --weekly"
 
 Claude:
 Weekly Comparison
@@ -604,7 +604,7 @@ Received:  47           52           down 10%
 Unread:    12           8            up 50%
 Sent:      23           19           up 21%
 
-→ Unread trending up -- consider /email:triage
+→ Unread trending up -- consider /himalaya:triage
 ```
 
 **Tip:** Great for Monday morning email planning -- check stats before diving in.
@@ -616,7 +616,7 @@ Forward an email to someone else with context and attribution.
 **Natural language:** "Forward email 42 to bob@example.com with context"
 
 ```
-/email:forward 42 "bob@example.com"
+/himalaya:forward 42 "bob@example.com"
   → read_email(id: "42")
   → compose_email(to: "bob@example.com", subject: "Fwd: ...", body: ...)
   → Show preview → "Send" to confirm
@@ -634,7 +634,7 @@ Forward an email to someone else with context and attribution.
 
 ```
 You: "Forward all emails about the project to the new team member"
-→ search_emails(query: "subject:project") → /email:forward for each
+→ search_emails(query: "subject:project") → /himalaya:forward for each
 ```
 
 ---
@@ -693,9 +693,9 @@ You: "Triage my last 50 emails"
 Claude: Times out partway through (too many emails)
 
 Recovery:
-1. Start smaller: /email:triage 20
-2. Process those, then /email:triage 20 more
-3. Or use /email:manage archive to clean processed items first
+1. Start smaller: /himalaya:triage 20
+2. Process those, then /himalaya:triage 20 more
+3. Or use /himalaya:manage archive to clean processed items first
 ```
 
 ### Interrupted download
@@ -721,6 +721,112 @@ Recovery:
 | `transient` | Network glitch, server timeout | Yes | Auto-retried once; re-run the operation |
 | `parse_error` | himalaya returned unexpected output | No | Check himalaya version; report bug |
 | `himalaya_not_installed` | Binary missing | Yes | `brew install himalaya` |
+
+---
+
+## 24. Snooze and Remind
+
+Temporarily hide an email and set a reminder to revisit it.
+
+**Natural language:** "Snooze email 42 until next Tuesday"
+
+**What happens:**
+
+1. `snooze_email(id: "42", snooze_until: "2026-03-03T09:00:00")` -- marks the email as snoozed
+2. Optionally: `create_reminder(title: "Follow up on email from Alice", due_date: "2026-03-03")` -- Apple Reminder
+
+**Snooze patterns:**
+
+```
+"Snooze email 42 until tomorrow morning"
+→ snooze_email(id: "42", snooze_until: "2026-07-08T09:00:00")
+
+"Remind me about this next Monday"
+→ snooze_email(id: "42", snooze_until: "2026-07-13T09:00:00")
+
+"What emails are snoozed?"
+→ list_snoozed_emails() → shows snoozed emails with unsnooze times
+```
+
+**Create a standalone reminder:**
+
+```
+"Remind me to check the budget report at 3pm"
+→ create_reminder(title: "Check budget report", due_date: "2026-07-07T15:00:00")
+```
+
+!!! note "macOS only"
+    `create_reminder` uses AppleScript to interact with Apple Reminders. Only available on macOS.
+
+---
+
+## 25. View Starred Emails
+
+Quickly find all flagged/starred emails.
+
+**Natural language:** "Show my starred emails"
+
+```
+list_starred()
+→ Returns flagged emails with subject, sender, and date
+
+list_starred(account: "work")
+→ Starred emails in a specific account
+
+list_starred(folder: "INBOX")
+→ Starred emails in a specific folder
+```
+
+**Use case:** Weekly review of everything you've starred for follow-up.
+
+---
+
+## 26. Read Email as Clean Markdown
+
+View HTML email rendered as markdown for cleaner reading.
+
+**Natural language:** "Show email 42 as markdown"
+
+```
+render_email(id: "42")
+→ Returns the email body rendered as clean markdown
+  (HTML emails are converted; plain text is returned as-is)
+```
+
+**When to use:** Preferred over `read_email_html` for newsletters, marketing emails, or any HTML-heavy message where you want clean text without clutter.
+
+---
+
+## 27. View Raw MIME Source
+
+Inspect the raw, unedited email source including all headers.
+
+**Natural language:** "Show me the raw source of email 42"
+
+```
+read_email_raw(id: "42")
+→ Returns the full MIME source with all headers
+```
+
+**Use cases:** Debugging email delivery, email forensics, exporting `.eml` files, verifying SPF/DKIM headers.
+
+---
+
+## 28. Check Unread Count
+
+Quickly check how many unread emails you have without fetching full envelopes.
+
+**Natural language:** "How many unread emails do I have?"
+
+```
+get_unread_count()
+→ Returns a single number: 12
+
+get_unread_count(folder: "INBOX")
+get_unread_count(account: "work")
+```
+
+**Why it's fast:** Uses himalaya's server-side filter (`not flag Seen`) — no envelope data is fetched, just a count.
 
 ---
 

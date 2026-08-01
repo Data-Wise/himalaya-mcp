@@ -10,15 +10,15 @@ triggers:
   - daily briefing
 ---
 
-# /email:morning - Morning Email Briefing
+# /himalaya:morning - Morning Email Briefing
 
 Comprehensive morning email briefing with urgency classification, calendar events, and action items.
 
 ## Usage
 
 ```
-/email:morning              # Full morning briefing
-/email:morning work         # Briefing for work account
+/himalaya:morning              # Full morning briefing
+/himalaya:morning work         # Briefing for work account
 ```
 
 ## When Invoked
@@ -30,10 +30,10 @@ Comprehensive morning email briefing with urgency classification, calendar event
    - Extract action items from flagged emails
 3. Present the structured briefing
 4. Offer follow-up actions:
-   - Triage remaining emails (`/email:triage`)
-   - Reply to urgent emails (`/email:reply`)
+   - Triage remaining emails (`/himalaya:triage`)
+   - Reply to urgent emails (`/himalaya:reply`)
    - Export briefing (`export_to_markdown`)
-   - Quick inbox check (`/email:inbox`)
+   - Quick inbox check (`/himalaya:inbox`)
 
 ## Output Format
 

@@ -91,7 +91,7 @@ The `himalaya-mcp-install` script (created by the formula) auto-runs during `pos
 4. Auto-enables in `~/.claude/settings.json` (skipped if Claude is running)
 5. Uses stable `$(brew --prefix)/opt/himalaya-mcp/libexec` path (survives upgrades)
 
-All JSON file writes (`marketplace.json`, `settings.json`) are guarded behind the Claude detection check because `mv` blocks indefinitely on files locked by Claude Code. If Claude is running during install, run `claude plugin install email@local-plugins` manually afterward.
+All JSON file writes (`marketplace.json`, `settings.json`) are guarded behind the Claude detection check because `mv` blocks indefinitely on files locked by Claude Code. If Claude is running during install, run `claude plugin install himalaya@local-plugins` manually afterward.
 
 ### Uninstall
 
@@ -172,7 +172,7 @@ This enables the GitHub install flow:
 
 ```bash
 claude plugin marketplace add Data-Wise/himalaya-mcp
-claude plugin install email
+claude plugin install himalaya
 ```
 
 ## .mcpb Desktop Extension

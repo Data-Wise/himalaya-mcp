@@ -742,6 +742,122 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor command", () => {
 });
 
 // ==============================================================================
+// E2E: doctor --pre-release / --post-release
+// ==============================================================================
+
+describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
+  // Isolate HOME so checkPostRelease()'s "Plugin installed" check doesn't
+  // depend on the developer's real ~/.claude/plugins/himalaya-mcp symlink,
+  // which never exists in CI. Seed a fake plugin install so the full
+  // Post-Release check suite runs (plugin.json, MCP handshake, etc.)
+  // instead of early-returning on a missing symlink.
+  let tempHome: string;
+
+  beforeEach(async () => {
+    tempHome = await mkdtemp(join(tmpdir(), "himalaya-doctor-release-test-"));
+    const pluginDir = join(tempHome, ".claude", "plugins", "himalaya-mcp");
+    await mkdir(join(pluginDir, ".claude-plugin"), { recursive: true });
+    await writeFile(
+      join(pluginDir, ".claude-plugin", "plugin.json"),
+      JSON.stringify({ name: "himalaya", version: "2.0.0" }, null, 2)
+    );
+  });
+
+  afterEach(async () => {
+    if (tempHome) await rm(tempHome, { recursive: true, force: true });
+  });
+
+  it("doctor --pre-release outputs Pre-Release category checks", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--pre-release"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    expect(stdout).toContain("Pre-Release");
+    expect(stdout).toContain("Build exists");
+    expect(stdout).toContain("TypeScript");
+    expect(stdout).toContain("Version sync");
+    expect(stdout).toContain("Test suite");
+    expect(stdout).toContain("Summary:");
+  }, 300_000);
+
+  it("doctor --pre-release --json outputs valid JSON", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--pre-release", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    const results = JSON.parse(stdout) as Array<{ name: string; category: string; status: string }>;
+    expect(Array.isArray(results)).toBe(true);
+    expect(results.length).toBeGreaterThan(3);
+
+    for (const r of results) {
+      expect(r.name).toBeDefined();
+      expect(r.category).toBe("Pre-Release");
+      expect(["pass", "warn", "fail"]).toContain(r.status);
+    }
+  }, 300_000);
+
+  it("doctor --post-release outputs Post-Release category checks", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--post-release"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    expect(stdout).toContain("Post-Release");
+    expect(stdout).toContain("Plugin installed");
+    expect(stdout).toContain("plugin.json");
+    expect(stdout).toContain("MCP handshake");
+    expect(stdout).toContain("Summary:");
+  }, 30_000);
+
+  it("doctor --post-release --json outputs valid JSON", async () => {
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--post-release", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    const results = JSON.parse(stdout) as Array<{ name: string; category: string; status: string }>;
+    expect(Array.isArray(results)).toBe(true);
+    expect(results.length).toBeGreaterThan(2);
+
+    for (const r of results) {
+      expect(r.name).toBeDefined();
+      expect(r.category).toBe("Post-Release");
+      expect(["pass", "warn", "fail"]).toContain(r.status);
+    }
+  }, 30_000);
+});
+
+// ==============================================================================
 // E2E: Plugin structure validation
 // Tests that the plugin directory contains everything Claude Code expects.
 // ==============================================================================
@@ -753,7 +869,7 @@ describe("Plugin structure validation", () => {
 
   it("plugin.json has required fields", async () => {
     const data = JSON.parse(await readFile(pluginJson, "utf-8"));
-    expect(data.name).toBe("email");
+    expect(data.name).toBe("himalaya");
     expect(data.version).toBeDefined();
     expect(data.description).toBeDefined();
     expect(data.author).toBeDefined();
@@ -763,7 +879,7 @@ describe("Plugin structure validation", () => {
     const data = JSON.parse(await readFile(marketplaceJson, "utf-8"));
     expect(data.plugins).toBeDefined();
     expect(data.plugins.length).toBeGreaterThan(0);
-    expect(data.plugins[0].name).toBe("email");
+    expect(data.plugins[0].name).toBe("himalaya");
   });
 
   it("all 16 skills exist as SKILL.md subdirectories and are non-empty", async () => {
@@ -785,8 +901,8 @@ describe("Plugin structure validation", () => {
     const mcpJson = JSON.parse(
       await readFile(resolve(__dirname, "..", ".mcp.json"), "utf-8")
     );
-    expect(mcpJson.mcpServers?.himalaya).toBeDefined();
-    expect(mcpJson.mcpServers.himalaya.args[0]).toContain("dist/index.js");
+    expect(mcpJson.mcpServers?.email).toBeDefined();
+    expect(mcpJson.mcpServers.email.args[0]).toContain("dist/index.js");
   });
 
   it("version consistency across all manifests", async () => {

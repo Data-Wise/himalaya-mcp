@@ -1,6 +1,6 @@
 {
-  "name": "email",
-  "version": "1.9.0",
+  "name": "himalaya",
+  "version": "2.0.0",
   "description": "Privacy-first email access for Claude via himalaya CLI \u2014 29 tools, 7 prompts, 3 resources, 16 skills, 2 hooks",
   "author": {
     "name": "Data-Wise"
@@ -19,7 +19,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "mcp__plugin_email_himalaya",
+        "matcher": "mcp__plugin_himalaya_email",
         "hooks": [
           {
             "type": "command",

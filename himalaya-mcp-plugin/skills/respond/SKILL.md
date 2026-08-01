@@ -1,6 +1,6 @@
 ---
 name: respond
-description: This skill should be used when the user asks to "respond to all my emails", "batch reply", "draft replies for everything", "answer all emails", "mass respond", "generate draft replies", "reply to all unread", "process my inbox replies", "bulk respond", "catch up on replies", or wants to batch-generate draft replies for multiple emails at once. For single-reply use /email:reply instead.
+description: This skill should be used when the user asks to "respond to all my emails", "batch reply", "draft replies for everything", "answer all emails", "mass respond", "generate draft replies", "reply to all unread", "process my inbox replies", "bulk respond", "catch up on replies", or wants to batch-generate draft replies for multiple emails at once. For single-reply use /himalaya:reply instead.
 triggers:
   - respond to all
   - batch reply
@@ -14,16 +14,16 @@ triggers:
   - process inbox replies
 ---
 
-# /email:respond - Batch Draft Replies
+# /himalaya:respond - Batch Draft Replies
 
 Draft replies for multiple actionable emails at once with a review-and-approve workflow.
 
 ## Usage
 
 ```
-/email:respond                         # Draft replies for actionable emails
-/email:respond --review                # Review previously generated drafts
-/email:respond <count>                 # Process N recent emails
+/himalaya:respond                         # Draft replies for actionable emails
+/himalaya:respond --review                # Review previously generated drafts
+/himalaya:respond <count>                 # Process N recent emails
 ```
 
 ## When Invoked
