@@ -325,3 +325,37 @@ describe("HimalayaClient", () => {
     });
   });
 });
+
+describe("stderr surfaced on empty stdout", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("throws HimalayaError with stderr content when stdout is empty", async () => {
+    mockExecFileAsync.mockResolvedValue({
+      stdout: "",
+      stderr: "Error: cannot parse search emails query `toilet`",
+    });
+    const client = new HimalayaClient({ retryBackoffMs: 0 });
+
+    await expect(client.exec(["envelope", "list"])).rejects.toThrow(HimalayaError);
+  });
+
+  it("ignores stderr when stdout has valid content", async () => {
+    mockExecFileAsync.mockResolvedValue({
+      stdout: '[{"id":"1","subject":"test"}]',
+      stderr: "WARN imap_codec::response: Rectified missing text",
+    });
+    const client = new HimalayaClient();
+
+    const result = await client.exec(["envelope", "list"]);
+    expect(result).toContain('"id":"1"');
+  });
+
+  it("returns empty stdout when both stdout and stderr are empty", async () => {
+    mockExecFileAsync.mockResolvedValue({ stdout: "[]", stderr: "WARN some harmless warning" });
+    const client = new HimalayaClient();
+
+    await expect(client.exec(["envelope", "list"])).resolves.toBe("[]");
+  });
+});

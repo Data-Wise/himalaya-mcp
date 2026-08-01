@@ -153,12 +153,19 @@ export class HimalayaClient {
     const timeout = options?.timeout ?? this.opts.timeout;
 
     try {
-      const { stdout } = await execFileAsync(this.opts.binary, args, {
+      const { stdout, stderr } = await execFileAsync(this.opts.binary, args, {
         timeout,
         maxBuffer: 10 * 1024 * 1024, // 10MB
         env: { ...process.env },
         cwd: options?.cwd,
       });
+
+      // When himalaya exits 0 but stdout is empty, stderr may hold
+      // the real error (e.g. parse errors from bare-word search queries).
+      if (!stdout.trim() && stderr.trim()) {
+        throw this.wrapError(new Error(stderr.trim()));
+      }
+
       return stdout;
     } catch (err: unknown) {
       throw this.wrapError(err, account);
