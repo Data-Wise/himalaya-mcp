@@ -413,5 +413,5 @@ DEBUG=* node dist/index.js
 ### Run tests to verify installation
 
 ```bash
-npm test    # 569 tests
+npm test    # 573 tests
 ```
