@@ -1,11 +1,6 @@
-/**
- * Parse himalaya's config.toml to extract account email addresses
- * when HIMALAYA_FROM is not explicitly set.
- *
- * Syntax: TOML `[accounts.<name>]` sections with `email = "..."` keys.
- * Default account found via `default = true` or `[accounts.personal]`.
- */
+/** Parse Himalaya configuration to extract account email addresses. */
 
+import { parse as parseToml } from "@iarna/toml";
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -16,60 +11,35 @@ export interface HimalayaConfigToml {
   accounts: Map<string, { email: string; isDefault: boolean }>;
 }
 
-/** Regex matches `[accounts.<name>]` section header. */
-const SECTION_RE = /^\[accounts\.(.+?)\]\s*$/;
-
-/** Regex matches `key = "value"` or `key = 'value'`. */
-const KEYVAL_RE = /^(\S+?)\s*=\s*(?:"([^"]*)"|'([^']*)')\s*$/;
-
 /**
- * Read and parse himalaya's config.toml.
+ * Read and parse Himalaya's TOML configuration.
  *
  * Path resolution (in order):
- *   1. `HIMALAYA_CONFIG` env var (absolute or ~/ relative)
- *   2. `~/.config/himalaya/config.toml` (default)
+ *   1. Explicit path, if supplied
+ *   2. `HIMALAYA_CONFIG` app override
+ *   3. `$XDG_CONFIG_HOME/himalaya/config.toml`
+ *   4. `~/.config/himalaya/config.toml`
+ *   5. `~/.himalayarc`
  */
-export function parseConfigToml(
-  customPath?: string,
-): HimalayaConfigToml {
-  const path = resolveConfigPath(customPath);
-  const content = readFileSync(path, "utf-8");
-  const lines = content.split("\n");
-
+export function parseConfigToml(customPath?: string): HimalayaConfigToml {
   const accounts = new Map<string, { email: string; isDefault: boolean }>();
-  let currentAccount: string | null = null;
+  const paths = resolveConfigPaths(customPath);
+  let found = false;
 
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-
-    // Section header
-    const secMatch = line.match(SECTION_RE);
-    if (secMatch) {
-      currentAccount = secMatch[1];
-      const existing = accounts.get(currentAccount);
-      if (!existing) {
-        accounts.set(currentAccount, { email: "", isDefault: false });
-      }
-      continue;
+  for (const path of paths) {
+    let content: string;
+    try {
+      content = readFileSync(path, "utf-8");
+    } catch (error) {
+      if (isMissingFile(error) && paths.length > 1) continue;
+      throw error;
     }
+    found = true;
+    mergeAccounts(accounts, parseToml(content));
+  }
 
-    // Key-value pair inside current section
-    if (currentAccount) {
-      // Check for `default = true` (boolean)
-      if (/^default\s*=\s*true\s*$/i.test(line)) {
-        const entry = accounts.get(currentAccount);
-        if (entry) entry.isDefault = true;
-        continue;
-      }
-      // Check for `email = "..."` or `email = '...'`
-      const kv = line.match(KEYVAL_RE);
-      if (kv && kv[1] === "email") {
-        const val = kv[2] !== undefined ? kv[2] : kv[3];
-        const entry = accounts.get(currentAccount);
-        if (entry) entry.email = val;
-        continue;
-      }
-    }
+  if (!found) {
+    throw new Error(`No Himalaya configuration file found in: ${paths.join(", ")}`);
   }
 
   return { accounts };
@@ -80,8 +50,8 @@ export function parseConfigToml(
  *
  * Priority:
  *   1. `HIMALAYA_FROM` env var
- *   2. himalaya config.toml → default account's email
- *   3. himalaya config.toml → explicit account's email (from HIMALAYA_ACCOUNT)
+ *   2. Himalaya config.toml → explicit account's email
+ *   3. Himalaya config.toml → default account's email
  *
  * Returns undefined if no source has a sender address.
  */
@@ -115,17 +85,60 @@ export function resolveFromAddress(
   return undefined;
 }
 
-/** Resolve the config.toml path. */
-function resolveConfigPath(customPath?: string): string {
+/** Resolve the config files accepted by the Himalaya CLI. */
+function resolveConfigPaths(customPath?: string): string[] {
   if (customPath) {
-    if (customPath.startsWith("~/")) {
-      return join(homedir(), customPath.slice(2));
-    }
-    return customPath;
+    return [expandHome(customPath)];
   }
   const envPath = process.env["HIMALAYA_CONFIG"];
   if (envPath && !envPath.startsWith("${")) {
-    return resolveConfigPath(envPath);
+    return [expandHome(envPath)];
   }
-  return join(homedir(), ".config", "himalaya", "config.toml");
+
+  const home = getHomeDir();
+  const xdgHome = process.env["XDG_CONFIG_HOME"];
+  return [
+    xdgHome && !xdgHome.startsWith("${")
+      ? join(expandHome(xdgHome), "himalaya", "config.toml")
+      : undefined,
+    join(home, ".config", "himalaya", "config.toml"),
+    join(home, ".himalayarc"),
+  ].filter((path): path is string => Boolean(path));
+}
+
+function expandHome(path: string): string {
+  return path.startsWith("~/") ? join(getHomeDir(), path.slice(2)) : path;
+}
+
+function getHomeDir(): string {
+  const home = process.env["HOME"];
+  return home && !home.startsWith("${") ? home : homedir();
+}
+
+function isMissingFile(error: unknown): boolean {
+  return error instanceof Error && "code" in error &&
+    (error as NodeJS.ErrnoException).code === "ENOENT";
+}
+
+function mergeAccounts(
+  accounts: Map<string, { email: string; isDefault: boolean }>,
+  document: Record<string, unknown>,
+): void {
+  const accountTables = asObject(document.accounts);
+  if (!accountTables) return;
+
+  for (const [name, rawAccount] of Object.entries(accountTables)) {
+    const account = asObject(rawAccount);
+    if (!account) continue;
+    const existing = accounts.get(name) ?? { email: "", isDefault: false };
+    if (typeof account.email === "string") existing.email = account.email;
+    if (typeof account.default === "boolean") existing.isDefault = account.default;
+    accounts.set(name, existing);
+  }
+}
+
+function asObject(value: unknown): Record<string, unknown> | undefined {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : undefined;
 }

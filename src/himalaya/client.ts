@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 import type { HimalayaClientOptions } from "./types.js";
 import { classifyStderr, HimalayaError } from "./errors.js";
+import { resolveFromAddress } from "./config-toml.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -62,9 +63,15 @@ export class HimalayaClient {
     if (!options.folder) this.opts.folder = DEFAULT_OPTIONS.folder;
   }
 
-  /** Sender email address (from HIMALAYA_FROM env var). */
+  /** Sender email address for the configured/default account. */
   get from(): string {
     return this.opts.from;
+  }
+
+  /** Resolve the sender for an optional per-call account override. */
+  fromForAccount(account?: string): string {
+    if (!account || account === this.opts.account) return this.opts.from;
+    return resolveFromAddress(account) ?? "";
   }
 
   /** Path to the himalaya binary. */

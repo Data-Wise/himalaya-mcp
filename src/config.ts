@@ -10,6 +10,7 @@
  *   HIMALAYA_FROM    — sender email address for compose/send
  *                       Falls back to himalaya config.toml (default account email)
  *                       if not explicitly set.
+ *   HIMALAYA_CONFIG  — optional path override for the Himalaya config file
  */
 
 import type { HimalayaClientOptions } from "./himalaya/types.js";

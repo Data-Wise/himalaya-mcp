@@ -60,7 +60,8 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       };
     }
 
-    if (!client.from) {
+    const from = client.fromForAccount(args.account);
+    if (!from) {
       return {
         content: [{
           type: "text" as const,
@@ -81,7 +82,7 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       }
     }
 
-    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc, client.from, args.attachments);
+    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc, from, args.attachments);
 
     // Safety gate: without confirm=true, just show preview
     if (!args.confirm) {

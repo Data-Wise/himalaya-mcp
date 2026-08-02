@@ -3,13 +3,14 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { writeFileSync, unlinkSync, mkdtempSync } from "node:fs";
+import { writeFileSync, mkdirSync, rmSync, mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { resolveFromAddress, parseConfigToml } from "../src/himalaya/config-toml.js";
 
 let tempDir: string;
 let configPath: string;
+const originalEnv = { ...process.env };
 
 beforeEach(() => {
   tempDir = mkdtempSync(join(tmpdir(), "himalaya-test-"));
@@ -21,8 +22,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  try { unlinkSync(configPath); } catch {}
-  try { unlinkSync(join(tempDir, "nonexistent.toml")); } catch {}
+  process.env = { ...originalEnv };
+  rmSync(tempDir, { recursive: true, force: true });
 });
 
 function writeConfig(content: string) {
@@ -69,6 +70,19 @@ default = true
 `);
     const result = parseConfigToml(configPath);
     expect(result.accounts.get("personal")?.email).toBe("single@example.com");
+  });
+
+  it("handles comments and quoted account names", () => {
+    writeConfig(`
+[accounts."work.personal"]
+email = "work@example.com" # inline comment
+default = true # another comment
+`);
+    const result = parseConfigToml(configPath);
+    expect(result.accounts.get("work.personal")).toEqual({
+      email: "work@example.com",
+      isDefault: true,
+    });
   });
 
   it("handles account without email", () => {
@@ -159,5 +173,32 @@ default = true
 `);
     const result = resolveFromAddress();
     expect(result).toBeUndefined();
+  });
+
+  it("reads the XDG config location when no override is set", () => {
+    delete process.env["HIMALAYA_CONFIG"];
+    const xdgHome = join(tempDir, "xdg");
+    mkdirSync(join(xdgHome, "himalaya"), { recursive: true });
+    writeFileSync(join(xdgHome, "himalaya", "config.toml"), `
+[accounts.xdg]
+email = "xdg@example.com"
+default = true
+`, "utf-8");
+    process.env["XDG_CONFIG_HOME"] = xdgHome;
+
+    expect(resolveFromAddress()).toBe("xdg@example.com");
+  });
+
+  it("reads the legacy home config location", () => {
+    delete process.env["HIMALAYA_CONFIG"];
+    process.env["XDG_CONFIG_HOME"] = join(tempDir, "missing-xdg");
+    process.env["HOME"] = tempDir;
+    writeFileSync(join(tempDir, ".himalayarc"), `
+[accounts.legacy]
+email = "legacy@example.com"
+default = true
+`, "utf-8");
+
+    expect(resolveFromAddress()).toBe("legacy@example.com");
   });
 });

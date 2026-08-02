@@ -3,11 +3,11 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { HimalayaClient } from "../src/himalaya/client.js";
 import { registerComposeNewTools } from "../src/tools/compose-new.js";
 import { tmpdir } from "node:os";
-import { writeFileSync, unlinkSync } from "node:fs";
+import { writeFileSync, unlinkSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 function createMockClient(): HimalayaClient {
-  const client = new HimalayaClient({ from: "sender@example.com" });
+  const client = new HimalayaClient({ from: "sender@example.com", account: "work" });
   vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
   return client;
 }
@@ -22,11 +22,18 @@ function getToolHandler(server: McpServer, toolName: string) {
 describe("Compose new email tool", () => {
   let server: McpServer;
   let client: HimalayaClient;
+  const originalEnv = { ...process.env };
 
   beforeEach(() => {
+    delete process.env["HIMALAYA_CONFIG"];
+    delete process.env["HIMALAYA_FROM"];
     server = new McpServer({ name: "test", version: "0.0.1" });
     client = createMockClient();
     registerComposeNewTools(server, client);
+  });
+
+  afterEach(() => {
+    process.env = { ...originalEnv };
   });
 
   describe("compose_email", () => {
@@ -112,6 +119,32 @@ describe("Compose new email tool", () => {
         expect.any(String),
         "work"
       );
+    });
+
+    it("uses the sender address for a per-call account override", async () => {
+      const tempDir = mkdtempSync(join(tmpdir(), "himalaya-compose-"));
+      const configPath = join(tempDir, "config.toml");
+      writeFileSync(configPath, `
+[accounts.work]
+email = "work@example.com"
+
+[accounts.personal]
+email = "personal@example.com"
+default = true
+`, "utf-8");
+      process.env["HIMALAYA_CONFIG"] = configPath;
+
+      try {
+        const tool = getToolHandler(server, "compose_email");
+        const result = await tool.handler({
+          to: "alice@example.com", subject: "Test", body: "Body",
+          cc: undefined, bcc: undefined, attachments: undefined, confirm: undefined, account: "personal",
+        }, {} as any);
+
+        expect(result.content[0].text).toContain("From: personal@example.com");
+      } finally {
+        rmSync(tempDir, { recursive: true, force: true });
+      }
     });
 
     it("template does not include Cc/Bcc when not provided", async () => {
