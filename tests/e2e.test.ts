@@ -192,7 +192,7 @@ describe("E2E: MCP Server Headless", () => {
 
     expect(initResult.result).toBeDefined();
     expect(initResult.result.serverInfo.name).toBe("himalaya-mcp");
-    expect(initResult.result.serverInfo.version).toBe("2.0.0");
+    expect(initResult.result.serverInfo.version).toBe("2.0.1");
 
     // Send initialized notification
     sendNotification("notifications/initialized");
@@ -856,16 +856,13 @@ describe("E2E: MCPB Build Pipeline", () => {
       expect(output).toContain("Manifest schema validation passes");
       expect(output).toContain("Building esbuild bundle");
 
-      // Find the output file — poll briefly if not immediately available (fs sync race)
-      let mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
+      // build-mcpb.sh packs directly to the final filename (no intermediate
+      // name, no rename) and exits non-zero if the file is missing, so by the
+      // time execFileAsync resolves the file is guaranteed present or the
+      // script already failed loudly — no poll needed here.
+      const mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
         f.match(/^himalaya-mcp-v.*\.mcpb$/)
       );
-      for (let attempt = 0; mcpbFiles.length === 0 && attempt < 6; attempt++) {
-        await new Promise((r) => setTimeout(r, 500));
-        mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
-          f.match(/^himalaya-mcp-v.*\.mcpb$/)
-        );
-      }
       if (mcpbFiles.length !== 1) {
         // Surface enough to root-cause a future CI-only failure without re-running blind
         console.error("build:mcpb diagnostic — timedOut:", timedOut);
@@ -919,6 +916,12 @@ interface RoundTripHarness {
   cleanup: () => Promise<void>;
 }
 
+interface RoundTripResolver {
+  resolve: (value: any) => void;
+  reject: (err: Error) => void;
+  timer: NodeJS.Timeout;
+}
+
 async function spawnHarnessWithFakeHimalaya(
   script: string
 ): Promise<RoundTripHarness> {
@@ -938,7 +941,9 @@ async function spawnHarnessWithFakeHimalaya(
   });
 
   let buffer = "";
-  const resolvers = new Map<number, (value: any) => void>();
+  let stderr = "";
+  let exitSummary = "";
+  const resolvers = new Map<number, RoundTripResolver>();
   let nextId = 0;
 
   proc.stdout!.on("data", (chunk: Buffer) => {
@@ -950,7 +955,9 @@ async function spawnHarnessWithFakeHimalaya(
       try {
         const msg = JSON.parse(line);
         if (msg.id && resolvers.has(msg.id)) {
-          resolvers.get(msg.id)!(msg);
+          const resolver = resolvers.get(msg.id)!;
+          clearTimeout(resolver.timer);
+          resolver.resolve(msg);
           resolvers.delete(msg.id);
         }
       } catch {
@@ -959,13 +966,32 @@ async function spawnHarnessWithFakeHimalaya(
     }
   });
 
+  proc.stderr!.on("data", (chunk: Buffer) => {
+    stderr += chunk.toString();
+  });
+
+  proc.on("exit", (code, signal) => {
+    exitSummary = `server exited code=${code ?? "null"} signal=${signal ?? "null"}`;
+    for (const [id, resolver] of resolvers) {
+      clearTimeout(resolver.timer);
+      resolver.reject(new Error(`No JSON-RPC response for id=${id}: ${exitSummary}; stderr=${stderr.trim()}`));
+    }
+    resolvers.clear();
+  });
+
   const send = (method: string, params?: any): Promise<any> => {
     const id = ++nextId;
     proc.stdin!.write(
       JSON.stringify({ jsonrpc: "2.0", id, method, params: params || {} }) +
         "\n"
     );
-    return new Promise((resolve) => resolvers.set(id, resolve));
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        resolvers.delete(id);
+        reject(new Error(`Timed out waiting for JSON-RPC response for id=${id} method=${method}; ${exitSummary}; stderr=${stderr.trim()}`));
+      }, 5_000);
+      resolvers.set(id, { resolve, reject, timer });
+    });
   };
 
   await send("initialize", {
@@ -973,6 +999,7 @@ async function spawnHarnessWithFakeHimalaya(
     capabilities: {},
     clientInfo: { name: "roundtrip-test", version: "1.0.0" },
   });
+  proc.stdin!.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized", params: {} }) + "\n");
 
   const cleanup = async () => {
     proc.kill("SIGTERM");
@@ -1098,7 +1125,7 @@ echo "this is not json at all"
       const harness = await spawnHarnessWithFakeHimalaya(`#!/bin/bash
 args="$*"
 if echo "$args" | grep -q "account list"; then
-  echo '[{"name":"unm","default":true,"backend":"imap"}]'
+  echo '{"accounts":[{"name":"unm","default":true,"backends":["imap","smtp"]}]}'
   exit 0
 fi
 if echo "$args" | grep -q "folder list"; then

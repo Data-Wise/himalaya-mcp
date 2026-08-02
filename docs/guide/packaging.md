@@ -156,15 +156,20 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
 
 ```json
 {
-  "name": "himalaya-mcp-marketplace",
+  "name": "himalaya-mcp",
   "owner": { "name": "Data-Wise" },
+  "metadata": {
+    "description": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
+    "version": "2.0.1"
+  },
   "plugins": [{
-    "name": "email",
+    "name": "himalaya",
     "source": "./himalaya-mcp-plugin",
     "description": "Privacy-first email MCP server wrapping himalaya CLI",
     "category": "productivity",
     "tags": ["email", "mcp", "himalaya", "privacy"]
-  }]
+  }],
+  "version": "2.0.1"
 }
 ```
 
@@ -183,7 +188,7 @@ The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a li
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v1.7.0.mcpb (151 KB)
+# Output: himalaya-mcp-v2.0.1.mcpb (151 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:
@@ -191,8 +196,7 @@ This runs `scripts/build-mcpb.sh` which:
 1. Builds the esbuild bundle (`dist/index.js`)
 2. Copies the bundle to `mcpb/dist/`
 3. Validates the manifest (`npx @anthropic-ai/mcpb validate mcpb/`)
-4. Packs the archive (`npx @anthropic-ai/mcpb pack mcpb/`)
-5. Renames to `himalaya-mcp-v{version}.mcpb`
+4. Packs directly to `himalaya-mcp-v{version}.mcpb` (`npx @anthropic-ai/mcpb pack mcpb/ himalaya-mcp-v{version}.mcpb`)
 
 ### Install (GUI)
 
@@ -201,7 +205,7 @@ Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.co
 ### Install (CLI)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v1.7.0.mcpb   # Install from file
+himalaya-mcp install-ext himalaya-mcp-v2.0.1.mcpb   # Install from file
 himalaya-mcp install-ext                              # Auto-find in project root
 himalaya-mcp remove-ext                               # Uninstall
 ```

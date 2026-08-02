@@ -4,7 +4,7 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: released
-## Focus: v2.0.0
+## Focus: v2.0.1 release in progress
 ## Phase: Maintenance
 ## Priority: 2
 ## Progress: 100
@@ -39,6 +39,68 @@
 
 ## Just Completed
 
+- 2026-08-02: PR #108 reviewed, fixed, and squash-merged to `dev` as `96447d1`
+  (`fix: resolve himalaya sender and account config`). Review findings fixed before merge:
+  sender fallback now derives from Himalaya config without a bundle-incompatible TOML dependency;
+  `compose_email` resolves `From:` per per-call account override; account discovery now uses
+  `himalaya account list --json` and accepts the v2 `{ accounts: [...] }` shape while preserving
+  legacy array parsing; E2E structured-error harness now fails fast with stderr/exit diagnostics.
+  Verification before merge: focused local tests 80/80, structured E2E 5/5, `npm run build`,
+  `npm run build:bundle`, and GitHub CI (`bundle`, `test`, `validate-mcpb`, `validate-plugin`) passed.
+- 2026-08-02: Began patch release prep for v2.0.1, then resumed the release bump.
+  Updated `CLAUDE.md` and `AGENTS.md` to version 2.0.1, corrected the account discovery command
+  reference to `--json`, and refreshed the test inventory to 619 tests across 33 files. Added a
+  draft `CHANGELOG.md` entry for 2.0.1. Release version surfaces are being bumped from 2.0.0 to
+  2.0.1 (`package.json`, lockfile root, `src/index.ts`, marketplace/plugin manifests, `.mcpb`
+  manifest). `/done` wrap selected: skip full tests; draft changelog; assess knowledge sync only.
+- 2026-08-01: Full PR triage + merge session — reviewed all 8 open PRs, merged 5 into their
+  bases: #69 (search trailingArgs fix → dev), #81 (tsconfig `types: ["node"]` → main), #105
+  (re-land of #92 search docs → main), #106 (re-land of #89 readMessageHtml message-export
+  fix → main), #107 (re-land of #70 stderr-surfacing + normalizeSearchQuery → dev). Closed
+  #92/#89/#70 with pointer comments crediting @igitur. Re-land pattern (igitur's fork forbids
+  maintainer edits, and its stale fork-base lockfile fails CI audit): fetch `pull/N/head`,
+  re-apply the reviewed value-add hunks onto a fresh main-repo branch, open a replacement PR,
+  merge, close the original with a pointer. #70's redundant trailingArgs hunk (already merged
+  via #69) was dropped; dev's rich #105 search_emails description and `f.toUpperCase() !==
+  "INBOX"` were kept.
+- 2026-08-01: PR #104 (`.mcpb` pack race) COMPLETED and merged — `npm overrides` (`postcss
+  ^8.5.18`, `tmp ^0.2.7`) verified: `npm audit --audit-level=high` clears (only pre-existing
+  `@hono/node-server` moderate from #102 remains; `tmp` 0.2.7 is forced past `^0.0.33` but
+  API-compatible and runtime-verified via `tmpNameSync`); `pack` script aligned to `bash
+  scripts/build-mcpb.sh`; 575 tests passed via `--pool=forks`. Merged squash (3aa5f49),
+  worktree cleaned.
+- 2026-08-01: dev fully synced with main (0 commits behind) — merge-commit sync-backs
+  (7b61393, e9be26f, 7b28a7d) brought #83-87/#102/#81/#105/#106 into dev; verified
+  `git rev-list --count origin/dev..origin/main` = 0.
+- 2026-08-01: AGENTS.md committed (24a0c58) as a standalone Codex-oriented parallel to
+  CLAUDE.md — intentional platform divergence (Codex vs Claude tooling), not a pointer.
+- 2026-08-01: Fixed a duplicate `"types": ["node"]` key in tsconfig.json (merge artifact from
+  the #81 sync-back, present on origin/dev) — removed the line-15 duplicate; committed as part
+  of #107.
+- 2026-07-31/08-01: PR triage + merge session — reviewed and merged #83 (checkout v7), #84
+  (setup-node v7), #86 (download-artifact v8, hit a real `.mcpb` build-detection flake, passed
+  on 3rd CI retry), #85 (setup-python v7, real merge conflict with #83 in `docs.yml`, resolved
+  by hand), #87 (upload-artifact v7, needed a companion fix to a hardcoded version-string
+  assertion in `tests/dogfood.test.ts`). #100 (SDK 1.29→1.30) auto-closed by Dependabot — its
+  goal was already met by #102.
+- 2026-07-31: #102 opened+merged — lockfile-only fix for 2 real CVEs (`@hono/node-server`,
+  `postcss` via vitest/vite) blocking the Actions-bump batch's CI; independently grounded
+  (fresh clone, reran audit/tests/build) before merging.
+- 2026-07-31: Fixed `AGENTS.md` (Codex's CLAUDE.md equivalent) — mechanical Claude→Codex
+  find/replace had broken real paths (`.claude-plugin/` renamed to nonexistent
+  `.Codex-plugin/`, `claude` CLI commands rewritten to a nonexistent `Codex` equivalent).
+  Fixed, left uncommitted/untracked pending a decision on standalone-vs-pointer maintenance.
+- 2026-08-01: Diagnosed and fixed a real CI flake in `.mcpb` packaging (not a retry-tuning
+  band-aid): `npx @anthropic-ai/mcpb pack` writes to an intermediate `mcpb.mcpb` name that
+  races a GH Actions write-visibility lag before the script's poll+`mv` step. Fix: pass the
+  final filename directly via `pack`'s second positional arg, eliminating the race by
+  construction. Plan at `~/.claude/plans/shimmering-wibbling-frost.md`; implemented as PR #104
+  on `feature/mcpb-pack-race` — MERGED (see 2026-08-01 entry above); pinning
+  `@anthropic-ai/mcpb` as a devDependency pulled in the CLI's own vulnerable transitive deps
+  (`tmp`, plus re-triggering `postcss`/`@hono/node-server`), resolved via `npm overrides`.
+- 2026-08-01: Fixed a real test bug found via adversarial review of #87: `tests/dogfood.test.ts`
+  hardcoded `expect(releaseContent).toContain("upload-artifact@v4")` — updated to `v7` to match.
+
 - 2026-07-09: GRILL'd GitHub issue #67 (plugin name `email` vs. repo name `himalaya-mcp` mismatch) — reopened once with new context (idea-refine on an ecosystem-wide fix). Final: document the divergence, don't rename — renaming would break all 16 `/email:*` commands plus the pre-send safety-hook matcher. Decision ledger: `docs/specs/GRILL-plugin-name-issue-67-2026-07-09.md`.
 - 2026-07-09: Drafted `docs/specs/SPEC-plugin-name-issue-67-2026-07-09.md` — ready-to-drive plan (extend `plugin.json`/`marketplace.json` description fields, close #67). Not yet driven.
 - 2026-07-09: idea-refined a cross-repo "forever fix" (one reusable aggregator-sync workflow in craft, replacing N copy-pasted per-repo workflows) — parked pending craft's ongoing refactor. See `docs/ideas/aggregator-sync-reusable-workflow.md`.
@@ -65,14 +127,21 @@
 
 ## Current State
 
-- Branch: `dev` (clean, no active worktree)
-- Version: 2.0.0 merged to `dev` (PR #93 rename + PR #94 doctor fix); PR #95 (`dev`→`main`) open, CI green
+- Branch: `dev` @ `81f36df` (`origin/dev`) after PR #108 merge and release-prep status commit.
+  Working tree has v2.0.1 version/docs edits in progress plus intentionally uncommitted local
+  `CLAUDE.md` and `AGENTS.md` edits.
+- Version: 2.0.0 remains the shipped release until the v2.0.1 tag/release is pushed. v2.0.1 patch
+  release bump is in progress.
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 573 passing across 31 test files
+- Tests: 619 tests across 33 test files (verified via `npx vitest list`). Full local suite was
+  skipped during `/done` by user choice due known local runtime/memory friction; prior PR #108 CI
+  passed after fixes.
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
-- Homebrew: data-wise/tap/himalaya-mcp at v1.9.0 (v2.0.0 pending release merge)
+- Homebrew: data-wise/tap/himalaya-mcp — verify current version after v2.0.0 release sync
 - Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/
-- Bundle: ~883KB (esbuild), .mcpb: ~247KB
+- Bundle: ~906KB after sender/config fixes (esbuild), .mcpb: ~247KB
+- Open PRs: #79 is superseded by merged #108. #82 (HTML compose_email) remains blocked by
+  manifest drift; #97 (TypeScript 7 bump) remains deferred.
 
 ## Install
 
@@ -101,10 +170,17 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- **Pending:** Merge PR #95 (`dev`→`main`) to complete the v2.0.0 release, then run the
-  Homebrew/GitHub release workflow.
-- **Post-merge:** `Data-Wise/claude-plugins` PR #30 (aggregator entry `email` → `himalaya`)
-  is held pending this release — merge it once v2.0.0 is out.
+- **Resume context:** `/release` resumed on `dev` for patch version v2.0.1. PR #108/#109 fixes are
+  already merged to `dev`; `.STATUS` and `CHANGELOG.md` release-prep notes were committed as
+  `81f36df` and pushed. Current release work is bumping all version surfaces from 2.0.0 to 2.0.1,
+  then running release gates, committing, tagging `v2.0.1`, and pushing refs. Do not commit the
+  existing local `CLAUDE.md`/`AGENTS.md` edits unless explicitly instructed.
+- **Pending:** PR #82 (HTML compose_email, base=main) — BLOCKED: its `mcpb/manifest.json`
+  diff deletes 8 tools + 1 prompt (stale-drift against an old base). Needs a rebase + manifest
+  restoration, and the SKILL.md text must be reconciled with the HTML-only (no text/plain
+  fallback) behavior.
+- **Pending:** PR #97 (TypeScript 6→7 major bump, Dependabot) — deferred; project pins
+  `typescript ^6.0.3`, needs a deliberate review.
 - Otherwise: all features complete, project in maintenance mode. Possible future directions:
   - Bundled .mcpb variant with universal himalaya binary (~19 MB)
   - Code signing + notarization (Apple Developer, $99/yr)
@@ -122,5 +198,8 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-07-23
-**Status:** v2.0.0 — plugin renamed from `email` to `himalaya`. PR #93 and PR #94 merged to `dev`. PR #95 (`dev`→`main` release) open, CI green, awaiting merge. `claude-plugins` PR #30 (aggregator sync) held until then.
+**Last Updated:** 2026-08-02
+**Status:** v2.0.0 released; v2.0.1 patch release is in progress on `dev`. This session:
+reviewed/fixed/merged PR #108, validated issue #109, updated agent docs to 619 tests, drafted the
+2.0.1 changelog entry, captured `/done` resume context, and resumed the v2.0.1 version bump. Open:
+#82 (BLOCKED manifest regression), #97 (TS7 deferred).

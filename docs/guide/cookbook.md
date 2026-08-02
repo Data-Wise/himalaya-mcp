@@ -364,14 +364,14 @@ himaya filter syntax for the `search_emails` tool and `/himalaya:search` skill.
 
 | Example | What it finds |
 |---------|---------------|
-| `subject:budget` | Subject contains "budget" |
-| `from:alice` | Sender contains "alice" |
-| `to:team` | Recipient contains "team" |
-| `body:deadline` | Body contains "deadline" |
-| `date:2026-02-13` | Sent on that date |
-| `after:2026-02-01` | Sent after date |
-| `before:2026-03-01` | Sent before date |
-| `flag:Flagged` | Has specific flag |
+| `subject budget` | Subject contains "budget" |
+| `from alice` | Sender contains "alice" |
+| `to team` | Recipient contains "team" |
+| `body deadline` | Body contains "deadline" |
+| `date 2026-02-13` | Sent on that date |
+| `after 2026-02-01` | Sent after date |
+| `before 2026-03-01` | Sent before date |
+| `flag Flagged` | Has specific flag |
 
 ### Flag predicates (shortcuts)
 
@@ -385,18 +385,18 @@ himaya filter syntax for the `search_emails` tool and `/himalaya:search` skill.
 
 | Operator | Example |
 |----------|---------|
-| `and` | `from:alice and subject:budget` |
-| `or` | `subject:invoice or subject:receipt` |
+| `and` | `from alice and subject budget` |
+| `or` | `subject invoice or subject receipt` |
 | `not` | `not flag Seen` |
-| Grouping | `from:alice and (subject:meeting or subject:budget)` |
+| Grouping | `from alice and (subject meeting or subject budget)` |
 
 ### Date math
 
 | Pattern | Meaning |
 |---------|---------|
-| `after:2026-01-15` | After January 15, 2026 |
-| `before:2026-02-01` | Before February 1, 2026 |
-| `date:2026-01-20` | On January 20, 2026 |
+| `after 2026-01-15` | After January 15, 2026 |
+| `before 2026-02-01` | Before February 1, 2026 |
+| `date 2026-01-20` | On January 20, 2026 |
 
 Himalaya does not support relative date expressions (like `3-days-ago`). Claude translates natural language date references into absolute dates before calling `search_emails`.
 
@@ -404,16 +404,16 @@ Himalaya does not support relative date expressions (like `3-days-ago`). Claude 
 
 ```
 "Find unread emails from Alice about the budget"
-→ search_emails(query: "from:alice and subject:budget and not flag Seen")
+→ search_emails(query: "from alice and subject budget and not flag Seen")
 
 "Emails from last week about invoices"
-→ search_emails(query: "subject:invoice and after:2026-02-03 and before:2026-02-10")
+→ search_emails(query: "subject invoice and after 2026-02-03 and before 2026-02-10")
 
 "Flagged emails from my boss"
-→ search_emails(query: "from:boss and flag:Flagged")
+→ search_emails(query: "from boss and flag Flagged")
 
 "All newsletters from the past month"
-→ search_emails(query: "from:newsletter and after:2026-01-13")
+→ search_emails(query: "from newsletter and after 2026-01-13")
 ```
 
 ---

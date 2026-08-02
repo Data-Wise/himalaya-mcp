@@ -9,6 +9,19 @@ import { parseEnvelopes, formatEnvelope } from "../himalaya/parser.js";
 import { parseError } from "../himalaya/errors.js";
 import { envelopeError } from "./_envelope.js";
 
+/** Auto-wrap bare single-word queries with `subject` prefix.
+ *  himalaya's filter parser chokes on unqualified terms like "toilet"
+ *  (interprets "to" as a field keyword, then "ilet" is garbage). */
+export function normalizeSearchQuery(query: string): string {
+  const trimmed = query.trim();
+  if (!trimmed) return trimmed;                       // empty → pass through as-is
+  const hasCondition = /^(subject|from|to|body|date|before|after|flag)\b/;
+  if (hasCondition.test(trimmed)) return trimmed;
+  if (/\s/.test(trimmed)) return trimmed;           // multi-word
+  if (/\b(and|or|not)\b/i.test(trimmed)) return trimmed; // has operators
+  return `subject ${trimmed}`;
+}
+
 export function registerInboxTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("list_emails", {
     description: "List emails in a folder. Returns envelope data: subject, from, date, flags.",
@@ -49,7 +62,9 @@ export function registerInboxTools(server: McpServer, client: HimalayaClient) {
     },
   }, async (args) => {
     try {
-      const raw = await client.searchEnvelopes(args.query, args.folder, args.account);
+      const query = normalizeSearchQuery(args.query);
+
+      const raw = await client.searchEnvelopes(query, args.folder, args.account);
       const result = parseEnvelopes(raw);
 
       if (!result.ok) {

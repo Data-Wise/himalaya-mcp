@@ -8,7 +8,7 @@ cd himalaya-mcp
 npm install
 npm run build              # TypeScript compilation
 npm run build:bundle       # esbuild single-file bundle (~883KB)
-npm test                   # Run all 573 tests
+npm test                   # Run all 619 tests
 ```
 
 ## Project Structure
@@ -22,7 +22,7 @@ src/                        # TypeScript source
   prompts/                  # 7 MCP prompt handlers
   resources/                # 3 MCP resource handlers
   adapters/                 # clipboard, calendar
-tests/                      # 573 tests across 31 files
+tests/                      # 619 tests across 33 files
 dist/                       # Build output
 himalaya-mcp-plugin/        # Claude Code plugin definition
 ```

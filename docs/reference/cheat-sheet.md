@@ -49,6 +49,7 @@ create_calendar_event   Add to Apple Calendar (macOS)
 list_threads        List conversation threads
 read_thread         Read all messages in a thread
 snooze_email        Snooze email until specified time
+list_snoozed_emails List snoozed emails and unsnooze times
 create_reminder     Create reminder in Apple Reminders
 export_to_markdown  Email → markdown + YAML frontmatter
 create_action_item  Extract todos and deadlines
@@ -134,7 +135,7 @@ Multi-acct: Any tool + account="work" | account="personal"
 npm run build           tsc (dev)
 npm run build:bundle    esbuild (~883KB)
 npm run build:mcpb      .mcpb extension (~247KB)
-npm test                573 tests (vitest)
+npm test                619 tests (vitest)
 ```
 
 ## Resources

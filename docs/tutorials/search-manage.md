@@ -30,11 +30,13 @@ Search supports combined filters:
 
 | Filter | Example |
 |--------|---------|
-| By sender | `from:alice` |
-| By subject | `subject:budget` |
-| By date | `after:2026-02-01 before:2026-03-01` |
-| By flag | `--unread` or `--flagged` |
-| Full body | `body:meeting` (any keyword) |
+| By sender | `from alice` |
+| By subject | `subject budget` |
+| By date | `after 2026-02-01 and before 2026-03-01` |
+| By flag | `not flag Seen` (unread) or `flag Flagged` |
+| Full body | `body meeting` (any keyword) |
+
+Combine conditions with `and` / `or` between every pair, and negate with `not`. Single bare words (like `budget`) are automatically treated as a subject search.
 
 ## Step 3: Bulk manage results
 
@@ -58,13 +60,13 @@ You: "Find all emails from newsletter@dev.to and archive them"
 
 Claude chains search into bulk management:
 
-1. `search_emails(query: "from:newsletter@dev.to")` -- finds matches
+1. `search_emails(query: "from newsletter@dev.to")` -- finds matches
 2. Asks for confirmation (bulk safety gate)
 3. `move_email(id, target_folder: "Archive")` for each result
 
 ## What you learned
 
-- `search_emails` uses himalaya filter syntax (`from:`, `subject:`, `after:`, etc.)
+- `search_emails` uses himalaya filter syntax (`from`, `subject`, `after`, etc.)
 - `/himalaya:manage` handles batch flag, move, and archive operations
 - Search + manage chaining is the most powerful email workflow
 - Bulk operations on 5+ emails trigger a confirmation gate

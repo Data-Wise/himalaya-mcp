@@ -60,11 +60,12 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       };
     }
 
-    if (!client.from) {
+    const from = client.fromForAccount(args.account);
+    if (!from) {
       return {
         content: [{
           type: "text" as const,
-          text: "HIMALAYA_FROM is not set. Set it to your email address to compose new emails.",
+          text: "No sender address configured. Set HIMALAYA_FROM env var, or add `email = \"you@example.com\"` to your default account in ~/.config/himalaya/config.toml.",
         }],
         isError: true,
       };
@@ -81,7 +82,7 @@ export function registerComposeNewTools(server: McpServer, client: HimalayaClien
       }
     }
 
-    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc, client.from, args.attachments);
+    const template = buildTemplate(args.to, args.subject, args.body, args.cc, args.bcc, from, args.attachments);
 
     // Safety gate: without confirm=true, just show preview
     if (!args.confirm) {

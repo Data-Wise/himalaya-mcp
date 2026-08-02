@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.1] - 2026-08-02
+
+### Fixed
+
+- Derive the sender address from Himalaya `config.toml` when `HIMALAYA_FROM` is unset, including per-account `compose_email` overrides.
+- Use Himalaya v2 account discovery syntax (`himalaya account list --json`) and accept the v2 `{ accounts: [...] }` response shape while preserving legacy array parsing.
+- Surface himalaya stderr failures through structured error envelopes and preserve transient retry attempt counts.
+- Wrap bare single-term `search_emails` queries as subject searches so natural queries like `invoice` work reliably.
+- Harden `.mcpb` packaging by pinning the pack CLI and writing the final package filename directly to avoid CI file-visibility races.
+
+### Changed
+
+- Refreshed project documentation and agent instructions for the current 619-test inventory.
+
 ## [2.0.0] - 2026-07-23
 
 ### Changed (BREAKING)

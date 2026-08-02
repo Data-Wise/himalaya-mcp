@@ -30,31 +30,9 @@ npx --yes @anthropic-ai/mcpb validate "$MCPB_DIR/"
 
 # Step 4: Pack .mcpb
 echo "  [4/4] Packing .mcpb..."
-npx @anthropic-ai/mcpb pack "$MCPB_DIR/"
-
-# mcpb pack writes synchronously to <packed-dir-basename>.mcpb in the CWD
-# (here: mcpb.mcpb, since we pack the "mcpb/" dir) — this is deterministic,
-# not a naming fallback guess. The retry below exists only because GH Actions
-# runners have occasionally shown a read-after-write visibility lag on this
-# immediate stat check right after a large minify+zip (observed once in
-# release CI, gone on retry with identical code/inputs — not reproducible
-# locally). Retry, don't add more filename guesses.
 OUTPUT_NAME="himalaya-mcp-v${VERSION}.mcpb"
 MCPB_FILE="$PROJECT_ROOT/$OUTPUT_NAME"
-PACKED_FILE="$PROJECT_ROOT/mcpb.mcpb"
-
-FOUND=""
-for attempt in 1 2 3 4 5; do
-  if [ -f "$PACKED_FILE" ]; then
-    FOUND="$PACKED_FILE"
-    break
-  fi
-  sleep 0.5
-done
-
-if [ -n "$FOUND" ]; then
-  mv "$FOUND" "$MCPB_FILE"
-fi
+npx @anthropic-ai/mcpb pack "$MCPB_DIR/" "$MCPB_FILE"
 
 if [ -f "$MCPB_FILE" ]; then
   SIZE=$(wc -c < "$MCPB_FILE" | tr -d ' ')

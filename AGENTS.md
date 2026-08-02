@@ -1,18 +1,18 @@
-# CLAUDE.md
+# AGENTS.md
 
 ## Project Overview
 
-**himalaya-mcp** — Privacy-first email MCP server and Claude Code plugin wrapping the himalaya CLI.
+**himalaya-mcp** — Privacy-first email MCP server and Codex plugin wrapping the himalaya CLI.
 
-- **Architecture:** TypeScript MCP server + Claude Code plugin
+- **Architecture:** TypeScript MCP server + Codex plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
-- **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
+- **Platforms:** Codex (plugin), Codex Desktop/Cowork (MCP server)
 - **Version:** 2.0.0
 - **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 601 tests)
 
 ### What It Does
 
-Exposes email operations as MCP tools, resources, and prompts so Claude can:
+Exposes email operations as MCP tools, resources, and prompts so Codex can:
 - List, search, and read emails (tools + resources)
 - Triage inbox: classify, summarize, flag (prompts + tools)
 - Compose and send with safety gates (tools)
@@ -77,8 +77,8 @@ himalaya-mcp/
 │       └── calendar.ts          # ICS parser + Apple Calendar (osascript)
 ├── himalaya-mcp-plugin/
 │   ├── .claude-plugin/
-│   │   └── plugin.json          # Claude Code plugin manifest
-│   ├── skills/                  # Claude Code plugin skills (16: inbox, triage, digest, compose, reply, respond, forward, attachments, export, threads, search, manage, stats, config, help, morning)
+│   │   └── plugin.json          # Plugin manifest
+│   ├── skills/                  # Plugin skills (16: inbox, triage, digest, compose, reply, respond, forward, attachments, export, threads, search, manage, stats, config, help, morning)
 │   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks (SessionStart, PreToolUse)
 ├── .claude-plugin/
@@ -117,7 +117,7 @@ himalaya-mcp/
 │   ├── list-starred.test.ts           # 6 list_starred tests
 │   ├── reminders.test.ts              # 7 create_reminder tests
 │   ├── snooze.test.ts                 # 12 snooze_email/list_snoozed_emails tests
-│   ├── dogfood.test.ts                # 153 dogfooding tests (realistic Claude usage)
+│   ├── dogfood.test.ts                # 153 dogfooding tests (realistic Codex usage)
 │   ├── dogfood-reliability.test.ts    # 20 reliability scenarios
 │   ├── setup.test.ts                  # 45 setup CLI + multi-account doctor E2E tests
 │   ├── e2e.test.ts                    # 39 E2E tests (headless MCP server pipeline + .mcpb build)
@@ -164,7 +164,7 @@ himalaya-mcp/
 
 | Prompt | Description |
 |--------|-------------|
-| `triage_inbox` | Guide Claude to classify emails as actionable/FYI/skip |
+| `triage_inbox` | Guide Codex to classify emails as actionable/FYI/skip |
 | `summarize_email` | One-sentence summary + action items |
 | `daily_email_digest` | Markdown digest grouped by priority |
 | `draft_reply` | Reply composition with tone/safety guidance |
@@ -261,6 +261,8 @@ brew tap data-wise/tap
 brew install himalaya-mcp
 
 # Claude Code plugin (from GitHub marketplace — requires brew install node himalaya)
+# (Codex has no equivalent marketplace/plugin-install command as of this writing;
+# Codex users should install via the MCP server config below instead.)
 claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install himalaya
 
@@ -307,10 +309,10 @@ unreleased changes, not as the default dev setup.
 ## Design Decisions
 
 1. **Subprocess over library** — Wrap himalaya CLI, don't reimplement IMAP
-2. **Prompt-based triage** — Claude IS the AI; MCP prompts guide it, no embedded AI
+2. **Prompt-based triage** — Codex IS the AI; MCP prompts guide it, no embedded AI
 3. **Safety gates** — send_email returns preview, requires explicit confirmation
 4. **Tools + Resources** — Tools for actions, resources for browsing
-5. **Plugin-first** — Claude Code plugin bundles MCP server; Desktop extension via `.mcpb`
+5. **Plugin-first** — Codex plugin bundles MCP server; Desktop extension via `.mcpb`
 
 ---
 
@@ -318,7 +320,7 @@ unreleased changes, not as the default dev setup.
 
 himalaya-mcp does NOT replace the `em` dispatcher. They serve different contexts:
 - `em` = terminal-native, fzf picker, interactive ZSH workflow
-- himalaya-mcp = AI-native, Claude as the interface, MCP protocol
+- himalaya-mcp = AI-native, Codex as the interface, MCP protocol
 
 Both wrap the same himalaya CLI and can coexist.
 

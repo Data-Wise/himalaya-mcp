@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 import type { HimalayaClientOptions } from "./types.js";
 import { classifyStderr, HimalayaError } from "./errors.js";
+import { resolveFromAddress } from "./config-toml.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -62,9 +63,15 @@ export class HimalayaClient {
     if (!options.folder) this.opts.folder = DEFAULT_OPTIONS.folder;
   }
 
-  /** Sender email address (from HIMALAYA_FROM env var). */
+  /** Sender email address for the configured/default account. */
   get from(): string {
     return this.opts.from;
+  }
+
+  /** Resolve the sender for an optional per-call account override. */
+  fromForAccount(account?: string): string {
+    if (!account || account === this.opts.account) return this.opts.from;
+    return resolveFromAddress(account) ?? "";
   }
 
   /** Path to the himalaya binary. */
@@ -153,12 +160,19 @@ export class HimalayaClient {
     const timeout = options?.timeout ?? this.opts.timeout;
 
     try {
-      const { stdout } = await execFileAsync(this.opts.binary, args, {
+      const { stdout, stderr } = await execFileAsync(this.opts.binary, args, {
         timeout,
         maxBuffer: 10 * 1024 * 1024, // 10MB
         env: { ...process.env },
         cwd: options?.cwd,
       });
+
+      // When himalaya exits 0 but stdout is empty, stderr may hold
+      // the real error (e.g. parse errors from bare-word search queries).
+      if (!stdout.trim() && stderr.trim()) {
+        throw this.wrapError(new Error(stderr.trim()));
+      }
+
       return stdout;
     } catch (err: unknown) {
       throw this.wrapError(err, account);
@@ -195,8 +209,12 @@ export class HimalayaClient {
     for (const token of tokens) {
       assertSafeArg(token, "query");
     }
-    args.push(...tokens);
-    return this.exec(args, { folder: f, account });
+    // The query is a trailing positional that must come AFTER all flags
+    // (including --output json). himalaya parses the filter greedily, so a
+    // query placed before --output json makes the CLI treat "--output json"
+    // as part of the filter ("cannot parse search emails query"). Routing
+    // the tokens through trailingArgs places them last.
+    return this.exec(args, { folder: f, account, trailingArgs: tokens });
   }
 
   /** Read a message body (plain text). */
