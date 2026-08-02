@@ -856,16 +856,13 @@ describe("E2E: MCPB Build Pipeline", () => {
       expect(output).toContain("Manifest schema validation passes");
       expect(output).toContain("Building esbuild bundle");
 
-      // Find the output file — poll briefly if not immediately available (fs sync race)
-      let mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
+      // build-mcpb.sh packs directly to the final filename (no intermediate
+      // name, no rename) and exits non-zero if the file is missing, so by the
+      // time execFileAsync resolves the file is guaranteed present or the
+      // script already failed loudly — no poll needed here.
+      const mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
         f.match(/^himalaya-mcp-v.*\.mcpb$/)
       );
-      for (let attempt = 0; mcpbFiles.length === 0 && attempt < 6; attempt++) {
-        await new Promise((r) => setTimeout(r, 500));
-        mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
-          f.match(/^himalaya-mcp-v.*\.mcpb$/)
-        );
-      }
       if (mcpbFiles.length !== 1) {
         // Surface enough to root-cause a future CI-only failure without re-running blind
         console.error("build:mcpb diagnostic — timedOut:", timedOut);

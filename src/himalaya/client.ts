@@ -160,12 +160,19 @@ export class HimalayaClient {
     const timeout = options?.timeout ?? this.opts.timeout;
 
     try {
-      const { stdout } = await execFileAsync(this.opts.binary, args, {
+      const { stdout, stderr } = await execFileAsync(this.opts.binary, args, {
         timeout,
         maxBuffer: 10 * 1024 * 1024, // 10MB
         env: { ...process.env },
         cwd: options?.cwd,
       });
+
+      // When himalaya exits 0 but stdout is empty, stderr may hold
+      // the real error (e.g. parse errors from bare-word search queries).
+      if (!stdout.trim() && stderr.trim()) {
+        throw this.wrapError(new Error(stderr.trim()));
+      }
+
       return stdout;
     } catch (err: unknown) {
       throw this.wrapError(err, account);
@@ -202,8 +209,12 @@ export class HimalayaClient {
     for (const token of tokens) {
       assertSafeArg(token, "query");
     }
-    args.push(...tokens);
-    return this.exec(args, { folder: f, account });
+    // The query is a trailing positional that must come AFTER all flags
+    // (including --output json). himalaya parses the filter greedily, so a
+    // query placed before --output json makes the CLI treat "--output json"
+    // as part of the filter ("cannot parse search emails query"). Routing
+    // the tokens through trailingArgs places them last.
+    return this.exec(args, { folder: f, account, trailingArgs: tokens });
   }
 
   /** Read a message body (plain text). */

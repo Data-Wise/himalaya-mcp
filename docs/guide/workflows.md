@@ -152,12 +152,12 @@ Find specific emails and act on them.
 **Natural language:** "Find all emails from alice about the budget"
 
 ```
-search_emails(query: "from:alice subject:budget")
+search_emails(query: "from alice and subject budget")
   -> read_email on results
   -> summarize, reply, export, or extract actions
 ```
 
-Search supports himalaya's filter syntax: `from:`, `subject:`, `body:`, `before:`, `after:`.
+Search supports himalaya's filter syntax: `from`, `subject`, `body`, `before`, `after`.
 
 ## 8. Batch Flag/Move
 
@@ -166,7 +166,7 @@ Organize multiple emails at once.
 **Natural language:** "Mark all newsletters as read and archive them"
 
 ```
-search_emails(query: "from:newsletter")
+search_emails(query: "from newsletter")
   -> flag_email(id, flags: ["Seen"], action: "add")  -- for each
   -> move_email(id, target_folder: "Archive")         -- for each
 ```
@@ -634,7 +634,7 @@ Forward an email to someone else with context and attribution.
 
 ```
 You: "Forward all emails about the project to the new team member"
-→ search_emails(query: "subject:project") → /himalaya:forward for each
+→ search_emails(query: "subject project") → /himalaya:forward for each
 ```
 
 ---

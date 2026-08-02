@@ -206,10 +206,10 @@ Checks: required fields, type correctness, prompt `text` fields, user_config typ
 ### Packing
 
 ```bash
-npx @anthropic-ai/mcpb pack mcpb/
+npx @anthropic-ai/mcpb pack mcpb/ himalaya-mcp-v2.0.0.mcpb
 ```
 
-Creates `mcpb.mcpb` in the current directory (named after the directory, not the extension name).
+The optional second argument is an explicit output path; without it, `pack` writes `mcpb.mcpb` in the current directory (named after the directory, not the extension name). This repo's `scripts/build-mcpb.sh` always supplies the explicit output path so the final filename is written directly, with no intermediate name and no rename step.
 
 ## Installation Mechanism
 
@@ -220,7 +220,7 @@ Double-click a `.mcpb` file or use File > Install Extension in Claude Desktop.
 ### CLI (himalaya-mcp)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v1.7.0.mcpb   # Install
+himalaya-mcp install-ext himalaya-mcp-v2.0.0.mcpb   # Install
 himalaya-mcp remove-ext                               # Uninstall
 ```
 
@@ -283,7 +283,7 @@ src/index.ts (16 source files)
     │
     ├── mcpb validate mcpb/     →  Schema check
     │
-    └── mcpb pack mcpb/         →  himalaya-mcp-v1.7.0.mcpb (151 KB)
+    └── mcpb pack mcpb/         →  himalaya-mcp-v2.0.0.mcpb (151 KB)
 ```
 
 Run: `npm run build:mcpb`
@@ -301,8 +301,8 @@ Run: `npm run build:mcpb`
 Extensions can be signed for authenticity verification. himalaya-mcp is currently unsigned (open source, distributed via GitHub Releases).
 
 ```bash
-mcpb sign himalaya-mcp-v1.7.0.mcpb --key private.pem
-mcpb verify himalaya-mcp-v1.7.0.mcpb --key public.pem
+mcpb sign himalaya-mcp-v2.0.0.mcpb --key private.pem
+mcpb verify himalaya-mcp-v2.0.0.mcpb --key public.pem
 ```
 
 ## CI/CD Integration

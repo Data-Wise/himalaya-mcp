@@ -50,7 +50,7 @@ You: "Forward all personal email receipts to my accountant on Fridays"
 
 Workflow:
 
-1. Search personal account for receipts: `search_emails(account: "personal", query: "subject:receipt OR subject:invoice")`
+1. Search personal account for receipts: `search_emails(account: "personal", query: "subject receipt or subject invoice")`
 2. Flag each: `flag_email(id, flags: ["Flagged"], action: "add")`
 3. Draft a forwarding email with the receipts as context
 4. Review and approve before sending
@@ -63,7 +63,7 @@ You: "Auto-archive newsletters I haven't opened in 7 days"
 
 The agent will:
 
-1. `search_emails(query: "--unread before:7-days-ago")` — find old unread
+1. `search_emails(query: "not flag Seen and before 2026-07-25")` — find old unread (himalaya takes absolute dates, so the agent converts "7 days ago")
 2. Identify newsletters by sender pattern
 3. Present the list for your approval (safety gate)
 4. `move_email(id, target_folder: "Archive")` — archive confirmed items
@@ -76,7 +76,7 @@ You: "Before my 10am standup, gather all emails about project Alpha"
 
 The agent:
 
-1. `search_emails(query: "subject:Alpha")` — find project emails
+1. `search_emails(query: "subject Alpha")` — find project emails
 2. `read_thread` on each thread — gather full context
 3. `create_action_item` — extract todos
 4. Presents a one-page briefing
@@ -89,7 +89,7 @@ You: "Gather all action items from this week's email into one list"
 
 The agent:
 
-1. `search_emails(query: "after:7-days-ago")` — all email from the past week
+1. `search_emails(query: "after 2026-07-25")` — all email from the past week (absolute date)
 2. `create_action_item` on each — extract todos and deadlines
 3. Deduplicates and groups by urgency
 4. Presents a consolidated task list with email cross-references
@@ -145,7 +145,7 @@ You: "Auto-archive any email from noreply@ that I haven't read in 3 days"
 
 Combines conditional filtering with folder rules:
 
-1. `search_emails(query: "from:noreply --unread before:3-days-ago")` — find candidates
+1. `search_emails(query: "from noreply and not flag Seen and before 2026-07-29")` — find candidates
 2. Show the count and ask for confirmation
 3. `move_email(id, target_folder: "Archive")` for each
 
@@ -153,15 +153,15 @@ Combines conditional filtering with folder rules:
 
 ```
 "Auto-archive all LinkedIn notifications after 24 hours"
-→ search_emails(query: "from:linkedin --unread before:1-days-ago")
+→ search_emails(query: "from linkedin and not flag Seen and before 2026-07-31")
 → move_email to Archive
 
 "Move all PR review requests to a Dev folder"
-→ search_emails(query: "subject:\"PR\" OR subject:\"pull request\"")
+→ search_emails(query: "subject PR or subject pull\\ request")
 → move_email to Dev
 
 "Flag all emails from my boss as important"
-→ search_emails(query: "from:boss@company.com")
+→ search_emails(query: "from boss@company.com")
 → flag_email(flags: ["Flagged"], action: "add")
 ```
 
@@ -176,7 +176,7 @@ You: "Each evening, give me a summary of what I handled today"
 The agent chains:
 
 1. `list_emails(page_size: 100)` — today's inbox
-2. `search_emails(query: "from:me")` — what you sent
+2. `search_emails(query: "from me")` — what you sent
 3. Compares to yesterday's unread count
 4. Generates a daily activity report
 
