@@ -4,7 +4,7 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: released
-## Focus: v2.0.1 release prep paused
+## Focus: v2.0.1 release in progress
 ## Phase: Maintenance
 ## Priority: 2
 ## Progress: 100
@@ -47,11 +47,11 @@
   legacy array parsing; E2E structured-error harness now fails fast with stderr/exit diagnostics.
   Verification before merge: focused local tests 80/80, structured E2E 5/5, `npm run build`,
   `npm run build:bundle`, and GitHub CI (`bundle`, `test`, `validate-mcpb`, `validate-plugin`) passed.
-- 2026-08-02: Began patch release prep for v2.0.1, then paused before version bump/tag/push.
+- 2026-08-02: Began patch release prep for v2.0.1, then resumed the release bump.
   Updated `CLAUDE.md` and `AGENTS.md` to version 2.0.1, corrected the account discovery command
   reference to `--json`, and refreshed the test inventory to 619 tests across 33 files. Added a
-  draft `CHANGELOG.md` entry for 2.0.1. Version surfaces remain at 2.0.0 unless explicitly bumped
-  later (`package.json`, lockfile root, `src/index.ts`, marketplace/plugin manifests, `.mcpb`
+  draft `CHANGELOG.md` entry for 2.0.1. Release version surfaces are being bumped from 2.0.0 to
+  2.0.1 (`package.json`, lockfile root, `src/index.ts`, marketplace/plugin manifests, `.mcpb`
   manifest). `/done` wrap selected: skip full tests; draft changelog; assess knowledge sync only.
 - 2026-08-01: Full PR triage + merge session — reviewed all 8 open PRs, merged 5 into their
   bases: #69 (search trailingArgs fix → dev), #81 (tsconfig `types: ["node"]` → main), #105
@@ -127,10 +127,11 @@
 
 ## Current State
 
-- Branch: `dev` @ `96447d1` (`origin/dev`) after PR #108 merge. Working tree has release-wrap
-  documentation edits in progress: `CLAUDE.md`, `AGENTS.md`, `CHANGELOG.md`, and this `.STATUS`.
-- Version: 2.0.0 remains the shipped release. v2.0.1 patch release prep is paused; only agent
-  docs and a draft changelog entry have been edited so far.
+- Branch: `dev` @ `81f36df` (`origin/dev`) after PR #108 merge and release-prep status commit.
+  Working tree has v2.0.1 version/docs edits in progress plus intentionally uncommitted local
+  `CLAUDE.md` and `AGENTS.md` edits.
+- Version: 2.0.0 remains the shipped release until the v2.0.1 tag/release is pushed. v2.0.1 patch
+  release bump is in progress.
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
 - Tests: 619 tests across 33 test files (verified via `npx vitest list`). Full local suite was
   skipped during `/done` by user choice due known local runtime/memory friction; prior PR #108 CI
@@ -169,11 +170,11 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- **Resume context:** `/done` wrap is nearly complete on `dev`. Release remains paused. Current
-  uncommitted docs/status work records the merged #108/#109 fixes and v2.0.1 prep, but no version
-  files, tags, pushes, release PRs, or GitHub releases have been created. If release resumes,
-  finish bumping all version surfaces from 2.0.0 to 2.0.1, run release gates, commit, tag, push,
-  and open/merge `dev -> main` according to the release workflow.
+- **Resume context:** `/release` resumed on `dev` for patch version v2.0.1. PR #108/#109 fixes are
+  already merged to `dev`; `.STATUS` and `CHANGELOG.md` release-prep notes were committed as
+  `81f36df` and pushed. Current release work is bumping all version surfaces from 2.0.0 to 2.0.1,
+  then running release gates, committing, tagging `v2.0.1`, and pushing refs. Do not commit the
+  existing local `CLAUDE.md`/`AGENTS.md` edits unless explicitly instructed.
 - **Pending:** PR #82 (HTML compose_email, base=main) — BLOCKED: its `mcpb/manifest.json`
   diff deletes 8 tools + 1 prompt (stale-drift against an old base). Needs a rebase + manifest
   restoration, and the SKILL.md text must be reconciled with the HTML-only (no text/plain
@@ -198,7 +199,7 @@ himalaya-mcp doctor --fix
 ---
 
 **Last Updated:** 2026-08-02
-**Status:** v2.0.0 released; `dev` contains merged v2.0.1 patch-candidate fixes. This session:
-reviewed/fixed/merged PR #108, validated issue #109, started but paused v2.0.1 release prep,
-updated agent docs to 619 tests, drafted the 2.0.1 changelog entry, and captured this `/done`
-resume context. Open: #82 (BLOCKED manifest regression), #97 (TS7 deferred).
+**Status:** v2.0.0 released; v2.0.1 patch release is in progress on `dev`. This session:
+reviewed/fixed/merged PR #108, validated issue #109, updated agent docs to 619 tests, drafted the
+2.0.1 changelog entry, captured `/done` resume context, and resumed the v2.0.1 version bump. Open:
+#82 (BLOCKED manifest regression), #97 (TS7 deferred).

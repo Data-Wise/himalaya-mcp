@@ -113,7 +113,7 @@ src/
 │   ├── thread-parser.ts  Thread/conversation grouping by subject line
 │   ├── errors.ts         MCPError envelope, HimalayaError class,
 │   │                     classifyStderr (stderr-pattern → stable code)
-│   ├── accounts.ts       discoverAccounts — `himalaya account list -o json`
+│   ├── accounts.ts       discoverAccounts — `himalaya account list --json`
 │   ├── trash.ts          getTrashFolder — provider-agnostic trash detection
 │   └── types.ts          Envelope, Folder, HimalayaClientOptions, *Params
 │
@@ -281,7 +281,7 @@ Anything not matched falls through to `code: "unknown"` with the raw stderr pres
 
 ### Multi-account discovery
 
-`discoverAccounts()` in `src/himalaya/accounts.ts` parses `himalaya account list -o json`. Used by:
+`discoverAccounts()` in `src/himalaya/accounts.ts` parses `himalaya account list --json`. Used by:
 
 - `himalaya-mcp doctor` (default mode iterates all accounts)
 - `health_check` MCP tool (default mode iterates all accounts)
