@@ -1,5 +1,5 @@
 /**
- * Account discovery wrapper around `himalaya account list -o json`.
+ * Account discovery wrapper around `himalaya account list --json`.
  *
  * Used by doctor and health_check to enumerate configured accounts
  * for per-account diagnostics.
@@ -21,14 +21,19 @@ export interface Account {
 interface HimalayaAccountJson {
   name: string;
   default: boolean;
-  backend: string;
+  backend?: string;
+  backends?: string[];
+}
+
+interface HimalayaAccountListJson {
+  accounts: HimalayaAccountJson[];
 }
 
 export async function listAccounts(): Promise<Account[]> {
   const binary = loadConfig().binary ?? "himalaya";
   let stdout: string;
   try {
-    const result = await execFileAsync(binary, ["account", "list", "-o", "json"], { timeout: ACCOUNT_TIMEOUT });
+    const result = await execFileAsync(binary, ["account", "list", "--json"], { timeout: ACCOUNT_TIMEOUT });
     stdout = result.stdout;
   } catch (err: unknown) {
     if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {
@@ -42,8 +47,12 @@ export async function listAccounts(): Promise<Account[]> {
     throw err;
   }
   try {
-    const parsed = JSON.parse(stdout) as HimalayaAccountJson[];
-    return parsed.map((a) => ({ name: a.name, isDefault: a.default }));
+    const parsed = JSON.parse(stdout) as HimalayaAccountJson[] | HimalayaAccountListJson;
+    const accounts = Array.isArray(parsed) ? parsed : parsed.accounts;
+    if (!Array.isArray(accounts)) {
+      throw new Error("Expected account list JSON array or object with accounts array");
+    }
+    return accounts.map((a) => ({ name: a.name, isDefault: a.default }));
   } catch (err: unknown) {
     throw parseError(
       err instanceof Error ? err.message : String(err),

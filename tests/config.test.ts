@@ -1,8 +1,13 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { loadConfig } from "../src/config.js";
 
 describe("loadConfig", () => {
   const originalEnv = { ...process.env };
+
+  beforeEach(() => {
+    // Prevent real himalaya config.toml from leaking into tests
+    process.env["HIMALAYA_CONFIG"] = "/nonexistent/himalaya/config.toml";
+  });
 
   afterEach(() => {
     process.env = { ...originalEnv };

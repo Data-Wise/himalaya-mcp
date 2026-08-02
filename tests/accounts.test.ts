@@ -24,18 +24,32 @@ describe("accounts", () => {
 
   it("listAccounts returns parsed account names from himalaya CLI", async () => {
     mockExecFileAsync.mockResolvedValue({
-      stdout: JSON.stringify([
-        { name: "unm", default: true, backend: "imap" },
-        { name: "personal", default: false, backend: "imap" },
-      ]),
+      stdout: JSON.stringify({
+        accounts: [
+          { name: "unm", default: true, backends: ["imap", "smtp"] },
+          { name: "personal", default: false, backends: ["imap"] },
+        ],
+      }),
       stderr: "",
     });
 
     const accounts = await listAccounts();
+    expect(mockExecFileAsync).toHaveBeenCalledWith("himalaya", ["account", "list", "--json"], { timeout: 15_000 });
     expect(accounts).toEqual([
       { name: "unm", isDefault: true },
       { name: "personal", isDefault: false },
     ]);
+  });
+
+  it("listAccounts accepts legacy bare-array JSON output", async () => {
+    mockExecFileAsync.mockResolvedValue({
+      stdout: JSON.stringify([
+        { name: "unm", default: true, backend: "imap" },
+      ]),
+      stderr: "",
+    });
+
+    expect(await listAccounts()).toEqual([{ name: "unm", isDefault: true }]);
   });
 
   it("listAccounts returns empty array when himalaya has no configured accounts", async () => {
@@ -59,10 +73,12 @@ describe("accounts", () => {
 
   it("getDefaultAccount returns the account marked default", async () => {
     mockExecFileAsync.mockResolvedValue({
-      stdout: JSON.stringify([
-        { name: "unm", default: false, backend: "imap" },
-        { name: "personal", default: true, backend: "imap" },
-      ]),
+      stdout: JSON.stringify({
+        accounts: [
+          { name: "unm", default: false, backends: ["imap"] },
+          { name: "personal", default: true, backends: ["imap"] },
+        ],
+      }),
       stderr: "",
     });
 
