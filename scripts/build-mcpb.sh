@@ -34,6 +34,13 @@ OUTPUT_NAME="himalaya-mcp-v${VERSION}.mcpb"
 MCPB_FILE="$PROJECT_ROOT/$OUTPUT_NAME"
 npx @anthropic-ai/mcpb pack "$MCPB_DIR/" "$MCPB_FILE"
 
+if [ ! -f "$MCPB_FILE" ]; then
+  FALLBACK_FILE="$PROJECT_ROOT/himalaya-mcp-${VERSION}.mcpb"
+  if [ -f "$FALLBACK_FILE" ]; then
+    mv "$FALLBACK_FILE" "$MCPB_FILE"
+  fi
+fi
+
 if [ -f "$MCPB_FILE" ]; then
   SIZE=$(wc -c < "$MCPB_FILE" | tr -d ' ')
   SIZE_KB=$((SIZE / 1024))
