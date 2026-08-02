@@ -4,7 +4,7 @@
 # pull_requests:write + admin/bypass on main. The guard step skips cleanly when unconfigured,
 # so this never breaks a release run before it's wired up.
 #
-# PLUGIN_NAME below is per-repo: scholar | rforge | email  (email = the himalaya-mcp plugin name).
+# PLUGIN_NAME below is per-repo: scholar | rforge | himalaya.
 name: Aggregator Sync
 
 on:
@@ -18,7 +18,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     env:
-      PLUGIN_NAME: "email"          # <-- set per repo
+      PLUGIN_NAME: "himalaya"          # <-- set per repo
       AGG_REPO: Data-Wise/claude-plugins
       APP_ID: ${{ secrets.APP_ID }}
     steps:
