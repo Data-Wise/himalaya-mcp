@@ -1,6 +1,5 @@
 /** Parse Himalaya configuration to extract account email addresses. */
 
-import { parse as parseToml } from "@iarna/toml";
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -35,7 +34,7 @@ export function parseConfigToml(customPath?: string): HimalayaConfigToml {
       throw error;
     }
     found = true;
-    mergeAccounts(accounts, parseToml(content));
+    mergeAccounts(accounts, parseConfigDocument(content));
   }
 
   if (!found) {
@@ -122,23 +121,128 @@ function isMissingFile(error: unknown): boolean {
 
 function mergeAccounts(
   accounts: Map<string, { email: string; isDefault: boolean }>,
-  document: Record<string, unknown>,
+  parsed: HimalayaConfigToml,
 ): void {
-  const accountTables = asObject(document.accounts);
-  if (!accountTables) return;
-
-  for (const [name, rawAccount] of Object.entries(accountTables)) {
-    const account = asObject(rawAccount);
-    if (!account) continue;
+  for (const [name, info] of parsed.accounts) {
     const existing = accounts.get(name) ?? { email: "", isDefault: false };
-    if (typeof account.email === "string") existing.email = account.email;
-    if (typeof account.default === "boolean") existing.isDefault = account.default;
+    if (info.email) existing.email = info.email;
+    existing.isDefault = existing.isDefault || info.isDefault;
     accounts.set(name, existing);
   }
 }
 
-function asObject(value: unknown): Record<string, unknown> | undefined {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
-    ? value as Record<string, unknown>
-    : undefined;
+function parseConfigDocument(content: string): HimalayaConfigToml {
+  const accounts = new Map<string, { email: string; isDefault: boolean }>();
+  let currentAccount: string | undefined;
+
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = stripInlineComment(rawLine).trim();
+    if (!line) continue;
+
+    if (line.startsWith("[") && line.endsWith("]")) {
+      const path = parseDottedPath(line.slice(1, -1).trim());
+      currentAccount = path.length === 2 && path[0] === "accounts" ? path[1] : undefined;
+      if (currentAccount && !accounts.has(currentAccount)) {
+        accounts.set(currentAccount, { email: "", isDefault: false });
+      }
+      continue;
+    }
+
+    if (!currentAccount) continue;
+    const eqIndex = line.indexOf("=");
+    if (eqIndex === -1) continue;
+
+    const key = parseDottedPath(line.slice(0, eqIndex).trim())[0];
+    const value = parseValue(line.slice(eqIndex + 1).trim());
+    const entry = accounts.get(currentAccount);
+    if (!entry) continue;
+    if (key === "email" && typeof value === "string") entry.email = value;
+    if (key === "default" && typeof value === "boolean") entry.isDefault = value;
+  }
+
+  return { accounts };
+}
+
+function stripInlineComment(line: string): string {
+  let quote: "'" | '"' | undefined;
+  let escaped = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (quote === '"' && char === "\\") {
+      escaped = true;
+      continue;
+    }
+    if ((char === '"' || char === "'") && !quote) {
+      quote = char;
+      continue;
+    }
+    if (char === quote) {
+      quote = undefined;
+      continue;
+    }
+    if (char === "#" && !quote) return line.slice(0, i);
+  }
+  return line;
+}
+
+function parseDottedPath(input: string): string[] {
+  const parts: string[] = [];
+  let part = "";
+  let quote: "'" | '"' | undefined;
+  let escaped = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+    if (escaped) {
+      part += char;
+      escaped = false;
+      continue;
+    }
+    if (quote === '"' && char === "\\") {
+      part += char;
+      escaped = true;
+      continue;
+    }
+    if ((char === '"' || char === "'") && !quote) {
+      quote = char;
+      part += char;
+      continue;
+    }
+    if (char === quote) {
+      quote = undefined;
+      part += char;
+      continue;
+    }
+    if (char === "." && !quote) {
+      parts.push(unquoteKey(part.trim()));
+      part = "";
+      continue;
+    }
+    part += char;
+  }
+
+  if (part.trim()) parts.push(unquoteKey(part.trim()));
+  return parts;
+}
+
+function unquoteKey(key: string): string {
+  if (key.startsWith('"') && key.endsWith('"')) return parseDoubleQuoted(key);
+  if (key.startsWith("'") && key.endsWith("'")) return key.slice(1, -1);
+  return key;
+}
+
+function parseValue(value: string): string | boolean | undefined {
+  if (/^true$/i.test(value)) return true;
+  if (/^false$/i.test(value)) return false;
+  if (value.startsWith('"') && value.endsWith('"')) return parseDoubleQuoted(value);
+  if (value.startsWith("'") && value.endsWith("'")) return value.slice(1, -1);
+  return undefined;
+}
+
+function parseDoubleQuoted(value: string): string {
+  return JSON.parse(value) as string;
 }
