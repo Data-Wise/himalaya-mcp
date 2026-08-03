@@ -734,12 +734,12 @@ async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; fai
 export async function doctor(flags: { fix: boolean; json: boolean; account?: string; preRelease?: boolean; postRelease?: boolean }): Promise<void> {
   if (flags.json) {
     const { output, failed } = await runDoctorJson(flags);
-    console.log(output);
-    if (failed > 0) process.exit(1);
+    process.stdout.write(output + "\n");
+    if (failed > 0) process.exitCode = 1;
     return;
   }
 
   const output = await runDoctor(flags);
-  console.log(output);
-  if (output.includes("✗")) process.exit(1);
+  process.stdout.write(output + "\n");
+  if (output.includes("✗")) process.exitCode = 1;
 }
