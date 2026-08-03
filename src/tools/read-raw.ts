@@ -22,7 +22,7 @@ export function registerReadRawTools(server: McpServer, client: HimalayaClient) 
   server.registerTool("read_email_raw", {
     description: "Read the raw MIME source of an email. Returns the full, unedited message including all headers. Useful for debugging, email forensics, and exporting to .eml format.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
