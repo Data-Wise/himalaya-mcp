@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Codex plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Codex (plugin), Codex Desktop/Cowork (MCP server)
-- **Version:** 2.0.0
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 601 tests)
+- **Version:** 2.0.1
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 619 tests)
 
 ### What It Does
 
@@ -39,7 +39,7 @@ himalaya-mcp/
 │   │   ├── parser.ts            # JSON response parser + formatEnvelope helper
 │   │   ├── thread-parser.ts     # Thread/conversation grouping by subject line
 │   │   ├── errors.ts            # MCPError envelope, HimalayaError, stderr classifier
-│   │   ├── accounts.ts          # Multi-account discovery (himalaya account list -o json)
+│   │   ├── accounts.ts          # Multi-account discovery (himalaya account list --json)
 │   │   ├── trash.ts             # Provider-agnostic trash folder (Gmail/Exchange/fallback)
 │   │   └── types.ts             # TypeScript types (Envelope, Thread, Folder, params, etc.)
 │   ├── tools/
@@ -92,36 +92,40 @@ himalaya-mcp/
 │   └── reference/               # Commands, cheat-sheet, architecture, CLI, desktop extensions
 ├── tests/
 │   ├── parser.test.ts                  # 13 parser tests
-│   ├── client.test.ts                  # 15 client tests (subprocess mock + retry)
+│   ├── client.test.ts                  # 31 client tests (subprocess mock + retry)
 │   ├── manage.test.ts                  # 7 manage tools tests
 │   ├── compose.test.ts                 # 13 compose tools tests
-│   ├── compose-new.test.ts             # 12 compose_email tests
+│   ├── compose-new.test.ts             # 13 compose_email tests
 │   ├── folders.test.ts                 # 12 folder tools tests
 │   ├── attachments.test.ts             # 10 attachment tools tests
-│   ├── calendar.test.ts                # 18 calendar tests (ICS parser + tools + escaping)
+│   ├── calendar.test.ts                # 21 calendar tests (ICS parser + tools + escaping)
 │   ├── actions.test.ts                 # 6 export/action tests
 │   ├── threads.test.ts                 # 30 thread parser + tool registration tests
 │   ├── morning.test.ts                 # 13 morning/inbox-check prompt tests
-│   ├── prompts.test.ts                 # 24 prompt registration tests
+│   ├── prompts.test.ts                 # 23 prompt registration tests
 │   ├── config.test.ts                  # 9 config tests
+│   ├── config-toml.test.ts             # 15 Himalaya config.toml tests
 │   ├── clipboard.test.ts               # 4 clipboard tests
 │   ├── errors.test.ts                  # 18 MCPError envelope + stderr classifier tests
 │   ├── retry.test.ts                   # 4 transient retry policy tests
-│   ├── accounts.test.ts                # 6 multi-account discovery tests
+│   ├── accounts.test.ts                # 7 multi-account discovery tests
 │   ├── health.test.ts                  # 5 health_check tool tests
 │   ├── trash.test.ts                   # 5 getTrashFolder tests
 │   ├── unread.test.ts                  # 4 get_unread_count tests
-│   ├── count-sync.test.ts             # 1 TOOL_COUNT drift test
-│   ├── read-raw.test.ts               # 5 read_email_raw tests
+│   ├── count-sync.test.ts             # 3 TOOL_COUNT drift tests
+│   ├── read-raw.test.ts               # 4 read_email_raw tests
 │   ├── render.test.ts                 # 5 render_email tests
 │   ├── list-starred.test.ts           # 6 list_starred tests
 │   ├── reminders.test.ts              # 7 create_reminder tests
-│   ├── snooze.test.ts                 # 12 snooze_email/list_snoozed_emails tests
+│   ├── snooze.test.ts                 # 10 snooze_email/list_snoozed_emails tests
+│   ├── inbox.test.ts                  # 23 search/list inbox tests
 │   ├── dogfood.test.ts                # 153 dogfooding tests (realistic Codex usage)
 │   ├── dogfood-reliability.test.ts    # 20 reliability scenarios
-│   ├── setup.test.ts                  # 45 setup CLI + multi-account doctor E2E tests
+│   ├── setup.test.ts                  # 49 setup CLI + multi-account doctor E2E tests
 │   ├── e2e.test.ts                    # 39 E2E tests (headless MCP server pipeline + .mcpb build)
-│   └── v150-features.test.ts          # 36 v1.5.0 integration tests (hook, threads, prompts, skills)
+│   └── v150-features.test.ts          # 37 v1.5.0 integration tests (hook, threads, prompts, skills)
+├── docs/specs/                  # SPEC/GRILL/BUG planning artifacts (working docs, not in nav)
+├── tasks/                        # plan.md + todo.md — spec-driven-development Phase 2/3 output
 ├── package.json
 └── tsconfig.json
 ```
@@ -247,7 +251,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (601 tests across 32 test files)
+npm test                         # Run vitest (619 tests across 33 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~883KB)
 node dist/index.js               # Run MCP server directly
 ```
@@ -326,4 +330,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-08-02
