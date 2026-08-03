@@ -1,6 +1,6 @@
 # Plugin Skills & Agent
 
-When installed as a Claude Code plugin, the email plugin provides 15 slash commands (skills), 1 autonomous agent, and 2 hooks.
+When installed as a Claude Code plugin, the himalaya plugin provides 16 slash commands (skills), 1 autonomous agent, and 2 hooks.
 
 ## Skills vs Tools
 
@@ -611,7 +611,7 @@ Setup complete. Try /himalaya:inbox to check your mail.
 
 ## /himalaya:help
 
-Help hub for the email plugin. Browse all available tools, prompts, resources, and workflows.
+Help hub for the himalaya plugin. Browse all available tools, prompts, resources, and workflows.
 
 **Triggers:** "email help", "himalaya help", "email commands", "what can you do with email"
 

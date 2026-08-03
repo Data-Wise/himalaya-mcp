@@ -1,6 +1,6 @@
 # himalaya-mcp
 
-Privacy-first email for Claude -- MCP server and Claude Code plugin (`email`) wrapping the [himalaya](https://github.com/pimalaya/himalaya) CLI.
+Privacy-first email for Claude -- MCP server and Claude Code plugin (`himalaya`) wrapping the [himalaya](https://github.com/pimalaya/himalaya) CLI.
 
 ## Features
 

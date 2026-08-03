@@ -30,7 +30,7 @@ Prints the semantic version on its own line and exits 0.
 
 ```bash
 himalaya-mcp --version   # also: -v, version
-# Example output: 2.0.0
+# Example output: 2.0.1
 ```
 
 ---
