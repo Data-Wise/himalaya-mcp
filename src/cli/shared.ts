@@ -92,13 +92,32 @@ export function writeConfig(config: DesktopConfig): void {
   }
 }
 
-/** Get the package version from package.json relative to this file. */
+/**
+ * Get the package version relative to this file.
+ *
+ * Resolution order:
+ *   1. package.json (source checkout — present at the repo root)
+ *   2. .claude-plugin/marketplace.json's top-level "version" field (Homebrew
+ *      libexec install — the formula's `install` block copies
+ *      marketplace.json into libexec/.claude-plugin/ but never copies
+ *      package.json, so (1) always misses there)
+ */
 export function getVersion(): string {
+  const thisFile = fileURLToPath(import.meta.url);
+  const projectRoot = dirname(dirname(dirname(realpathSync(thisFile))));
+
   try {
-    const thisFile = fileURLToPath(import.meta.url);
-    const projectRoot = dirname(dirname(dirname(realpathSync(thisFile))));
     const pkg = JSON.parse(readFileSync(join(projectRoot, "package.json"), "utf-8")) as { version?: string };
-    return pkg.version || "";
+    if (pkg.version) return pkg.version;
+  } catch {
+    // fall through to the marketplace.json fallback below
+  }
+
+  try {
+    const marketplace = JSON.parse(
+      readFileSync(join(projectRoot, ".claude-plugin", "marketplace.json"), "utf-8"),
+    ) as { version?: string };
+    return marketplace.version || "";
   } catch {
     return "";
   }
