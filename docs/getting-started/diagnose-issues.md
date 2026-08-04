@@ -83,8 +83,10 @@ Both `health_check` and `doctor` surface the same stable codes:
 | `imap_auth_failed` | App password expired or wrong | Re-run `himalaya account configure <name>` |
 | `imap_cert_error` | TLS cert not trusted | Trust the cert or use `imap-encryption-tls.insecure` |
 | `transient` | Network blip (retried once) | Check VPN / network |
-| `folder_not_found` | UID or folder stale | Run `himalaya folder list` |
+| `folder_not_found` | UID or folder stale | Run `himalaya mailbox list --json` (v1.x: `himalaya folder list --output json`) |
 | `himalaya_not_installed` | Binary missing on PATH | `brew install himalaya` |
+| `himalaya_version_undetected` | `himalaya --version` timed out or returned unparseable output | Run `himalaya --version` directly; reinstall if it hangs or errors |
+| `unsupported_backend` | Folder create/delete attempted on a non-IMAP account (himalaya v2 only) | Only IMAP-backed accounts support folder create/delete on the current CLI |
 
 The full table lives in [Troubleshooting](../guide/troubleshooting.md).
 

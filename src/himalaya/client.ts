@@ -9,8 +9,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import type { HimalayaClientOptions } from "./types.js";
-import { classifyStderr, HimalayaError } from "./errors.js";
+import { classifyStderr, HimalayaError, unsupportedBackendError } from "./errors.js";
 import { resolveFromAddress } from "./config-toml.js";
+import { detectHimalayaVersion, type HimalayaVersion } from "./cli-version.js";
+import { isImapAccount, listAccounts } from "./accounts.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -56,11 +58,26 @@ const MAX_ATTEMPTS = 2;
 export class HimalayaClient {
   private opts: Required<HimalayaClientOptions>;
 
+  // Lazy, per-instance version detection. Memoizing the *promise* (not just
+  // the resolved value) means concurrent first calls share one subprocess
+  // spawn instead of racing, and a detection failure stays cached as a
+  // rejected promise for the instance's lifetime (fail fast, don't re-probe
+  // a binary that already proved broken/unreachable on every subsequent call).
+  private versionPromise: Promise<HimalayaVersion> | null = null;
+
   constructor(options: HimalayaClientOptions = {}) {
     this.opts = { ...DEFAULT_OPTIONS, ...options };
     // Remove empty strings so they don't override
     if (!options.account) this.opts.account = "";
     if (!options.folder) this.opts.folder = DEFAULT_OPTIONS.folder;
+  }
+
+  /** Detect (and cache) the installed himalaya CLI's major version. */
+  private resolveVersion(): Promise<HimalayaVersion> {
+    if (!this.versionPromise) {
+      this.versionPromise = detectHimalayaVersion(this.opts.binary);
+    }
+    return this.versionPromise;
   }
 
   /** Sender email address for the configured/default account. */
@@ -137,6 +154,12 @@ export class HimalayaClient {
     cwd?: string;
     trailingArgs?: string[];
   }): Promise<string> {
+    // Version detection failures throw here as a HimalayaError with code
+    // "himalaya_version_undetected" (not "transient"), so exec()'s retry
+    // loop lets them through on the first attempt instead of burning the
+    // retry budget on a probe that already proved broken.
+    const version = await this.resolveVersion();
+
     const args: string[] = [];
 
     // Subcommand first (himalaya v1.1.0 expects flags after subcommand)
@@ -149,8 +172,12 @@ export class HimalayaClient {
       args.push("--account", account);
     }
 
-    // Output format
-    args.push("--output", "json");
+    // Output format — himalaya v2 dropped --output in favor of a bare --json flag.
+    if (version.major >= 2) {
+      args.push("--json");
+    } else {
+      args.push("--output", "json");
+    }
 
     // Positional args must come after all flags (e.g. reply body)
     if (options?.trailingArgs?.length) {
@@ -319,7 +346,8 @@ export class HimalayaClient {
       );
     }
 
-    const args = ["template", "send", "--output", "json"];
+    const version = await this.resolveVersion();
+    const args = version.major >= 2 ? ["template", "send", "--json"] : ["template", "send", "--output", "json"];
     const acct = account || this.opts.account;
     if (acct) {
       assertSafeArg(acct, "account");
@@ -360,21 +388,68 @@ export class HimalayaClient {
 
   /** List folders. */
   async listFolders(account?: string): Promise<string> {
-    return this.exec(["folder", "list"], { account });
+    const version = await this.resolveVersion();
+    const subcommand = version.major >= 2 ? ["mailbox", "list"] : ["folder", "list"];
+    return this.exec(subcommand, { account });
   }
 
   /** Create a folder. */
   async createFolder(name: string, account?: string): Promise<string> {
     assertSafeArg(name, "name");
-    return this.exec(["folder", "create", name], { account });
+    const version = await this.resolveVersion();
+    if (version.major < 2) {
+      return this.exec(["folder", "create", name], { account });
+    }
+    // v2 dropped folder create/delete from the shared API — only the
+    // IMAP-protocol-specific `imap create`/`imap delete` survive.
+    await this.assertImapCreateDeleteSafe(name, account);
+    return this.exec(["imap", "create", name], { account });
   }
 
   /** Delete a folder. */
   async deleteFolder(name: string, account?: string): Promise<string> {
     assertSafeArg(name, "name");
-    // --yes suppresses the interactive confirmation prompt that himalaya prints
-    // to stdout, which would block when invoked as a subprocess (no TTY).
-    return this.exec(["folder", "delete", "--yes", name], { account });
+    const version = await this.resolveVersion();
+    if (version.major < 2) {
+      // --yes suppresses the interactive confirmation prompt that himalaya
+      // prints to stdout, which would block when invoked as a subprocess (no TTY).
+      return this.exec(["folder", "delete", "--yes", name], { account });
+    }
+    await this.assertImapCreateDeleteSafe(name, account);
+    return this.exec(["imap", "delete", name], { account });
+  }
+
+  /**
+   * Pre-flight checks for the v2 `imap create`/`imap delete` path. Both
+   * checks raise a structured error client-side, before any subprocess is
+   * spawned:
+   *
+   * 1. Fail-closed backend check: `imap create`/`imap delete` are raw RFC
+   *    3501 commands with no cross-backend abstraction. If the account's
+   *    backend isn't confirmed IMAP (missing/malformed/unrecognized
+   *    `backends`), refuse rather than guessing — never fall through to
+   *    calling the CLI against an unconfirmed backend.
+   * 2. Namespace safety: `assertSafeArg` only blocks flag-smuggling
+   *    (leading "-"). Verified live (see BUG-himalaya-v2-cli-incompatibility
+   *    -2026-08-03.md) that a "/"-containing name creates a real nested
+   *    mailbox via `imap create` — reject "/", "#", and a leading "." before
+   *    they reach the raw IMAP command, since it has no backend-agnostic
+   *    softening the removed shared API had.
+   */
+  private async assertImapCreateDeleteSafe(name: string, account?: string): Promise<void> {
+    if (name.includes("/") || name.includes("#") || name.startsWith(".")) {
+      throw new Error(
+        `name value "${name}" contains a namespace-hierarchy character ("/", "#", or leading "."). ` +
+        `Refusing to pass it to "himalaya imap create/delete".`,
+      );
+    }
+
+    const acct = account || this.opts.account;
+    const accounts = await listAccounts();
+    const matched = acct ? accounts.find((a) => a.name === acct) : accounts.find((a) => a.isDefault);
+    if (!matched || !isImapAccount(matched)) {
+      throw unsupportedBackendError("create_folder/delete_folder", acct || matched?.name);
+    }
   }
 
   /** List accounts. */

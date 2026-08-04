@@ -16,6 +16,14 @@ const ACCOUNT_TIMEOUT = 15_000;
 export interface Account {
   name: string;
   isDefault: boolean;
+  /**
+   * Configured backends for this account (e.g. ["imap", "smtp"]), normalized
+   * from either the v1-style singular `backend` field or the v2-style plural
+   * `backends` array. Undefined/empty means "unknown" -- callers that need to
+   * confirm a specific backend (e.g. isImapAccount) must fail closed on that,
+   * never assume IMAP.
+   */
+  backends?: string[];
 }
 
 interface HimalayaAccountJson {
@@ -52,7 +60,11 @@ export async function listAccounts(): Promise<Account[]> {
     if (!Array.isArray(accounts)) {
       throw new Error("Expected account list JSON array or object with accounts array");
     }
-    return accounts.map((a) => ({ name: a.name, isDefault: a.default }));
+    return accounts.map((a) => ({
+      name: a.name,
+      isDefault: a.default,
+      backends: normalizeBackends(a),
+    }));
   } catch (err: unknown) {
     throw parseError(
       err instanceof Error ? err.message : String(err),
@@ -63,4 +75,19 @@ export async function listAccounts(): Promise<Account[]> {
 export async function getDefaultAccount(): Promise<string | null> {
   const accounts = await listAccounts();
   return accounts.find((a) => a.isDefault)?.name ?? null;
+}
+
+function normalizeBackends(a: HimalayaAccountJson): string[] | undefined {
+  if (Array.isArray(a.backends) && a.backends.length > 0) return a.backends;
+  if (typeof a.backend === "string" && a.backend.length > 0) return [a.backend];
+  return undefined;
+}
+
+/**
+ * Fail-closed IMAP-backend check. Returns false (never assume IMAP) when
+ * `backends` is missing, empty, or contains no recognized "imap" entry --
+ * only a confirmed "imap" backend returns true.
+ */
+export function isImapAccount(account: Pick<Account, "backends">): boolean {
+  return Array.isArray(account.backends) && account.backends.includes("imap");
 }
