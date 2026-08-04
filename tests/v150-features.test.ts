@@ -130,8 +130,8 @@ describe("v1.5.0: plugin.json hook structure", () => {
     expect(pluginJson.description).toContain("2 hooks");
   });
 
-  it("version is 2.0.1", () => {
-    expect(pluginJson.version).toBe("2.0.1");
+  it("version is 2.0.2", () => {
+    expect(pluginJson.version).toBe("2.0.2");
   });
 });
 
@@ -283,6 +283,10 @@ describe("v1.5.0: thread tools via MCP server", () => {
     await writeFile(join(dir, "message.json"), '"Message body for testing threads."');
     await writeFile(join(dir, "folders.json"), '[{"name":"INBOX","desc":""}]');
     const script = `#!/bin/bash
+if [ "$1" = "--version" ]; then
+  echo "himalaya 1.1.0"
+  exit 0
+fi
 args="$*"
 DIR="$(cd "$(dirname "$0")" && pwd)"
 clean=$(echo "$args" | sed 's/--account [^ ]* //g' | sed 's/--output json //g')
@@ -436,6 +440,10 @@ describe("v1.5.0: morning/inbox prompts via MCP server", () => {
 
   async function createFakeHimalaya(dir: string) {
     const script = `#!/bin/bash
+if [ "$1" = "--version" ]; then
+  echo "himalaya 1.1.0"
+  exit 0
+fi
 echo '[]'
 `;
     await writeFile(join(dir, "himalaya"), script);

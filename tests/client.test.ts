@@ -10,7 +10,7 @@ vi.mock("node:child_process", async () => {
   const fn: any = vi.fn();
   const promisified = vi.fn();
   fn[realPromisify.custom] = promisified;
-  return { execFile: fn };
+  return { execFile: fn, spawn: vi.fn() };
 });
 
 vi.mock("node:fs", () => ({
@@ -23,20 +23,78 @@ vi.mock("node:os", () => ({
   tmpdir: vi.fn().mockReturnValue("/tmp"),
 }));
 
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
+import { EventEmitter } from "node:events";
 import * as fs from "node:fs";
 import * as os from "node:os";
+
+const mockSpawn = vi.mocked(spawn);
+
+/** A minimal fake ChildProcess for sendTemplate()'s spawn() path. */
+function fakeChildProcess(exitCode: number, stdout = "", stderr = "") {
+  const child: any = new EventEmitter();
+  child.stdout = new EventEmitter();
+  child.stderr = new EventEmitter();
+  child.stdin = { write: vi.fn(), end: vi.fn() };
+  child.kill = vi.fn();
+  // Defer to next tick so listeners registered after spawn() returns still fire.
+  queueMicrotask(() => {
+    if (stdout) child.stdout.emit("data", Buffer.from(stdout));
+    if (stderr) child.stderr.emit("data", Buffer.from(stderr));
+    child.emit("close", exitCode);
+  });
+  return child;
+}
 
 const mockExecFile = vi.mocked(execFile);
 // Access the promisified version that client.ts actually calls
 const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
 
+const V2_VERSION_STDOUT = "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir";
+const V1_VERSION_STDOUT = "himalaya 1.1.0";
+const DEFAULT_ACCOUNTS_STDOUT = JSON.stringify({
+  accounts: [{ name: "default", default: true, backends: ["imap", "smtp"] }],
+});
+
+interface MockConfig {
+  /** Raw `himalaya --version` stdout. Defaults to the real v2.0.0 string. */
+  version?: string;
+  /** Raw `himalaya account list --json` stdout (accounts.ts's own call, used by the
+   *  fail-closed backend check in createFolder/deleteFolder). */
+  accounts?: string;
+  stdout?: string;
+  stderr?: string;
+  error?: Error;
+}
+
+/**
+ * HimalayaClient's execOnce() now shells out to `--version` before every real
+ * command (resolveVersion()), and createFolder/deleteFolder on v2 shell out
+ * to `account list --json` (via accounts.ts, independently of client.ts) for
+ * the fail-closed backend check. A single mockResolvedValue can't answer all
+ * three distinct call shapes, so dispatch on argv instead.
+ */
+function configureMock(cfg: MockConfig) {
+  const versionStdout = cfg.version ?? V2_VERSION_STDOUT;
+  const accountsStdout = cfg.accounts ?? DEFAULT_ACCOUNTS_STDOUT;
+  mockExecFileAsync.mockImplementation(async (_binary: string, args: string[]) => {
+    if (args.length === 1 && args[0] === "--version") {
+      return { stdout: versionStdout, stderr: "" };
+    }
+    if (args[0] === "account" && args[1] === "list" && args.includes("--json")) {
+      return { stdout: accountsStdout, stderr: "" };
+    }
+    if (cfg.error) throw cfg.error;
+    return { stdout: cfg.stdout ?? "[]", stderr: cfg.stderr ?? "" };
+  });
+}
+
 function setupMock(stdout: string, stderr = "") {
-  mockExecFileAsync.mockResolvedValue({ stdout, stderr });
+  configureMock({ stdout, stderr });
 }
 
 function setupErrorMock(error: Error) {
-  mockExecFileAsync.mockRejectedValue(error);
+  configureMock({ error });
 }
 
 describe("HimalayaClient", () => {
@@ -62,8 +120,23 @@ describe("HimalayaClient", () => {
   });
 
   describe("exec", () => {
-    it("passes --output json flag", async () => {
-      setupMock("[]");
+    it("passes --json flag on himalaya v2", async () => {
+      configureMock({ version: V2_VERSION_STDOUT, stdout: "[]" });
+      const client = new HimalayaClient();
+      await client.exec(["envelope", "list"]);
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["--json"]),
+        expect.any(Object),
+      );
+      // and never the removed v1 flag
+      const commandCall = mockExecFileAsync.mock.calls.find((c: any[]) => c[1][0] === "envelope");
+      expect(commandCall![1]).not.toContain("--output");
+    });
+
+    it("passes --output json flag on himalaya v1.x", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "[]" });
       const client = new HimalayaClient();
       await client.exec(["envelope", "list"]);
 
@@ -72,6 +145,35 @@ describe("HimalayaClient", () => {
         expect.arrayContaining(["--output", "json"]),
         expect.any(Object),
       );
+      const commandCall = mockExecFileAsync.mock.calls.find((c: any[]) => c[1][0] === "envelope");
+      expect(commandCall![1]).not.toContain("--json");
+    });
+
+    it("shells out to --version at most once per client instance across multiple exec() calls", async () => {
+      configureMock({ stdout: "[]" });
+      const client = new HimalayaClient();
+      await client.exec(["envelope", "list"]);
+      await client.exec(["account", "list"]);
+      await client.exec(["envelope", "list"]);
+
+      const versionCalls = mockExecFileAsync.mock.calls.filter((c: any[]) => c[1].length === 1 && c[1][0] === "--version");
+      expect(versionCalls).toHaveLength(1);
+    });
+
+    it("throws himalaya_version_undetected (not retried) when --version is unparseable", async () => {
+      configureMock({ version: "himalaya (git rev unknown)" });
+      const client = new HimalayaClient({ retryBackoffMs: 0 });
+
+      try {
+        await client.exec(["envelope", "list"]);
+        throw new Error("expected to throw");
+      } catch (e) {
+        expect(e).toBeInstanceOf(HimalayaError);
+        expect((e as HimalayaError).envelope.code).toBe("himalaya_version_undetected");
+      }
+      // Only the single --version probe call, never a retried second probe
+      // and never the real command (which never got to run).
+      expect(mockExecFileAsync).toHaveBeenCalledTimes(1);
     });
 
     it("passes --account flag when set", async () => {
@@ -221,8 +323,20 @@ describe("HimalayaClient", () => {
       expect(args).not.toContain("--html");
     });
 
-    it("listFolders calls folder list", async () => {
-      setupMock("[]");
+    it("listFolders calls mailbox list on himalaya v2", async () => {
+      configureMock({ version: V2_VERSION_STDOUT, stdout: "[]" });
+      const client = new HimalayaClient();
+      await client.listFolders();
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["mailbox", "list"]),
+        expect.any(Object),
+      );
+    });
+
+    it("listFolders calls folder list on himalaya v1.x", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "[]" });
       const client = new HimalayaClient();
       await client.listFolders();
 
@@ -232,6 +346,170 @@ describe("HimalayaClient", () => {
         expect.any(Object),
       );
     });
+  });
+
+  describe("sendTemplate dual-syntax (spawn path, not exec())", () => {
+    it("passes --json flag on himalaya v2", async () => {
+      configureMock({ version: V2_VERSION_STDOUT });
+      mockSpawn.mockImplementation(() => fakeChildProcess(0, "ok"));
+      const client = new HimalayaClient();
+
+      await client.sendTemplate("From: a@b.com\n\nhi");
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["template", "send", "--json"]),
+        expect.any(Object),
+      );
+      const spawnArgs = mockSpawn.mock.calls[0][1] as string[];
+      expect(spawnArgs).not.toContain("--output");
+    });
+
+    it("passes --output json flag on himalaya v1.x", async () => {
+      configureMock({ version: V1_VERSION_STDOUT });
+      mockSpawn.mockImplementation(() => fakeChildProcess(0, "ok"));
+      const client = new HimalayaClient();
+
+      await client.sendTemplate("From: a@b.com\n\nhi");
+
+      expect(mockSpawn).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["template", "send", "--output", "json"]),
+        expect.any(Object),
+      );
+    });
+  });
+
+  describe("createFolder / deleteFolder dual-path (v2: imap create/delete)", () => {
+    it("v1.x: createFolder calls folder create", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "ok" });
+      const client = new HimalayaClient();
+      await client.createFolder("Archive");
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["folder", "create", "Archive"]),
+        expect.any(Object),
+      );
+    });
+
+    it("v1.x: deleteFolder calls folder delete --yes", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "ok" });
+      const client = new HimalayaClient();
+      await client.deleteFolder("Archive");
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["folder", "delete", "--yes", "Archive"]),
+        expect.any(Object),
+      );
+    });
+
+    it("v2 + confirmed IMAP account: createFolder calls imap create", async () => {
+      configureMock({
+        version: V2_VERSION_STDOUT,
+        accounts: JSON.stringify({ accounts: [{ name: "default", default: true, backends: ["imap"] }] }),
+        stdout: "Mailbox successfully created",
+      });
+      const client = new HimalayaClient();
+      await client.createFolder("Archive");
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["imap", "create", "Archive"]),
+        expect.any(Object),
+      );
+    });
+
+    it("v2 + confirmed IMAP account: deleteFolder calls imap delete", async () => {
+      configureMock({
+        version: V2_VERSION_STDOUT,
+        accounts: JSON.stringify({ accounts: [{ name: "default", default: true, backends: ["imap"] }] }),
+        stdout: "Mailbox successfully deleted",
+      });
+      const client = new HimalayaClient();
+      await client.deleteFolder("Archive");
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["imap", "delete", "Archive"]),
+        expect.any(Object),
+      );
+    });
+
+    it("v2 + non-IMAP backend: fails closed with unsupported_backend, never calls imap create", async () => {
+      configureMock({
+        version: V2_VERSION_STDOUT,
+        accounts: JSON.stringify({ accounts: [{ name: "default", default: true, backends: ["jmap", "smtp"] }] }),
+      });
+      const client = new HimalayaClient();
+
+      try {
+        await client.createFolder("Archive");
+        throw new Error("expected to throw");
+      } catch (e) {
+        expect(e).toBeInstanceOf(HimalayaError);
+        expect((e as HimalayaError).envelope.code).toBe("unsupported_backend");
+      }
+      const imapCall = mockExecFileAsync.mock.calls.find((c: any[]) => c[1][0] === "imap");
+      expect(imapCall).toBeUndefined();
+    });
+
+    it("v2 + missing backends field: fails closed with unsupported_backend, never calls imap create", async () => {
+      configureMock({
+        version: V2_VERSION_STDOUT,
+        accounts: JSON.stringify({ accounts: [{ name: "default", default: true }] }),
+      });
+      const client = new HimalayaClient();
+
+      try {
+        await client.createFolder("Archive");
+        throw new Error("expected to throw");
+      } catch (e) {
+        expect(e).toBeInstanceOf(HimalayaError);
+        expect((e as HimalayaError).envelope.code).toBe("unsupported_backend");
+      }
+      const imapCall = mockExecFileAsync.mock.calls.find((c: any[]) => c[1][0] === "imap");
+      expect(imapCall).toBeUndefined();
+    });
+
+    it("v2 + empty (malformed) backends array: fails closed with unsupported_backend, never calls imap create", async () => {
+      configureMock({
+        version: V2_VERSION_STDOUT,
+        accounts: JSON.stringify({ accounts: [{ name: "default", default: true, backends: [] }] }),
+      });
+      const client = new HimalayaClient();
+
+      try {
+        await client.createFolder("Archive");
+        throw new Error("expected to throw");
+      } catch (e) {
+        expect(e).toBeInstanceOf(HimalayaError);
+        expect((e as HimalayaError).envelope.code).toBe("unsupported_backend");
+      }
+      const imapCall = mockExecFileAsync.mock.calls.find((c: any[]) => c[1][0] === "imap");
+      expect(imapCall).toBeUndefined();
+    });
+
+    it.each(["Archive/Nested", "#shared/mailbox", ".hidden"])(
+      "v2 + confirmed IMAP account: rejects namespace-unsafe name %s before any subprocess call beyond version detection",
+      async (unsafeName) => {
+        configureMock({
+          version: V2_VERSION_STDOUT,
+          accounts: JSON.stringify({ accounts: [{ name: "default", default: true, backends: ["imap"] }] }),
+        });
+        const client = new HimalayaClient();
+
+        await expect(client.createFolder(unsafeName)).rejects.toThrow(/namespace-hierarchy character/);
+
+        // Only the --version probe ran; neither account list nor imap create
+        // was reached, since the namespace check runs before both.
+        const nonVersionCalls = mockExecFileAsync.mock.calls.filter(
+          (c: any[]) => !(c[1].length === 1 && c[1][0] === "--version"),
+        );
+        expect(nonVersionCalls).toHaveLength(0);
+      },
+    );
   });
 
   describe("flag-injection guard", () => {
@@ -310,7 +588,9 @@ describe("HimalayaClient", () => {
       const client = new HimalayaClient();
       await client.searchEnvelopes("subject    invoice", "INBOX");
 
-      const call = mockExecFileAsync.mock.calls[0];
+      const call = mockExecFileAsync.mock.calls.find(
+        (c) => (c[1] as string[])[0] === "envelope",
+      );
       const argv = call?.[1] as string[];
       expect(argv.filter((a) => a === "")).toHaveLength(0);
       expect(argv).toContain("subject");
@@ -327,25 +607,31 @@ describe("HimalayaClient", () => {
 });
 
 describe("stderr surfaced on empty stdout", () => {
+  const VERSION_STDOUT = { stdout: V2_VERSION_STDOUT, stderr: "" };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("throws HimalayaError with stderr content when stdout is empty", async () => {
-    mockExecFileAsync.mockResolvedValue({
-      stdout: "",
-      stderr: "Error: cannot parse search emails query `toilet`",
-    });
+    mockExecFileAsync
+      .mockResolvedValueOnce(VERSION_STDOUT)
+      .mockResolvedValue({
+        stdout: "",
+        stderr: "Error: cannot parse search emails query `toilet`",
+      });
     const client = new HimalayaClient({ retryBackoffMs: 0 });
 
     await expect(client.exec(["envelope", "list"])).rejects.toThrow(HimalayaError);
   });
 
   it("ignores stderr when stdout has valid content", async () => {
-    mockExecFileAsync.mockResolvedValue({
-      stdout: '[{"id":"1","subject":"test"}]',
-      stderr: "WARN imap_codec::response: Rectified missing text",
-    });
+    mockExecFileAsync
+      .mockResolvedValueOnce(VERSION_STDOUT)
+      .mockResolvedValue({
+        stdout: '[{"id":"1","subject":"test"}]',
+        stderr: "WARN imap_codec::response: Rectified missing text",
+      });
     const client = new HimalayaClient();
 
     const result = await client.exec(["envelope", "list"]);
@@ -353,7 +639,9 @@ describe("stderr surfaced on empty stdout", () => {
   });
 
   it("returns empty stdout when both stdout and stderr are empty", async () => {
-    mockExecFileAsync.mockResolvedValue({ stdout: "[]", stderr: "WARN some harmless warning" });
+    mockExecFileAsync
+      .mockResolvedValueOnce(VERSION_STDOUT)
+      .mockResolvedValue({ stdout: "[]", stderr: "WARN some harmless warning" });
     const client = new HimalayaClient();
 
     await expect(client.exec(["envelope", "list"])).resolves.toBe("[]");

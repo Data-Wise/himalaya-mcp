@@ -15,6 +15,8 @@ export type MCPErrorCode =
   | "message_not_found"
   | "himalaya_not_installed"
   | "himalaya_config_missing"
+  | "himalaya_version_undetected"
+  | "unsupported_backend"
   | "parse_error"
   | "transient"
   | "unknown";
@@ -126,6 +128,37 @@ export function parseError(detail: string, account?: string): HimalayaError {
     code: "parse_error",
     message: `himalaya output failed to parse: ${detail}`,
     hint: "This usually indicates a himalaya version mismatch or corrupt response. Run: himalaya --version",
+    account,
+    recoverable: false,
+  });
+}
+
+/**
+ * Build a HimalayaError for a failed/timed-out/unparseable `himalaya --version`
+ * probe. Distinct from "himalaya_not_installed" (binary missing entirely) and
+ * from a generic "unknown" exec failure — the caller needs to know version
+ * detection itself failed, not that a real command failed.
+ */
+export function versionDetectionError(detail: string): HimalayaError {
+  return new HimalayaError({
+    code: "himalaya_version_undetected",
+    message: `Could not detect himalaya CLI version: ${detail}`,
+    hint: "Run: himalaya --version. If it hangs or errors, reinstall: brew reinstall himalaya",
+    recoverable: false,
+  });
+}
+
+/**
+ * Build a HimalayaError for an operation (e.g. folder create/delete) that has
+ * no implementation for the account's backend. Raised client-side, pre-flight
+ * — before any subprocess is spawned — so it never risks being classified as
+ * a "transient" stderr pattern and retried.
+ */
+export function unsupportedBackendError(operation: string, account?: string): HimalayaError {
+  return new HimalayaError({
+    code: "unsupported_backend",
+    message: `${operation} is not supported for this account's backend.`,
+    hint: "This operation currently requires an IMAP-backed account.",
     account,
     recoverable: false,
   });

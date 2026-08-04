@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.2] - 2026-08-04
+
+### Fixed
+
+- Support both himalaya CLI v1.x and v2.x — auto-detect the installed CLI's major version and branch every affected call site (`--output json` vs `--json`, `folder` vs `mailbox` subcommand) accordingly, so the same install works against either CLI generation.
+- `create_folder`/`delete_folder` on himalaya v2 now shell out to `imap create`/`imap delete` directly (v2 dropped `folder create`/`delete` from the shared API), gated by a fail-closed IMAP-backend check and a namespace-hierarchy safety check on the folder name.
+- Resolved 3 high/moderate-severity transitive dependency vulnerabilities (`fast-uri`, `hono`, `ip-address`) flagged by `npm audit`.
+
 ## [2.0.1] - 2026-08-02
 
 ### Fixed

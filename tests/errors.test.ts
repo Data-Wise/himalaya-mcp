@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { classifyStderr, type MCPErrorCode } from "../src/himalaya/errors";
+import {
+  classifyStderr,
+  versionDetectionError,
+  unsupportedBackendError,
+  HimalayaError,
+  type MCPErrorCode,
+} from "../src/himalaya/errors";
 
 describe("classifyStderr", () => {
   const cases: Array<[string, MCPErrorCode]> = [
@@ -71,11 +77,40 @@ describe("classifyStderr", () => {
         himalaya_config_missing: "Cannot find config",
         imap_connection_failed: "x",
         unknown: "x",
+        // Not stderr-classified -- raised client-side pre-flight only
+        // (see versionDetectionError/unsupportedBackendError below).
+        himalaya_version_undetected: "x",
+        unsupported_backend: "x",
       };
       const env = classifyStderr(stderrSamples[code]);
       if (env.code === code) {
         expect(env.hint).toBeTruthy();
       }
     }
+  });
+});
+
+describe("versionDetectionError", () => {
+  it("returns a HimalayaError with code himalaya_version_undetected, not recoverable", () => {
+    const err = versionDetectionError("Command timed out");
+    expect(err).toBeInstanceOf(HimalayaError);
+    expect(err.envelope.code).toBe("himalaya_version_undetected");
+    expect(err.envelope.recoverable).toBe(false);
+    expect(err.envelope.message).toContain("Command timed out");
+  });
+});
+
+describe("unsupportedBackendError", () => {
+  it("returns a HimalayaError with code unsupported_backend, not recoverable", () => {
+    const err = unsupportedBackendError("create_folder", "personal");
+    expect(err).toBeInstanceOf(HimalayaError);
+    expect(err.envelope.code).toBe("unsupported_backend");
+    expect(err.envelope.recoverable).toBe(false);
+    expect(err.envelope.account).toBe("personal");
+  });
+
+  it("message never matches the transient retry-classification pattern", () => {
+    const err = unsupportedBackendError("delete_folder");
+    expect(/ECONNRESET|ETIMEDOUT|\* BYE/i.test(err.envelope.message)).toBe(false);
   });
 });

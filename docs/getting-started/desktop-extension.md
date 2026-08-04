@@ -21,8 +21,11 @@ Use himalaya-mcp as a Desktop Extension to read, triage, and manage email direct
 Verify himalaya works from your terminal first:
 
 ```bash
-himalaya envelope list --output json
+himalaya envelope list --json
 ```
+
+(himalaya v1.x: use `himalaya envelope list --output json` instead — himalaya-mcp detects and
+supports both CLI generations automatically.)
 
 ## Step 1: Install the Extension
 

@@ -22,8 +22,8 @@ following the same pattern this ecosystem already trusts for Homebrew releases.
 This isn't new tooling — it's assembly of tooling craft already built. `verify-surfaces.sh`
 already has a name-mismatch check (`resolve_aggregator()`, added specifically after
 himalaya-mcp#67: *"a wrong name in the aggregator is as bad as wrong version"*), but nothing
-invokes it — himalaya-mcp's own workflow bypasses it entirely and hardcodes
-`PLUGIN_NAME: "email"` as a manually-maintained YAML comment. The reusable workflow should (a)
+invokes it — himalaya-mcp's own workflow previously bypassed it entirely and hardcoded
+`PLUGIN_NAME` as a manually-maintained YAML constant. The reusable workflow should (a)
 derive the plugin name from `plugin.json` at runtime instead of a hardcoded constant, and (b)
 actually call `verify-surfaces.sh --aggregator-file` so the existing BLOCK check fires.
 

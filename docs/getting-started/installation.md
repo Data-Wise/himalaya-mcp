@@ -15,10 +15,15 @@
 ### Verify himalaya works
 
 ```bash
-himalaya --output json envelope list
+himalaya envelope list --json
 ```
 
 This should print JSON envelopes from your default account. If it fails, check the [himalaya docs](https://github.com/pimalaya/himalaya) for account setup.
+
+!!! note "himalaya v1.x"
+    himalaya-mcp supports both current himalaya (v2.x, `--json`) and himalaya v1.x
+    (`--output json`) — it detects the installed CLI's version automatically. If
+    `himalaya --version` reports a v1.x release, use `himalaya --output json envelope list` instead.
 
 ## Install Methods
 
@@ -148,7 +153,7 @@ If you have himalaya-mcp installed (Homebrew or source), you can install the ext
 
 ```bash
 npm run build:mcpb                                     # Build .mcpb (dev only)
-himalaya-mcp install-ext himalaya-mcp-v2.0.1.mcpb      # Install from file
+himalaya-mcp install-ext himalaya-mcp-v2.0.2.mcpb      # Install from file
 himalaya-mcp install-ext                                # Auto-find in project root
 himalaya-mcp remove-ext                                 # Uninstall extension
 ```
