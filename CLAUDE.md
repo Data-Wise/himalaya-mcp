@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 2.0.1
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 619 tests)
+- **Version:** 2.0.2
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 666 tests)
 
 ### What It Does
 
@@ -251,7 +251,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (619 tests across 33 test files)
+npm test                         # Run vitest (666 tests across 36 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~883KB)
 node dist/index.js               # Run MCP server directly
 ```

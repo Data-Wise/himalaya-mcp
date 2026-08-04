@@ -3,9 +3,9 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: released, critical bug found post-release
-## Focus: fix himalaya CLI v2.0.0 incompatibility (every MCP tool call broken on current Homebrew stable) — implemented in worktree, awaiting npm test run + PR
-## Phase: Maintenance (bug-fix implemented, T9 verification pending)
+## Status: v2.0.2 release in progress (dev→main PR pending)
+## Focus: himalaya CLI v2.0.0 incompatibility fix merged to dev; releasing as v2.0.2
+## Phase: Maintenance (fix merged, release PR pending)
 ## Priority: 1
 ## Progress: 100
 
@@ -141,18 +141,20 @@
 
 ## Current State
 
-- Branch: `dev` @ `6d20421` (`origin/dev`, `origin/main`) after the v2.0.1 release and release
-  automation follow-up merges. Working tree has post-release docs-audit updates in progress plus
-  intentionally uncommitted local `CLAUDE.md` and `AGENTS.md` edits.
-- Version: 2.0.1 is released. GitHub Release v2.0.1, Homebrew tap, and aggregator marketplace are
-  all updated.
+- Branch: `dev` @ `d09e3b9` (`origin/dev`) — PR #118 (himalaya CLI v1.x/v2.x compat) and PR #119
+  (npm audit fix) both merged (squash). Version bump to 2.0.2 in progress on `dev`, release PR to
+  `main` not yet opened.
+- Version: 2.0.1 released to `main`/Homebrew/marketplace; 2.0.2 (this bump) not yet released.
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 619 tests across 33 test files. Full release suite passed during the v2.0.1 release; main
-  and dev CI passed after the final automation follow-up.
+- Tests: 666 tests across 36 test files (up from 619/33 — PR #118 added cli-version.ts +
+  4 new test files). Docker-isolated full run on merged `dev`: 666/666 pass, exit 0.
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
-- Homebrew: data-wise/tap/himalaya-mcp — updated to v2.0.1 via homebrew-tap#202
-- Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/
-- Bundle: ~906KB after sender/config fixes (esbuild), .mcpb: ~252KB
+- Homebrew: data-wise/tap/himalaya-mcp — still pinned to v2.0.0 in the formula `url`
+  (v2.0.1 never triggered a formula content update per the tap repo check); will update via
+  `homebrew-release.yml` after the v2.0.2 GitHub Release publishes — verify post-release.
+- Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/ (still reflects 2.0.1 content
+  until this release's docs-site deploy runs)
+- Bundle: ~906KB (esbuild), .mcpb: ~252KB
 - Open PRs: #79 is superseded by merged #108. #82 (HTML compose_email) remains blocked by
   manifest drift; #97 (TypeScript 7 bump) remains deferred.
 
@@ -206,23 +208,45 @@ himalaya-mcp doctor --fix
   per the vitest process-leak issue (see Testing note below).
 - 2026-08-03: Diagnosed the recurring vitest process-leak (Codex rescue research,
   `feedback_no_vitest_direct.md` in memory) — a harness Bash-timeout/vitest-SIGTERM interaction,
-  not a vitest bug or project misconfig. Documented a safe invocation pattern (unverified by an
-  actual run) in `CLAUDE.md`/`AGENTS.md`'s Testing section.
+  not a vitest bug or project misconfig. Adopted Docker (bind-mounted worktree + named
+  `node_modules` volume, `--rm`) as the standing T9 verification method — leaked fork-pool
+  workers die with the container instead of the host.
+- 2026-08-03/04: Ran T9 (full suite) via Docker — first pass surfaced 48 failures (fake-himalaya
+  E2E fixtures not answering the new `--version` probe), then 25 (mocked `execFileAsync`/`spawn`
+  in `retry.test.ts`/`manage.test.ts`/`dogfood-reliability.test.ts`/`client.test.ts` not
+  accounting for the extra probe call), then found and fixed 2 real test-fixture bugs: a JS
+  `.replace()` pattern-string `$1` collision that corrupted `spawnHarnessWithFakeHimalaya`'s
+  version guard, and a `fakeChildProcess()` construction-time-vs-call-time race in the new
+  `sendTemplate` spawn tests. Final: 666/666 tests, 36/36 files, exit 0. Full detail in
+  `tasks/todo.md` T9. Committed, pushed, PR #118 → `dev` opened.
+- 2026-08-04: PR #118's `test` CI check failed on `npm audit --audit-level=high` — 3 pre-existing
+  high/moderate transitive-dep vulnerabilities (`fast-uri`, `hono`, `ip-address`), confirmed also
+  failing on `dev`'s own latest CI run (not a regression from #118). Fixed in a separate PR #119
+  (`npm audit fix`, lockfile-only, 0 vulnerabilities, 619/619 tests via Docker) to keep #118's
+  diff clean. Both PRs code-reviewed, CI verified green, merged (squash) to `dev` in order:
+  #119 (`60af03f`) then #118 rebased onto it and merged (`4adacf6`). Local `dev` had a stray
+  unpushed commit (`c429bc1`, docs-only) reconciled via merge (`d09e3b9`) — origin/dev and local
+  dev now match.
+- 2026-08-04: Began v2.0.2 (patch) release — version bump across `package.json`,
+  `package-lock.json`, `.claude-plugin/marketplace.json`, `mcpb/manifest.json`,
+  `himalaya-mcp-plugin/.claude-plugin/plugin.json`, `src/index.ts` `VERSION`,
+  `tests/e2e.test.ts` serverInfo assertion, `CLAUDE.md`/`AGENTS.md` (version + 666-test count),
+  `CHANGELOG.md`. Homebrew formula left to the automated `homebrew-release.yml` workflow
+  post-release (not hand-edited) — formula `url` is currently still pinned to v2.0.0, needs
+  verification after this release publishes.
 
 ## Next Action
 
-- **Start here:** run `npm test` in `~/.git-worktrees/himalaya-mcp/feature-cli-v2-compat`
-  (Recommended — the last blocker on the CLI-compat fix) and report pass/fail counts. See
-  `CLAUDE.md`'s Testing section for the safe-invocation command if running via an agent's Bash
-  tool rather than directly.
-- Then: review the uncommitted worktree diff, commit to `feature/himalaya-cli-v2-compat`, and
-  open a PR to `dev` (`tasks/todo.md` tracks remaining T9 sub-items).
-- **Also pending on `dev`:** `AGENTS.md`/`CLAUDE.md` version-sync (2.0.0→2.0.1) already landed in
-  commit `df7030a` — no longer pending.
-- **Resume context for /recap:** v2.0.1 itself is fully released and downstream surfaces are
-  updated (GitHub Release, `.mcpb` asset, `main`, `dev`, Homebrew tap, aggregator marketplace) —
-  the critical bug above was found *after* that release, doesn't block it, and doesn't need a
-  release revert.
+- **Start here (Recommended):** commit the v2.0.2 version bump, push to `dev`, open the
+  `dev`→`main` release PR, watch CI, merge on green (ask before merging, per standing protocol),
+  then `gh release create v2.0.2`.
+- **After the GitHub Release publishes:** verify the `homebrew-release.yml` workflow actually
+  updates `data-wise/tap/Formula/himalaya-mcp.rb`'s `url`/`sha256` — the formula is currently
+  still pinned to v2.0.0 (last observed 2026-08-04), so this needs explicit confirmation rather
+  than an assumption that it "just works" this time.
+- **Docs site:** confirm the mkdocs deploy picks up 2.0.2 (`docs.yml` triggers on push to `main`)
+  and the live badge matches — see `homebrew-release.yml`/docs-deploy notes in the global
+  `craft:release` skill reference for the anchored-version-grep gotcha if checking manually.
 - **Pending:** PR #82 (HTML compose_email, base=main) — BLOCKED: its `mcpb/manifest.json`
   diff deletes 8 tools + 1 prompt (stale-drift against an old base). Needs a rebase + manifest
   restoration, and the SKILL.md text must be reconciled with the HTML-only (no text/plain
@@ -246,9 +270,7 @@ himalaya-mcp doctor --fix
 
 ---
 
-**Last Updated:** 2026-08-03
-**Status:** v2.0.1 released and downstream release surfaces updated. Critical post-release bug
-(himalaya v2.0.0 CLI incompatibility) implemented in worktree `feature/himalaya-cli-v2-compat`
-(T1–T8 done, uncommitted) — T9 (`npm test`) needs the user to run per the diagnosed vitest
-process-leak issue (`feedback_no_vitest_direct.md`, safe-invocation command in CLAUDE.md's
-Testing section). Open: #82 (BLOCKED manifest regression), #97 (TS7 deferred).
+**Last Updated:** 2026-08-04
+**Status:** himalaya CLI v1.x/v2.x compat fix (PR #118) and npm audit fix (PR #119) merged to
+`dev`. v2.0.2 patch-release version bump in progress; `dev`→`main` release PR not yet opened.
+Open: #82 (BLOCKED manifest regression), #97 (TS7 deferred).
