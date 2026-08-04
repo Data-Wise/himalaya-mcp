@@ -345,6 +345,12 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
   }, 10_000);
 
+  // Homebrew-libexec fallback (marketplace.json when package.json is absent)
+  // is covered by tests/get-version.test.ts as a pure unit test — a prior
+  // version of this test spawned a real subprocess against a copy of dist/,
+  // which raced tests/e2e.test.ts's beforeAll `npm run build` under vitest's
+  // default cross-file parallelism and flaked once in full-suite runs.
+
   it("unknown command writes to stderr and exits 1", async () => {
     let exitCode = 0;
     let stdout = "";

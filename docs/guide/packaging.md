@@ -23,7 +23,7 @@ flowchart TD
     BUNDLE --> HB["`**Homebrew**
     brew install himalaya-mcp`"]
     BUNDLE --> MCPB["`**.mcpb Extension**
-    ~151KB ZIP archive`"]
+    ~253KB ZIP archive`"]
     BUNDLE --> GH["`**GitHub Marketplace**
     claude plugin marketplace add`"]
     BUNDLE --> DEV["`**Source Install**
@@ -182,13 +182,13 @@ claude plugin install himalaya
 
 ## .mcpb Desktop Extension
 
-The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a lightweight ZIP archive (~151 KB) containing the esbuild bundle and a `manifest.json` descriptor.
+The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a lightweight ZIP archive (~253 KB) containing the esbuild bundle and a `manifest.json` descriptor.
 
 ### Build
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v2.0.2.mcpb (151 KB)
+# Output: himalaya-mcp-v2.0.2.mcpb (253 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:

@@ -39,7 +39,7 @@ brew install himalaya-mcp
 **What happens automatically:**
 
 1. Installs himalaya CLI + Node.js as dependencies
-2. Builds the esbuild bundle (~883KB, no node_modules shipped)
+2. Builds the esbuild bundle (~908KB, no node_modules shipped)
 3. Symlinks plugin to `~/.claude/plugins/himalaya-mcp`
 4. Registers in local marketplace
 5. Auto-runs install script (enables in Claude Code settings if Claude not running)
@@ -132,7 +132,7 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 
 ### Option A: .mcpb Package (one-click)
 
-Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` is a lightweight (~151 KB) package that bundles the MCP server and configures it automatically.
+Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.com/Data-Wise/himalaya-mcp/releases) and double-click to install in Claude Desktop. The `.mcpb` is a lightweight (~253 KB) package that bundles the MCP server and configures it automatically.
 
 !!! warning "Prerequisites"
     The `.mcpb` package does **not** bundle the himalaya CLI. You must install it separately:
@@ -224,7 +224,7 @@ himalaya-mcp doctor
 # Auto-fix common issues
 himalaya-mcp doctor --fix
 
-# Run tests (619 tests)
+# Run tests (666 tests)
 npm test
 
 # Check Claude Desktop config (legacy)
