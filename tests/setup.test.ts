@@ -253,7 +253,7 @@ describe("CLI setup: remove command", () => {
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { mkdtemp, rm, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, readFile, writeFile, cp, realpath } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { accessSync } from "node:fs";
 
@@ -343,6 +343,45 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
       { cwd: PROJECT_ROOT }
     );
     expect(stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
+  }, 10_000);
+
+  it("--version resolves from marketplace.json when package.json is absent (Homebrew libexec layout)", async () => {
+    // The Homebrew formula's `install` block copies dist/, .claude-plugin/, agents/,
+    // man/, and skills/ into libexec/ -- but never package.json. Reproduce that
+    // exact layout in a temp dir so this test fails the way `himalaya-mcp --version`
+    // failed in production (printing "unknown") if getVersion()'s fallback regresses.
+    //
+    // realpath() the tempdir before spawning: on macOS, os.tmpdir() resolves under
+    // /tmp, a symlink to /private/tmp. The CLI's own isMain() guard compares
+    // import.meta.url (always symlink-resolved by Node) against process.argv[1]
+    // (whatever path form we pass in) -- an unresolved /tmp/... path mismatches
+    // and silently skips running the CLI entirely (empty stdout, exit 0). Passing
+    // the already-resolved path sidesteps that, matching how the real Homebrew
+    // install path (/opt/homebrew/opt/...) is never itself a symlinked tmpdir.
+    const rawFakeRoot = await mkdtemp(join(tmpdir(), "himalaya-mcp-libexec-"));
+    const fakeRoot = await realpath(rawFakeRoot);
+    try {
+      await cp(join(PROJECT_ROOT, "dist"), join(fakeRoot, "dist"), { recursive: true });
+      await mkdir(join(fakeRoot, ".claude-plugin"), { recursive: true });
+
+      const pkg = JSON.parse(await readFile(join(PROJECT_ROOT, "package.json"), "utf-8"));
+      await writeFile(
+        join(fakeRoot, ".claude-plugin", "marketplace.json"),
+        JSON.stringify({ name: "himalaya-mcp", version: pkg.version }),
+      );
+      // Deliberately no package.json anywhere under fakeRoot.
+
+      const { stdout, stderr } = await execFileAsync(
+        "node",
+        [join(fakeRoot, "dist", "cli", "index.js"), "--version"],
+        { cwd: fakeRoot },
+      );
+      expect(stdout.trim()).toBe(pkg.version);
+      expect(stdout.trim()).not.toBe("unknown");
+      expect(stderr).toBe("");
+    } finally {
+      await rm(rawFakeRoot, { recursive: true, force: true });
+    }
   }, 10_000);
 
   it("unknown command writes to stderr and exits 1", async () => {
