@@ -283,7 +283,7 @@ src/index.ts (16 source files)
     │
     ├── mcpb validate mcpb/     →  Schema check
     │
-    └── mcpb pack mcpb/         →  himalaya-mcp-v2.0.2.mcpb (151 KB)
+    └── mcpb pack mcpb/         →  himalaya-mcp-v2.0.2.mcpb (253 KB)
 ```
 
 Run: `npm run build:mcpb`
@@ -294,7 +294,7 @@ Run: `npm run build:mcpb`
 |------|------|---------|
 | `manifest.json` | 6.3 KB | Extension descriptor |
 | `dist/index.js` | 604.3 KB | esbuild bundle (all deps inlined) |
-| **Total (compressed)** | **~151 KB** | ZIP archive |
+| **Total (compressed)** | **~253 KB** | ZIP archive |
 
 ## Signing
 

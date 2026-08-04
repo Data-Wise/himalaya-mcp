@@ -252,7 +252,7 @@ npm run build
 
 ```bash
 npm test                         # Run vitest (666 tests across 36 test files)
-npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~883KB)
+npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~908KB)
 node dist/index.js               # Run MCP server directly
 ```
 
