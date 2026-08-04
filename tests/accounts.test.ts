@@ -12,7 +12,7 @@ vi.mock("node:child_process", async () => {
 });
 
 import { execFile } from "node:child_process";
-import { listAccounts, getDefaultAccount } from "../src/himalaya/accounts";
+import { listAccounts, getDefaultAccount, isImapAccount } from "../src/himalaya/accounts";
 import { HimalayaError } from "../src/himalaya/errors";
 
 const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
@@ -36,12 +36,12 @@ describe("accounts", () => {
     const accounts = await listAccounts();
     expect(mockExecFileAsync).toHaveBeenCalledWith("himalaya", ["account", "list", "--json"], { timeout: 15_000 });
     expect(accounts).toEqual([
-      { name: "unm", isDefault: true },
-      { name: "personal", isDefault: false },
+      { name: "unm", isDefault: true, backends: ["imap", "smtp"] },
+      { name: "personal", isDefault: false, backends: ["imap"] },
     ]);
   });
 
-  it("listAccounts accepts legacy bare-array JSON output", async () => {
+  it("listAccounts accepts legacy bare-array JSON output with singular `backend`", async () => {
     mockExecFileAsync.mockResolvedValue({
       stdout: JSON.stringify([
         { name: "unm", default: true, backend: "imap" },
@@ -49,7 +49,25 @@ describe("accounts", () => {
       stderr: "",
     });
 
-    expect(await listAccounts()).toEqual([{ name: "unm", isDefault: true }]);
+    expect(await listAccounts()).toEqual([{ name: "unm", isDefault: true, backends: ["imap"] }]);
+  });
+
+  it("listAccounts leaves backends undefined when neither backend nor backends is present", async () => {
+    mockExecFileAsync.mockResolvedValue({
+      stdout: JSON.stringify([{ name: "unm", default: true }]),
+      stderr: "",
+    });
+
+    expect(await listAccounts()).toEqual([{ name: "unm", isDefault: true, backends: undefined }]);
+  });
+
+  it("listAccounts leaves backends undefined for an empty backends array", async () => {
+    mockExecFileAsync.mockResolvedValue({
+      stdout: JSON.stringify([{ name: "unm", default: true, backends: [] }]),
+      stderr: "",
+    });
+
+    expect(await listAccounts()).toEqual([{ name: "unm", isDefault: true, backends: undefined }]);
   });
 
   it("listAccounts returns empty array when himalaya has no configured accounts", async () => {
@@ -103,5 +121,23 @@ describe("accounts", () => {
       expect(e).toBeInstanceOf(HimalayaError);
       expect((e as HimalayaError).envelope.code).toBe("parse_error");
     }
+  });
+});
+
+describe("isImapAccount (fail-closed)", () => {
+  it("returns true when backends includes imap", () => {
+    expect(isImapAccount({ backends: ["imap", "smtp"] })).toBe(true);
+  });
+
+  it("returns false when backends is missing", () => {
+    expect(isImapAccount({ backends: undefined })).toBe(false);
+  });
+
+  it("returns false when backends is empty", () => {
+    expect(isImapAccount({ backends: [] })).toBe(false);
+  });
+
+  it("returns false when backends contains only non-imap entries", () => {
+    expect(isImapAccount({ backends: ["jmap", "smtp"] })).toBe(false);
   });
 });

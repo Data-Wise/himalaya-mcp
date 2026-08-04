@@ -16,7 +16,9 @@ import { execFile } from "node:child_process";
 const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
 
 function setupMock(stdout: string, stderr = "") {
-  mockExecFileAsync.mockResolvedValue({ stdout, stderr });
+  mockExecFileAsync
+    .mockResolvedValueOnce({ stdout: "himalaya v2.0.0 +gmail +imap", stderr: "" })
+    .mockResolvedValue({ stdout, stderr });
 }
 
 describe("Manage tools — client methods", () => {

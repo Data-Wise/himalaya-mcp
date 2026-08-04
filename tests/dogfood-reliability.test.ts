@@ -340,6 +340,10 @@ describe("dogfood: reliability scenarios", () => {
   // Plan: "via folders tool". Adapted: exercise the same classification
   // pipeline that the folders tool's createFolder/deleteFolder rely on.
   it("Scenario 13: folder ops with 'No such folder' → code=folder_not_found", async () => {
+    vi.spyOn(HimalayaClient.prototype as any, "resolveVersion").mockResolvedValue({
+      major: 1,
+      raw: "himalaya 1.1.0",
+    });
     vi.spyOn(HimalayaClient.prototype as any, "execOnce").mockRejectedValue(
       new HimalayaError(classifyStderr("No such folder: Archive", "unm")),
     );
@@ -500,6 +504,10 @@ describe("dogfood: reliability scenarios — exec call counts", () => {
 
   // ─── Scenario 15 ───────────────────────────────────────────────────────
   it("Scenario 15: AUTHENTICATIONFAILED → exactly 1 execFile call (no retry)", async () => {
+    vi.spyOn(HimalayaClient.prototype as any, "resolveVersion").mockResolvedValue({
+      major: 2,
+      raw: "himalaya v2.0.0",
+    });
     mockExecFileAsync.mockRejectedValue(
       Object.assign(new Error("exited 1"), {
         stderr: "AUTHENTICATIONFAILED for user@example.com",
@@ -521,6 +529,10 @@ describe("dogfood: reliability scenarios — exec call counts", () => {
 
   // ─── Scenario 16 ───────────────────────────────────────────────────────
   it("Scenario 16: persistent ECONNRESET → exactly 2 execFile calls (retry fires)", async () => {
+    vi.spyOn(HimalayaClient.prototype as any, "resolveVersion").mockResolvedValue({
+      major: 2,
+      raw: "himalaya v2.0.0",
+    });
     mockExecFileAsync.mockRejectedValue(
       Object.assign(new Error("exited 1"), { stderr: "ECONNRESET" }),
     );
