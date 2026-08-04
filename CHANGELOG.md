@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.3] - 2026-08-04
+
+### Fixed
+
+- `himalaya-mcp --version` printed `unknown` on Homebrew installs — `getVersion()` only looked for `package.json`, which the formula's `install` block never copies into `libexec/`. Falls back to `.claude-plugin/marketplace.json`'s `version` field.
+- Removed a flaky test (a subprocess-spawning regression test that raced `tests/e2e.test.ts`'s `dist/` rebuild under vitest's default cross-file parallelism) in favor of a pure unit test with no shared-filesystem dependency; added `fileParallelism: false` to `vitest.config.ts` as defense in depth.
+
 ## [2.0.2] - 2026-08-04
 
 ### Fixed

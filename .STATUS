@@ -3,9 +3,9 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.0.2 release in progress (dev→main PR pending)
-## Focus: himalaya CLI v2.0.0 incompatibility fix merged to dev; releasing as v2.0.2
-## Phase: Maintenance (fix merged, release PR pending)
+## Status: v2.0.3 release in progress (version bump on dev, dev→main PR pending)
+## Focus: --version Homebrew-libexec bug fix (#122) + flaky-test elimination (#123) merged to dev; releasing as v2.0.3
+## Phase: Maintenance (fixes merged, release PR pending)
 ## Priority: 1
 ## Progress: 100
 
@@ -141,22 +141,22 @@
 
 ## Current State
 
-- Branch: `dev` @ `d09e3b9` (`origin/dev`) — PR #118 (himalaya CLI v1.x/v2.x compat) and PR #119
-  (npm audit fix) both merged (squash). Version bump to 2.0.2 in progress on `dev`, release PR to
-  `main` not yet opened.
-- Version: 2.0.1 released to `main`/Homebrew/marketplace; 2.0.2 (this bump) not yet released.
+- Branch: `dev` @ `8c6b231` (`origin/dev`) — PR #122 (`--version` Homebrew-libexec fix) and
+  PR #123 (flaky-test elimination) both merged (squash). Version bump to 2.0.3 in progress on
+  `dev`, release PR to `main` not yet opened.
+- Version: 2.0.2 released to `main`/Homebrew/marketplace; 2.0.3 (this bump) not yet released.
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 666 tests across 36 test files (up from 619/33 — PR #118 added cli-version.ts +
-  4 new test files). Docker-isolated full run on merged `dev`: 666/666 pass, exit 0.
+- Tests: 669 tests across 37 test files (up from 666/36 — PR #123 removed 1 flaky E2E test,
+  added `tests/get-version.test.ts` with 3 unit tests). Docker-isolated full run on merged
+  `dev` (`fileParallelism: false`, `--pool=threads`): 669/669 pass, exit 0, 787s.
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
-- Homebrew: data-wise/tap/himalaya-mcp — still pinned to v2.0.0 in the formula `url`
-  (v2.0.1 never triggered a formula content update per the tap repo check); will update via
-  `homebrew-release.yml` after the v2.0.2 GitHub Release publishes — verify post-release.
-- Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/ (still reflects 2.0.1 content
-  until this release's docs-site deploy runs)
-- Bundle: ~906KB (esbuild), .mcpb: ~252KB
+- Homebrew: data-wise/tap/himalaya-mcp — confirmed correctly updated through v2.0.2
+  (earlier "stuck on v2.0.0" claim was a stale local clone read, corrected 2026-08-04).
+- Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/, reflects 2.0.2 content.
+- Bundle: ~908KB (esbuild), .mcpb: ~253KB
 - Open PRs: #79 is superseded by merged #108. #82 (HTML compose_email) remains blocked by
-  manifest drift; #97 (TypeScript 7 bump) remains deferred.
+  manifest drift; #97 (TypeScript 7 bump) remains deferred. Issue #121 filed (not fixed):
+  `.mcpb` CI artifact-upload flake in `actions/upload-artifact@v7`.
 
 ## Install
 
@@ -227,26 +227,36 @@ himalaya-mcp doctor --fix
   #119 (`60af03f`) then #118 rebased onto it and merged (`4adacf6`). Local `dev` had a stray
   unpushed commit (`c429bc1`, docs-only) reconciled via merge (`d09e3b9`) — origin/dev and local
   dev now match.
-- 2026-08-04: Began v2.0.2 (patch) release — version bump across `package.json`,
+- 2026-08-04: Released v2.0.2 (PR #120 → `main`, `18c83ce`) — GitHub Release + `.mcpb` asset,
+  Homebrew/aggregator sync, docs deploy all independently verified against live sources
+  (not assumed). Filed issue #121 for the `.mcpb` CI artifact-upload flake (not fixed — a
+  manual asset upload covered the release). Fixed 12 files of stale docs (test counts,
+  bundle/`.mcpb` sizes).
+- 2026-08-04: Found and fixed a real `--version` bug affecting all Homebrew installs —
+  `getVersion()` only checked `package.json`, absent from the `libexec` install layout;
+  added a `.claude-plugin/marketplace.json` fallback + regression test. PR #122 merged to `dev`.
+- 2026-08-04: The PR #122 regression test (subprocess spawn copying `dist/`) flaked once in a
+  full-suite Docker pre-release verification run — raced `tests/e2e.test.ts`'s `beforeAll`
+  `npm run build` under vitest's default cross-file parallelism. Root-caused (not guessed),
+  replaced with a pure-unit-test version (`tests/get-version.test.ts`, mocks `node:fs`, no
+  shared-filesystem dependency) and added `fileParallelism: false` to `vitest.config.ts` as
+  defense in depth. PR #123 merged to `dev`, verified 669/669 tests green in Docker.
+- 2026-08-04: Began v2.0.3 (patch) release — version bump across `package.json`,
   `package-lock.json`, `.claude-plugin/marketplace.json`, `mcpb/manifest.json`,
   `himalaya-mcp-plugin/.claude-plugin/plugin.json`, `src/index.ts` `VERSION`,
-  `tests/e2e.test.ts` serverInfo assertion, `CLAUDE.md`/`AGENTS.md` (version + 666-test count),
-  `CHANGELOG.md`. Homebrew formula left to the automated `homebrew-release.yml` workflow
-  post-release (not hand-edited) — formula `url` is currently still pinned to v2.0.0, needs
-  verification after this release publishes.
+  `tests/e2e.test.ts` serverInfo assertion, `tests/v150-features.test.ts` version assertion,
+  `CLAUDE.md`/`AGENTS.md` (version), `CHANGELOG.md`.
 
 ## Next Action
 
-- **Start here (Recommended):** commit the v2.0.2 version bump, push to `dev`, open the
-  `dev`→`main` release PR, watch CI, merge on green (ask before merging, per standing protocol),
-  then `gh release create v2.0.2`.
-- **After the GitHub Release publishes:** verify the `homebrew-release.yml` workflow actually
-  updates `data-wise/tap/Formula/himalaya-mcp.rb`'s `url`/`sha256` — the formula is currently
-  still pinned to v2.0.0 (last observed 2026-08-04), so this needs explicit confirmation rather
-  than an assumption that it "just works" this time.
-- **Docs site:** confirm the mkdocs deploy picks up 2.0.2 (`docs.yml` triggers on push to `main`)
-  and the live badge matches — see `homebrew-release.yml`/docs-deploy notes in the global
-  `craft:release` skill reference for the anchored-version-grep gotcha if checking manually.
+- **Start here (Recommended):** commit the v2.0.3 version bump, verify via Docker, push to
+  `dev`, open the `dev`→`main` release PR, watch CI, merge on green (ask before merging, per
+  standing protocol), then `gh release create v2.0.3` with the `.mcpb` asset.
+- **After the GitHub Release publishes:** verify `homebrew-release.yml` updates
+  `data-wise/tap/Formula/himalaya-mcp.rb`'s `url`/`sha256`, and watch for issue #121's
+  `.mcpb` CI artifact-upload flake recurring (manual upload fallback if it does).
+- **Docs site:** confirm the mkdocs deploy picks up 2.0.3 (`docs.yml` triggers on push to `main`)
+  and the live badge matches.
 - **Pending:** PR #82 (HTML compose_email, base=main) — BLOCKED: its `mcpb/manifest.json`
   diff deletes 8 tools + 1 prompt (stale-drift against an old base). Needs a rebase + manifest
   restoration, and the SKILL.md text must be reconciled with the HTML-only (no text/plain
