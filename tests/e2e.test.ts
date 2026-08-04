@@ -60,6 +60,10 @@ let requestId = 0;
 async function createFakeHimalaya(dir: string) {
   const script = `#!/bin/bash
 # Fake himalaya for E2E tests — returns canned JSON based on subcommand
+if [ "$1" = "--version" ]; then
+  echo "himalaya 1.1.0"
+  exit 0
+fi
 args="$*"
 
 # Strip global flags to match subcommand
@@ -720,6 +724,10 @@ describe("E2E: MCP Server Headless", () => {
 
         const invalidJsonScript = `#!/bin/bash
 # Fake himalaya that outputs invalid JSON
+if [ "$1" = "--version" ]; then
+  echo "himalaya 1.1.0"
+  exit 0
+fi
 echo "NOT_JSON_AT_ALL"
 `;
         const invalidJsonBinPath = join(invalidJsonBinDir, "himalaya");
@@ -931,7 +939,17 @@ async function spawnHarnessWithFakeHimalaya(
   );
   await mkdir(dir, { recursive: true });
   const binPath = join(dir, "himalaya");
-  await writeFile(binPath, script);
+  // Every caller's script intentionally errors/misbehaves on the *real*
+  // command it's testing, but HimalayaClient now probes `--version` first
+  // (see cli-version.ts) — intercept that here, once, so callers don't each
+  // need their own guard. A v1.x response keeps every existing script's
+  // subcommand/flag assumptions (--output json, folder list, etc.) valid.
+  const versionGuard = 'if [ "$1" = "--version" ]; then\n  echo "himalaya 1.1.0"\n  exit 0\nfi\n';
+  // Function replacer, not a string pattern — a string replacement would
+  // treat the shell script's own "$1" inside versionGuard as a JS $1
+  // backreference to the captured shebang line, corrupting the guard.
+  const wrappedScript = script.replace(/^(#!.*\n)/, (shebang) => shebang + versionGuard);
+  await writeFile(binPath, wrappedScript);
   await chmod(binPath, 0o755);
 
   const proc = spawn("node", ["dist/index.js"], {

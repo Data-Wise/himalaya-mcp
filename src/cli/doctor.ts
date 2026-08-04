@@ -17,6 +17,8 @@ import {
   getVersion,
 } from "./shared.js";
 import { listAccounts, type Account } from "../himalaya/accounts.js";
+import { detectHimalayaVersion } from "../himalaya/cli-version.js";
+import { HimalayaError } from "../himalaya/errors.js";
 
 export interface CheckResult {
   name: string;
@@ -60,7 +62,7 @@ function whichBin(name: string): string | null {
   return ok && stdout ? stdout.split("\n")[0] : null;
 }
 
-function checkPrerequisites(): CheckResult[] {
+export async function checkPrerequisites(): Promise<CheckResult[]> {
   const results: CheckResult[] = [];
 
   const nodeVersion = process.version;
@@ -73,9 +75,23 @@ function checkPrerequisites(): CheckResult[] {
 
   const himalayaPath = whichBin("himalaya");
   if (himalayaPath) {
-    const ver = execQuiet(himalayaPath, ["--version"]);
-    const versionStr = ver.ok ? ver.stdout.split("\n")[0] : "unknown";
-    results.push({ name: "himalaya CLI", category: "Prerequisites", status: "pass", message: `${versionStr} (${himalayaPath})` });
+    // Single source of truth with HimalayaClient: same detection module,
+    // called fresh here (doctor is a one-shot CLI invocation in its own
+    // process — nothing to share a cache with).
+    try {
+      const version = await detectHimalayaVersion(himalayaPath);
+      const branch = version.major >= 2 ? "v2 syntax (mailbox/--json)" : "v1 syntax (folder/--output json)";
+      results.push({
+        name: "himalaya CLI", category: "Prerequisites", status: "pass",
+        message: `${version.raw} (${himalayaPath}) — using ${branch}`,
+      });
+    } catch (err: unknown) {
+      const detail = err instanceof HimalayaError ? err.envelope.message : String(err);
+      results.push({
+        name: "himalaya CLI", category: "Prerequisites", status: "fail",
+        message: `Could not detect version: ${detail}`,
+      });
+    }
   } else {
     results.push({
       name: "himalaya CLI", category: "Prerequisites", status: "fail",
@@ -113,7 +129,7 @@ function checkMcpServer(): CheckResult[] {
   return results;
 }
 
-function checkEmailConnectivity(): CheckResult[] {
+async function checkEmailConnectivity(): Promise<CheckResult[]> {
   const results: CheckResult[] = [];
 
   const himalayaPath = whichBin("himalaya");
@@ -122,10 +138,28 @@ function checkEmailConnectivity(): CheckResult[] {
     return results;
   }
 
-  const accounts = execQuiet(himalayaPath, ["account", "list", "--output", "json"]);
+  // Same dual-syntax branch as HimalayaClient (see cli-version.ts) --
+  // this function bypasses HimalayaClient entirely (uses execQuiet
+  // directly), so it needs its own version check rather than inheriting one.
+  let isV2 = true;
+  try {
+    isV2 = (await detectHimalayaVersion(himalayaPath)).major >= 2;
+  } catch {
+    // Version detection failed -- the "himalaya CLI" prerequisite check
+    // above already reports this; fall through assuming v2 (current
+    // Homebrew stable) rather than blocking this check entirely.
+  }
+  const outputFlag = isV2 ? ["--json"] : ["--output", "json"];
+  const mailboxSubcommand = isV2 ? "mailbox" : "folder";
+
+  const accounts = execQuiet(himalayaPath, ["account", "list", ...outputFlag]);
   if (accounts.ok) {
     try {
-      const parsed = JSON.parse(accounts.stdout) as Array<{ name: string; backend: string; default: boolean }>;
+      // v2 wraps the array as {accounts: [...]}; v1 returns a bare array.
+      const rawParsed = JSON.parse(accounts.stdout) as
+        | Array<{ name: string; backend: string; default: boolean }>
+        | { accounts: Array<{ name: string; backend: string; default: boolean }> };
+      const parsed = Array.isArray(rawParsed) ? rawParsed : rawParsed.accounts;
       const defaultAcct = parsed.find(a => a.default);
       const acctName = defaultAcct ? defaultAcct.name : parsed[0]?.name || "unknown";
       results.push({ name: "Default account", category: "Email", status: "pass", message: acctName });
@@ -137,10 +171,12 @@ function checkEmailConnectivity(): CheckResult[] {
     return results;
   }
 
-  const folders = execQuiet(himalayaPath, ["folder", "list", "--output", "json"]);
+  const folders = execQuiet(himalayaPath, [mailboxSubcommand, "list", ...outputFlag]);
   if (folders.ok) {
     try {
-      const parsed = JSON.parse(folders.stdout) as unknown[];
+      // v2 wraps the array as {mailboxes: [...]}; v1 returns a bare array.
+      const rawParsed = JSON.parse(folders.stdout) as unknown[] | { mailboxes: unknown[] };
+      const parsed = Array.isArray(rawParsed) ? rawParsed : rawParsed.mailboxes;
       results.push({ name: "Folder listing", category: "Email", status: "pass", message: `works (${parsed.length} folders)` });
     } catch {
       results.push({ name: "Folder listing", category: "Email", status: "warn", message: "Could not parse folder list" });
@@ -149,7 +185,7 @@ function checkEmailConnectivity(): CheckResult[] {
     results.push({ name: "Folder listing", category: "Email", status: "fail", message: "Failed. Check IMAP connection." });
   }
 
-  const envelopes = execQuiet(himalayaPath, ["envelope", "list", "--page-size", "1", "--output", "json"]);
+  const envelopes = execQuiet(himalayaPath, ["envelope", "list", "--page-size", "1", ...outputFlag]);
   if (envelopes.ok) {
     results.push({ name: "Envelope listing", category: "Email", status: "pass", message: "works" });
   } else {
@@ -559,9 +595,9 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
     results = checkPostRelease();
   } else if (includeBase) {
     results = [
-      ...checkPrerequisites(),
+      ...(await checkPrerequisites()),
       ...checkMcpServer(),
-      ...checkEmailConnectivity(),
+      ...(await checkEmailConnectivity()),
       ...checkDesktopExtension(),
       ...checkCodePlugin(),
       ...checkPluginCache(),
@@ -662,9 +698,9 @@ async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; fai
     results = checkPostRelease();
   } else {
     results = [
-      ...checkPrerequisites(),
+      ...(await checkPrerequisites()),
       ...checkMcpServer(),
-      ...checkEmailConnectivity(),
+      ...(await checkEmailConnectivity()),
       ...checkDesktopExtension(),
       ...checkCodePlugin(),
       ...checkPluginCache(),

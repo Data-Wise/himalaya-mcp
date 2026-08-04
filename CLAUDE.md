@@ -321,6 +321,12 @@ unreleased changes, not as the default dev setup.
 3. **Safety gates** — send_email returns preview, requires explicit confirmation
 4. **Tools + Resources** — Tools for actions, resources for browsing
 5. **Plugin-first** — Claude Code plugin bundles MCP server; Desktop extension via `.mcpb`
+6. **Dual himalaya CLI generation support** — himalaya made a breaking CLI change at v2.0.0
+   (`folder`→`mailbox`, `--output json`→`--json`, `folder create`/`delete` dropped from the
+   shared API in favor of IMAP-only `imap create`/`imap delete`). `HimalayaClient` detects the
+   installed major version (`src/himalaya/cli-version.ts`, cached per-instance) and branches
+   arg-building accordingly, rather than requiring a specific CLI generation. See
+   `docs/specs/SPEC-himalaya-v2-cli-compat-2026-08-03.md` for the full design.
 
 ---
 
