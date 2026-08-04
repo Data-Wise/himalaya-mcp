@@ -256,6 +256,12 @@ npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~8
 node dist/index.js               # Run MCP server directly
 ```
 
+> **Claude Code agents:** do not run `npm test`/`vitest run` directly via Bash — it reliably
+> leaves orphaned fork-pool worker processes leaking GBs of memory (harness-timeout interaction,
+> diagnosed root cause, not a vitest bug). Ask the user to run it, or use
+> `timeout --signal=TERM --kill-after=5s 100s ./node_modules/.bin/vitest run --pool=threads --maxWorkers=1`
+> if unavoidable.
+
 ### Install
 
 ```bash

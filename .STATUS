@@ -4,8 +4,8 @@
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
 ## Status: released, critical bug found post-release
-## Focus: fix himalaya CLI v2.0.0 incompatibility (every MCP tool call broken on current Homebrew stable) — spec+plan ready, implementation not started
-## Phase: Maintenance (bug-fix spec approved through Plan phase)
+## Focus: fix himalaya CLI v2.0.0 incompatibility (every MCP tool call broken on current Homebrew stable) — implemented in worktree, awaiting npm test run + PR
+## Phase: Maintenance (bug-fix implemented, T9 verification pending)
 ## Priority: 1
 ## Progress: 100
 
@@ -194,20 +194,31 @@ himalaya-mcp doctor --fix
   `imap create`/`imap delete` verification against the real account, cleaned up after) — decided
   to support **both** himalaya v1.x and v2.x (not a cutover):
   `docs/specs/SPEC-himalaya-v2-cli-compat-2026-08-03.md`. Phase 2 (Plan) done:
-  `tasks/plan.md` + `tasks/todo.md` (9 tasks, T1–T9, dependency-ordered). **Implementation not
-  started** — next session begins at T1 on a `feature/*` worktree off `dev`.
+  `tasks/plan.md` + `tasks/todo.md` (9 tasks, T1–T9, dependency-ordered).
+- 2026-08-03 (later same day): Implemented T1–T8 in worktree
+  `~/.git-worktrees/himalaya-mcp/feature-cli-v2-compat` (branch `feature/himalaya-cli-v2-compat`),
+  **uncommitted**. `npm run build` and `npm run build:bundle` both pass clean; a manual (non-vitest)
+  smoke script exercised the real compiled code against a CI argv fixture in both v1/v2 modes —
+  passed. Found and fixed 3 bugs beyond the original task list (a second broken call site in
+  `sendTemplate()`, a third in doctor's `checkEmailConnectivity()` plus two v2 JSON-shape bugs,
+  and a version-regex bug caught only by the manual smoke run) — full detail in
+  `tasks/todo.md`'s "Follow-ups" section. **T9 (full `npm test` run) not done — needs the user**,
+  per the vitest process-leak issue (see Testing note below).
+- 2026-08-03: Diagnosed the recurring vitest process-leak (Codex rescue research,
+  `feedback_no_vitest_direct.md` in memory) — a harness Bash-timeout/vitest-SIGTERM interaction,
+  not a vitest bug or project misconfig. Documented a safe invocation pattern (unverified by an
+  actual run) in `CLAUDE.md`/`AGENTS.md`'s Testing section.
 
 ## Next Action
 
-- **Start here:** himalaya CLI v1.x/v2.x compat fix, Phase 4 (Implement). Read
-  `tasks/todo.md` T1 first — foundation task (`src/himalaya/cli-version.ts`), can run in
-  parallel with T2/T3/T7a. Create a `feature/*` worktree off `dev` before touching code (spec
-  assumption #1 — `dev` blocks new/modified code files). Full context: spec + plan + bug report
-  linked above.
-- **Also pending on `dev` (uncommitted, unrelated to the bug fix):** `AGENTS.md`/`CLAUDE.md`
-  version-sync (2.0.0→2.0.1, test count 601→619) is mid-edit from the prior session — finish and
-  commit this separately before or alongside starting the worktree; it's docs-only so it's safe
-  directly on `dev`.
+- **Start here:** run `npm test` in `~/.git-worktrees/himalaya-mcp/feature-cli-v2-compat`
+  (Recommended — the last blocker on the CLI-compat fix) and report pass/fail counts. See
+  `CLAUDE.md`'s Testing section for the safe-invocation command if running via an agent's Bash
+  tool rather than directly.
+- Then: review the uncommitted worktree diff, commit to `feature/himalaya-cli-v2-compat`, and
+  open a PR to `dev` (`tasks/todo.md` tracks remaining T9 sub-items).
+- **Also pending on `dev`:** `AGENTS.md`/`CLAUDE.md` version-sync (2.0.0→2.0.1) already landed in
+  commit `df7030a` — no longer pending.
 - **Resume context for /recap:** v2.0.1 itself is fully released and downstream surfaces are
   updated (GitHub Release, `.mcpb` asset, `main`, `dev`, Homebrew tap, aggregator marketplace) —
   the critical bug above was found *after* that release, doesn't block it, and doesn't need a
@@ -237,6 +248,7 @@ himalaya-mcp doctor --fix
 
 **Last Updated:** 2026-08-03
 **Status:** v2.0.1 released and downstream release surfaces updated. Critical post-release bug
-found (himalaya v2.0.0 CLI incompatibility, every tool call affected) — spec + plan complete,
-implementation starts next session at `tasks/todo.md` T1. Open: #82 (BLOCKED manifest regression),
-#97 (TS7 deferred), AGENTS.md/CLAUDE.md 2.0.1 version-sync (uncommitted, docs-only).
+(himalaya v2.0.0 CLI incompatibility) implemented in worktree `feature/himalaya-cli-v2-compat`
+(T1–T8 done, uncommitted) — T9 (`npm test`) needs the user to run per the diagnosed vitest
+process-leak issue (`feedback_no_vitest_direct.md`, safe-invocation command in CLAUDE.md's
+Testing section). Open: #82 (BLOCKED manifest regression), #97 (TS7 deferred).
