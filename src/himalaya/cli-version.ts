@@ -19,8 +19,10 @@ const execFileAsync = promisify(execFile);
 
 // Independent of HimalayaClient's command timeout (default 120s) -- a hung
 // or misbehaving binary should stall the version probe briefly, not the
-// whole first tool call.
-const VERSION_PROBE_TIMEOUT_MS = 5_000;
+// whole first tool call. 15s (not 5s) so a slow/loaded environment (Docker
+// CI, cold start) does not false-fail the probe; the probe runs once per
+// client instance, so the extra worst-case latency is bounded and rare.
+const VERSION_PROBE_TIMEOUT_MS = 15_000;
 
 export interface HimalayaVersion {
   /** Major version number, e.g. 2 for "himalaya v2.0.0 ...". */

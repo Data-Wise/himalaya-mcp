@@ -29,7 +29,7 @@ describe("detectHimalayaVersion", () => {
     const result = await detectHimalayaVersion("himalaya");
     expect(result.major).toBe(2);
     expect(result.raw).toContain("v2.0.0");
-    expect(mockExecFileAsync).toHaveBeenCalledWith("himalaya", ["--version"], { timeout: 5_000 });
+    expect(mockExecFileAsync).toHaveBeenCalledWith("himalaya", ["--version"], { timeout: 15_000 });
   });
 
   it("parses a plausible v1.x --version output", async () => {
@@ -90,10 +90,10 @@ describe("detectHimalayaVersion", () => {
     }
   });
 
-  it("uses its own 5s timeout, independent of any command timeout", async () => {
+  it("uses its own 15s timeout, independent of any command timeout", async () => {
     mockExecFileAsync.mockResolvedValue({ stdout: "himalaya v2.0.0\n", stderr: "" });
     await detectHimalayaVersion("himalaya");
     const callArgs = mockExecFileAsync.mock.calls[0];
-    expect(callArgs[2]).toEqual({ timeout: 5_000 });
+    expect(callArgs[2]).toEqual({ timeout: 15_000 });
   });
 });
