@@ -663,7 +663,7 @@ function readRegistry(): { extensions: Record<string, unknown> } {
   }
 }
 
-export function checkAccountHealth(name: string): AccountHealth {
+export async function checkAccountHealth(name: string): Promise<AccountHealth> {
   const himalayaPath = whichBin("himalaya");
   if (!himalayaPath) {
     return {
@@ -672,14 +672,27 @@ export function checkAccountHealth(name: string): AccountHealth {
       hint: "Install: brew install himalaya",
     };
   }
+
+  // Same dual-syntax branch as checkEmailConnectivity (see cli-version.ts):
+  // himalaya v2 renamed folder→mailbox and --output json→--json.
+  let isV2 = true;
+  try {
+    isV2 = (await detectHimalayaVersion(himalayaPath)).major >= 2;
+  } catch {
+    // Version detection failed -- fall through assuming v2 (current Homebrew
+    // stable) rather than hardcoding the v1 syntax that v2 rejects.
+  }
+  const outputFlag = isV2 ? ["--json"] : ["--output", "json"];
+  const mailboxSubcommand = isV2 ? "mailbox" : "folder";
+
   let stdout = "";
   let stderr = "";
   let ok = false;
   try {
     stdout = execFileSync(
       himalayaPath,
-      ["folder", "list", "--account", name, "--output", "json"],
-      { timeout: 5_000, stdio: "pipe" },
+      [mailboxSubcommand, "list", "--account", name, ...outputFlag],
+      { timeout: 15_000, stdio: "pipe" },
     ).toString().trim();
     ok = true;
   } catch (err: unknown) {
