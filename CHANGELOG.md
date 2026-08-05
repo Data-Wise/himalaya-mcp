@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Fixed
+
+- `himalaya-mcp doctor` now detects version drift in the Claude Code plugin chain: it compares the installed plugin's `plugin.json` version and the `local-plugins` marketplace source's version against the installed binary, and warns when the marketplace source is a directory copy instead of a symlink to the Homebrew install (so `brew upgrade` no longer propagates). `doctor --fix` auto-relinks stale directories to the Homebrew `libexec` layout.
+- Raised the himalaya CLI version-probe timeout from 5s to 15s so slow or heavily loaded CI/Docker environments no longer false-fail CLI-version detection (`Could not detect himalaya CLI version`).
+
+### Changed
+
+- Defaulted the vitest pool to `threads` so pool workers die with the vitest process — a harness timeout can no longer orphan fork-pool child processes holding memory. Full-suite verification now runs detached in Docker without `--rm` and uses `docker wait` to capture the real exit status.
+
 ## [2.0.3] - 2026-08-04
 
 ### Fixed

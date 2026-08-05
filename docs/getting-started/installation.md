@@ -224,7 +224,7 @@ himalaya-mcp doctor
 # Auto-fix common issues
 himalaya-mcp doctor --fix
 
-# Run tests (666 tests)
+# Run tests (680 tests)
 npm test
 
 # Check Claude Desktop config (legacy)
