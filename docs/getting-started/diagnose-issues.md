@@ -71,6 +71,7 @@ Only safe, deterministic fixes run automatically:
 - Empty `himalaya_binary` in Desktop settings → set to `which himalaya`
 - Missing Desktop extension settings file → create defaults
 - Stale plugin cache at `~/.claude/plugins/cache/` → remove
+- Stale plugin directory copy (`~/.claude/plugins/himalaya-mcp` or `~/.claude/local-marketplace/himalaya-mcp` at an older version than the installed binary) → deletes the copy and relinks it to the Homebrew `libexec` install, so `brew upgrade` propagates again
 
 Auth, cert, and network failures are never auto-fixed — they need user action.
 
@@ -85,7 +86,7 @@ Both `health_check` and `doctor` surface the same stable codes:
 | `transient` | Network blip (retried once) | Check VPN / network |
 | `folder_not_found` | UID or folder stale | Run `himalaya mailbox list --json` (v1.x: `himalaya folder list --output json`) |
 | `himalaya_not_installed` | Binary missing on PATH | `brew install himalaya` |
-| `himalaya_version_undetected` | `himalaya --version` timed out or returned unparseable output | Run `himalaya --version` directly; reinstall if it hangs or errors |
+| `himalaya_version_undetected` | `himalaya --version` timed out (15s probe) or returned unparseable output | Run `himalaya --version` directly; reinstall if it hangs or errors. A timeout on a slow, loaded machine or in Docker can be a false failure — retry first |
 | `unsupported_backend` | Folder create/delete attempted on a non-IMAP account (himalaya v2 only) | Only IMAP-backed accounts support folder create/delete on the current CLI |
 
 The full table lives in [Troubleshooting](../guide/troubleshooting.md).

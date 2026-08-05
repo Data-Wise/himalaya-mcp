@@ -348,7 +348,7 @@ himalaya-mcp doctor --fix              # Auto-fix common issues
 himalaya-mcp doctor --json             # Machine-readable output
 ```
 
-The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health, per-account email connectivity, Claude Desktop extension state, Claude Code plugin registration, and environment variables. See the [CLI Reference](../reference/cli.md#himalaya-mcp-doctor) for full details.
+The `doctor` command checks prerequisites (Node.js, himalaya), MCP server health, per-account email connectivity, Claude Desktop extension state, Claude Code plugin registration (including installed-plugin and marketplace-source version drift vs the installed binary), and environment variables. See the [CLI Reference](../reference/cli.md#himalaya-mcp-doctor) for full details.
 
 For in-conversation diagnostics, ask Claude to run a health check — that invokes the `health_check` MCP tool documented above.
 
@@ -366,7 +366,7 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 666 tests across 36 files (vitest)
+npm test    # 680 tests across 39 files (vitest)
 ```
 
 Test breakdown:
@@ -374,31 +374,41 @@ Test breakdown:
 | File | Tests | What it covers |
 |------|-------|----------------|
 | `parser.test.ts` | 13 | JSON response parsing, formatEnvelope |
-| `client.test.ts` | 15 | Subprocess wrapper, retry policy, argument building |
+| `client.test.ts` | 47 | Subprocess wrapper, retry policy, argument building |
 | `manage.test.ts` | 7 | flag_email, move_email client methods |
 | `compose.test.ts` | 13 | draft_reply, send_email safety gate + attachment tests |
-| `compose-new.test.ts` | 12 | compose_email safety gate + attachment tests |
+| `compose-new.test.ts` | 13 | compose_email safety gate + attachment tests |
 | `folders.test.ts` | 12 | Folder tools (list, create, delete) |
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
-| `calendar.test.ts` | 18 | ICS parser + calendar event tools + escaping |
+| `calendar.test.ts` | 21 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
 | `threads.test.ts` | 30 | Thread parser + tool registration |
-| `prompts.test.ts` | 24 | All 7 prompts register and return correct text |
+| `prompts.test.ts` | 23 | All 7 prompts register and return correct text |
 | `config.test.ts` | 9 | Env var loading, template variable guards |
 | `clipboard.test.ts` | 4 | pbcopy/xclip adapter |
-| `errors.test.ts` | 18 | MCPError envelope + stderr classifier |
+| `errors.test.ts` | 21 | MCPError envelope + stderr classifier |
 | `retry.test.ts` | 4 | Transient retry policy |
-| `accounts.test.ts` | 6 | Multi-account discovery |
+| `accounts.test.ts` | 13 | Multi-account discovery |
 | `health.test.ts` | 5 | health_check tool |
 | `trash.test.ts` | 5 | getTrashFolder |
 | `unread.test.ts` | 4 | get_unread_count |
-| `read-raw.test.ts` | 5 | read_email_raw |
+| `read-raw.test.ts` | 4 | read_email_raw |
 | `render.test.ts` | 5 | render_email |
 | `list-starred.test.ts` | 6 | list_starred |
 | `reminders.test.ts` | 7 | create_reminder |
-| `snooze.test.ts` | 12 | snooze_email, list_snoozed_emails |
+| `snooze.test.ts` | 10 | snooze_email, list_snoozed_emails |
+| `inbox.test.ts` | 23 | search/list inbox tools |
+| `config-toml.test.ts` | 15 | Himalaya config.toml parsing |
+| `morning.test.ts` | 13 | morning_briefing + inbox_check prompts |
+| `count-sync.test.ts` | 3 | Tool-count drift detection |
+| `get-version.test.ts` | 3 | --version resolution (package.json + marketplace fallback) |
+| `cli-version.test.ts` | 7 | himalaya CLI major-version detection |
+| `cli-argv-smoke.test.ts` | 10 | Real fixture argv acceptance |
+| `doctor-version.test.ts` | 10 | doctor version-drift checks |
+| `check-prerequisites.test.ts` | 5 | doctor prerequisites checks |
+| `vitest-config.test.ts` | 1 | Threads-pool default tripwire |
 | `dogfood.test.ts` | 153 | Realistic Claude usage scenarios |
 | `dogfood-reliability.test.ts` | 20 | Reliability scenarios |
-| `setup.test.ts` | 45 | Setup CLI + multi-account doctor E2E |
+| `setup.test.ts` | 49 | Setup CLI + multi-account doctor E2E |
 | `e2e.test.ts` | 39 | Full MCP server pipeline + .mcpb build |
-| `v150-features.test.ts` | 36 | v1.5.0 integration tests |
+| `v150-features.test.ts` | 37 | v1.5.0 integration tests |

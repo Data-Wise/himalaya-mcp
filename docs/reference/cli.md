@@ -30,7 +30,7 @@ Prints the semantic version on its own line and exits 0.
 
 ```bash
 himalaya-mcp --version   # also: -v, version
-# Example output: 2.0.2
+# Example output: 2.0.4
 ```
 
 ---
@@ -56,7 +56,7 @@ himalaya-mcp doctor --post-release     # Maintainer-only: verify plugin install 
 | MCP Server | `dist/index.js` exists and is non-empty |
 | Email Connectivity | Account list, folder list, envelope fetch |
 | Desktop Extension | Extension dir, manifest, registry, settings, user_config |
-| Claude Code Plugin | Symlink, plugin.json, marketplace registration |
+| Claude Code Plugin | Symlink, plugin.json, marketplace registration, plugin version vs installed binary, marketplace source version + symlink state |
 | Plugin Cache | Stale cache at `~/.claude/plugins/cache/` |
 | Environment | `HIMALAYA_*` env vars, unresolved template variables |
 
@@ -67,6 +67,7 @@ himalaya-mcp doctor --post-release     # Maintainer-only: verify plugin install 
 | `himalaya_binary` empty in Desktop settings | Set to `which himalaya` result |
 | Settings file missing | Create default settings (enabled, empty config) |
 | Stale plugin cache | Remove cached metadata from `~/.claude/plugins/cache/` |
+| Stale plugin directory copy | Deletes the `~/.claude/plugins/himalaya-mcp` (or `~/.claude/local-marketplace/himalaya-mcp`) directory copy and relinks it to the Homebrew `libexec` install so `brew upgrade` propagates |
 
 ### Pre-release / post-release checks
 
@@ -197,7 +198,7 @@ Restart Claude Desktop after removal.
 npm run build           # TypeScript compilation (development)
 npm run build:bundle    # esbuild single-file bundle (~908KB, production)
 npm run build:mcpb      # Build .mcpb Desktop Extension (~247KB)
-npm test                # Run 666 tests (vitest)
+npm test                # Run 680 tests (vitest)
 node dist/index.js      # Start MCP server standalone
 ```
 

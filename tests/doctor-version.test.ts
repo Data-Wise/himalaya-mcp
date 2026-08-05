@@ -1,82 +1,176 @@
+/**
+ * Unit tests for assessVersionDrift — version-staleness detection in `himalaya-mcp doctor`.
+ *
+ * Pattern mirrors tests/get-version.test.ts: mock node:fs at module level so the pure
+ * function is exercised without touching the real ~/.claude or Homebrew layout.
+ */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { promisify } from "node:util";
 
-// checkPrerequisites() calls whichBin() (execFileSync, for `which himalaya`)
-// and detectHimalayaVersion() (promisify(execFile), for `himalaya --version`).
-// Both need mocking to test the version/branch reporting in isolation from
-// the rest of doctor's filesystem-touching checks.
-vi.mock("node:child_process", async () => {
-  const { promisify: realPromisify } = await import("node:util");
-  const fn: any = vi.fn();
-  const promisified = vi.fn();
-  fn[realPromisify.custom] = promisified;
-  return { execFile: fn, execFileSync: vi.fn() };
+const { existsSyncMock, readFileSyncMock, lstatSyncMock, rmSyncMock, symlinkSyncMock } = vi.hoisted(() => ({
+  existsSyncMock: vi.fn(),
+  readFileSyncMock: vi.fn(),
+  lstatSyncMock: vi.fn(),
+  rmSyncMock: vi.fn(),
+  symlinkSyncMock: vi.fn(),
+}));
+
+vi.mock("node:fs", async () => {
+  const actual = await vi.importActual<typeof import("node:fs")>("node:fs");
+  return {
+    ...actual,
+    existsSync: (...args: Parameters<typeof actual.existsSync>) => existsSyncMock(...args),
+    readFileSync: (...args: Parameters<typeof actual.readFileSync>) => readFileSyncMock(...args),
+    lstatSync: (...args: Parameters<typeof actual.lstatSync>) => lstatSyncMock(...args),
+    rmSync: (...args: Parameters<typeof actual.rmSync>) => rmSyncMock(...args),
+    symlinkSync: (...args: Parameters<typeof actual.symlinkSync>) => symlinkSyncMock(...args),
+  };
 });
 
-vi.mock("node:fs", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("node:fs")>();
-  return { ...actual, existsSync: vi.fn().mockReturnValue(true) };
-});
+import { assessVersionDrift } from "../src/cli/doctor";
 
-import { execFile, execFileSync } from "node:child_process";
-import { checkPrerequisites } from "../src/cli/doctor";
+function baseOpts(overrides: Record<string, unknown> = {}) {
+  return {
+    binaryVersion: "2.0.3",
+    pluginDir: "/home/user/.claude/plugins/himalaya-mcp",
+    pluginJsonPath: "/home/user/.claude/plugins/himalaya-mcp/.claude-plugin/plugin.json",
+    sourceDir: "/home/user/.claude/local-marketplace/himalaya-mcp",
+    sourceJsonPath: "/home/user/.claude/local-marketplace/himalaya-mcp/.claude-plugin/marketplace.json",
+    brewLibexecPath: "/opt/homebrew/opt/himalaya-mcp/libexec",
+    ...overrides,
+  };
+}
 
-const mockExecFileSync = vi.mocked(execFileSync);
-const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
-
-describe("checkPrerequisites — himalaya CLI version/branch reporting", () => {
+describe("assessVersionDrift", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    // `which himalaya` succeeds with a fixed path for every test in this file.
-    mockExecFileSync.mockReturnValue(Buffer.from("/opt/homebrew/bin/himalaya\n"));
+    existsSyncMock.mockReset();
+    readFileSyncMock.mockReset();
+    lstatSyncMock.mockReset();
+    rmSyncMock.mockReset();
+    symlinkSyncMock.mockReset();
   });
 
-  function himalayaCheck(results: Awaited<ReturnType<typeof checkPrerequisites>>) {
-    const check = results.find((r) => r.name === "himalaya CLI");
-    if (!check) throw new Error("no 'himalaya CLI' check result found");
-    return check;
-  }
+  it("passes when installed plugin version matches the binary and the source is a symlink", () => {
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") || p.includes(".claude-plugin"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.3" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => true }));
 
-  it("reports pass + v2/mailbox branch for a real v2.0.0 --version string", async () => {
-    mockExecFileAsync.mockResolvedValue({
-      stdout: "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir\n",
-      stderr: "",
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    expect(results[0]).toMatchObject({ name: "Plugin version", status: "pass", message: "v2.0.3 matches binary" });
+    expect(results[1]).toMatchObject({ name: "Marketplace source version", status: "pass" });
+  });
+
+  it("warns when installed plugin version differs from the binary and attaches a relink fix", () => {
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") || p.includes(".claude-plugin"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.2" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => true }));
+
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    const plugin = results[0];
+    expect(plugin.status).toBe("warn");
+    expect(plugin.message).toContain("Installed plugin v2.0.2 ≠ binary v2.0.3");
+    expect(plugin.fix).toBeDefined();
+    expect(plugin.fix!.description).toContain("Deletes");
+    expect(plugin.fix!.description).toContain("relinks");
+    plugin.fix!.auto!();
+    expect(rmSyncMock).toHaveBeenCalledWith("/home/user/.claude/plugins/himalaya-mcp", { recursive: true, force: true });
+    expect(symlinkSyncMock).toHaveBeenCalledWith("/opt/homebrew/opt/himalaya-mcp/libexec", "/home/user/.claude/plugins/himalaya-mcp", "dir");
+  });
+
+  it("warns that a directory copy is not a symlink even when versions match", () => {
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") || p.includes(".claude-plugin"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.3" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => false }));
+
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    expect(results[0]).toMatchObject({ status: "pass" });
+    const source = results[1];
+    expect(source.status).toBe("warn");
+    expect(source.message).toContain("a copy, not a symlink");
+  });
+
+  it("warns when the marketplace source version is stale", () => {
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") || p.includes(".claude-plugin"));
+    readFileSyncMock.mockImplementation((p: string) =>
+      p.endsWith(".claude-plugin/plugin.json") ? JSON.stringify({ version: "2.0.3" }) : JSON.stringify({ version: "2.0.2" }),
+    );
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => false }));
+
+    const results = assessVersionDrift(baseOpts());
+    const source = results[1];
+    expect(source.status).toBe("warn");
+    expect(source.message).toContain("local-marketplace source v2.0.2 ≠ binary v2.0.3");
+  });
+
+  it("does not attach a fix when no Homebrew libexec is available", () => {
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") || p.includes(".claude-plugin"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.2" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => false }));
+
+    const results = assessVersionDrift(baseOpts({ brewLibexecPath: null }));
+    expect(results).toHaveLength(2);
+    expect(results[0].fix).toBeUndefined();
+    expect(results[1].fix).toBeUndefined();
+  });
+
+  it("returns no checks when the binary version is unknown", () => {
+    const results = assessVersionDrift(baseOpts({ binaryVersion: "" }));
+    expect(results).toHaveLength(0);
+  });
+
+  it("skips the marketplace source check when the source dir is absent", () => {
+    existsSyncMock.mockImplementation((p: string) => p.endsWith(".claude-plugin/plugin.json") && !p.includes("local-marketplace"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.3" }));
+
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({ name: "Plugin version", status: "pass" });
+  });
+
+  it("warns (not fails) when a version file is unreadable", () => {
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") || p.includes(".claude-plugin"));
+    readFileSyncMock.mockImplementation(() => {
+      throw new Error("EACCES");
     });
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => true }));
 
-    const check = himalayaCheck(await checkPrerequisites());
-    expect(check.status).toBe("pass");
-    expect(check.message).toContain("v2.0.0");
-    expect(check.message).toMatch(/v2 syntax/);
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    expect(results[0].status).toBe("warn");
+    expect(results[0].message).toBe("Could not read installed plugin version");
+    expect(results[1].status).toBe("warn");
+    expect(results[1].message).toBe("Could not read local-marketplace source version");
   });
 
-  it("reports pass + v1/folder branch for a v1.x --version string", async () => {
-    mockExecFileAsync.mockResolvedValue({ stdout: "himalaya 1.1.0\n", stderr: "" });
+  it("warns on a broken marketplace-source symlink instead of skipping the check", () => {
+    // existsSync follows symlinks, so a dangling link reads as absent; lstatSync
+    // still resolves it as a symlink. The check must warn, not silently return.
+    existsSyncMock.mockImplementation((p: string) => p.endsWith(".claude-plugin/plugin.json") && !p.includes("local-marketplace"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.3" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => true }));
 
-    const check = himalayaCheck(await checkPrerequisites());
-    expect(check.status).toBe("pass");
-    expect(check.message).toMatch(/v1 syntax/);
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    const source = results[1];
+    expect(source).toMatchObject({ name: "Marketplace source version", status: "warn" });
+    expect(source.message).toContain("broken symlink");
   });
 
-  it("reports fail (not a silent pass) when --version output is unparseable", async () => {
-    mockExecFileAsync.mockResolvedValue({ stdout: "himalaya (git rev unknown)\n", stderr: "" });
+  it("does not attach a fix when libexec lacks plugin.json even if brewLibexecPath resolves", () => {
+    // brewLibexecPath is non-null but the libexec dir has no plugin.json, so the
+    // relink target is not a valid plugin source -> warn without a fix.
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") && !p.includes("/opt/homebrew/opt/himalaya-mcp/libexec"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.2" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => false }));
 
-    const check = himalayaCheck(await checkPrerequisites());
-    expect(check.status).toBe("fail");
-    expect(check.message).toMatch(/Could not detect version/);
-  });
-
-  it("reports fail when the --version probe times out", async () => {
-    const err: any = new Error("Command timed out");
-    err.killed = true;
-    mockExecFileAsync.mockRejectedValue(err);
-
-    const check = himalayaCheck(await checkPrerequisites());
-    expect(check.status).toBe("fail");
-  });
-
-  it("calls the --version probe exactly once per checkPrerequisites() run", async () => {
-    mockExecFileAsync.mockResolvedValue({ stdout: "himalaya v2.0.0\n", stderr: "" });
-    await checkPrerequisites();
-    expect(mockExecFileAsync).toHaveBeenCalledTimes(1);
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    expect(results[0].status).toBe("warn");
+    expect(results[0].fix).toBeUndefined();
+    expect(results[1].status).toBe("warn");
+    expect(results[1].fix).toBeUndefined();
   });
 });

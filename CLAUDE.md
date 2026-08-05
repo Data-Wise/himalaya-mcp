@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 2.0.3
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 666 tests)
+- **Version:** 2.0.4
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 680 tests)
 
 ### What It Does
 
@@ -251,16 +251,21 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (666 tests across 36 test files)
+npm test                         # Run vitest (680 tests across 39 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~908KB)
 node dist/index.js               # Run MCP server directly
 ```
 
-> **Claude Code agents:** do not run `npm test`/`vitest run` directly via Bash — it reliably
-> leaves orphaned fork-pool worker processes leaking GBs of memory (harness-timeout interaction,
-> diagnosed root cause, not a vitest bug). Ask the user to run it, or use
-> `timeout --signal=TERM --kill-after=5s 100s ./node_modules/.bin/vitest run --pool=threads --maxWorkers=1`
-> if unavoidable.
+> **Claude Code agents:** `npm test`/`vitest run` now defaults to the `threads` pool
+> (vitest.config.ts), so worker threads die with the vitest process and cannot be orphaned by a
+> harness timeout — the forks-pool leak is gone. The `timeout` wrapper below remains only as a
+> belt-and-suspenders cap on the ~6-minute full run (threads pool, host) if you must bound the runtime:
+> `timeout --signal=TERM --kill-after=5s 600s ./node_modules/.bin/vitest run --maxWorkers=1`
+>
+> **Docker verification (full suite):** `node:22`, bind-mounted worktree + a named
+> `node_modules` volume. Run detached WITHOUT `--rm`, then `docker wait <id>` to capture the
+> real exit status (using `--rm` loses it if the client is killed before the run finishes):
+> `docker run -d --name hmcp-test -v <repo>:/app -v himalaya-mcp-node-modules:/app/node_modules -w /app node:22 npm test` → `docker wait hmcp-test; docker logs hmcp-test | tail -40`.
 
 ### Install
 
