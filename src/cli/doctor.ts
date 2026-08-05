@@ -2,7 +2,9 @@
  * himalaya-mcp doctor — diagnose installation and per-account connectivity.
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, realpathSync, readdirSync, lstatSync, symlinkSync } from "node:fs";
+import {
+  existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, realpathSync, readdirSync, lstatSync, symlinkSync,
+} from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { execFileSync } from "node:child_process";
@@ -295,7 +297,7 @@ function readPluginVersion(jsonPath: string): string | null {
 
 function relinkFix(dir: string, libexec: string): CheckResult["fix"] {
   return {
-    description: `Relink ${dir} → ${libexec}`,
+    description: `Deletes ${dir} and relinks it to ${libexec} (replaces a stale directory copy with a symlink that tracks brew upgrades)`,
     auto: () => {
       rmSync(dir, { recursive: true, force: true });
       symlinkSync(libexec, dir, "dir");
@@ -324,14 +326,26 @@ export function assessVersionDrift(opts: {
     const fix = brewLibexecPath && existsSync(join(brewLibexecPath, ".claude-plugin", "plugin.json")) ? relinkFix(pluginDir, brewLibexecPath) : undefined;
     results.push({
       name: "Plugin version", category: "Claude Code Plugin", status: "warn",
-      message: `Installed plugin v${pluginVersion} ≠ binary v${binaryVersion}. Run: claude plugin update himalaya-mcp@local-plugins`,
+      message: `Installed plugin v${pluginVersion} ≠ binary v${binaryVersion}. Run: himalaya-mcp doctor --fix (relinks the plugin dir to the Homebrew install), then: claude plugin update himalaya-mcp@local-plugins`,
       fix,
     });
   } else {
     results.push({ name: "Plugin version", category: "Claude Code Plugin", status: "pass", message: `v${pluginVersion} matches binary` });
   }
 
-  if (!existsSync(sourceDir)) return results;
+  if (!existsSync(sourceDir)) {
+    // existsSync follows symlinks: false for a broken symlink. Distinguish it
+    // from a genuinely-absent source dir so a dangling link is flagged, not skipped.
+    let isBrokenSymlink = false;
+    try { isBrokenSymlink = lstatSync(sourceDir).isSymbolicLink(); } catch { /* absent or unreadable */ }
+    if (isBrokenSymlink) {
+      results.push({
+        name: "Marketplace source version", category: "Claude Code Plugin", status: "warn",
+        message: "local-marketplace source is a broken symlink (target missing). Run: himalaya-mcp doctor --fix",
+      });
+    }
+    return results;
+  }
 
   let isSymlink = false;
   try { isSymlink = lstatSync(sourceDir).isSymbolicLink(); } catch { /* keep false */ }
@@ -347,7 +361,7 @@ export function assessVersionDrift(opts: {
     const fix = brewLibexecPath && existsSync(join(brewLibexecPath, ".claude-plugin", "plugin.json")) ? relinkFix(sourceDir, brewLibexecPath) : undefined;
     results.push({
       name: "Marketplace source version", category: "Claude Code Plugin", status: "warn",
-      message: `${parts.join("; ")}. Run: claude plugin update himalaya-mcp@local-plugins`,
+      message: `${parts.join("; ")}. Run: himalaya-mcp doctor --fix (relinks the marketplace source), then: claude plugin update himalaya-mcp@local-plugins`,
       fix,
     });
   } else {

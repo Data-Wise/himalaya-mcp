@@ -72,7 +72,8 @@ describe("assessVersionDrift", () => {
     expect(plugin.status).toBe("warn");
     expect(plugin.message).toContain("Installed plugin v2.0.2 ≠ binary v2.0.3");
     expect(plugin.fix).toBeDefined();
-    expect(plugin.fix!.description).toContain("Relink");
+    expect(plugin.fix!.description).toContain("Deletes");
+    expect(plugin.fix!.description).toContain("relinks");
     plugin.fix!.auto!();
     expect(rmSyncMock).toHaveBeenCalledWith("/home/user/.claude/plugins/himalaya-mcp", { recursive: true, force: true });
     expect(symlinkSyncMock).toHaveBeenCalledWith("/opt/homebrew/opt/himalaya-mcp/libexec", "/home/user/.claude/plugins/himalaya-mcp", "dir");
@@ -142,5 +143,34 @@ describe("assessVersionDrift", () => {
     expect(results[0].message).toBe("Could not read installed plugin version");
     expect(results[1].status).toBe("warn");
     expect(results[1].message).toBe("Could not read local-marketplace source version");
+  });
+
+  it("warns on a broken marketplace-source symlink instead of skipping the check", () => {
+    // existsSync follows symlinks, so a dangling link reads as absent; lstatSync
+    // still resolves it as a symlink. The check must warn, not silently return.
+    existsSyncMock.mockImplementation((p: string) => p.endsWith(".claude-plugin/plugin.json") && !p.includes("local-marketplace"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.3" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => true }));
+
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    const source = results[1];
+    expect(source).toMatchObject({ name: "Marketplace source version", status: "warn" });
+    expect(source.message).toContain("broken symlink");
+  });
+
+  it("does not attach a fix when libexec lacks plugin.json even if brewLibexecPath resolves", () => {
+    // brewLibexecPath is non-null but the libexec dir has no plugin.json, so the
+    // relink target is not a valid plugin source -> warn without a fix.
+    existsSyncMock.mockImplementation((p: string) => p.includes("himalaya-mcp") && !p.includes("/opt/homebrew/opt/himalaya-mcp/libexec"));
+    readFileSyncMock.mockImplementation((p: string) => JSON.stringify({ version: "2.0.2" }));
+    lstatSyncMock.mockImplementation(() => ({ isSymbolicLink: () => false }));
+
+    const results = assessVersionDrift(baseOpts());
+    expect(results).toHaveLength(2);
+    expect(results[0].status).toBe("warn");
+    expect(results[0].fix).toBeUndefined();
+    expect(results[1].status).toBe("warn");
+    expect(results[1].fix).toBeUndefined();
   });
 });
