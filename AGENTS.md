@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Codex (plugin), Codex Desktop/Cowork (MCP server)
 - **Version:** 2.0.3
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 666 tests)
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 680 tests)
 
 ### What It Does
 
@@ -251,7 +251,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (666 tests across 36 test files)
+npm test                         # Run vitest (680 tests across 39 test files)
 npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~908KB)
 node dist/index.js               # Run MCP server directly
 ```
