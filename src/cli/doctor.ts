@@ -2,7 +2,7 @@
  * himalaya-mcp doctor — diagnose installation and per-account connectivity.
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, realpathSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, realpathSync, readdirSync, lstatSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { execFileSync } from "node:child_process";
@@ -275,6 +275,88 @@ function checkDesktopExtension(): CheckResult[] {
   return results;
 }
 
+function brewLibexecPath(): string | null {
+  for (const prefix of ["/opt/homebrew", "/usr/local"]) {
+    const libexec = join(prefix, "opt", "himalaya-mcp", "libexec");
+    if (existsSync(libexec)) return libexec;
+  }
+  return null;
+}
+
+function readPluginVersion(jsonPath: string): string | null {
+  try {
+    if (!existsSync(jsonPath)) return null;
+    const parsed = JSON.parse(readFileSync(jsonPath, "utf-8")) as { version?: string };
+    return parsed.version ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function relinkFix(dir: string, libexec: string): CheckResult["fix"] {
+  return {
+    description: `Relink ${dir} → ${libexec}`,
+    auto: () => {
+      rmSync(dir, { recursive: true, force: true });
+      symlinkSync(libexec, dir, "dir");
+    },
+  };
+}
+
+export function assessVersionDrift(opts: {
+  binaryVersion: string;
+  pluginDir: string;
+  pluginJsonPath: string;
+  sourceDir: string;
+  sourceJsonPath: string;
+  brewLibexecPath: string | null;
+}): CheckResult[] {
+  const { binaryVersion, pluginDir, pluginJsonPath, sourceDir, sourceJsonPath, brewLibexecPath } = opts;
+  const results: CheckResult[] = [];
+
+  if (!binaryVersion) return results;
+
+  const pluginVersion = readPluginVersion(pluginJsonPath);
+
+  if (pluginVersion === null) {
+    results.push({ name: "Plugin version", category: "Claude Code Plugin", status: "warn", message: "Could not read installed plugin version" });
+  } else if (pluginVersion !== binaryVersion) {
+    const fix = brewLibexecPath && existsSync(join(brewLibexecPath, ".claude-plugin", "plugin.json")) ? relinkFix(pluginDir, brewLibexecPath) : undefined;
+    results.push({
+      name: "Plugin version", category: "Claude Code Plugin", status: "warn",
+      message: `Installed plugin v${pluginVersion} ≠ binary v${binaryVersion}. Run: claude plugin update himalaya-mcp@local-plugins`,
+      fix,
+    });
+  } else {
+    results.push({ name: "Plugin version", category: "Claude Code Plugin", status: "pass", message: `v${pluginVersion} matches binary` });
+  }
+
+  if (!existsSync(sourceDir)) return results;
+
+  let isSymlink = false;
+  try { isSymlink = lstatSync(sourceDir).isSymbolicLink(); } catch { /* keep false */ }
+
+  const sourceVersion = readPluginVersion(sourceJsonPath);
+
+  if (sourceVersion === null) {
+    results.push({ name: "Marketplace source version", category: "Claude Code Plugin", status: "warn", message: "Could not read local-marketplace source version" });
+  } else if (sourceVersion !== binaryVersion || !isSymlink) {
+    const parts: string[] = [];
+    if (sourceVersion !== binaryVersion) parts.push(`local-marketplace source v${sourceVersion} ≠ binary v${binaryVersion}`);
+    if (!isSymlink) parts.push("local-marketplace source is a copy, not a symlink — brew upgrades will not propagate");
+    const fix = brewLibexecPath && existsSync(join(brewLibexecPath, ".claude-plugin", "plugin.json")) ? relinkFix(sourceDir, brewLibexecPath) : undefined;
+    results.push({
+      name: "Marketplace source version", category: "Claude Code Plugin", status: "warn",
+      message: `${parts.join("; ")}. Run: claude plugin update himalaya-mcp@local-plugins`,
+      fix,
+    });
+  } else {
+    results.push({ name: "Marketplace source version", category: "Claude Code Plugin", status: "pass", message: `symlinked to a current install, v${sourceVersion} matches binary` });
+  }
+
+  return results;
+}
+
 function checkCodePlugin(): CheckResult[] {
   const results: CheckResult[] = [];
 
@@ -291,6 +373,16 @@ function checkCodePlugin(): CheckResult[] {
     } else {
       results.push({ name: "plugin.json", category: "Claude Code Plugin", status: "fail", message: "Missing .claude-plugin/plugin.json" });
     }
+
+    const sourceDir = join(homedir(), ".claude", "local-marketplace", "himalaya-mcp");
+    results.push(...assessVersionDrift({
+      binaryVersion: getVersion(),
+      pluginDir: symlinkPath,
+      pluginJsonPath: pluginJson,
+      sourceDir,
+      sourceJsonPath: join(sourceDir, ".claude-plugin", "marketplace.json"),
+      brewLibexecPath: brewLibexecPath(),
+    }));
   } else {
     results.push({
       name: "Plugin symlink", category: "Claude Code Plugin", status: "warn",
