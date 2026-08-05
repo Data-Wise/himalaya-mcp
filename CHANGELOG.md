@@ -4,12 +4,13 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [2.0.4] - 2026-08-05
 
 ### Fixed
 
 - `himalaya-mcp doctor` now detects version drift in the Claude Code plugin chain: it compares the installed plugin's `plugin.json` version and the `local-plugins` marketplace source's version against the installed binary, and warns when the marketplace source is a directory copy instead of a symlink to the Homebrew install (so `brew upgrade` no longer propagates). `doctor --fix` auto-relinks stale directories to the Homebrew `libexec` layout.
 - Raised the himalaya CLI version-probe timeout from 5s to 15s so slow or heavily loaded CI/Docker environments no longer false-fail CLI-version detection (`Could not detect himalaya CLI version`).
+- `himalaya-mcp doctor`'s per-account health probe used hardcoded himalaya v1 CLI syntax (`folder list --output json`), which always failed on himalaya v2 (`unrecognized subcommand 'folder'`). It now detects the installed CLI's major version and uses `mailbox`/`--json` on v2.
 
 ### Changed
 
