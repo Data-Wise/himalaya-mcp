@@ -1,5 +1,7 @@
 node_modules/
 dist/
+!himalaya-mcp-plugin/dist/
+!himalaya-mcp-plugin/dist/index.js
 mcpb/dist/
 *.mcpb
 .env

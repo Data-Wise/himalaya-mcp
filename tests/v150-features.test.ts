@@ -29,7 +29,7 @@ const PROJECT_ROOT = resolve(__dirname, "..");
 describe("v1.5.0: SessionStart hook", () => {
   const hookPath = join(
     PROJECT_ROOT,
-    "himalaya-mcp-plugin/.claude-plugin/hooks/session-start.sh",
+    "himalaya-mcp-plugin/hooks/session-start.sh",
   );
 
   it("hook script executes and outputs valid JSON", async () => {

@@ -138,20 +138,22 @@ section() {
 
 section "1. Plugin Structure"
 
+CURRENT_VERSION=$(python3 -c "import json; print(json.load(open('package.json'))['version'])")
+
 assert_file_exists "himalaya-mcp-plugin/.claude-plugin/plugin.json" "plugin.json exists"
 assert_json_valid "himalaya-mcp-plugin/.claude-plugin/plugin.json" "plugin.json is valid JSON"
-assert_json_field "himalaya-mcp-plugin/.claude-plugin/plugin.json" "name" "email" "plugin name is 'email'"
-assert_json_field "himalaya-mcp-plugin/.claude-plugin/plugin.json" "version" "1.2.1" "plugin version is 1.2.1"
+assert_json_field "himalaya-mcp-plugin/.claude-plugin/plugin.json" "name" "himalaya" "plugin name is 'himalaya'"
+assert_json_field "himalaya-mcp-plugin/.claude-plugin/plugin.json" "version" "$CURRENT_VERSION" "plugin version is $CURRENT_VERSION"
 
 assert_file_exists ".claude-plugin/marketplace.json" "marketplace.json exists"
 assert_json_valid ".claude-plugin/marketplace.json" "marketplace.json is valid JSON"
 
 # Marketplace plugin name matches
 MARKETPLACE_NAME=$(python3 -c "import json; d=json.load(open('.claude-plugin/marketplace.json')); print(d['plugins'][0]['name'])" 2>/dev/null)
-if [[ "$MARKETPLACE_NAME" == "email" ]]; then
-    assert_pass "marketplace plugin name is 'email'"
+if [[ "$MARKETPLACE_NAME" == "himalaya" ]]; then
+    assert_pass "marketplace plugin name is 'himalaya'"
 else
-    assert_fail "marketplace plugin name is 'email'" "Got '$MARKETPLACE_NAME'"
+    assert_fail "marketplace plugin name is 'himalaya'" "Got '$MARKETPLACE_NAME'"
 fi
 
 assert_file_exists ".mcp.json" "MCP server config exists"
@@ -173,28 +175,28 @@ assert_dir_exists "src/adapters" "src/adapters/ directory"
 
 # ───────────────────────────────────────────────────────────────────────
 
-section "3. Skills (7 expected)"
+section "3. Skills (16 expected)"
 
-SKILLS=(inbox triage digest reply compose attachments help)
-SKILL_COUNT=$(ls himalaya-mcp-plugin/skills/*.md 2>/dev/null | wc -l | tr -d ' ')
+SKILLS=(inbox triage digest reply compose forward attachments export threads search manage stats config morning respond help)
+SKILL_COUNT=$(find himalaya-mcp-plugin/skills -mindepth 2 -maxdepth 2 -name SKILL.md -type f | wc -l | tr -d ' ')
 
-if [[ "$SKILL_COUNT" -eq 7 ]]; then
-    assert_pass "7 skill files found"
+if [[ "$SKILL_COUNT" -eq 16 ]]; then
+    assert_pass "16 SKILL.md files found"
 else
-    assert_fail "7 skill files found" "Found $SKILL_COUNT"
+    assert_fail "16 SKILL.md files found" "Found $SKILL_COUNT"
 fi
 
 for skill in "${SKILLS[@]}"; do
-    assert_file_exists "himalaya-mcp-plugin/skills/${skill}.md" "skill: ${skill}.md"
+    assert_file_exists "himalaya-mcp-plugin/skills/${skill}/SKILL.md" "skill: ${skill}/SKILL.md"
 done
 
 # Validate skill files are non-empty
 for skill in "${SKILLS[@]}"; do
-    local_file="himalaya-mcp-plugin/skills/${skill}.md"
+    local_file="himalaya-mcp-plugin/skills/${skill}/SKILL.md"
     if [[ -s "$local_file" ]]; then
-        assert_pass "${skill}.md is non-empty"
+        assert_pass "${skill}/SKILL.md is non-empty"
     else
-        assert_fail "${skill}.md is non-empty" "File is empty"
+        assert_fail "${skill}/SKILL.md is non-empty" "File is empty"
     fi
 done
 
@@ -220,17 +222,17 @@ done
 
 # Count registerTool calls
 TOOL_COUNT=$(grep -r 'registerTool' src/tools/*.ts src/adapters/clipboard.ts 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$TOOL_COUNT" -eq 21 ]]; then
-    assert_pass "21 registerTool calls found"
+if [[ "$TOOL_COUNT" -eq 29 ]]; then
+    assert_pass "29 registerTool calls found"
 else
-    assert_fail "21 registerTool calls found" "Found $TOOL_COUNT"
+    assert_fail "29 registerTool calls found" "Found $TOOL_COUNT"
 fi
 
 # ───────────────────────────────────────────────────────────────────────
 
-section "6. MCP Prompts (6 expected)"
+section "6. MCP Prompts (7 expected)"
 
-PROMPT_FILES=(triage.ts summarize.ts digest.ts reply.ts morning.ts inbox-check.ts)
+PROMPT_FILES=(triage.ts summarize.ts digest.ts weekly-digest.ts reply.ts morning.ts inbox-check.ts)
 for pf in "${PROMPT_FILES[@]}"; do
     assert_file_exists "src/prompts/$pf" "prompt source: $pf"
 done
@@ -250,9 +252,9 @@ section "8. Build Artifacts"
 
 if [[ -f "dist/index.js" ]]; then
     assert_pass "dist/index.js exists (esbuild bundle)"
-    # Check bundle size is reasonable (400KB-800KB)
+    # Check bundle size is reasonable (800KB-1.2MB)
     SIZE=$(wc -c < dist/index.js | tr -d ' ')
-    if [[ "$SIZE" -gt 400000 && "$SIZE" -lt 800000 ]]; then
+    if [[ "$SIZE" -gt 800000 && "$SIZE" -lt 1200000 ]]; then
         assert_pass "bundle size reasonable ($(( SIZE / 1024 ))KB)"
     else
         assert_fail "bundle size reasonable" "Got $(( SIZE / 1024 ))KB"
@@ -272,9 +274,9 @@ fi
 section "9. Setup CLI"
 
 if [[ -f "dist/cli/setup.js" ]]; then
-    assert_command_output_contains "setup --help shows usage" "Usage:" node dist/cli/setup.js --help
-    assert_command_output_contains "setup --help mentions --check" "check" node dist/cli/setup.js --help
-    assert_command_output_contains "setup --help mentions --remove" "remove" node dist/cli/setup.js --help
+    assert_command_output_contains "setup --help shows usage" "Usage:" node dist/cli/index.js --help
+    assert_command_output_contains "setup --help mentions --check" "check" node dist/cli/index.js --help
+    assert_command_output_contains "setup --help mentions --remove" "remove" node dist/cli/index.js --help
 else
     assert_skip "setup CLI tests" "dist/cli/setup.js not built"
 fi
@@ -286,7 +288,7 @@ section "10. Package Metadata"
 assert_file_exists "package.json" "package.json exists"
 assert_json_valid "package.json" "package.json is valid JSON"
 assert_json_field "package.json" "name" "himalaya-mcp" "npm package name"
-assert_json_field "package.json" "version" "1.2.1" "npm package version"
+assert_json_field "package.json" "version" "$CURRENT_VERSION" "npm package version"
 assert_file_contains "package.json" '"type": "module"' "ESM module type"
 
 # ───────────────────────────────────────────────────────────────────────
@@ -341,12 +343,14 @@ section "14. Vitest Suite"
 
 if command -v npx &>/dev/null; then
     echo -e "  ${CYAN}Running vitest...${NC}"
-    if npx vitest run --reporter=verbose 2>&1 | tail -5 | grep -q "Tests.*passed"; then
-        VITEST_RESULT=$(npx vitest run 2>&1 | grep "Tests" | tail -1)
+    VITEST_LOG=$(mktemp)
+    if npx vitest run --pool=threads --maxWorkers=1 >"$VITEST_LOG" 2>&1; then
+        VITEST_RESULT=$(grep "Tests" "$VITEST_LOG" | tail -1)
         assert_pass "vitest: $VITEST_RESULT"
     else
-        assert_fail "vitest suite passes" "See npm test output"
+        assert_fail "vitest suite passes" "See $VITEST_LOG"
     fi
+    rm -f "$VITEST_LOG"
 else
     assert_skip "vitest suite" "npx not available"
 fi

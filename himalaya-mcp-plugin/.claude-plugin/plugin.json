@@ -11,7 +11,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/bash \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/session-start.sh\"",
+            "command": "/bin/bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"",
             "timeout": 5000
           }
         ]
@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/bash \"${CLAUDE_PLUGIN_ROOT}/.claude-plugin/hooks/pre-send.sh\"",
+            "command": "/bin/bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-send.sh\"",
             "timeout": 5000
           }
         ]

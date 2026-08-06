@@ -432,6 +432,27 @@ describe.skipIf(!hasBuild)("CLI E2E: setup command", () => {
     }
   }, 10_000);
 
+  it("setup --check is read-only", async () => {
+    await execFileAsync("node", ["dist/cli/index.js", "setup"], {
+      cwd: PROJECT_ROOT,
+      env: { ...process.env, HOME: tempHome },
+    });
+    const before = await readFile(tempConfigPath, "utf-8");
+
+    let stdout = "";
+    try {
+      ({ stdout } = await execFileAsync("node", ["dist/cli/index.js", "setup", "--check"], {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, HOME: tempHome },
+      }));
+    } catch (error: any) {
+      stdout = error.stdout ?? "";
+    }
+
+    expect(stdout).toContain("configured");
+    expect(await readFile(tempConfigPath, "utf-8")).toBe(before);
+  }, 10_000);
+
   it("setup --remove removes config", async () => {
     // First, setup the config
     await execFileAsync("node", ["dist/cli/index.js", "setup"], {
@@ -910,6 +931,11 @@ describe("Plugin structure validation", () => {
     expect(mcpJson.mcpServers?.email).toBeDefined();
     expect(mcpJson.mcpServers.email.args[0]).toContain("dist/index.js");
     expect(mcpJson.mcpServers.email.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
+  });
+
+  it("plugin-root MCP bundle is present", async () => {
+    const bundle = await readFile(join(pluginRoot, "dist", "index.js"), "utf-8");
+    expect(bundle.length).toBeGreaterThan(400_000);
   });
 
   it("version consistency across all manifests", async () => {

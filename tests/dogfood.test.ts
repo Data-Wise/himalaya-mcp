@@ -1197,7 +1197,7 @@ describe("Packaging: plugin manifest structure", () => {
 });
 
 describe("Packaging: pre-send hook", () => {
-  const hookPath = join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "hooks", "pre-send.sh");
+  const hookPath = join(PROJECT_ROOT, "himalaya-mcp-plugin", "hooks", "pre-send.sh");
   let tempHome: string;
 
   /** Run the hook with isolated HOME to prevent audit log pollution */
