@@ -19,7 +19,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "mcp__plugin_himalaya_email",
+        "matcher": "mcp__plugin_himalaya_email__.*",
         "hooks": [
           {
             "type": "command",

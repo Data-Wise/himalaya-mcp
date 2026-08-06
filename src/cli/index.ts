@@ -50,7 +50,13 @@ async function runCli(): Promise<void> {
     const account = parseAccountFlag(args);
     await doctor({ fix, json, account, preRelease, postRelease });
   } else if (!command || command === "setup") {
-    setup();
+    if (args.includes("--check")) {
+      setupCheck();
+    } else if (args.includes("--remove")) {
+      setupRemove();
+    } else {
+      setup();
+    }
   } else {
     console.error(`himalaya-mcp: unknown command '${command}'`);
     console.error("Run 'himalaya-mcp --help' for usage.");

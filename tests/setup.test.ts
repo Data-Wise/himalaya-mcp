@@ -903,12 +903,13 @@ describe("Plugin structure validation", () => {
     expect(content.length).toBeGreaterThan(50);
   });
 
-  it(".mcp.json references dist/index.js", async () => {
+  it("plugin-root .mcp.json references dist/index.js", async () => {
     const mcpJson = JSON.parse(
-      await readFile(resolve(__dirname, "..", ".mcp.json"), "utf-8")
+      await readFile(join(pluginRoot, ".mcp.json"), "utf-8")
     );
     expect(mcpJson.mcpServers?.email).toBeDefined();
     expect(mcpJson.mcpServers.email.args[0]).toContain("dist/index.js");
+    expect(mcpJson.mcpServers.email.args[0]).toContain("${CLAUDE_PLUGIN_ROOT}");
   });
 
   it("version consistency across all manifests", async () => {

@@ -47,9 +47,9 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
                                                                             └─ Requires: brew install himalaya
   │
   ├─ libexec/
-  │   ├─ .claude-plugin/plugin.json
-  │   ├─ .claude-plugin/marketplace.json
-  │   ├─ .mcp.json
+   │   ├─ .claude-plugin/plugin.json
+   │   ├─ .claude-plugin/marketplace.json
+   │   ├─ .mcp.json
   │   ├─ plugin/skills/*/SKILL.md
   │   ├─ plugin/agents/*.md
   │   └─ dist/index.js (esbuild bundle, ~908KB)
@@ -59,6 +59,11 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
       ├─ register → ~/.claude/local-marketplace/marketplace.json
       └─ auto-enable → ~/.claude/settings.json
 ```
+
+The GitHub marketplace plugin definition also includes
+`himalaya-mcp-plugin/.mcp.json`. Claude Code resolves plugin MCP configuration
+relative to the installed plugin root; the Homebrew installer copies the
+server bundle into that same root.
 
 ### Build Pipeline
 

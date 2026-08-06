@@ -1235,6 +1235,7 @@ describe("Packaging: pre-send hook", () => {
     );
     expect(pJson.hooks).toBeDefined();
     expect(pJson.hooks.PreToolUse).toBeDefined();
+    expect(pJson.hooks.PreToolUse[0].matcher).toBe("mcp__plugin_himalaya_email__.*");
     const cmd = pJson.hooks.PreToolUse[0].hooks[0].command;
     expect(cmd).toContain("${CLAUDE_PLUGIN_ROOT}");
     expect(cmd).not.toContain("./.");

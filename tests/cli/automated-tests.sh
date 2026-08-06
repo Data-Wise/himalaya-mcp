@@ -156,6 +156,8 @@ fi
 
 assert_file_exists ".mcp.json" "MCP server config exists"
 assert_json_valid ".mcp.json" ".mcp.json is valid JSON"
+assert_file_exists "himalaya-mcp-plugin/.mcp.json" "plugin-root MCP server config exists"
+assert_json_valid "himalaya-mcp-plugin/.mcp.json" "plugin-root MCP config is valid JSON"
 
 # ───────────────────────────────────────────────────────────────────────
 

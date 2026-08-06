@@ -261,7 +261,7 @@ The setup command:
 | `dist/index.js` (bundle) | Built during install | Pre-built | Built locally |
 | `.claude-plugin/plugin.json` | Stripped to essentials | Full | Full |
 | `.claude-plugin/marketplace.json` | In libexec | In repo | In repo |
-| `.mcp.json` | In libexec | In repo | In repo |
+| `.mcp.json` | In libexec | `himalaya-mcp-plugin/.mcp.json` | `himalaya-mcp-plugin/.mcp.json` |
 | `skills/*/SKILL.md` | At libexec root | In repo | In repo |
 | `agents/*.md` | At libexec root | In repo | In repo |
 | `node_modules/` | Not shipped | Not shipped | Local only |
