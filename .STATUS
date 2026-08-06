@@ -3,8 +3,8 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.0.5 release in progress on dev
-## Focus: Release v2.0.5 after Claude Code/Desktop and Homebrew fixes
+## Status: v2.0.5 released (main/Homebrew/marketplace), dev synced
+## Focus: Maintenance after v2.0.5 Claude integration release
 ## Phase: Maintenance
 ## Priority: 1
 ## Progress: 100
@@ -38,6 +38,12 @@
 - **v1.9.0 CI Fix (PR #78)**: Fixed reminders.test.ts failing on Linux CI (process.platform mocking)
 
 ## Just Completed
+
+- 2026-08-05: Released v2.0.5. Release PR #132 merged to `main` as `f4fba9e`, GitHub release
+  published with `himalaya-mcp-v2.0.5.mcpb`, main CI and docs deployment passed, aggregator sync
+  passed, and Homebrew tap PR #207 merged. The Homebrew workflow's artifact-download step remains
+  a non-blocking CI defect because the release asset is already present; its GitHub App formula
+  update succeeded. `dev` is synced to the release commit.
 
 - 2026-08-05: Documentation sync PR #131 merged to `dev` as `29a0962`, documenting the Claude
   integration fixes, self-contained plugin bundle, stable Homebrew path, hook layout, recovery
