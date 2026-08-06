@@ -3,8 +3,8 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.0.4 released (main/Homebrew/marketplace), dev synced
-## Focus: Release v2.0.4 — #125 (doctor version drift), #126 (15s probe), #127 (docs), #128 (account health v1/v2); opencode MCP setup
+## Status: v2.0.4 released; Claude integration fixes merged to dev
+## Focus: Prepare v2.0.5 release after documenting Claude Code/Desktop and Homebrew fixes
 ## Phase: Maintenance
 ## Priority: 1
 ## Progress: 100
@@ -38,6 +38,14 @@
 - **v1.9.0 CI Fix (PR #78)**: Fixed reminders.test.ts failing on Linux CI (process.platform mocking)
 
 ## Just Completed
+
+- 2026-08-06: Reviewed and fixed Claude integration bugs in PR #130, then merged to `dev` as
+  `519580a`. Claude Desktop now uses the stable Homebrew `opt` path; `setup --check` is read-only;
+  GitHub Marketplace installs ship a plugin-root MCP config and prebuilt bundle; safety hooks use
+  the documented root `hooks/` layout and fully scoped MCP tool matcher; the automated suite was
+  updated to current counts and now runs Vitest once. Verification: 97 automated checks, 691 tests,
+  plugin validation, bundle, MCPB, TypeScript, JSON, and diff checks passed. Homebrew compatibility
+  merged separately in tap PR #206 as `f3c6ad4`.
 
 - 2026-08-02: PR #108 reviewed, fixed, and squash-merged to `dev` as `96447d1`
   (`fix: resolve himalaya sender and account config`). Review findings fixed before merge:

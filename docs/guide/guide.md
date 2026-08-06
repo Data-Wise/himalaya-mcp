@@ -366,7 +366,7 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 680 tests across 39 files (vitest)
+npm test    # 691 tests across 40 files (vitest, threads pool)
 ```
 
 Test breakdown:
