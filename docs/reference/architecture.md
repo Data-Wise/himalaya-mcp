@@ -50,8 +50,9 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
   │   ├─ .claude-plugin/plugin.json
   │   ├─ .claude-plugin/marketplace.json
   │   ├─ .mcp.json
-  │   ├─ plugin/skills/*/SKILL.md
-  │   ├─ plugin/agents/*.md
+  │   ├─ skills/*/SKILL.md
+  │   ├─ agents/*.md
+  │   ├─ hooks/*.sh
   │   └─ dist/index.js (esbuild bundle, ~908KB)
   │
   └─ post_install → himalaya-mcp-install

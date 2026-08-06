@@ -199,7 +199,8 @@ Then restart Claude Code.
 
 **Fix (GitHub Marketplace):**
 
-The marketplace install clones the full repo. Skills live at `himalaya-mcp-plugin/skills/`, but Claude Code expects them at the plugin root. Verify:
+The marketplace source packages `himalaya-mcp-plugin/` as the plugin root. Verify the installed
+cache exposes its skills directly at the plugin root:
 
 ```bash
 ls ~/.claude/plugins/himalaya-mcp/skills/
@@ -209,27 +210,44 @@ If missing, re-install: `claude plugin install himalaya@himalaya-mcp`
 
 ### MCP tools not available (GitHub Marketplace install)
 
-If you installed via `claude plugin marketplace add` and MCP tools (like `list_emails`, `search_emails`) are not available, the `dist/` directory may be missing. The GitHub marketplace method does not pre-build the server bundle.
+The GitHub Marketplace plugin now ships its own `dist/index.js` bundle. If MCP tools are
+missing, the installed plugin is likely stale or incomplete.
 
 **Diagnose:**
 
 ```bash
 ls ~/.claude/plugins/himalaya-mcp/dist/index.js
-# If "No such file", the bundle wasn't built
+# The file must exist inside the installed plugin directory
 ```
 
 **Fix:**
 
 ```bash
-cd ~/.claude/plugins/himalaya-mcp
-npm install && npm run build
+claude plugin marketplace update himalaya-mcp
+claude plugin update himalaya@himalaya-mcp
 ```
 
-Then restart Claude Code. The `dist/index.js` bundle is required for the MCP server to start.
+Then restart Claude Code. The plugin-root `.mcp.json` launches the bundled server through
+`${CLAUDE_PLUGIN_ROOT}/dist/index.js`.
+
+### Claude Desktop fails after a Homebrew upgrade
+
+If `mcp-server-himalaya.log` reports `MODULE_NOT_FOUND` for a path under
+`/opt/homebrew/Cellar/himalaya-mcp/<version>/`, the Desktop config contains a stale versioned
+keg path. Re-run setup with the current release:
+
+```bash
+himalaya-mcp setup
+himalaya-mcp setup --check
+```
+
+The expected entry uses the stable path
+`/opt/homebrew/opt/himalaya-mcp/libexec/dist/index.js`. `setup --check` is read-only and does
+not rewrite the configuration.
 
 ### Plugin not found after install
 
-If `claude plugin list` doesn't show the `email` plugin:
+If `claude plugin list` doesn't show the `himalaya` plugin:
 
 **1. Check the symlink exists and is valid:**
 
@@ -413,5 +431,5 @@ DEBUG=* node dist/index.js
 ### Run tests to verify installation
 
 ```bash
-npm test    # 680 tests
+npm test    # 691 tests across 40 files
 ```

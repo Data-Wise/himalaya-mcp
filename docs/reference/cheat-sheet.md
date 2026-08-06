@@ -133,9 +133,9 @@ Multi-acct: Any tool + account="work" | account="personal"
 
 ```
 npm run build           tsc (dev)
-npm run build:bundle    esbuild (~908KB)
-npm run build:mcpb      .mcpb extension (~247KB)
-npm test                680 tests (vitest)
+npm run build:bundle    esbuild root + plugin bundles (~908KB each)
+npm run build:mcpb      .mcpb extension (~253KB)
+npm test                691 tests (vitest, threads pool)
 ```
 
 ## Resources

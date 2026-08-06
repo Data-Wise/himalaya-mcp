@@ -196,9 +196,9 @@ Restart Claude Desktop after removal.
 
 ```bash
 npm run build           # TypeScript compilation (development)
-npm run build:bundle    # esbuild single-file bundle (~908KB, production)
-npm run build:mcpb      # Build .mcpb Desktop Extension (~247KB)
-npm test                # Run 680 tests (vitest)
+npm run build:bundle    # Build root + plugin bundles (~908KB each, production)
+npm run build:mcpb      # Build .mcpb Desktop Extension (~253KB)
+npm test                # Run 691 tests (vitest, threads pool)
 node dist/index.js      # Start MCP server standalone
 ```
 
