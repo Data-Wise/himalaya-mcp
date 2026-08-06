@@ -1197,7 +1197,7 @@ describe("Packaging: plugin manifest structure", () => {
 });
 
 describe("Packaging: pre-send hook", () => {
-  const hookPath = join(PROJECT_ROOT, "himalaya-mcp-plugin", ".claude-plugin", "hooks", "pre-send.sh");
+  const hookPath = join(PROJECT_ROOT, "himalaya-mcp-plugin", "hooks", "pre-send.sh");
   let tempHome: string;
 
   /** Run the hook with isolated HOME to prevent audit log pollution */
@@ -1235,6 +1235,7 @@ describe("Packaging: pre-send hook", () => {
     );
     expect(pJson.hooks).toBeDefined();
     expect(pJson.hooks.PreToolUse).toBeDefined();
+    expect(pJson.hooks.PreToolUse[0].matcher).toBe("mcp__plugin_himalaya_email__.*");
     const cmd = pJson.hooks.PreToolUse[0].hooks[0].command;
     expect(cmd).toContain("${CLAUDE_PLUGIN_ROOT}");
     expect(cmd).not.toContain("./.");

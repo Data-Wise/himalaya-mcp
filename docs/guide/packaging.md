@@ -18,14 +18,14 @@ flowchart TD
     SRC["`**Source**
     16 TypeScript files
     + MCP SDK + zod`"] -->|esbuild| BUNDLE["`**dist/index.js**
-    604KB single file`"]
+    908KB single file`"]
 
     BUNDLE --> HB["`**Homebrew**
     brew install himalaya-mcp`"]
     BUNDLE --> MCPB["`**.mcpb Extension**
     ~253KB ZIP archive`"]
     BUNDLE --> GH["`**GitHub Marketplace**
-    claude plugin marketplace add`"]
+    self-contained plugin cache`"]
     BUNDLE --> DEV["`**Source Install**
     git clone + npm run build`"]
 
@@ -51,13 +51,14 @@ npm run build:bundle
 
 **Input:** 16 TypeScript source files + `@modelcontextprotocol/sdk` dependency
 
-**Output:** Single `dist/index.js` (604KB minified)
+**Output:** Single `dist/index.js` (approximately 908KB minified), copied to
+`himalaya-mcp-plugin/dist/index.js` for GitHub Marketplace installs.
 
 The bundle includes all dependencies (MCP SDK, zod) inlined. No runtime `node_modules` needed -- just `node dist/index.js`.
 
 ### Why esbuild
 
-- **72MB to 604KB** -- node_modules eliminated entirely
+- **72MB to approximately 908KB** -- node_modules eliminated entirely
 - **Zero runtime deps** -- single file ships in Homebrew formula
 - **Fast** -- builds in ~25ms
 - **ESM compatible** -- handles zod/v4 import maps and MCP SDK subpath exports
@@ -67,7 +68,7 @@ The bundle includes all dependencies (MCP SDK, zod) inlined. No runtime `node_mo
 | Script | Purpose | Output |
 |--------|---------|--------|
 | `npm run build` | TypeScript compilation (development) | `dist/*.js` + `.d.ts` + sourcemaps |
-| `npm run build:bundle` | esbuild single-file (production) | `dist/index.js` (604KB) |
+| `npm run build:bundle` | esbuild single-file (production) | `dist/index.js` and `himalaya-mcp-plugin/dist/index.js` |
 
 ## Homebrew Formula
 
@@ -78,7 +79,7 @@ The formula lives in the [homebrew-tap](https://github.com/Data-Wise/homebrew-ta
 1. **Downloads** the release tarball from GitHub
 2. **Installs dependencies** -- `himalaya` (email CLI) + `node` (runtime)
 3. **Builds** -- runs `npm install` then `npm run build:bundle`
-4. **Installs to libexec** -- `.claude-plugin/`, `.mcp.json`, `skills/`, `agents/`, `dist/`
+4. **Installs to libexec** -- `.claude-plugin/`, `.mcp.json`, `hooks/`, `skills/`, `agents/`, `dist/`
 5. **Runs post-install** -- auto-runs install script (symlink, marketplace registration, auto-enable)
 
 ### Post-install script
@@ -258,10 +259,11 @@ The setup command:
 
 | Content | Homebrew | GitHub | Source |
 |---------|----------|--------|--------|
-| `dist/index.js` (bundle) | Built during install | Pre-built | Built locally |
+| `dist/index.js` (bundle) | Built during install | Pre-built at `himalaya-mcp-plugin/dist/index.js` | Built locally |
 | `.claude-plugin/plugin.json` | Stripped to essentials | Full | Full |
 | `.claude-plugin/marketplace.json` | In libexec | In repo | In repo |
-| `.mcp.json` | In libexec | In repo | In repo |
+| `.mcp.json` | In libexec | `himalaya-mcp-plugin/.mcp.json` | `himalaya-mcp-plugin/.mcp.json` |
+| `hooks/*.sh` | At libexec root | In `himalaya-mcp-plugin/hooks/` | In `himalaya-mcp-plugin/hooks/` |
 | `skills/*/SKILL.md` | At libexec root | In repo | In repo |
 | `agents/*.md` | At libexec root | In repo | In repo |
 | `node_modules/` | Not shipped | Not shipped | Local only |

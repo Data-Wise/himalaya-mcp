@@ -7,8 +7,8 @@ git clone https://github.com/Data-Wise/himalaya-mcp.git
 cd himalaya-mcp
 npm install
 npm run build              # TypeScript compilation
-npm run build:bundle       # esbuild single-file bundle (~908KB)
-npm test                   # Run all 680 tests
+npm run build:bundle       # Build root + plugin bundles (~908KB each)
+npm test                   # Run all 691 tests
 ```
 
 ## Project Structure
@@ -22,7 +22,7 @@ src/                        # TypeScript source
   prompts/                  # 7 MCP prompt handlers
   resources/                # 3 MCP resource handlers
   adapters/                 # clipboard, calendar
-tests/                      # 680 tests across 39 files
+tests/                      # 691 tests across 40 files
 dist/                       # Build output
 himalaya-mcp-plugin/        # Claude Code plugin definition
 ```
@@ -61,7 +61,9 @@ npm run build:bundle        # esbuild — single file, for distribution
 npm run build:mcpb          # Package as .mcpb Desktop Extension
 ```
 
-The esbuild bundle includes all dependencies in a single ~604KB file. This eliminates the 72MB `node_modules` requirement for distribution.
+The esbuild bundle includes all dependencies in a single ~908KB file. The production build writes
+the standalone bundle to `dist/index.js` and copies it to `himalaya-mcp-plugin/dist/index.js` for
+marketplace distribution. This eliminates the 72MB `node_modules` requirement at runtime.
 
 ## Documentation
 

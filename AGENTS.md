@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Codex plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Codex (plugin), Codex Desktop/Cowork (MCP server)
-- **Version:** 2.0.4
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 680 tests)
+- **Version:** 2.0.5
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 691 tests)
 
 ### What It Does
 
@@ -78,6 +78,8 @@ himalaya-mcp/
 ├── himalaya-mcp-plugin/
 │   ├── .claude-plugin/
 │   │   └── plugin.json          # Plugin manifest
+│   ├── .mcp.json                # Plugin-root MCP server config
+│   ├── dist/index.js            # Prebuilt bundle for marketplace installs
 │   ├── skills/                  # Plugin skills (16: inbox, triage, digest, compose, reply, respond, forward, attachments, export, threads, search, manage, stats, config, help, morning)
 │   ├── agents/                  # Plugin agents (email-assistant)
 │   └── hooks/                   # Plugin hooks (SessionStart, PreToolUse)
@@ -251,8 +253,8 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (680 tests across 39 test files)
-npm run build:bundle             # esbuild single-file bundle (dist/index.js, ~908KB)
+npm test                         # Run vitest (691 tests across 40 test files)
+npm run build:bundle             # Build root + plugin bundles (~908KB each)
 node dist/index.js               # Run MCP server directly
 ```
 

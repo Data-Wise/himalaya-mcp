@@ -3,9 +3,9 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.0.4 release in progress (bump committed, PR to main pending)
-## Focus: Release v2.0.4 — #125 (doctor version drift), #126 (15s probe), #127 (docs), #128 (account health v1/v2)
-## Phase: Release (v2.0.4)
+## Status: v2.0.5 release in progress on dev
+## Focus: Release v2.0.5 after Claude Code/Desktop and Homebrew fixes
+## Phase: Maintenance
 ## Priority: 1
 ## Progress: 100
 
@@ -38,6 +38,18 @@
 - **v1.9.0 CI Fix (PR #78)**: Fixed reminders.test.ts failing on Linux CI (process.platform mocking)
 
 ## Just Completed
+
+- 2026-08-05: Documentation sync PR #131 merged to `dev` as `29a0962`, documenting the Claude
+  integration fixes, self-contained plugin bundle, stable Homebrew path, hook layout, recovery
+  steps, and current 691-test validation baseline.
+
+- 2026-08-06: Reviewed and fixed Claude integration bugs in PR #130, then merged to `dev` as
+  `519580a`. Claude Desktop now uses the stable Homebrew `opt` path; `setup --check` is read-only;
+  GitHub Marketplace installs ship a plugin-root MCP config and prebuilt bundle; safety hooks use
+  the documented root `hooks/` layout and fully scoped MCP tool matcher; the automated suite was
+  updated to current counts and now runs Vitest once. Verification: 97 automated checks, 691 tests,
+  plugin validation, bundle, MCPB, TypeScript, JSON, and diff checks passed. Homebrew compatibility
+  merged separately in tap PR #206 as `f3c6ad4`.
 
 - 2026-08-02: PR #108 reviewed, fixed, and squash-merged to `dev` as `96447d1`
   (`fix: resolve himalaya sender and account config`). Review findings fixed before merge:
@@ -141,27 +153,30 @@
 
 ## Current State
 
-- Branch: `dev` @ `0c5e2fe` (`origin/dev`) — v2.0.4 release in progress.
-- Version: 2.0.4 (bump in flight; 2.0.3 was released to `main`/Homebrew/marketplace, tag `v2.0.3`).
+- Branch: `dev` @ `e9bfdcb` (`origin/dev`) — v2.0.4 released and merged to `main`, dev synced.
+- Version: 2.0.4 (released to `main`/Homebrew/marketplace, tag `v2.0.4`, `.mcpb` asset attached).
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 680 tests across 39 test files. Full host run (threads pool): 680/680 pass, exit 0, ~6.3 min.
+- Tests: 686 tests across 40 test files. Full host run (threads pool): 686/686 pass, exit 0, ~6.4 min.
   (Docker full-suite verification runs detached without `--rm` + `docker wait` to capture the real exit
   status; 8 environmental flakes seen in one Docker run were false failures of the 5s version probe,
   fixed by raising it to 15s — PR #126.) CI on `main` green
   (bundle/test/validate-mcpb/validate-plugin, `test` job ~9min).
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
-- Homebrew: data-wise/tap/himalaya-mcp — confirmed at v2.0.3 (`url`/`sha256` verified live
-  against the tap repo, not assumed).
+- Homebrew: data-wise/tap/himalaya-mcp — confirmed at v2.0.4 (`url`/`sha256` verified live
+  against the tap repo, not assumed; commit d9e75ec).
 - Aggregator marketplace: Data-Wise/claude-plugins `.claude-plugin/marketplace.json` confirmed
-  `himalaya` @ 2.0.3.
+  `himalaya` @ 2.0.4 (auto-synced by aggregator-sync.yml, PR #43).
 - Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/ (Deploy Docs workflow green on
-  the v2.0.3 merge commit).
-- Bundle: ~908KB (esbuild), .mcpb: ~253KB
-- Open PRs: #79 is superseded by merged #108. #82 (HTML compose_email) remains blocked by
-  manifest drift; #97 (TypeScript 7 bump) remains deferred. Issue #121 (not fixed, recurred
-  again on this release): `.mcpb` CI artifact-upload flake in `actions/upload-artifact@v7` —
+  the v2.0.4 merge commit).
+- Bundle: ~908KB (esbuild), .mcpb: ~252KB
+- opencode: `himalaya` MCP server configured in `~/.config/opencode/config.json` (enabled,
+  entry `/opt/homebrew/opt/himalaya-mcp/libexec/dist/index.js`, `HIMALAYA_ACCOUNT=unm`; was
+  disabled with a dead Cellar 2.0.0 path + obsolete wrapper).
+- Open PRs: #82 (HTML compose_email) remains blocked by manifest drift; #97 (TypeScript 7 bump)
+  remains deferred. Issue #121 (not fixed, recurred again on this release): `.mcpb` CI
+  artifact-upload flake in `actions/upload-artifact@v7` —
   `Upload MCPB to Release` job downloads an empty (22-byte) artifact and fails; harmless when
-  the GitHub Release was created with the `.mcpb` asset attached directly (as done for v2.0.3),
+  the GitHub Release was created with the `.mcpb` asset attached directly (as done for v2.0.4),
   since that job only re-uploads a file the release already has.
 
 ## Install
@@ -191,6 +206,22 @@ himalaya-mcp doctor --fix
 
 ## Just Completed
 
+- 2026-08-05: **v2.0.4 released** (tag `v2.0.4`, `.mcpb` asset attached, PR #129 dev→main merge
+  `e9bfdcb`). Contains: #125 doctor version-drift checks (plugin.json + marketplace source vs
+  binary; `doctor --fix` auto-relinks stale dir copies to Homebrew libexec) + vitest threads pool;
+  #126 version-probe timeout 5s→15s; #127 docs (changelog, doctor checks, test counts 680/39);
+  #128 account-health probe dual v1/v2 syntax (`mailbox`/`--json` on v2). Verified: tsc clean,
+  version-sensitive tests 82/82, full host run 686/686 (40 files) — run completed again at wrap.
+  Homebrew formula bumped to v2.0.4 (tap commit d9e75ec, `brew audit` clean); aggregator
+  Data-Wise/claude-plugins auto-synced to `himalaya` @ 2.0.4 (PR #43); CI on main green; docs
+  deployed. Dev synced to main. Advisory pins: `brew upgrade himalaya-mcp` (done, binary now
+  2.0.4), `claude plugin update himalaya-mcp@local-plugins`.
+- 2026-08-05: Set up the `himalaya` MCP server for **opencode**: fixed the stale entry in
+  `~/.config/opencode/config.json` (was disabled, pointed at a dead Cellar 2.0.0 path, used an
+  obsolete `HIMALAYA_BINARY` wrapper + wrong `HIMALAYA_ACCOUNT=default`). Now enabled with
+  `command: [node, /opt/homebrew/opt/himalaya-mcp/libexec/dist/index.js]` (stable opt symlink)
+  and `HIMALAYA_ACCOUNT=unm`. Config validated as JSON; restart opencode to load the ~29 email
+  tools.
 - 2026-08-03: Discovered and fully specified a **critical post-release bug**: every himalaya-mcp
   MCP tool call fails against `himalaya 2.0.0` (Homebrew's current stable) because
   `HimalayaClient.execOnce()` unconditionally sends `--output json`, a flag the v2 CLI rejects

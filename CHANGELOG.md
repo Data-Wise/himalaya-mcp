@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.5] - 2026-08-05
+
+### Fixed
+
+- Claude Desktop setup now writes the upgrade-safe Homebrew path
+  `$(brew --prefix)/opt/himalaya-mcp/libexec/dist/index.js` instead of resolving to a
+  versioned `Cellar` path that breaks after `brew upgrade`.
+- `himalaya-mcp setup --check` and `himalaya-mcp setup --remove` now dispatch to the documented
+  subcommands instead of falling through to a configuration write.
+- Claude Code marketplace installs now include the plugin-root `.mcp.json` and prebuilt
+  `himalaya-mcp-plugin/dist/index.js`, so the bundled MCP server does not depend on files outside
+  the cached plugin directory.
+- Claude Code safety hooks now use the fully scoped MCP tool matcher and live in the documented
+  plugin-root `hooks/` directory.
+- The CLI automated test suite now matches the current plugin name, 16 skills, 29 tools, 7
+  prompts, 691-test suite, and runs Vitest once with the threads pool instead of launching the
+  full suite twice.
+
+### Changed
+
+- `npm run build:bundle` refreshes both the standalone `dist/index.js` bundle and the bundled
+  Claude Code plugin copy.
+
 ## [2.0.4] - 2026-08-05
 
 ### Fixed

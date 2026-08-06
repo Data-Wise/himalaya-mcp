@@ -33,6 +33,14 @@ export const EXTENSIONS_DIR = join(CONFIG_DIR, "Claude Extensions");
 export const EXTENSIONS_SETTINGS_DIR = join(CONFIG_DIR, "Claude Extensions Settings");
 export const INSTALLATIONS_PATH = join(CONFIG_DIR, "extensions-installations.json");
 
+/** Return the upgrade-safe Homebrew entry when this module runs from a keg. */
+export function stableBrewEntry(path: string): string | null {
+  const match = path.match(
+    /^(.*)\/(?:Cellar\/himalaya-mcp\/[^/]+|opt\/himalaya-mcp)\/libexec\/dist\/cli\/index\.js$/,
+  );
+  return match ? join(match[1], "opt", "himalaya-mcp", "libexec", "dist", "index.js") : null;
+}
+
 /**
  * Find dist/index.js — the MCP server entry point.
  *
@@ -42,7 +50,18 @@ export const INSTALLATIONS_PATH = join(CONFIG_DIR, "extensions-installations.jso
  */
 export function findServerEntry(): string {
   const thisFile = fileURLToPath(import.meta.url);
-  const distDir = dirname(dirname(realpathSync(thisFile)));
+  const invokedEntry = stableBrewEntry(process.argv[1] || thisFile);
+  if (invokedEntry && existsSync(invokedEntry)) {
+    return invokedEntry;
+  }
+
+  const resolvedFile = realpathSync(thisFile);
+  const resolvedEntry = stableBrewEntry(resolvedFile);
+  if (resolvedEntry && existsSync(resolvedEntry)) {
+    return resolvedEntry;
+  }
+
+  const distDir = dirname(dirname(resolvedFile));
   const relativeEntry = join(distDir, "index.js");
   if (existsSync(relativeEntry)) {
     return relativeEntry;
