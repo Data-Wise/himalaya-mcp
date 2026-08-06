@@ -60,6 +60,11 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
       └─ auto-enable → ~/.claude/settings.json
 ```
 
+The GitHub marketplace plugin definition also includes
+`himalaya-mcp-plugin/.mcp.json`. Claude Code resolves plugin MCP configuration
+relative to the installed plugin root; the Homebrew installer copies the
+server bundle into that same root.
+
 ### Build Pipeline
 
 ```
