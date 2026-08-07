@@ -20,7 +20,7 @@ vi.mock("node:fs", async () => {
 });
 
 import { execFile, execFileSync } from "node:child_process";
-import { checkAccountHealth } from "../src/cli/doctor";
+import { checkAccountHealth, clearDoctorClientCache } from "../src/cli/doctor";
 
 const mockExecFileSync = vi.mocked(execFileSync);
 const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
@@ -30,6 +30,9 @@ describe("checkAccountHealth — dual v1/v2 CLI syntax, multi-surface", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // A fresh client per test: the cached HimalayaClient memoizes its
+    // resolved himalaya version, which would leak v2 into the v1 test.
+    clearDoctorClientCache();
     // `which himalaya` resolves to a fixed path.
     mockExecFileSync.mockImplementation((bin: string) =>
       Buffer.from(bin === "which" ? "/opt/homebrew/bin/himalaya\n" : "[]\n"),

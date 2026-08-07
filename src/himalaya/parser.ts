@@ -40,18 +40,24 @@ export function parse<T>(raw: string): CommandOutput<T> {
 }
 
 /**
- * Unwrap a himalaya v2 list wrapper object back into a bare array.
+ * Unwrap a himalaya list response into a bare array, reporting which wire
+ * shape was matched so callers can pick the right normalization.
  *
  * himalaya v1 returns bare arrays (`[...]`), while v2 wraps them in a named
- * object (`{"mailboxes":[...]}`, `{"envelopes":[...]}`). Accepts either shape.
+ * object (`{"mailboxes":[...]}`, `{"envelopes":[...]}`). The matched shape is
+ * authoritative: `"array"` means the elements are canonical v1 shapes, `"key"`
+ * means they are v2 wire shapes, and `"none"` means the response had neither
+ * shape (callers should fail loud rather than degrade to an empty list).
  */
-export function unwrapList<T>(data: unknown, key: string): T[] {
-  if (Array.isArray(data)) return data as T[];
+export type ListUnwrap<T> = { matched: "array" | "key" | "none"; data: T[] };
+
+export function unwrapList<T>(data: unknown, key: string): ListUnwrap<T> {
+  if (Array.isArray(data)) return { matched: "array", data: data as T[] };
   if (data !== null && typeof data === "object") {
     const wrapped = (data as Record<string, unknown>)[key];
-    if (Array.isArray(wrapped)) return wrapped as T[];
+    if (Array.isArray(wrapped)) return { matched: "key", data: wrapped as T[] };
   }
-  return [];
+  return { matched: "none", data: [] };
 }
 
 /** Map a v2 address (array of {name, email}) to the canonical single Address. */
@@ -60,46 +66,69 @@ function firstAddress(list: V2Address[]): Address {
   return first ? { name: first.name, addr: first.email } : { name: null, addr: "" };
 }
 
-/** Normalize a v2 envelope object to the canonical v1 Envelope shape. */
-function normalizeEnvelope(e: Envelope | V2Envelope): Envelope {
-  // v2 `from`/`to` are arrays; v1's are single objects. Presence of an array
-  // distinguishes the wire shapes.
-  if (!Array.isArray(e.from)) return e as Envelope;
-  // v2 branch: `from`/`to` are arrays, `flags` are {raw, iana} objects,
-  // sizes are kebab-case `has-attachment` null|bool.
-  const v2 = e as V2Envelope;
+/**
+ * Normalize a v2 envelope object to the canonical v1 Envelope shape.
+ * Only called on the v2 wire shape (`{envelopes:[...]}`), so `from`/`to` are
+ * arrays, `flags` are {raw, iana} objects, and attachment is kebab-case.
+ */
+function normalizeEnvelope(e: V2Envelope): Envelope {
   return {
-    id: v2.id,
-    flags: v2.flags.map((f) => f.raw.replace(/^\\/, "")),
-    subject: v2.subject,
-    from: firstAddress(v2.from),
-    to: firstAddress(v2.to),
-    date: v2.date,
-    has_attachment: Boolean(v2["has-attachment"]),
+    id: e.id,
+    flags: e.flags.map((f) => f.raw.replace(/^\\/, "")),
+    subject: e.subject,
+    from: firstAddress(e.from),
+    to: firstAddress(e.to),
+    date: e.date,
+    has_attachment: Boolean(e["has-attachment"]),
   };
 }
 
-/** Normalize a v2 mailbox object to the canonical Folder shape. */
-function normalizeFolder(f: Folder | V2Mailbox): Folder {
-  // v2 mailbox objects carry id/name/total/unread but no `desc`
-  if ("desc" in f) return f;
+/**
+ * Normalize a v2 mailbox object to the canonical Folder shape.
+ * v2 mailbox objects carry id/name/total/unread but no `desc`.
+ */
+function normalizeFolder(f: V2Mailbox): Folder {
   return { name: f.name, desc: "" };
 }
 
-/** Parse envelope list response (v1 bare array or v2 {"envelopes":[...]}). */
+/**
+ * Parse envelope list response (v1 bare array or v2 {"envelopes":[...]}).
+ * Fails loud with `parse_error` when the response has neither shape rather
+ * than silently reporting an empty inbox.
+ */
 export function parseEnvelopes(raw: string): CommandOutput<Envelope[]> {
   const result = parse<unknown>(raw);
   if (!result.ok) return result;
-  const list = unwrapList<Envelope | V2Envelope>(result.data, "envelopes");
-  return { ok: true, data: list.map(normalizeEnvelope) };
+  const { matched, data } = unwrapList<Envelope | V2Envelope>(result.data, "envelopes");
+  if (matched === "none") {
+    return {
+      ok: false,
+      error: "Unexpected envelope list response (expected an array or {envelopes:[...]})",
+      code: "PARSE_ERROR",
+    };
+  }
+  const list = matched === "array" ? (data as Envelope[]) : (data as V2Envelope[]).map(normalizeEnvelope);
+  return { ok: true, data: list };
 }
 
-/** Parse folder list response (v1 bare array or v2 {"mailboxes":[...]}). */
+/**
+ * Parse folder list response (v1 bare array or v2 {"mailboxes":[...]}).
+ * Fails loud with `parse_error` when the response has neither shape rather
+ * than silently reporting an empty folder list.
+ */
 export function parseFolders(raw: string): CommandOutput<Folder[]> {
   const result = parse<unknown>(raw);
   if (!result.ok) return result;
-  const list = unwrapList<Folder | V2Mailbox>(result.data, "mailboxes");
-  return { ok: true, data: list.map(normalizeFolder) };
+  const { matched, data } = unwrapList<Folder | V2Mailbox>(result.data, "mailboxes");
+  if (matched === "none") {
+    return {
+      ok: false,
+      error: "Unexpected folder list response (expected an array or {mailboxes:[...]})",
+      code: "PARSE_ERROR",
+    };
+  }
+  const list = matched === "array" ? (data as Folder[]) : (data as V2Mailbox[]).map(normalizeFolder);
+  return { ok: true, data: list };
 }
 
 /** Parse account list response. */

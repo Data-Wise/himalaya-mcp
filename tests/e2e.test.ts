@@ -1182,8 +1182,22 @@ describe("E2E: v2 CLI Compatibility", () => {
   // that were broken on v2 (issue #133) are verified end-to-end.
   const V2_FAKE = `#!/bin/bash
 args="$*"
+# v2 rejects the v1 folder flag outright; if the client still passes
+# --folder the tool call must fail loudly (proves the --mailbox branch).
+if echo "$args" | grep -q -- "--folder"; then
+  echo "error: unexpected argument '--folder' found" >&2
+  exit 1
+fi
 if echo "$args" | grep -q "account list"; then
   echo '{"accounts":[{"name":"unm","default":true,"backends":["imap","smtp"]}]}'
+  exit 0
+fi
+if echo "$args" | grep -q "message read"; then
+  echo '"Read from non-INBOX mailbox: v2 body works"'
+  exit 0
+fi
+if echo "$args" | grep -q "message move"; then
+  echo '{}'
   exit 0
 fi
 if echo "$args" | grep -q "mailbox list"; then
@@ -1292,6 +1306,52 @@ echo '[]'
         expect(body.himalayaVersion).toMatch(/himalaya v2\.0\.0/);
         expect(body.accounts[0].surfaces.folders.ok).toBe(true);
         expect(body.accounts[0].surfaces.envelopes.ok).toBe(true);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "read_email on a non-INBOX mailbox uses --mailbox (v2)",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "read_email",
+          arguments: { id: "100", folder: "Archive" },
+        });
+        expect(result.result?.isError).toBeFalsy();
+        const text = result.result.content[0].text as string;
+        expect(text).toContain("v2 body works");
+        expect(text).not.toContain("undefined");
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "move_email from a non-INBOX mailbox uses --mailbox (v2)",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "move_email",
+          arguments: { id: "100", target_folder: "Trash", folder: "Archive" },
+        });
+        expect(result.result?.isError).toBeFalsy();
+        const text = result.result.content[0].text as string;
+        expect(text).toContain("Trash");
+        expect(text).not.toContain("undefined");
       } finally {
         await harness.cleanup();
       }

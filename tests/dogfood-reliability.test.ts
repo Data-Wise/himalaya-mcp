@@ -66,6 +66,13 @@ describe("dogfood: reliability scenarios", () => {
     });
   });
 
+  // Stub the envelope surface for health_check scenarios. listEnvelopes is
+  // not default-spied, so every health_check scenario that probes envelopes
+  // must call this (or provide its own stub, e.g. a failure for Scenario 22).
+  function mockHealthyEnvelopes(): ReturnType<typeof vi.spyOn> {
+    return vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+  }
+
   // ─── Scenario 1 ──────────────────────────────────────────────────────────
   it('Scenario 1: "Check my email" — one account broken, others healthy', async () => {
     vi.spyOn(accountsMod, "listAccounts").mockResolvedValue([
@@ -86,7 +93,7 @@ describe("dogfood: reliability scenarios", () => {
         return "[]";
       },
     );
-    vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
@@ -105,7 +112,7 @@ describe("dogfood: reliability scenarios", () => {
       { name: "personal", isDefault: false },
     ]);
     vi.spyOn(HimalayaClient.prototype, "listFolders").mockResolvedValue("[]");
-    vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
@@ -193,7 +200,7 @@ describe("dogfood: reliability scenarios", () => {
         });
       },
     );
-    vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({ account: "unm" }, client);
@@ -306,7 +313,7 @@ describe("dogfood: reliability scenarios", () => {
         });
       },
     );
-    vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
@@ -465,7 +472,7 @@ describe("dogfood: reliability scenarios", () => {
         return "[]";
       },
     );
-    vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
     const body = JSON.parse(result.content[0].text);
@@ -505,9 +512,7 @@ describe("dogfood: reliability scenarios", () => {
       { name: "unm", isDefault: true },
     ]);
     vi.spyOn(HimalayaClient.prototype, "listFolders").mockResolvedValue("[]");
-    // listEnvelopes is not default-spied anymore; health_check's envelope
-    // probe needs a hermetic stub here.
-    vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);

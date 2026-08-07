@@ -45,7 +45,9 @@ function surfaceFromError(err: unknown): ProbeSurface {
 
 /**
  * Probe both the folder and envelope surfaces for a single account.
- * Both inherit transient-retry from HimalayaClient.exec.
+ * Both inherit transient-retry from HimalayaClient.exec. Probes run
+ * sequentially so downstream test mocks (and subprocess call ordering)
+ * stay deterministic; each probe is a separate subprocess anyway.
  */
 export async function probeAccountSurfaces(
   account: string,

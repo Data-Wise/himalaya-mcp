@@ -6,6 +6,7 @@ import {
   parseAccounts,
   parseMessageBody,
   formatEnvelope,
+  unwrapList,
 } from "../src/himalaya/parser.js";
 
 describe("parse (generic)", () => {
@@ -38,6 +39,29 @@ describe("parse (generic)", () => {
     if (!result.ok) {
       expect(result.code).toBe("PARSE_ERROR");
     }
+  });
+});
+
+describe("unwrapList", () => {
+  it("matches bare arrays as shape 'array'", () => {
+    const result = unwrapList<number>([1, 2], "envelopes");
+    expect(result.matched).toBe("array");
+    expect(result.data).toEqual([1, 2]);
+  });
+
+  it("matches wrapper objects as shape 'key'", () => {
+    const result = unwrapList<{ id: string }>({ mailboxes: [{ id: "INBOX" }] }, "mailboxes");
+    expect(result.matched).toBe("key");
+    expect(result.data).toEqual([{ id: "INBOX" }]);
+  });
+
+  it("reports 'none' when the response has neither shape", () => {
+    expect(unwrapList("nope", "envelopes").matched).toBe("none");
+    expect(unwrapList({ foo: "bar" }, "envelopes").matched).toBe("none");
+    expect(unwrapList({ envelopes: "not-an-array" }, "envelopes").matched).toBe("none");
+    expect(unwrapList(null, "envelopes").matched).toBe("none");
+    expect(unwrapList(undefined, "envelopes").matched).toBe("none");
+    expect(unwrapList([1, 2], "mailboxes").matched).toBe("array");
   });
 });
 
@@ -125,6 +149,25 @@ describe("parseEnvelopes", () => {
     }
   });
 
+  it("fails loud when response has neither a bare array nor an envelopes wrapper", () => {
+    for (const raw of [
+      JSON.stringify({ foo: "bar" }),
+      JSON.stringify({ envelopes: "not-an-array" }),
+      JSON.stringify({ other: [] }),
+      "not json",
+    ]) {
+      const result = parseEnvelopes(raw);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe("PARSE_ERROR");
+      }
+    }
+    const shapeMismatch = parseEnvelopes(JSON.stringify({ foo: "bar" }));
+    if (!shapeMismatch.ok) {
+      expect(shapeMismatch.error).toContain("envelope");
+    }
+  });
+
   it("renders a v2-normalized envelope via formatEnvelope", () => {
     const result = parseEnvelopes(JSON.stringify({
       envelopes: [{
@@ -185,6 +228,25 @@ describe("parseFolders", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data).toHaveLength(0);
+    }
+  });
+
+  it("fails loud when response has neither a bare array nor a mailboxes wrapper", () => {
+    for (const raw of [
+      JSON.stringify({ foo: "bar" }),
+      JSON.stringify({ mailboxes: "not-an-array" }),
+      JSON.stringify({ other: [] }),
+      "not json",
+    ]) {
+      const result = parseFolders(raw);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe("PARSE_ERROR");
+      }
+    }
+    const shapeMismatch = parseFolders(JSON.stringify({ foo: "bar" }));
+    if (!shapeMismatch.ok) {
+      expect(shapeMismatch.error).toContain("folder");
     }
   });
 });

@@ -41,6 +41,18 @@ export interface AccountHealth {
   hint?: string;
 }
 
+/**
+ * Cache one HimalayaClient per himalaya binary path so the --version probe
+ * (cached per client instance) runs once per invocation rather than once per
+ * account. checkAccountHealth is called once per account by runDoctor.
+ */
+const clientCache = new Map<string, HimalayaClient>();
+
+/** Test hook: drop cached clients so each test starts with a fresh version probe. */
+export function clearDoctorClientCache(): void {
+  clientCache.clear();
+}
+
 export interface DoctorOptions {
   account?: string;
   fix?: boolean;
@@ -685,7 +697,11 @@ export async function checkAccountHealth(name: string): Promise<AccountHealth> {
   // Route through the same shared probe the health_check tool uses so the
   // two surfaces (folder + envelope) never drift again (#133 lesson). The
   // client handles v1/v2 syntax, JSON output flags, and transient retry.
-  const client = new HimalayaClient({ binary: himalayaPath, timeout: 15_000 });
+  let client = clientCache.get(himalayaPath);
+  if (!client) {
+    client = new HimalayaClient({ binary: himalayaPath, timeout: 15_000 });
+    clientCache.set(himalayaPath, client);
+  }
   const probe = await probeAccountSurfaces(name, client);
   if (probe.reachable) {
     return { reachable: true };
