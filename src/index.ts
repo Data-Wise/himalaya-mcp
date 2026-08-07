@@ -36,7 +36,7 @@ import { registerReplyPrompt } from "./prompts/reply.js";
 import { registerMorningPrompt } from "./prompts/morning.js";
 import { registerInboxCheckPrompt } from "./prompts/inbox-check.js";
 
-export const VERSION = "2.0.5";
+export const VERSION = "2.1.0";
 export const NAME = "himalaya-mcp";
 export const TOOL_COUNT = 29;
 
