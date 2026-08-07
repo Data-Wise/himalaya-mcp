@@ -21,7 +21,8 @@
 │                                                │                │
 │                                     ┌──────────▼───────────┐    │
 │                                     │ himalaya CLI         │    │
-│                                     │ --output json        │    │
+│                                     │ --json (v2) /        │    │
+│                                     │ --output json (v1)   │    │
 │                                     └──────────┬───────────┘    │
 │                                                │                │
 └────────────────────────────────────────────────┼────────────────┘
@@ -53,7 +54,7 @@ Homebrew (Primary)                  GitHub (Fallback)                    .mcpb (
   │   ├─ skills/*/SKILL.md
   │   ├─ agents/*.md
   │   ├─ hooks/*.sh
-  │   └─ dist/index.js (esbuild bundle, ~908KB)
+  │   └─ dist/index.js (esbuild bundle, ~910KB)
   │
   └─ post_install → himalaya-mcp-install
       ├─ symlink → ~/.claude/plugins/himalaya-mcp
@@ -73,7 +74,7 @@ src/index.ts (16 files)
   │
   ├─ npm run build          → dist/*.js + .d.ts (development)
   │
-  └─ npm run build:bundle   → dist/index.js (~908KB, production)
+  └─ npm run build:bundle   → dist/index.js (~910KB, production)
       esbuild --bundle --platform=node --target=node22 --format=esm --minify
       Inlines: @modelcontextprotocol/sdk, zod, content-type, raw-body
 ```
@@ -113,13 +114,16 @@ src/
 │
 ├── himalaya/
 │   ├── client.ts         HimalayaClient — subprocess wrapper
-│   │                     execFile("himalaya", [...args, "--output", "json"])
+│   │                     execFile("himalaya", [...args, "--json" (v2) / "--output", "json" (v1)])
 │   ├── parser.ts         parseEnvelopes, parseMessageBody, parseFolders
+│   │                     unwraps v2 {envelopes}/{mailboxes} wrappers; fails loud on unknown shapes
 │   │                     formatEnvelope — human-readable one-liner
 │   ├── thread-parser.ts  Thread/conversation grouping by subject line
 │   ├── errors.ts         MCPError envelope, HimalayaError class,
 │   │                     classifyStderr (stderr-pattern → stable code)
 │   ├── accounts.ts       discoverAccounts — `himalaya account list --json`
+│   ├── diagnostics.ts    probeAccountSurfaces — shared per-account folder+envelope
+│   │                     probing (single source for health_check + doctor)
 │   ├── trash.ts          getTrashFolder — provider-agnostic trash detection
 │   └── types.ts          Envelope, Folder, HimalayaClientOptions, *Params
 │
@@ -139,7 +143,8 @@ src/
 │   ├── threads.ts        list_threads, read_thread
 │   ├── reminders.ts      create_reminder (Apple Reminders)
 │   ├── snooze.ts         snooze_email, list_snoozed_emails
-│   ├── health.ts         health_check — per-account IMAP reachability
+│   ├── health.ts         health_check — probes folder + envelope surfaces per
+│   │                     account, reports himalaya version/binary
 │   └── actions.ts        export_to_markdown, create_action_item
 │
 ├── prompts/
@@ -160,7 +165,9 @@ src/
 │   └── calendar.ts       ICS parser + Apple Calendar (osascript)
 │
 └── cli/
-    └── setup.ts          Claude Desktop setup (setup/check/remove MCP config + install-ext/remove-ext)
+    ├── setup.ts          Claude Desktop setup (setup/check/remove MCP config + install-ext/remove-ext)
+    └── doctor.ts         doctor — full-stack diagnostics CLI (multi-surface per-account
+                          checks via diagnostics.ts, exit-code-safe output)
 ```
 
 ## Data Flow
@@ -170,10 +177,11 @@ src/
 ```
 list_emails
   → client.listEnvelopes(folder, pageSize, page, account)
-    → execFile("himalaya", ["envelope", "list", "--page-size", N, "--output", "json"])
+    → execFile("himalaya", ["envelope", "list", "--page-size", N, "--json" (v2) / "--output", "json" (v1)])
       → parseEnvelopes(stdout) → Envelope[]
         → formatEnvelope(each) → "ID | From | Subject | Date | Flags"
 ```
+Searching uses the dedicated `envelope search` subcommand on v2 (the DSL is a trailing positional; flags precede it).
 
 ### Send Path (Two-Phase Safety Gate)
 
@@ -269,7 +277,7 @@ rawStderr    original stderr preserved for debugging
 | `imap_auth_failed` | `AUTHENTICATIONFAILED`, `Invalid credentials`, `authentication failed` | Re-check app password |
 | `imap_cert_error` | `certificate verify failed`, `self-signed certificate` | Trust cert or set `insecure = true` |
 | `account_not_found` | `Cannot find account` | `himalaya account list` |
-| `folder_not_found` | `No such folder`, `Mailbox doesn't exist` | `himalaya folder list` |
+| `folder_not_found` | `No such folder`, `Mailbox doesn't exist` | `himalaya mailbox list` (v1.x: `himalaya folder list`) |
 | `message_not_found` | `Message not found` | UID may be stale |
 | `himalaya_not_installed` | `command not found: himalaya`, `spawn himalaya ENOENT` | `brew install himalaya` |
 | `himalaya_config_missing` | `Cannot find config` | `himalaya account configure` |

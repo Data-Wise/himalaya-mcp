@@ -18,7 +18,7 @@ flowchart TD
     SRC["`**Source**
     16 TypeScript files
     + MCP SDK + zod`"] -->|esbuild| BUNDLE["`**dist/index.js**
-    908KB single file`"]
+    ~910KB single file`"]
 
     BUNDLE --> HB["`**Homebrew**
     brew install himalaya-mcp`"]
@@ -51,14 +51,14 @@ npm run build:bundle
 
 **Input:** 16 TypeScript source files + `@modelcontextprotocol/sdk` dependency
 
-**Output:** Single `dist/index.js` (approximately 908KB minified), copied to
+**Output:** Single `dist/index.js` (approximately 910KB minified), copied to
 `himalaya-mcp-plugin/dist/index.js` for GitHub Marketplace installs.
 
 The bundle includes all dependencies (MCP SDK, zod) inlined. No runtime `node_modules` needed -- just `node dist/index.js`.
 
 ### Why esbuild
 
-- **72MB to approximately 908KB** -- node_modules eliminated entirely
+- **72MB to approximately 910KB** -- node_modules eliminated entirely
 - **Zero runtime deps** -- single file ships in Homebrew formula
 - **Fast** -- builds in ~25ms
 - **ESM compatible** -- handles zod/v4 import maps and MCP SDK subpath exports
@@ -161,7 +161,7 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
   "owner": { "name": "Data-Wise" },
   "metadata": {
     "description": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
-    "version": "2.0.2"
+    "version": "2.1.0"
   },
   "plugins": [{
     "name": "himalaya",
@@ -170,7 +170,7 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
     "category": "productivity",
     "tags": ["email", "mcp", "himalaya", "privacy"]
   }],
-  "version": "2.0.2"
+  "version": "2.1.0"
 }
 ```
 
@@ -189,7 +189,7 @@ The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a li
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v2.0.2.mcpb (253 KB)
+# Output: himalaya-mcp-v2.1.0.mcpb (253 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:
@@ -206,7 +206,7 @@ Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.co
 ### Install (CLI)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v2.0.2.mcpb   # Install from file
+himalaya-mcp install-ext himalaya-mcp-v2.1.0.mcpb   # Install from file
 himalaya-mcp install-ext                              # Auto-find in project root
 himalaya-mcp remove-ext                               # Uninstall
 ```
@@ -228,7 +228,7 @@ During install (or via Settings > Extensions in Claude Desktop), users can confi
 | File | Size | Purpose |
 |------|------|---------|
 | `manifest.json` | 6.3 KB | Extension manifest (metadata, tools, prompts, config) |
-| `dist/index.js` | 604 KB | esbuild bundle (all deps inlined) |
+| `dist/index.js` | ~910 KB | esbuild bundle (all deps inlined) |
 
 !!! note "See also"
     **[Desktop Extensions Reference](../reference/desktop-extensions.md)** for the full `.mcpb` format specification, manifest schema, and installation internals.

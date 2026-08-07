@@ -12,25 +12,42 @@ When something stops working — auth fails, an account goes dark, a folder disa
 You: "Is email working?"
 ```
 
-Claude calls the `health_check` tool. The response is structured JSON with one of three top-level states — `healthy`, `degraded`, or `broken` — plus per-account detail:
+Claude calls the `health_check` tool. The response is structured JSON with one of three top-level states — `healthy`, `degraded`, or `broken` — plus the detected himalaya version and binary path, and per-account detail. Each account is probed on two surfaces (folder list + envelope fetch) and reports both in `surfaces`:
 
 ```json
 {
   "overall": "degraded",
+  "himalayaVersion": "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir",
+  "himalayaBinary": "/opt/homebrew/bin/himalaya",
   "accounts": [
-    { "name": "work", "reachable": true },
+    {
+      "name": "work",
+      "reachable": true,
+      "surfaces": {
+        "folders": { "ok": true },
+        "envelopes": { "ok": true }
+      }
+    },
     {
       "name": "personal",
       "reachable": false,
       "code": "imap_auth_failed",
       "hint": "Re-check app password. Run: himalaya account configure <account>",
-      "attempts": 1
+      "attempts": 1,
+      "surfaces": {
+        "folders": {
+          "ok": false,
+          "code": "imap_auth_failed",
+          "hint": "Re-check app password. Run: himalaya account configure <account>"
+        },
+        "envelopes": { "ok": false, "code": "imap_auth_failed" }
+      }
     }
   ]
 }
 ```
 
-Claude reads the `code` and `hint` and tells you in plain English what to do.
+`reachable` reflects the folder surface (the primary probe); an account with working folders but a failing envelope probe stays `reachable: true` while `overall` degrades. Claude reads the `code` and `hint` and tells you in plain English what to do.
 
 ## Step 2: Scope to one account
 
@@ -58,7 +75,7 @@ Doctor groups checks by category and ends with a per-account `Accounts` section.
 himalaya-mcp doctor --account personal
 ```
 
-Skips the account list discovery and probes a single account with a 5-second timeout. Good for `personal` being slow without holding up `work`.
+Skips the account list discovery and probes a single account with a 15-second timeout. Good for `personal` being slow without holding up `work`.
 
 ## Step 5: Apply auto-fixes
 

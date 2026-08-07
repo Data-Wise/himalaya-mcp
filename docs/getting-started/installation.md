@@ -39,7 +39,7 @@ brew install himalaya-mcp
 **What happens automatically:**
 
 1. Installs himalaya CLI + Node.js as dependencies
-2. Builds the standalone and plugin esbuild bundles (~908KB each, no node_modules shipped)
+2. Builds the standalone and plugin esbuild bundles (~910KB each, no node_modules shipped)
 3. Symlinks plugin to `~/.claude/plugins/himalaya-mcp`
 4. Registers in local marketplace
 5. Auto-runs install script (enables in Claude Code settings if Claude not running)
@@ -153,7 +153,7 @@ If you have himalaya-mcp installed (Homebrew or source), you can install the ext
 
 ```bash
 npm run build:mcpb                                     # Build .mcpb (dev only)
-himalaya-mcp install-ext himalaya-mcp-v2.0.2.mcpb      # Install from file
+himalaya-mcp install-ext himalaya-mcp-v2.1.0.mcpb      # Install from file
 himalaya-mcp install-ext                                # Auto-find in project root
 himalaya-mcp remove-ext                                 # Uninstall extension
 ```
@@ -224,7 +224,7 @@ himalaya-mcp doctor
 # Auto-fix common issues
 himalaya-mcp doctor --fix
 
-# Run tests (691 tests)
+# Run tests (719 tests)
 npm test
 
 # Check Claude Desktop config (legacy)

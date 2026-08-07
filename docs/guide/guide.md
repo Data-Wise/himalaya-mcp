@@ -274,7 +274,7 @@ Example with env vars:
 
 #### `health_check`
 
-Returns `overall` status (`healthy` / `degraded` / `broken`) plus a per-account detail array. Use it when an email tool fails — Claude can call `health_check` to diagnose which accounts are reachable and surface the per-account `hint` from the structured error envelope.
+Returns `overall` status (`healthy` / `degraded` / `broken`), the detected himalaya version and binary path, plus a per-account detail array. Each account is probed on **two surfaces** — the folder list and an envelope fetch — so a folder failure and an envelope failure are reported separately instead of collapsing into one generic unreachable state. Use it when an email tool fails — Claude can call `health_check` to diagnose which accounts are reachable and surface the per-account `hint` from the structured error envelope.
 
 **Arguments:**
 
@@ -285,12 +285,29 @@ Returns `overall` status (`healthy` / `degraded` / `broken`) plus a per-account 
 ```json
 {
   "overall": "degraded",
+  "himalayaVersion": "himalaya v2.0.0 ...",
+  "himalayaBinary": "/opt/homebrew/bin/himalaya",
   "accounts": [
-    { "name": "unm", "reachable": false, "code": "imap_auth_failed", "hint": "Re-check app password. Run: himalaya account configure <account>" },
-    { "name": "personal", "reachable": true }
+    {
+      "name": "unm",
+      "reachable": false,
+      "code": "imap_auth_failed",
+      "hint": "Re-check app password. Run: himalaya account configure <account>",
+      "surfaces": {
+        "folders": { "ok": false, "code": "imap_auth_failed", "message": "AUTHENTICATIONFAILED" },
+        "envelopes": { "ok": true }
+      }
+    },
+    {
+      "name": "personal",
+      "reachable": true,
+      "surfaces": { "folders": { "ok": true }, "envelopes": { "ok": true } }
+    }
   ]
 }
 ```
+
+`reachable` reflects the folder surface (primary); a failing envelope surface alone leaves the account reachable but degrades `overall` and is reported in `surfaces`. The same probing logic powers `himalaya-mcp doctor`'s per-account checks, so the two never drift.
 
 If any tool fails, also see the [troubleshooting guide](troubleshooting.md).
 
@@ -366,19 +383,19 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 691 tests across 40 files (vitest, threads pool)
+npm test    # 719 tests across 41 files (vitest, threads pool)
 ```
 
 Test breakdown:
 
 | File | Tests | What it covers |
 |------|-------|----------------|
-| `parser.test.ts` | 13 | JSON response parsing, formatEnvelope |
+| `parser.test.ts` | 24 | JSON response parsing, formatEnvelope |
 | `client.test.ts` | 47 | Subprocess wrapper, retry policy, argument building |
 | `manage.test.ts` | 7 | flag_email, move_email client methods |
 | `compose.test.ts` | 13 | draft_reply, send_email safety gate + attachment tests |
 | `compose-new.test.ts` | 13 | compose_email safety gate + attachment tests |
-| `folders.test.ts` | 12 | Folder tools (list, create, delete) |
+| `folders.test.ts` | 13 | Folder tools (list, create, delete) |
 | `attachments.test.ts` | 10 | Attachment list/download with body part filtering |
 | `calendar.test.ts` | 21 | ICS parser + calendar event tools + escaping |
 | `actions.test.ts` | 6 | export_to_markdown formatting |
@@ -389,12 +406,12 @@ Test breakdown:
 | `errors.test.ts` | 21 | MCPError envelope + stderr classifier |
 | `retry.test.ts` | 4 | Transient retry policy |
 | `accounts.test.ts` | 13 | Multi-account discovery |
-| `health.test.ts` | 5 | health_check tool |
+| `health.test.ts` | 8 | health_check tool |
 | `trash.test.ts` | 5 | getTrashFolder |
 | `unread.test.ts` | 4 | get_unread_count |
 | `read-raw.test.ts` | 4 | read_email_raw |
 | `render.test.ts` | 5 | render_email |
-| `list-starred.test.ts` | 6 | list_starred |
+| `list-starred.test.ts` | 7 | list_starred |
 | `reminders.test.ts` | 7 | create_reminder |
 | `snooze.test.ts` | 10 | snooze_email, list_snoozed_emails |
 | `inbox.test.ts` | 23 | search/list inbox tools |
@@ -407,8 +424,8 @@ Test breakdown:
 | `doctor-version.test.ts` | 10 | doctor version-drift checks |
 | `check-prerequisites.test.ts` | 5 | doctor prerequisites checks |
 | `vitest-config.test.ts` | 1 | Threads-pool default tripwire |
-| `dogfood.test.ts` | 153 | Realistic Claude usage scenarios |
-| `dogfood-reliability.test.ts` | 20 | Reliability scenarios |
-| `setup.test.ts` | 49 | Setup CLI + multi-account doctor E2E |
-| `e2e.test.ts` | 39 | Full MCP server pipeline + .mcpb build |
+| `dogfood.test.ts` | 154 | Realistic Claude usage scenarios |
+| `dogfood-reliability.test.ts` | 22 | Reliability scenarios |
+| `setup.test.ts` | 51 | Setup CLI + multi-account doctor E2E |
+| `e2e.test.ts` | 45 | Full MCP server pipeline + .mcpb build |
 | `v150-features.test.ts` | 37 | v1.5.0 integration tests |
