@@ -39,6 +39,8 @@
 
 ## Just Completed
 
+- 2026-08-07: Published v2.1.0 docs. Docs audit refreshed all v2.1.0 references (version 2.0.2→2.1.0, tests 691→719 across 41 files, bundle ~910KB, health_check folder+envelope surfaces + himalayaVersion/himalayaBinary, architecture.md module map for diagnostics.ts/doctor.ts, v2 --json / envelope search notes). Docs commit `0ef207f` on `dev`, published via docs PR #136 (dev→main, merged as `3704924`, all 4 CI checks green); gh-pages force-updated on merge. `dev` synced to `3704924`.
+
 - 2026-08-07: Released v2.1.0. Release PR #135 merged to `main` as `c6940bd`, GitHub release
   published with `himalaya-mcp-v2.1.0.mcpb`, main CI (bundle/test/validate-mcpb/validate-plugin)
   and docs deployment passed, aggregator sync auto-merged himalaya @ 2.1.0 (PR #45), and Homebrew
