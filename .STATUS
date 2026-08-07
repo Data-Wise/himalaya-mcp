@@ -3,9 +3,9 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.1.0 release in progress (dev), v2.0.5 live on main/Homebrew/marketplace
-## Focus: Release v2.1.0 — v2 CLI compatibility (#133) + multi-surface health/doctor overhaul
-## Phase: Release
+## Status: v2.1.0 released (main/Homebrew/marketplace/aggregator), dev synced
+## Focus: Post-release verification — v2.1.0 shipped
+## Phase: Maintenance
 ## Priority: 1
 ## Progress: 100
 
@@ -38,6 +38,15 @@
 - **v1.9.0 CI Fix (PR #78)**: Fixed reminders.test.ts failing on Linux CI (process.platform mocking)
 
 ## Just Completed
+
+- 2026-08-07: Released v2.1.0. Release PR #135 merged to `main` as `c6940bd`, GitHub release
+  published with `himalaya-mcp-v2.1.0.mcpb`, main CI (bundle/test/validate-mcpb/validate-plugin)
+  and docs deployment passed, aggregator sync auto-merged himalaya @ 2.1.0 (PR #45), and Homebrew
+  tap PR #208 merged (formula v2.1.0, sha256 d93b1bbc...). Release content: v2 CLI compatibility
+  fix (#133 — wrapper unwrap + field normalization + `--mailbox`/`envelope search` version
+  branching + fail-loud parsing), multi-surface health/doctor overhaul (shared
+  `probeAccountSurfaces`, version/binary reporting, doctor exit-code stdout race #116), 719 tests
+  across 41 files. `dev` is synced to the release commit.
 
 - 2026-08-05: Released v2.0.5. Release PR #132 merged to `main` as `f4fba9e`, GitHub release
   published with `himalaya-mcp-v2.0.5.mcpb`, main CI and docs deployment passed, aggregator sync
@@ -159,21 +168,21 @@
 
 ## Current State
 
-- Branch: `dev` @ `a9922fb` (`origin/dev`) — v2.0.5 released and merged to `main`, dev synced.
-- Version: 2.0.5 (released to `main`/Homebrew/marketplace, tag `v2.0.5`, `.mcpb` asset attached).
+- Branch: `dev` @ `c6940bd` (`origin/dev`) — v2.1.0 released and merged to `main`, dev synced.
+- Version: 2.1.0 (released to `main`/Homebrew/marketplace/aggregator, tag `v2.1.0`, `.mcpb` asset attached).
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 691 tests across 41 test files. CI and release validation passed, including bundle,
-  TypeScript, JSON, plugin, MCPB, and docs checks. The full host baseline is 691/691.
+- Tests: 719 tests across 41 test files. CI and release validation passed, including bundle,
+  TypeScript, JSON, plugin, MCPB, and docs checks. The full host baseline is 719/719.
   CI on `main` green
   (bundle/test/validate-mcpb/validate-plugin, `test` job ~9min).
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
-- Homebrew: data-wise/tap/himalaya-mcp — confirmed at v2.0.5, revision 1 (`url`/`sha256`
-  verified live against the tap repo).
+- Homebrew: data-wise/tap/himalaya-mcp — confirmed at v2.1.0 (`url`/`sha256`
+  verified live against the tap repo, PR #208 merged).
 - Aggregator marketplace: Data-Wise/claude-plugins `.claude-plugin/marketplace.json` confirmed
-  `himalaya` @ 2.0.5 (auto-synced by aggregator-sync.yml).
+  `himalaya` @ 2.1.0 (auto-synced by aggregator-sync.yml, PR #45 merged).
 - Docs: deployed at https://Data-Wise.github.io/himalaya-mcp/ (Deploy Docs workflow green on
-  the v2.0.5 merge commit).
-- Bundle: ~908KB (esbuild), .mcpb: ~252KB
+  the v2.1.0 merge commit).
+- Bundle: ~910KB (esbuild), .mcpb: ~253KB
 - opencode: `himalaya` MCP server configured in `~/.config/opencode/config.json` (enabled,
   entry `/opt/homebrew/opt/himalaya-mcp/libexec/dist/index.js`, `HIMALAYA_ACCOUNT=unm`).
 - Historical worktrees remain clean: `feature/fix-claude-desktop-path`, `feature/docs-plugin-fixes`,
@@ -181,7 +190,7 @@
 - Maintenance follow-up: Issue #121 (not fixed, recurred again on this release): `.mcpb` CI
   artifact-upload flake in `actions/upload-artifact@v7` —
   `Upload MCPB to Release` job downloads an empty (22-byte) artifact and fails; harmless when
-  the GitHub Release was created with the `.mcpb` asset attached directly (as done for v2.0.5),
+  the GitHub Release was created with the `.mcpb` asset attached directly (as done for v2.1.0),
   since that job only re-uploads a file the release already has.
 
 ## Install
