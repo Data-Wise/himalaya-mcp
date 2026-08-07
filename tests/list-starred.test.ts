@@ -63,6 +63,35 @@ describe("list_starred", () => {
     expect(result.content[0].text).toContain("100");
   });
 
+  it("formats a v2 envelope wrapper response", async () => {
+    const envelopes = JSON.stringify({
+      envelopes: [
+        {
+          id: "249574",
+          flags: [{ raw: "\\Seen", iana: "seen" }, { raw: "\\Flagged", iana: "flagged" }],
+          subject: "Re: Stat Faculty get together",
+          from: [{ name: "Ronald Christensen", email: "rchriste@unm.edu" }],
+          to: [{ name: "Erik Erhardt", email: "erike@stat.unm.edu" }],
+          date: "2026-02-18T22:30:36Z",
+          size: 46219,
+          "has-attachment": null,
+        },
+      ],
+    });
+    const server = { registerTool: vi.fn() };
+    const client = new HimalayaClient({ from: "test@example.com" });
+    vi.spyOn(client, "searchEnvelopes").mockResolvedValue(envelopes);
+    registerStarredTools(server as unknown as McpServer, client);
+
+    const handler = (server.registerTool as ReturnType<typeof vi.fn>).mock.calls[0][2];
+    const result = await handler({ folder: undefined, account: undefined });
+
+    expect(result.content[0].text).toContain("249574");
+    expect(result.content[0].text).toContain("Ronald Christensen");
+    expect(result.content[0].text).toContain("[Seen, Flagged]");
+    expect(result.content[0].text).not.toContain("undefined");
+  });
+
   it("passes folder and account to searchEnvelopes", async () => {
     const server = { registerTool: vi.fn() };
     const client = new HimalayaClient({ from: "test@example.com" });

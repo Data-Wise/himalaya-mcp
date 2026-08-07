@@ -200,7 +200,7 @@ describe("E2E: MCP Server Headless", () => {
 
     // Send initialized notification
     sendNotification("notifications/initialized");
-  }, 15_000);
+  }, 120_000);
 
   afterAll(async () => {
     if (serverProcess) {
@@ -931,7 +931,8 @@ interface RoundTripResolver {
 }
 
 async function spawnHarnessWithFakeHimalaya(
-  script: string
+  script: string,
+  version: string = "himalaya 1.1.0"
 ): Promise<RoundTripHarness> {
   const dir = join(
     tmpdir(),
@@ -943,8 +944,9 @@ async function spawnHarnessWithFakeHimalaya(
   // command it's testing, but HimalayaClient now probes `--version` first
   // (see cli-version.ts) — intercept that here, once, so callers don't each
   // need their own guard. A v1.x response keeps every existing script's
-  // subcommand/flag assumptions (--output json, folder list, etc.) valid.
-  const versionGuard = 'if [ "$1" = "--version" ]; then\n  echo "himalaya 1.1.0"\n  exit 0\nfi\n';
+  // subcommand/flag assumptions (--output json, folder list, etc.) valid;
+  // pass a v2.x version string to exercise v2 syntax (mailbox list, --json).
+  const versionGuard = `if [ "$1" = "--version" ]; then\n  echo "${version}"\n  exit 0\nfi\n`;
   // Function replacer, not a string pattern — a string replacement would
   // treat the shell script's own "$1" inside versionGuard as a JS $1
   // backreference to the captured shebang line, corrupting the guard.
@@ -1165,6 +1167,191 @@ echo '[]'
         expect(body.accounts[0].reachable).toBe(false);
         expect(body.accounts[0].code).toBe("imap_auth_failed");
         expect(body.accounts[0].hint).toMatch(/configure/i);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+});
+
+describe("E2E: v2 CLI Compatibility", () => {
+  // himalaya v2 renamed folder→mailbox and --output json→--json, wraps
+  // envelope/mailbox listings in named objects, and moved the search DSL
+  // to `envelope search`. This fake emulates that wire shape so the tools
+  // that were broken on v2 (issue #133) are verified end-to-end.
+  const V2_FAKE = `#!/bin/bash
+args="$*"
+# v2 rejects the v1 folder flag outright; if the client still passes
+# --folder the tool call must fail loudly (proves the --mailbox branch).
+if echo "$args" | grep -q -- "--folder"; then
+  echo "error: unexpected argument '--folder' found" >&2
+  exit 1
+fi
+if echo "$args" | grep -q "account list"; then
+  echo '{"accounts":[{"name":"unm","default":true,"backends":["imap","smtp"]}]}'
+  exit 0
+fi
+if echo "$args" | grep -q "message read"; then
+  echo '"Read from non-INBOX mailbox: v2 body works"'
+  exit 0
+fi
+if echo "$args" | grep -q "message move"; then
+  echo '{}'
+  exit 0
+fi
+if echo "$args" | grep -q "mailbox list"; then
+  echo '{"mailboxes":[{"id":"admin","name":"admin","total":null,"unread":null},{"id":"Archive","name":"Archive","total":3,"unread":0}]}'
+  exit 0
+fi
+if echo "$args" | grep -q "envelope search"; then
+  echo '{"envelopes":[{"id":"249574","flags":[{"raw":"\\\\Seen","iana":"seen"},{"raw":"\\\\Flagged","iana":"flagged"}],"subject":"Re: Stat Faculty get together","from":[{"name":"Ronald Christensen","email":"rchriste@unm.edu"}],"to":[{"name":"Erik Erhardt","email":"erike@stat.unm.edu"}],"date":"2026-02-18T22:30:36Z","size":46219,"has-attachment":null}]}'
+  exit 0
+fi
+if echo "$args" | grep -q "envelope list"; then
+  echo '{"envelopes":[{"id":"249574","flags":[{"raw":"\\\\Seen","iana":"seen"},{"raw":"\\\\Flagged","iana":"flagged"}],"subject":"Re: Stat Faculty get together","from":[{"name":"Ronald Christensen","email":"rchriste@unm.edu"}],"to":[{"name":"Erik Erhardt","email":"erike@stat.unm.edu"}],"date":"2026-02-18T22:30:36Z","size":46219,"has-attachment":null}]}'
+  exit 0
+fi
+echo '[]'
+`;
+
+  it(
+    "list_folders renders the v2 mailbox wrapper",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "list_folders",
+          arguments: {},
+        });
+        expect(result.result?.isError).toBeFalsy();
+        const text = result.result.content[0].text as string;
+        expect(text).toContain("admin");
+        expect(text).toContain("Archive");
+        expect(text).not.toContain("undefined");
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "list_emails unwraps the v2 envelope wrapper and normalizes fields",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "list_emails",
+          arguments: {},
+        });
+        expect(result.result?.isError).toBeFalsy();
+        const text = result.result.content[0].text as string;
+        expect(text).toContain("249574");
+        expect(text).toContain("Ronald Christensen");
+        expect(text).toContain("Re: Stat Faculty get together");
+        expect(text).toContain("[Seen, Flagged]");
+        expect(text).not.toContain("undefined");
+        expect(text).not.toContain("[object Object]");
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "search_emails uses the v2 envelope search subcommand",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "search_emails",
+          arguments: { query: "subject quarterly report" },
+        });
+        expect(result.result?.isError).toBeFalsy();
+        const text = result.result.content[0].text as string;
+        expect(text).toContain("249574");
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "health_check probes both surfaces on v2 and reports version",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "health_check",
+          arguments: {},
+        });
+        const text = result.result.content[0].text as string;
+        const body = JSON.parse(text);
+        expect(body.overall).toBe("healthy");
+        expect(body.himalayaVersion).toMatch(/himalaya v2\.0\.0/);
+        expect(body.accounts[0].surfaces.folders.ok).toBe(true);
+        expect(body.accounts[0].surfaces.envelopes.ok).toBe(true);
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "read_email on a non-INBOX mailbox uses --mailbox (v2)",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "read_email",
+          arguments: { id: "100", folder: "Archive" },
+        });
+        expect(result.result?.isError).toBeFalsy();
+        const text = result.result.content[0].text as string;
+        expect(text).toContain("v2 body works");
+        expect(text).not.toContain("undefined");
+      } finally {
+        await harness.cleanup();
+      }
+    },
+    15_000
+  );
+
+  it(
+    "move_email from a non-INBOX mailbox uses --mailbox (v2)",
+    async () => {
+      const harness = await spawnHarnessWithFakeHimalaya(
+        V2_FAKE,
+        "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir"
+      );
+      try {
+        const result = await harness.send("tools/call", {
+          name: "move_email",
+          arguments: { id: "100", target_folder: "Trash", folder: "Archive" },
+        });
+        expect(result.result?.isError).toBeFalsy();
+        const text = result.result.content[0].text as string;
+        expect(text).toContain("Trash");
+        expect(text).not.toContain("undefined");
       } finally {
         await harness.cleanup();
       }

@@ -55,7 +55,23 @@ const mockExecFileAsync = (mockedExecFile as any)[
 describe("dogfood: reliability scenarios", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    // health_check now reports himalaya version + binary, so default-spy
+    // resolveVersion to keep every scenario hermetic. listEnvelopes is NOT
+    // default-spied here: Scenarios 3/4/7/8/9/20 call the real method
+    // through a spied execOnce and must reach it; the health_check scenarios
+    // that probe envelopes add their own listEnvelopes stub.
+    vi.spyOn(HimalayaClient.prototype, "resolveVersion").mockResolvedValue({
+      major: 2,
+      raw: "himalaya v2.0.0 +gmail +jmap +msgraph +smtp +rustls-ring +imap +m2dir",
+    });
   });
+
+  // Stub the envelope surface for health_check scenarios. listEnvelopes is
+  // not default-spied, so every health_check scenario that probes envelopes
+  // must call this (or provide its own stub, e.g. a failure for Scenario 22).
+  function mockHealthyEnvelopes(): ReturnType<typeof vi.spyOn> {
+    return vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockResolvedValue("[]");
+  }
 
   // ─── Scenario 1 ──────────────────────────────────────────────────────────
   it('Scenario 1: "Check my email" — one account broken, others healthy', async () => {
@@ -77,6 +93,7 @@ describe("dogfood: reliability scenarios", () => {
         return "[]";
       },
     );
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
@@ -95,6 +112,7 @@ describe("dogfood: reliability scenarios", () => {
       { name: "personal", isDefault: false },
     ]);
     vi.spyOn(HimalayaClient.prototype, "listFolders").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
@@ -182,6 +200,7 @@ describe("dogfood: reliability scenarios", () => {
         });
       },
     );
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({ account: "unm" }, client);
@@ -294,6 +313,7 @@ describe("dogfood: reliability scenarios", () => {
         });
       },
     );
+    mockHealthyEnvelopes();
 
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
@@ -452,6 +472,7 @@ describe("dogfood: reliability scenarios", () => {
         return "[]";
       },
     );
+    mockHealthyEnvelopes();
     const client = new HimalayaClient({ retryBackoffMs: 0 });
     const result = await handleHealthCheck({}, client);
     const body = JSON.parse(result.content[0].text);
@@ -483,6 +504,47 @@ describe("dogfood: reliability scenarios", () => {
       subject: "Hello",
       flags: ["Seen"],
     });
+  });
+
+  // ─── Scenario 21 ─────────────────────────────────────────────────────────
+  it("Scenario 21: health_check reports himalaya version + both surfaces", async () => {
+    vi.spyOn(accountsMod, "listAccounts").mockResolvedValue([
+      { name: "unm", isDefault: true },
+    ]);
+    vi.spyOn(HimalayaClient.prototype, "listFolders").mockResolvedValue("[]");
+    mockHealthyEnvelopes();
+
+    const client = new HimalayaClient({ retryBackoffMs: 0 });
+    const result = await handleHealthCheck({}, client);
+    const body = JSON.parse(result.content[0].text);
+    expect(body.himalayaVersion).toMatch(/himalaya v2\.0\.0/);
+    expect(body.himalayaBinary).toBeTruthy();
+    expect(body.accounts[0].surfaces.folders.ok).toBe(true);
+    expect(body.accounts[0].surfaces.envelopes.ok).toBe(true);
+  });
+
+  // ─── Scenario 22 ─────────────────────────────────────────────────────────
+  it("Scenario 22: folders ok, envelopes broken → overall degraded, account still reachable", async () => {
+    vi.spyOn(accountsMod, "listAccounts").mockResolvedValue([
+      { name: "unm", isDefault: true },
+    ]);
+    vi.spyOn(HimalayaClient.prototype, "listFolders").mockResolvedValue("[]");
+    vi.spyOn(HimalayaClient.prototype, "listEnvelopes").mockRejectedValue(
+      new HimalayaError(
+        classifyStderr("AUTHENTICATIONFAILED for unm", "unm"),
+      ),
+    );
+
+    const client = new HimalayaClient({ retryBackoffMs: 0 });
+    const result = await handleHealthCheck({}, client);
+    const body = JSON.parse(result.content[0].text);
+    expect(body.overall).toBe("degraded");
+    // The folder surface is primary: an envelope failure alone does not
+    // flip the account to unreachable.
+    expect(body.accounts[0].reachable).toBe(true);
+    expect(body.accounts[0].surfaces.folders.ok).toBe(true);
+    expect(body.accounts[0].surfaces.envelopes.ok).toBe(false);
+    expect(body.accounts[0].surfaces.envelopes.code).toBe("imap_auth_failed");
   });
 });
 

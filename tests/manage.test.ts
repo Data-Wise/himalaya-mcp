@@ -58,7 +58,7 @@ describe("Manage tools — client methods", () => {
 
       expect(mockExecFileAsync).toHaveBeenCalledWith(
         "himalaya",
-        expect.arrayContaining(["--folder", "Sent Items"]),
+        expect.arrayContaining(["--mailbox", "Sent Items"]),
         expect.any(Object),
       );
     });
@@ -96,7 +96,7 @@ describe("Manage tools — client methods", () => {
 
       expect(mockExecFileAsync).toHaveBeenCalledWith(
         "himalaya",
-        expect.arrayContaining(["--folder", "Sent Items"]),
+        expect.arrayContaining(["--mailbox", "Sent Items"]),
         expect.any(Object),
       );
     });
