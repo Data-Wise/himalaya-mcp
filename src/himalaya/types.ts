@@ -1,6 +1,7 @@
 /**
  * TypeScript types for himalaya CLI JSON output.
- * Based on himalaya v1.1.0 --output json responses.
+ * Canonical shapes below are based on himalaya v1.1.0 --output json responses;
+ * himalaya v2.x wire shapes are defined separately and normalized in parser.ts.
  */
 
 // --- Address ---
@@ -43,6 +44,51 @@ export interface Account {
 // himalaya returns the body as a plain JSON string
 
 export type MessageBody = string;
+
+// --- V2 wire shapes (himalaya v2.x --json output) ---
+// himalaya v2.0.0 renamed `--output json` to `--json` and wrapped bare array
+// responses in named objects ({"mailboxes":[...]}, {"envelopes":[...]}).
+// Field shapes also drifted: `flags` are {raw, iana} objects, `from`/`to` are
+// arrays, `has-attachment` is kebab-case null|bool, and mailbox objects have no
+// `desc` field. These types describe the raw wire JSON; parser.ts normalizes
+// them into the canonical Envelope/Folder shapes above.
+
+export interface V2Flag {
+  raw: string;
+  iana: string;
+}
+
+export interface V2Address {
+  name: string | null;
+  email: string;
+}
+
+export interface V2Envelope {
+  id: string;
+  "message-id"?: string;
+  flags: V2Flag[];
+  subject: string;
+  from: V2Address[];
+  to: V2Address[];
+  date: string;
+  size?: number;
+  "has-attachment": boolean | null;
+}
+
+export interface V2Mailbox {
+  id: string;
+  name: string;
+  total: number | null;
+  unread: number | null;
+}
+
+export interface V2EnvelopeList {
+  envelopes: V2Envelope[];
+}
+
+export interface V2MailboxList {
+  mailboxes: V2Mailbox[];
+}
 
 // --- Client options ---
 

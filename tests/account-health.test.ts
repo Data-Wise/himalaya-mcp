@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { promisify } from "node:util";
 
-// checkAccountHealth() calls whichBin() (execFileSync `which himalaya`),
-// detectHimalayaVersion() (promisify(execFile) `himalaya --version`), then
-// execFileSync(himalaya, <mailbox|folder> list --account <name> --json).
-// Mocking node:child_process covers all three at the source of the
-// subprocess calls, mirroring the check-prerequisites.test.ts pattern.
+// checkAccountHealth() runs whichBin() (execFileSync `which himalaya`), then
+// routes through HimalayaClient + probeAccountSurfaces: version probe
+// (promisify(execFile) `himalaya --version`), then a folder-list probe and an
+// envelope-list probe. Mocking node:child_process covers all of them at the
+// source of the subprocess calls, mirroring the client.test.ts pattern.
 vi.mock("node:child_process", async () => {
   const { promisify: realPromisify } = await import("node:util");
   const fn: any = vi.fn();
@@ -25,23 +25,26 @@ import { checkAccountHealth } from "../src/cli/doctor";
 const mockExecFileSync = vi.mocked(execFileSync);
 const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
 
-describe("checkAccountHealth — dual v1/v2 CLI syntax", () => {
+describe("checkAccountHealth — dual v1/v2 CLI syntax, multi-surface", () => {
   const account = "unm";
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // `which himalaya` resolves to a fixed path; any other subprocess
-    // (the folder/mailbox list) returns canned JSON.
+    // `which himalaya` resolves to a fixed path.
     mockExecFileSync.mockImplementation((bin: string) =>
       Buffer.from(bin === "which" ? "/opt/homebrew/bin/himalaya\n" : "[]\n"),
     );
   });
 
-  function listCall() {
-    const call = mockExecFileSync.mock.calls.find((c) => c[0] !== "which");
-    if (!call) throw new Error("no folder/mailbox list subprocess call found");
+  function asyncCallWithArgv(match: (argv: string[]) => boolean) {
+    // promisify(execFile) calls land as (file, argv, options), so the argv
+    // array is the second element of each recorded call.
+    const call = mockExecFileAsync.mock.calls.find((c) => match(c[1]));
+    if (!call) throw new Error("no matching async subprocess call found");
     return call;
   }
+  const folderCall = () => asyncCallWithArgv((argv) => argv[0] === "mailbox" || argv[0] === "folder");
+  const envelopeCall = () => asyncCallWithArgv((argv) => argv[0] === "envelope");
 
   it("uses v2 mailbox/--json syntax when --version reports v2", async () => {
     mockExecFileAsync.mockResolvedValue({
@@ -51,7 +54,8 @@ describe("checkAccountHealth — dual v1/v2 CLI syntax", () => {
 
     const result = await checkAccountHealth(account);
     expect(result.reachable).toBe(true);
-    expect(listCall()[1]).toEqual(["mailbox", "list", "--account", account, "--json"]);
+    expect(folderCall()[1]).toEqual(["mailbox", "list", "--account", account, "--json"]);
+    expect(envelopeCall()[1]).toEqual(["envelope", "list", "--page-size", "1", "--account", account, "--json"]);
   });
 
   it("uses v1 folder/--output json syntax when --version reports v1", async () => {
@@ -59,32 +63,34 @@ describe("checkAccountHealth — dual v1/v2 CLI syntax", () => {
 
     const result = await checkAccountHealth(account);
     expect(result.reachable).toBe(true);
-    expect(listCall()[1]).toEqual(["folder", "list", "--account", account, "--output", "json"]);
+    expect(folderCall()[1]).toEqual(["folder", "list", "--account", account, "--output", "json"]);
+    expect(envelopeCall()[1]).toEqual(["envelope", "list", "--page-size", "1", "--account", account, "--output", "json"]);
   });
 
-  it("falls back to v2 syntax when version detection fails", async () => {
+  it("reports unreachable (fail-closed) when version detection fails", async () => {
+    // HimalayaClient.execOnce resolves the version first and throws
+    // himalaya_version_undetected on failure -- no silent v2 fallback.
     mockExecFileAsync.mockRejectedValue(
       Object.assign(new Error("Command timed out"), { killed: true }),
     );
 
     const result = await checkAccountHealth(account);
-    expect(result.reachable).toBe(true);
-    expect(listCall()[1]).toEqual(["mailbox", "list", "--account", account, "--json"]);
+    expect(result.reachable).toBe(false);
+    expect(result.error).toMatch(/version/i);
   });
 
-  it("reports unreachable when the list subprocess fails", async () => {
-    mockExecFileAsync.mockResolvedValue({ stdout: "himalaya v2.0.0\n", stderr: "" });
-    mockExecFileSync.mockImplementation((bin: string) => {
-      if (bin === "which") return Buffer.from("/opt/homebrew/bin/himalaya\n");
-      throw new Error("Command failed: unrecognized subcommand 'folder'");
-    });
+  it("reports unreachable when the folder-list subprocess fails", async () => {
+    mockExecFileAsync
+      .mockResolvedValueOnce({ stdout: "himalaya v2.0.0\n", stderr: "" })
+      .mockRejectedValueOnce(new Error("Command failed: unrecognized subcommand 'folder'"))
+      .mockResolvedValue({ stdout: "[]\n", stderr: "" });
 
     const result = await checkAccountHealth(account);
     expect(result.reachable).toBe(false);
     expect(result.error).toContain("unrecognized subcommand");
   });
 
-  it("reports not-found without probing version when himalaya is missing from PATH", async () => {
+  it("reports not-found without probing when himalaya is missing from PATH", async () => {
     mockExecFileSync.mockReturnValue(Buffer.from("\n"));
 
     const result = await checkAccountHealth(account);
@@ -93,10 +99,10 @@ describe("checkAccountHealth — dual v1/v2 CLI syntax", () => {
     expect(mockExecFileAsync).not.toHaveBeenCalled();
   });
 
-  it("passes a 15s timeout to the list subprocess (matches the #126 probe rationale)", async () => {
+  it("passes a 15s timeout to the list subprocess", async () => {
     mockExecFileAsync.mockResolvedValue({ stdout: "himalaya v2.0.0\n", stderr: "" });
 
     await checkAccountHealth(account);
-    expect(listCall()[2]).toMatchObject({ timeout: 15_000 });
+    expect(folderCall()[2]).toMatchObject({ timeout: 15_000 });
   });
 });

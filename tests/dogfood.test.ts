@@ -240,6 +240,33 @@ describe("Dogfooding: search_emails", () => {
     const text = result.content[0].text;
     expect(text).toContain("3 emails matching");
   });
+
+  it("Scenario: v2 CLI wrapper response — renders v2 envelopes without undefined", async () => {
+    vi.spyOn(client, "searchEnvelopes").mockResolvedValue(
+      JSON.stringify({
+        envelopes: [
+          {
+            id: "249574",
+            flags: [{ raw: "\\Seen", iana: "seen" }, { raw: "\\Flagged", iana: "flagged" }],
+            subject: "Re: Stat Faculty get together",
+            from: [{ name: "Ronald Christensen", email: "rchriste@unm.edu" }],
+            to: [{ name: "Erik Erhardt", email: "erike@stat.unm.edu" }],
+            date: "2026-02-18T22:30:36Z",
+            size: 46219,
+            "has-attachment": null,
+          },
+        ],
+      })
+    );
+    const tool = getToolHandler(server, "search_emails");
+    const result = await tool.handler({ query: "from rchriste", folder: undefined, account: undefined }, {} as any);
+
+    const text = result.content[0].text;
+    expect(text).toContain("249574");
+    expect(text).toContain("Ronald Christensen");
+    expect(text).toContain("[Seen, Flagged]");
+    expect(text).not.toContain("undefined");
+  });
 });
 
 describe("Dogfooding: read_email", () => {

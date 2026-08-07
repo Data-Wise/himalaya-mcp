@@ -59,6 +59,26 @@ describe("Folder tools", () => {
       expect(client.listFolders).toHaveBeenCalledWith("work");
     });
 
+    it("renders a v2 mailbox wrapper response", async () => {
+      vi.spyOn(client, "listFolders").mockResolvedValue(
+        JSON.stringify({
+          mailboxes: [
+            { id: "admin", name: "admin", total: null, unread: null },
+            { id: "Archive", name: "Archive", total: 3, unread: 0 },
+          ],
+        }),
+      );
+      const tool = getToolHandler(server, "list_folders");
+      const result = await tool.handler({
+        account: undefined,
+      }, {} as any);
+
+      const text = result.content[0].text;
+      expect(text).toContain("- admin");
+      expect(text).toContain("- Archive");
+      expect(text).not.toContain("undefined");
+    });
+
     it("handles errors as envelope", async () => {
       vi.spyOn(client, "listFolders").mockRejectedValue(
         new HimalayaError({

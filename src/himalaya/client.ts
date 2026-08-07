@@ -73,7 +73,7 @@ export class HimalayaClient {
   }
 
   /** Detect (and cache) the installed himalaya CLI's major version. */
-  private resolveVersion(): Promise<HimalayaVersion> {
+  resolveVersion(): Promise<HimalayaVersion> {
     if (!this.versionPromise) {
       this.versionPromise = detectHimalayaVersion(this.opts.binary);
     }
@@ -101,13 +101,15 @@ export class HimalayaClient {
     return this.opts.account;
   }
 
-  // Resolve the effective folder, validate it, and append --folder to `args`
-  // if it differs from the implicit INBOX default. Returns the effective folder.
-  private applyFolderArg(args: string[], folder: string | undefined): string {
+  // Resolve the effective folder, validate it, and append the folder flag to
+  // `args` if it differs from the implicit INBOX default. himalaya v2 renamed
+  // --folder to --mailbox. Returns the effective folder.
+  private async applyFolderArg(args: string[], folder: string | undefined): Promise<string> {
     const f = folder || this.opts.folder;
     if (f && f.toUpperCase() !== "INBOX") {
       assertSafeArg(f, "folder");
-      args.push("--folder", f);
+      const version = await this.resolveVersion();
+      args.push(version.major >= 2 ? "--mailbox" : "--folder", f);
     }
     return f;
   }
@@ -209,7 +211,7 @@ export class HimalayaClient {
   /** List envelopes in a folder. */
   async listEnvelopes(folder?: string, pageSize?: number, page?: number, account?: string): Promise<string> {
     const args = ["envelope", "list"];
-    const f = this.applyFolderArg(args, folder);
+    const f = await this.applyFolderArg(args, folder);
     if (pageSize) {
       args.push("--page-size", String(pageSize));
     }
@@ -227,8 +229,11 @@ export class HimalayaClient {
    *   Example: "subject invoice and from paypal"
    */
   async searchEnvelopes(query: string, folder?: string, account?: string): Promise<string> {
-    const args = ["envelope", "list"];
-    const f = this.applyFolderArg(args, folder);
+    // himalaya v2 moved the search DSL off `envelope list` (which now accepts
+    // no positional args) onto the dedicated `envelope search` subcommand.
+    const version = await this.resolveVersion();
+    const args = version.major >= 2 ? ["envelope", "search"] : ["envelope", "list"];
+    const f = await this.applyFolderArg(args, folder);
     // Query words are positional args to himalaya (not a -q flag).
     // Tokenize with quote awareness so `subject "meeting notes"` works,
     // and refuse any token that would be parsed as a flag.
@@ -248,7 +253,7 @@ export class HimalayaClient {
   async readMessage(id: string, folder?: string, account?: string): Promise<string> {
     assertSafeArg(id, "id");
     const args = ["message", "read", id];
-    const f = this.applyFolderArg(args, folder);
+    const f = await this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -263,10 +268,7 @@ export class HimalayaClient {
     const tmpDir = mkdtempSync(join(tmpdir(), "himalaya-mcp-html-"));
     try {
       const args = ["message", "export"];
-      const f = folder || this.opts.folder;
-      if (f && f.toUpperCase() !== "INBOX") {
-        args.push("--folder", f);
-      }
+      const f = await this.applyFolderArg(args, folder);
       args.push("--destination", tmpDir, id);
       // Note: exec() already appends --account and --output json
       await this.exec(args, { folder: f, account });
@@ -290,7 +292,7 @@ export class HimalayaClient {
       assertSafeArg(flag, "flag");
     }
     const args = ["flag", action, id, ...flags];
-    const f = this.applyFolderArg(args, folder);
+    const f = await this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -304,7 +306,7 @@ export class HimalayaClient {
     assertSafeArg(id, "id");
     assertSafeArg(targetFolder, "target_folder");
     const args = ["message", "move", targetFolder, id];
-    const f = this.applyFolderArg(args, folder);
+    const f = await this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
@@ -318,7 +320,7 @@ export class HimalayaClient {
   ): Promise<string> {
     assertSafeArg(id, "id");
     const args = ["template", "reply"];
-    const f = this.applyFolderArg(args, folder);
+    const f = await this.applyFolderArg(args, folder);
     if (replyAll) {
       args.push("--all");
     }
@@ -462,7 +464,7 @@ export class HimalayaClient {
     assertSafeArg(id, "id");
     assertSafeArg(destDir, "destDir");
     const args = ["attachment", "download", "--downloads-dir", destDir, id];
-    const f = this.applyFolderArg(args, folder);
+    const f = await this.applyFolderArg(args, folder);
     return this.exec(args, { folder: f, account });
   }
 
