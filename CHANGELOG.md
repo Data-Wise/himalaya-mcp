@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.0] - 2026-08-07
+
+### Fixed
+
+- Full himalaya v2 CLI compatibility (#133): v2 returns wrapper objects (`{"mailboxes":[...]}`
+  / `{"envelopes":[...]}`) instead of bare arrays, so `list_folders`/`list_emails`/`list_starred`
+  crashed with `n.data.map is not a function`. The parser now unwraps the wrappers and normalizes
+  v2 field shapes (flags as `{raw, iana}` objects, `from`/`to` as arrays, `has-attachment`
+  kebab-case `null|bool`, missing `desc` on mailboxes) into the canonical envelope/folder shapes.
+- v2 rejects the `--folder` flag (only `--mailbox` works) and moved the search DSL off `envelope
+  list` onto the dedicated `envelope search` subcommand. The client now version-branches the
+  folder flag (`--mailbox` on v2, `--folder` on v1) across every call site, and `search_emails`
+  uses `envelope search` with flags placed before the greedy positional query.
+- The parser now fails loud with `parse_error` when a list response is neither a bare array nor
+  an object wrapping an array at the expected key, instead of silently reporting empty mailboxes.
+- `himalaya-mcp doctor`'s envelope probe now unwraps the v2 `{"envelopes":[...]}` wrapper so it
+  catches the same regression class as the MCP tools.
+
+### Changed
+
+- Health/doctor overhaul: `health_check` now probes both folder and envelope surfaces per account
+  and reports the installed himalaya version and binary path. `doctor`'s per-account probe routes
+  through the same shared `probeAccountSurfaces` helper as `health_check`, so the two can never
+  drift again, and caches its `HimalayaClient` per binary path so the version probe runs once per
+  invocation instead of once per account.
+- Fixed the `doctor` CLI exit-code stdout race (#116): output is written with
+  `process.stdout.write` and the exit code set via `process.exitCode`, so `doctor --json` no
+  longer truncates its JSON for CI parsers.
+- Test suite grew from 691 to 719 tests across 41 files, adding v2-shape parser/client coverage,
+  an E2E v2 CLI compatibility suite, and new dogfood reliability scenarios for multi-surface
+  health checks.
+
 ## [2.0.5] - 2026-08-05
 
 ### Fixed

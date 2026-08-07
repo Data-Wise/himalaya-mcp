@@ -20,6 +20,8 @@ import {
 } from "./shared.js";
 import { listAccounts, type Account } from "../himalaya/accounts.js";
 import { detectHimalayaVersion } from "../himalaya/cli-version.js";
+import { HimalayaClient } from "../himalaya/client.js";
+import { probeAccountSurfaces } from "../himalaya/diagnostics.js";
 import { HimalayaError } from "../himalaya/errors.js";
 
 export interface CheckResult {
@@ -37,6 +39,18 @@ export interface AccountHealth {
   reachable: boolean;
   error?: string;
   hint?: string;
+}
+
+/**
+ * Cache one HimalayaClient per himalaya binary path so the --version probe
+ * (cached per client instance) runs once per invocation rather than once per
+ * account. checkAccountHealth is called once per account by runDoctor.
+ */
+const clientCache = new Map<string, HimalayaClient>();
+
+/** Test hook: drop cached clients so each test starts with a fresh version probe. */
+export function clearDoctorClientCache(): void {
+  clientCache.clear();
 }
 
 export interface DoctorOptions {
@@ -189,7 +203,14 @@ async function checkEmailConnectivity(): Promise<CheckResult[]> {
 
   const envelopes = execQuiet(himalayaPath, ["envelope", "list", "--page-size", "1", ...outputFlag]);
   if (envelopes.ok) {
-    results.push({ name: "Envelope listing", category: "Email", status: "pass", message: "works" });
+    try {
+      // v2 wraps the array as {envelopes: [...]}; v1 returns a bare array.
+      const rawParsed = JSON.parse(envelopes.stdout) as unknown[] | { envelopes: unknown[] };
+      const parsed = Array.isArray(rawParsed) ? rawParsed : rawParsed.envelopes;
+      results.push({ name: "Envelope listing", category: "Email", status: "pass", message: `works (${parsed.length} envelopes)` });
+    } catch {
+      results.push({ name: "Envelope listing", category: "Email", status: "warn", message: "Could not parse envelope list" });
+    }
   } else {
     results.push({ name: "Envelope listing", category: "Email", status: "fail", message: "Failed to list emails" });
   }
@@ -673,35 +694,24 @@ export async function checkAccountHealth(name: string): Promise<AccountHealth> {
     };
   }
 
-  // Same dual-syntax branch as checkEmailConnectivity (see cli-version.ts):
-  // himalaya v2 renamed folder→mailbox and --output json→--json.
-  let isV2 = true;
-  try {
-    isV2 = (await detectHimalayaVersion(himalayaPath)).major >= 2;
-  } catch {
-    // Version detection failed -- fall through assuming v2 (current Homebrew
-    // stable) rather than hardcoding the v1 syntax that v2 rejects.
+  // Route through the same shared probe the health_check tool uses so the
+  // two surfaces (folder + envelope) never drift again (#133 lesson). The
+  // client handles v1/v2 syntax, JSON output flags, and transient retry.
+  let client = clientCache.get(himalayaPath);
+  if (!client) {
+    client = new HimalayaClient({ binary: himalayaPath, timeout: 15_000 });
+    clientCache.set(himalayaPath, client);
   }
-  const outputFlag = isV2 ? ["--json"] : ["--output", "json"];
-  const mailboxSubcommand = isV2 ? "mailbox" : "folder";
-
-  let stdout = "";
-  let stderr = "";
-  let ok = false;
-  try {
-    stdout = execFileSync(
-      himalayaPath,
-      [mailboxSubcommand, "list", "--account", name, ...outputFlag],
-      { timeout: 15_000, stdio: "pipe" },
-    ).toString().trim();
-    ok = true;
-  } catch (err: unknown) {
-    stderr = err instanceof Error ? err.message : String(err);
-  }
-  if (ok && stdout) {
+  const probe = await probeAccountSurfaces(name, client);
+  if (probe.reachable) {
     return { reachable: true };
   }
-  return { reachable: false, error: stderr || "folder list failed" };
+  const folder = probe.folders;
+  return {
+    reachable: false,
+    error: folder.message || "folder list failed",
+    hint: folder.hint,
+  };
 }
 
 export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
@@ -889,12 +899,15 @@ async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; fai
 export async function doctor(flags: { fix: boolean; json: boolean; account?: string; preRelease?: boolean; postRelease?: boolean }): Promise<void> {
   if (flags.json) {
     const { output, failed } = await runDoctorJson(flags);
-    console.log(output);
-    if (failed > 0) process.exit(1);
+    // process.stdout.write + process.exitCode (not console.log + process.exit)
+    // so stdout is flushed before the process exits -- the console.log/exit
+    // combo truncated JSON output, breaking `doctor --json` for CI parsers.
+    process.stdout.write(output + "\n");
+    if (failed > 0) process.exitCode = 1;
     return;
   }
 
   const output = await runDoctor(flags);
-  console.log(output);
-  if (output.includes("✗")) process.exit(1);
+  process.stdout.write(output + "\n");
+  if (output.includes("✗")) process.exitCode = 1;
 }

@@ -130,8 +130,8 @@ describe("v1.5.0: plugin.json hook structure", () => {
     expect(pluginJson.description).toContain("2 hooks");
   });
 
-  it("version is 2.0.5", () => {
-    expect(pluginJson.version).toBe("2.0.5");
+  it("version is 2.1.0", () => {
+    expect(pluginJson.version).toBe("2.1.0");
   });
 });
 

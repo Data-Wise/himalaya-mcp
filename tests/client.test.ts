@@ -266,8 +266,8 @@ describe("HimalayaClient", () => {
   });
 
   describe("convenience methods", () => {
-    it("listEnvelopes builds correct args", async () => {
-      setupMock("[]");
+    it("listEnvelopes builds correct args on v1.x (--folder)", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "[]" });
       const client = new HimalayaClient();
       await client.listEnvelopes("Sent Items", 10, 2);
 
@@ -278,8 +278,37 @@ describe("HimalayaClient", () => {
       );
     });
 
-    it("searchEnvelopes passes query as positional args", async () => {
-      setupMock("[]");
+    it("listEnvelopes builds correct args on v2 (--mailbox)", async () => {
+      configureMock({ version: V2_VERSION_STDOUT, stdout: "[]" });
+      const client = new HimalayaClient();
+      await client.listEnvelopes("Sent Items", 10, 2);
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["envelope", "list", "--mailbox", "Sent Items", "--page-size", "10", "--page", "2"]),
+        expect.any(Object),
+      );
+      const call = mockExecFileAsync.mock.calls.find((c) => (c[1] as string[])[0] === "envelope");
+      expect(call![1]).not.toContain("--folder");
+    });
+
+    it("searchEnvelopes on v2 uses the dedicated envelope search subcommand", async () => {
+      configureMock({ version: V2_VERSION_STDOUT, stdout: "[]" });
+      const client = new HimalayaClient();
+      await client.searchEnvelopes("subject invoice", "INBOX");
+
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["envelope", "search", "subject", "invoice"]),
+        expect.any(Object),
+      );
+      const call = mockExecFileAsync.mock.calls.find((c) => (c[1] as string[])[0] === "envelope");
+      expect((call![1] as string[])[1]).toBe("search");
+      expect(call![1]).not.toContain("list");
+    });
+
+    it("searchEnvelopes on v1.x keeps passing the DSL to envelope list", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "[]" });
       const client = new HimalayaClient();
       await client.searchEnvelopes("subject invoice", "INBOX");
 
@@ -288,6 +317,18 @@ describe("HimalayaClient", () => {
         expect.arrayContaining(["envelope", "list", "subject", "invoice"]),
         expect.any(Object),
       );
+    });
+
+    it("searchEnvelopes on v2 orders flags before the greedy query positional", async () => {
+      configureMock({ version: V2_VERSION_STDOUT, stdout: "[]" });
+      const client = new HimalayaClient();
+      await client.searchEnvelopes("flag Flagged", "INBOX");
+
+      const call = mockExecFileAsync.mock.calls.find((c) => (c[1] as string[])[0] === "envelope");
+      const argv = call![1] as string[];
+      // The query DSL is a greedy positional on v2, so every flag must precede
+      // the query tokens or clap swallows them.
+      expect(argv.indexOf("flag")).toBeGreaterThan(argv.indexOf("--json"));
     });
 
     it("readMessage passes id", async () => {
@@ -566,7 +607,7 @@ describe("HimalayaClient", () => {
 
       expect(mockExecFileAsync).toHaveBeenCalledWith(
         "himalaya",
-        expect.arrayContaining(["envelope", "list", "subject", "meeting notes"]),
+        expect.arrayContaining(["envelope", "search", "subject", "meeting notes"]),
         expect.any(Object),
       );
     });
@@ -578,7 +619,7 @@ describe("HimalayaClient", () => {
 
       expect(mockExecFileAsync).toHaveBeenCalledWith(
         "himalaya",
-        expect.arrayContaining(["envelope", "list", "from", "foo bar@example.com"]),
+        expect.arrayContaining(["envelope", "search", "from", "foo bar@example.com"]),
         expect.any(Object),
       );
     });
