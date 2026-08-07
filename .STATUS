@@ -3,9 +3,9 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.0.5 released (main/Homebrew/marketplace), dev synced
-## Focus: Maintenance after v2.0.5 Claude integration release
-## Phase: Maintenance
+## Status: v2.1.0 release in progress (dev), v2.0.5 live on main/Homebrew/marketplace
+## Focus: Release v2.1.0 — v2 CLI compatibility (#133) + multi-surface health/doctor overhaul
+## Phase: Release
 ## Priority: 1
 ## Progress: 100
 
