@@ -91,7 +91,7 @@ himalaya-mcp doctor
   ✓ himalaya config exists
 
   MCP Server
-  ✓ dist/index.js exists (604 KB)
+  ✓ dist/index.js exists (~910 KB)
 
   Email Connectivity
   ✓ Accounts: personal, work
@@ -154,7 +154,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v2.0.2.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v2.1.0.mcpb     # Install specific file
 ```
 
 ### What it does
@@ -196,9 +196,9 @@ Restart Claude Desktop after removal.
 
 ```bash
 npm run build           # TypeScript compilation (development)
-npm run build:bundle    # Build root + plugin bundles (~908KB each, production)
+npm run build:bundle    # Build root + plugin bundles (~910KB each, production)
 npm run build:mcpb      # Build .mcpb Desktop Extension (~253KB)
-npm test                # Run 691 tests (vitest, threads pool)
+npm test                # Run 719 tests (vitest, threads pool)
 node dist/index.js      # Start MCP server standalone
 ```
 

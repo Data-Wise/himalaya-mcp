@@ -70,7 +70,7 @@ flowchart LR
     Code / Desktop`"] -->|MCP JSON-RPC| B["`**himalaya-mcp**
     29 tools · 7 prompts`"]
     B -->|execFile| C["`**himalaya CLI**
-    --output json`"]
+    --json (v2) / --output json (v1)`"]
     C -->|IMAP/SMTP| D["`**Mail Server**
     Gmail, Fastmail, etc.`"]
 ```
