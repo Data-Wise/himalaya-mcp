@@ -379,10 +379,15 @@ himalaya-mcp doctor --fix
 - **Pending:** PR #115 (coerce numeric IDs to string in Zod schemas, base=main) — valid and still
   needed; all 13 `z.string()` id sites remain unpatched on `dev`, merges clean. Needs retargeting
   `main` → `dev`.
-- **Pending:** PR #117 (Dependabot "dev-deps group") — this is the TypeScript 6→7 **major** bump
-  (`^6.0.3` → `^7.0.2`) relabeled; it supersedes the previously-deferred PR #97, which is now
-  closed. `test` job is red. Hold for the same deliberate review, or split the `@types/node`
-  26.1.1→26.2.0 patch out from the major.
+- **Pending:** PR #141 (Dependabot "dev-deps group") — the TypeScript 6→7 **major** bump
+  (`^6.0.3` → `^7.0.2`) plus `@types/node` 26.1.1→26.2.0. This is the **third filing** of the same
+  major: #97 was closed unmerged as a deliberate deferral, #117 replaced it and was itself closed
+  by Dependabot on 2026-08-17, which opened #141.
+  **The TS major has still never actually been tested.** #117's red `test` job was the `nanoid`
+  audit failure at CI's first step, not a TypeScript error — so the job aborted before the compiler
+  ran. That audit failure is fixed (#138), so #141 would give the first genuine signal on whether
+  TS 7 breaks the build. Hold for a reviewed pass, or split the `@types/node` patch out from the
+  major and merge that alone.
 - Otherwise: all features complete, project in maintenance mode. Possible future directions:
   - Bundled .mcpb variant with universal himalaya binary (~19 MB)
   - Code signing + notarization (Apple Developer, $99/yr)
