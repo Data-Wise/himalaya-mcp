@@ -258,11 +258,19 @@ npm run build:bundle             # Build root + plugin bundles (~908KB each)
 node dist/index.js               # Run MCP server directly
 ```
 
-> **Claude Code agents:** `npm test`/`vitest run` now defaults to the `threads` pool
-> (vitest.config.ts), so worker threads die with the vitest process and cannot be orphaned by a
-> harness timeout — the forks-pool leak is gone. The `timeout` wrapper below remains only as a
-> belt-and-suspenders cap on the ~6-minute full run (threads pool, host) if you must bound the runtime:
+> **Claude Code agents:** the full suite runs in **~24s on the host, ~53s in CI** (v2.1.2+).
+> If you remember it as a ~6-minute run, that was issue #139: `doctor --pre-release` and the
+> suite spawned each other with no recursion guard, so the suite spent ~93% of its wall time
+> running nested copies of itself and leaked 40+ orphaned vitest processes per run. Fixed —
+> `doctor` now skips its test-suite check when `process.env.VITEST` is set.
+>
+> `vitest.config.ts` also defaults to the `threads` pool, so workers die with the vitest process
+> and cannot be orphaned by a harness timeout. A bare `npm test` is now safe and fast; the
+> `timeout` wrapper is no longer needed to bound the runtime, though it remains harmless:
 > `timeout --signal=TERM --kill-after=5s 600s ./node_modules/.bin/vitest run --maxWorkers=1`
+>
+> If you ever see orphaned `vitest` processes again, check for a reintroduced recursion before
+> blaming the pool — `pgrep -f vitest | wc -l` after a run should be 0.
 >
 > **Docker verification (full suite):** `node:22`, bind-mounted worktree + a named
 > `node_modules` volume. Run detached WITHOUT `--rm`, then `docker wait <id>` to capture the
@@ -347,4 +355,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-08-02
+**Last Updated:** 2026-08-17
