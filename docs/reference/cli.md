@@ -30,7 +30,7 @@ Prints the semantic version on its own line and exits 0.
 
 ```bash
 himalaya-mcp --version   # also: -v, version
-# Example output: 2.1.1
+# Example output: 2.1.2
 ```
 
 ---
@@ -154,7 +154,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v2.1.1.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v2.1.2.mcpb     # Install specific file
 ```
 
 ### What it does
@@ -198,7 +198,7 @@ Restart Claude Desktop after removal.
 npm run build           # TypeScript compilation (development)
 npm run build:bundle    # Build root + plugin bundles (~910KB each, production)
 npm run build:mcpb      # Build .mcpb Desktop Extension (~253KB)
-npm test                # Run 717 tests (vitest, threads pool)
+npm test                # Run 718 tests (vitest, threads pool)
 node dist/index.js      # Start MCP server standalone
 ```
 

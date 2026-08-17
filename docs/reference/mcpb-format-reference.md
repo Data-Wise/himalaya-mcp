@@ -1045,7 +1045,7 @@ The client applies locale fallbacks: `es-UY` -> `es-MX` -> `es-ES` -> `en-US` (d
   "manifest_version": "0.3",
   "name": "himalaya-mcp",
   "display_name": "Himalaya Email",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Privacy-first email for Claude via the himalaya CLI.",
   "author": { "name": "Data-Wise", "url": "https://github.com/Data-Wise" },
   "server": {

@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.2] - 2026-08-17
+
+CI and build reliability. No runtime behavior changes — `src/cli/doctor.ts` is a maintainer
+command; everything else is build tooling and tests.
+
+### Fixed
+
+- **The test suite and `doctor --pre-release` invoked each other with no recursion guard**
+  (#139). `tests/setup.test.ts` spawns the doctor CLI, and doctor's Pre-Release "Test suite"
+  check spawned a full `vitest run`, which re-ran that file, which spawned doctor again —
+  unbounded. Observed 40+ orphaned vitest processes per run, outliving the run that started
+  them. `doctor` now skips that check when `process.env.VITEST` is set.
+
+  The effect is much larger than a leak fix. Same machine, full suite: **397s → 24s**, and in
+  CI **481–531s → 53s**. The suite was spending roughly 93% of its wall time running nested
+  copies of itself. It also explains a class of phantom failures — one run reported 2 failures
+  in 771s, both 5-second timeout expirations under CPU starvation, which vanished on the
+  identical commit once the orphans were killed.
+
+- **The `.mcpb` build was a race, not a dead CI job** (#121). `mcpb pack` ignores the output
+  path it is handed and writes `himalaya-mcp-<version>.mcpb` — no `v` prefix — into either the
+  project root or the packed directory. `build-mcpb.sh` papered over this with a
+  sleep-and-retry loop globbing only the project root, and that loop raced: it won on the
+  v2.1.0 release and lost on v2.1.1, failing the build and skipping the entire Homebrew formula
+  update. Re-running the identical commit then succeeded, which is what proved it
+  nondeterministic.
+
+  The retry is gone — once pack exits there is nothing to wait for, only a name to reconcile.
+  The script now searches both directories, refuses to rename any archive whose filename does
+  not carry the current version, and fails naming both searched paths.
+
 ## [2.1.1] - 2026-08-16
 
 ### Fixed
