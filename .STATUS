@@ -324,15 +324,16 @@ himalaya-mcp doctor --fix
 ## Next Action
 
 - No active release work — v2.1.0 is fully shipped and verified end-to-end.
-- **Fix next:** issue #121 (`.mcpb` release artifact upload) — NOT a flake, and **not
-  load-bearing**. The `upload-mcpb` job has failed on all five releases (v2.0.2–v2.1.0) while
-  every release still shipped its `.mcpb`, because the local release pipeline attaches the asset
-  at release-creation time and the CI job only re-uploads it (see the timing evidence below).
-  Decision needed: **delete the redundant `upload-mcpb` job** and its feeding
-  `Upload MCPB artifact` step (simplest — five releases prove the job is dead weight), **or**
-  keep it as a CI-side safety net and make it honest by adding `if-no-files-found: error` plus a
-  pre-upload `ls -la` diagnostic so the next failure names its own cause. Either way, the silent
-  `if-no-files-found` default is the defect that hid this for five releases.
+- **Zero open issues.** All seven were closed 2026-08-16 during backlog triage (#133, #114, #101,
+  #109, #113 as already-fixed; #103 as belonging to `Data-Wise/dotfiles`; #121 by PR #137).
+- **Watch — the one unverified item:** the next release's `homebrew-release.yml` run should now go
+  green end to end, with the `.mcpb` still attached by the local pipeline as it already is. That
+  run is the real gate on #121; reopen if it surprises us.
+- **Unexplained but moot:** why the old `upload-artifact@v7` glob matched nothing in CI was never
+  root-caused. Ruled out: working-directory mismatch, and the file not existing. A local
+  `build:mcpb` writes the bundle to the repo root exactly where the glob pointed. The job is gone,
+  so this only matters if a CI-side upload is ever reintroduced — and two tests in
+  `tests/dogfood.test.ts` now fail if it is.
 - **Pending:** PR #82 (HTML compose_email, base=main) — the previously recorded manifest blocker
   is GONE (a 2026-08-07 force-push reduced the `mcpb/manifest.json` diff to +1/−1, a single tool
   description; it does not delete 8 tools + 1 prompt). Branch merges clean. Real blockers now:
