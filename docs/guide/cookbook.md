@@ -433,15 +433,18 @@ Claude:
 You: paste into Obsidian
 ```
 
-For automation, use the `compose_email` tool from a script:
+For automation from a shell, himalaya v2 needs two calls — the headers come from
+the envelope, the body from the message (v1's `envelope get` was removed in v2):
 
 ```bash
 # Save directly to vault
-himalaya envelope get 42 --output json | \
-  node -e "process.stdin.on('data', d => {
-    const e = JSON.parse(d);
-    console.log('# ' + e.subject + '\n\n**From:** ' + e.from + '\n**Date:** ' + e.date);
-  })" > ~/vault/email-42.md
+ID=42
+{
+  himalaya envelope list --json --page-size 100 \
+    | jq -r --arg id "$ID" '.envelopes[] | select(.id == $id)
+        | "# \(.subject)\n\n**From:** \(.from[0].name // .from[0].email)\n**Date:** \(.date)\n"'
+  himalaya message read "$ID" --json | jq -r '.text_body'
+} > ~/vault/email-$ID.md
 ```
 
 ### Create Apple Reminder from action item

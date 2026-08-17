@@ -82,42 +82,12 @@ jobs:
       - name: Verify bundle
         run: test -f dist/index.js && echo "Bundle OK ($(wc -c < dist/index.js) bytes)"
 
+      # Build gate only — proves the .mcpb still packs before the formula PR
+      # opens. The bundle is NOT uploaded from CI: the local release pipeline
+      # attaches the .mcpb at release-creation time (see issue #121), so a CI
+      # upload job would only ever re-upload a file the release already has.
       - name: Build MCPB bundle
         run: npm run build:mcpb
-
-      - name: Upload MCPB artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: mcpb-bundle
-          path: himalaya-mcp-v*.mcpb
-
-  upload-mcpb:
-    name: Upload MCPB to Release
-    needs: [validate]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    permissions:
-      contents: write
-    steps:
-      - name: Download MCPB artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: mcpb-bundle
-
-      - name: Upload to GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG_NAME: ${{ github.event.release.tag_name }}
-        run: |
-          shopt -s nullglob
-          MCPB_FILES=(himalaya-mcp-v*.mcpb)
-          if [ ${#MCPB_FILES[@]} -eq 0 ]; then
-            echo "ERROR: No .mcpb file found — build may have failed"
-            exit 1
-          fi
-          MCPB_FILE="${MCPB_FILES[0]}"
-          gh release upload "$TAG_NAME" "$MCPB_FILE" --repo "$GITHUB_REPOSITORY"
-          echo "Uploaded $MCPB_FILE to release $TAG_NAME"
 
   prepare:
     name: Prepare Release Info

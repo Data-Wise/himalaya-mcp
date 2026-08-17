@@ -16,15 +16,22 @@ Claude will:
 2. `copy_to_clipboard(text)` — copy to clipboard
 3. You paste into Obsidian
 
-For automation, save directly:
+For automation from a shell, note that himalaya v2 needs **two** calls — headers
+live on the envelope, the body on the message, and no single subcommand returns
+both (v1's `envelope get` was removed in v2):
 
 ```bash
-himalaya envelope get 42 --output json | \
-  node -e "process.stdin.on('data', d => { \
-    const e = JSON.parse(d); \
-    console.log('# ' + e.subject + '\n\n**From:** ' + e.from + '\n**Date:** ' + e.date + '\n\n' + e.body); \
-  })" > ~/vault/email-42.md
+ID=42
+{
+  himalaya envelope list --json --page-size 100 \
+    | jq -r --arg id "$ID" '.envelopes[] | select(.id == $id)
+        | "# \(.subject)\n\n**From:** \(.from[0].name // .from[0].email)\n**Date:** \(.date)\n"'
+  himalaya message read "$ID" --json | jq -r '.text_body'
+} > ~/vault/email-$ID.md
 ```
+
+Asking Claude for `export_to_markdown` is still the easier path — it emits YAML
+frontmatter plus the body in one step, with no reassembly.
 
 ## Apple Ecosystem
 

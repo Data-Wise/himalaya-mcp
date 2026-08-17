@@ -49,7 +49,8 @@ himalaya-mcp works with both Claude Code and Claude Desktop, but the experience 
 Verify himalaya works:
 
 ```bash
-himalaya --output json envelope list     # Should print JSON envelopes
+himalaya envelope list --json            # Should print {"envelopes":[...]}
+# himalaya v1.x instead wants: himalaya --output json envelope list
 ```
 
 ## Installation
@@ -383,7 +384,7 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 719 tests across 41 files (vitest, threads pool)
+npm test    # 717 tests across 41 files (vitest, threads pool)
 ```
 
 Test breakdown:

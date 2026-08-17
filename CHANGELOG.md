@@ -4,6 +4,44 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.1] - 2026-08-16
+
+### Fixed
+
+- Three documented commands used himalaya v1 syntax and fail outright on the v2 CLI this
+  project targets. Verified against himalaya v2.1.0: `--output json` is rejected, and
+  `envelope get` no longer exists (v2 keeps only `envelope list` / `envelope search`).
+  - The verify-install command in the user guide — the first command a new user runs —
+    now reads `himalaya envelope list --json`.
+  - The Obsidian export snippet in the cookbook and integrations guide additionally assumed
+    a single call returning subject, from, date and body together. No such response shape
+    exists on v2: headers come from `envelope list --json`, the body from
+    `message read --json` (`{attachments, html_body, parts, text_body}`). Rewritten as the
+    two-call form. `from` is an array of `{email, name}`, so the previous `.from` would have
+    rendered `[object Object]` even with the flag corrected.
+- `docs/reference/commands.md` advertised "29 MCP tools" but documented 25. Added
+  `health_check`, `snooze_email`, `list_snoozed_emails`, and `create_reminder`, written from
+  their actual Zod schemas.
+- Resolved a high-severity advisory in the dev dependency tree (`nanoid` <3.3.18,
+  GHSA-2v37-7h3g-55p8). `npm audit` runs as the first step of the CI test job, so this had
+  been failing every pull request — and aborting the job before the suite ran. Dev-only
+  transitive (`vitest → vite → postcss → nanoid`); never shipped in the bundle.
+
+### Removed
+
+- Dropped the redundant `upload-mcpb` job and its feeding `Upload MCPB artifact` step from
+  `homebrew-release.yml` (#121). The job had failed on all five releases to date
+  (v2.0.2–v2.1.0) while every release still shipped its `.mcpb`: the local release pipeline
+  attaches the asset at release-creation time, so the CI job only ever re-uploaded a file the
+  release already had. The `Build MCPB bundle` step stays as a pre-release build gate. The
+  underlying reason the job's artifact glob matched nothing in CI is still unexplained, but is
+  now moot — a local `npm run build:mcpb` writes the bundle to the repo root exactly where the
+  glob pointed.
+- `tests/dogfood.test.ts`'s `Packaging: release includes mcpb` block went 5 tests → 3: the four
+  assertions that the deleted job exists are replaced by two that assert it stays deleted (no
+  `upload-mcpb:` / `mcpb-bundle` / `gh release upload` in the workflow) and that the comment
+  explaining why survives. Suite total is now **717 across 41 files** (was 719).
+
 ## [2.1.0] - 2026-08-07
 
 ### Fixed
