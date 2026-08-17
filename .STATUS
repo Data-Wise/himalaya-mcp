@@ -187,13 +187,22 @@
 - Bundle: ~910KB (esbuild), .mcpb: ~253KB
 - opencode: `himalaya` MCP server configured in `~/.config/opencode/config.json` (enabled,
   entry `/opt/homebrew/opt/himalaya-mcp/libexec/dist/index.js`, `HIMALAYA_ACCOUNT=unm`).
-- Historical worktrees remain clean: `feature/fix-claude-desktop-path`, `feature/docs-plugin-fixes`,
-  and detached `gracious-wilson-4b3f6a`; current worktree is clean on `dev`.
-- Maintenance follow-up: Issue #121 (not fixed, recurred again on this release): `.mcpb` CI
-  artifact-upload flake in `actions/upload-artifact@v7` —
-  `Upload MCPB to Release` job downloads an empty (22-byte) artifact and fails; harmless when
-  the GitHub Release was created with the `.mcpb` asset attached directly (as done for v2.1.0),
-  since that job only re-uploads a file the release already has.
+- Worktrees: only the main checkout remains, clean on `dev`. Removed 2026-08-16 during backlog
+  triage — `feature/docs-plugin-fixes` and detached `gracious-wilson-4b3f6a` worktrees, plus the
+  `feature/docs-plugin-fixes` (`395a18a`) and `feature/docs-680-tests-v2` (`8b2ba1b`) branches
+  local and remote. Both were docs-only and fully superseded: their unique prose (standalone +
+  plugin bundle wording, stale-plugin-directory doctor fix, 15s probe note, `email`→`himalaya`
+  plugin rename) and all three CHANGELOG entries already landed on `dev` via `0ef207f`, and their
+  test counts (680/691) were stale against 719.
+- Maintenance follow-up: Issue #121 — **root-caused 2026-08-16, not a flake.** The
+  `homebrew-release.yml` workflow has failed on all five releases to date (v2.0.2–v2.1.0); the
+  `.mcpb` asset reaches each release only via the manual upload workaround. The `validate` job's
+  upload step silently matches nothing (`##[warning]No files were found with the provided path:
+  himalaya-mcp-v*.mcpb`) and, lacking `if-no-files-found: error`, stays green — so the failure
+  only surfaces one job later in `upload-mcpb` as a misleading "Artifact not found for name:
+  mcpb-bundle". A working-directory mismatch is ruled out (`checkout@v7`, no `path:`, no
+  `defaults.run.working-directory`, and `scripts/build-mcpb.sh:51-59` hard-exits when the file is
+  absent). Leading remaining cause: `.gitignore:6` `*.mcpb`. See "Next Action" for the fix.
 
 ## Install
 
@@ -306,17 +315,30 @@ himalaya-mcp doctor --fix
 
 ## Next Action
 
-- No active release work — v2.0.3 is fully shipped and verified end-to-end.
-- **Pending:** PR #82 (HTML compose_email, base=main) — BLOCKED: its `mcpb/manifest.json`
-  diff deletes 8 tools + 1 prompt (stale-drift against an old base). Needs a rebase + manifest
-  restoration, and the SKILL.md text must be reconciled with the HTML-only (no text/plain
-  fallback) behavior.
-- **Pending:** PR #97 (TypeScript 6→7 major bump, Dependabot) — deferred; project pins
-  `typescript ^6.0.3`, needs a deliberate review.
-- **Watch:** issue #121 (`.mcpb` CI artifact-upload flake) — recurred a second time
-  (v2.0.2 and v2.0.3 releases both hit it); root cause still unconfirmed
-  (`actions/upload-artifact@v7` possible regression). Manual-upload workaround is reliable but
-  worth a real fix if it keeps recurring every release.
+- No active release work — v2.1.0 is fully shipped and verified end-to-end.
+- **Fix next:** issue #121 (`.mcpb` release artifact upload) — NOT a flake. Failed on all five
+  releases to date (v2.0.2–v2.1.0); the `.mcpb` asset reaches each release only via the manual
+  workaround. Root cause found 2026-08-16: `homebrew-release.yml:88-92` omits
+  `if-no-files-found: error`, so the glob miss (`himalaya-mcp-v*.mcpb` matched nothing) degrades
+  to a warning and `validate` stays green — the error only surfaces one job later in
+  `upload-mcpb` as a misleading "artifact not found". Ruled out a working-directory mismatch
+  (`checkout@v7`, no `path:`, no `defaults.run.working-directory`); leading remaining cause is
+  `.gitignore:6` `*.mcpb`. Fix: have `scripts/build-mcpb.sh` write to a dedicated `dist-mcpb/`
+  dir, upload that directory, and add `if-no-files-found: error`.
+- **Pending:** PR #82 (HTML compose_email, base=main) — the previously recorded manifest blocker
+  is GONE (a 2026-08-07 force-push reduced the `mcpb/manifest.json` diff to +1/−1, a single tool
+  description; it does not delete 8 tools + 1 prompt). Branch merges clean. Real blockers now:
+  (1) `skills/compose/SKILL.md` promises multipart/alternative with a text/plain part, but the
+  code sends HTML-only by design; (2) `html: false` is ignored — no opt-out from auto-detection;
+  (3) `isHtmlContent()` false-positives on plain prose (`a\s`, `p\b`, `link\b`, `meta\b`);
+  (4) HTML + attachments untested. Also needs retargeting `main` → `dev`.
+- **Pending:** PR #115 (coerce numeric IDs to string in Zod schemas, base=main) — valid and still
+  needed; all 13 `z.string()` id sites remain unpatched on `dev`, merges clean. Needs retargeting
+  `main` → `dev`.
+- **Pending:** PR #117 (Dependabot "dev-deps group") — this is the TypeScript 6→7 **major** bump
+  (`^6.0.3` → `^7.0.2`) relabeled; it supersedes the previously-deferred PR #97, which is now
+  closed. `test` job is red. Hold for the same deliberate review, or split the `@types/node`
+  26.1.1→26.2.0 patch out from the major.
 - Otherwise: all features complete, project in maintenance mode. Possible future directions:
   - Bundled .mcpb variant with universal himalaya binary (~19 MB)
   - Code signing + notarization (Apple Developer, $99/yr)
