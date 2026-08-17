@@ -807,6 +807,113 @@ Read all messages in a thread chronologically, showing sender, date, and message
 
 ---
 
+### Snooze
+
+#### `snooze_email`
+
+Snooze an email until a specified time. The email reappears in your inbox check after the snooze period expires.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | — | Email message ID to snooze |
+| `snoozeUntil` | string | **Yes** | — | When to unsnooze — ISO (`2026-07-08T09:00:00`) or shorthand (`2h`, `1d`, `tomorrow`, `monday`) |
+| `subject` | string | No | — | Email subject, for display in the snooze list |
+| `folder` | string | No | `INBOX` | Folder name |
+| `account` | string | No | default | Account name |
+
+**Examples:**
+
+```
+"Snooze email 42 until tomorrow"
+→ snooze_email(id: "42", snoozeUntil: "tomorrow")
+
+"Hide this until Monday"
+→ snooze_email(id: "42", snoozeUntil: "monday")
+
+"Snooze for 2 hours"
+→ snooze_email(id: "42", snoozeUntil: "2h")
+```
+
+**Related:** [list_snoozed_emails](#list_snoozed_emails), [inbox_check](#inbox_check-prompt)
+
+---
+
+#### `list_snoozed_emails`
+
+List all snoozed emails and their unsnooze times. Emails past their snooze time are returned as expired and can be revisited.
+
+Takes no parameters.
+
+**Examples:**
+
+```
+"What have I snoozed?"
+→ list_snoozed_emails()
+
+"Anything due to come back?"
+→ list_snoozed_emails()
+```
+
+**Related:** [snooze_email](#snooze_email)
+
+---
+
+### Reminders
+
+#### `create_reminder`
+
+Create a reminder in Apple Reminders. Use for action items, follow-ups, and tasks extracted from email.
+
+!!! note "macOS only"
+    Backed by `osascript`. On other platforms the tool returns a structured error.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `title` | string | **Yes** | — | Reminder title / task description |
+| `notes` | string | No | — | Notes or context for the reminder |
+| `dueDate` | string | No | — | Due date, ISO format (`2026-07-15T14:00:00`) |
+| `priority` | number | No | — | Priority 1–5 (1 = highest) |
+
+**Examples:**
+
+```
+"Remind me to reply to Sarah tomorrow at 2pm"
+→ create_reminder(title: "Reply to Sarah", dueDate: "2026-07-15T14:00:00")
+
+"Add the action item from email 42 to my reminders"
+→ create_action_item(id: "42") then create_reminder(title: ..., notes: ...)
+```
+
+**Related:** [create_action_item](#create_action_item), [create_calendar_event](#create_calendar_event)
+
+---
+
+### Diagnostics
+
+#### `health_check`
+
+Check himalaya-mcp installation health and per-account IMAP connectivity. Use when an email tool fails, to find which accounts are reachable.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `account` | string | No | all accounts | Specific account to test |
+
+Each account is probed on **two surfaces** — the folder list and an envelope fetch — so a folder failure and an envelope failure are reported separately rather than collapsing into one generic "unreachable". The response carries an `overall` status (`healthy` / `degraded` / `broken`), the detected himalaya version and binary path, and a per-account detail array with a `hint` for each failure.
+
+**Examples:**
+
+```
+"Why is my email not working?"
+→ health_check()
+
+"Check just the work account"
+→ health_check(account: "work")
+```
+
+**Related:** [Diagnose issues](../getting-started/diagnose-issues.md), [Troubleshooting](../guide/troubleshooting.md)
+
+---
+
 ## Prompts
 
 ### `triage_inbox` {#triage_inbox-prompt}
