@@ -1845,22 +1845,18 @@ describe("Packaging: release includes mcpb", () => {
     expect(releaseContent).toContain("npm run build:mcpb");
   });
 
-  it("release workflow uploads mcpb artifact", () => {
-    expect(releaseContent).toContain("upload-artifact@v7");
-    expect(releaseContent).toContain("mcpb-bundle");
+  // The .mcpb is attached at release-creation time by the local release
+  // pipeline, not from CI (#121) — so a CI upload job can only ever re-upload
+  // a file the release already has. The job that used to live here failed on
+  // all five releases it ran for while every release still shipped its asset.
+  // These two assertions fence it from silently coming back.
+  it("release workflow does not re-upload the mcpb from CI", () => {
+    expect(releaseContent).not.toContain("upload-mcpb:");
+    expect(releaseContent).not.toContain("mcpb-bundle");
+    expect(releaseContent).not.toContain("gh release upload");
   });
 
-  it("release workflow has upload-mcpb job", () => {
-    expect(releaseContent).toContain("upload-mcpb:");
-    expect(releaseContent).toContain("Upload MCPB to Release");
-  });
-
-  it("upload-mcpb uses gh release upload", () => {
-    expect(releaseContent).toContain("gh release upload");
-  });
-
-  it("upload-mcpb uses env vars for GitHub context (injection safe)", () => {
-    expect(releaseContent).toContain("GH_TOKEN: ${{ github.token }}");
-    expect(releaseContent).toContain("TAG_NAME: ${{ github.event.release.tag_name }}");
+  it("release workflow records why the mcpb upload is absent", () => {
+    expect(releaseContent).toContain("attaches the .mcpb at release-creation time");
   });
 });
