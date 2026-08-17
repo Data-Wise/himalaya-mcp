@@ -194,15 +194,21 @@
   plugin bundle wording, stale-plugin-directory doctor fix, 15s probe note, `email`→`himalaya`
   plugin rename) and all three CHANGELOG entries already landed on `dev` via `0ef207f`, and their
   test counts (680/691) were stale against 719.
-- Maintenance follow-up: Issue #121 — **root-caused 2026-08-16, not a flake.** The
-  `homebrew-release.yml` workflow has failed on all five releases to date (v2.0.2–v2.1.0); the
-  `.mcpb` asset reaches each release only via the manual upload workaround. The `validate` job's
-  upload step silently matches nothing (`##[warning]No files were found with the provided path:
-  himalaya-mcp-v*.mcpb`) and, lacking `if-no-files-found: error`, stays green — so the failure
-  only surfaces one job later in `upload-mcpb` as a misleading "Artifact not found for name:
-  mcpb-bundle". A working-directory mismatch is ruled out (`checkout@v7`, no `path:`, no
-  `defaults.run.working-directory`, and `scripts/build-mcpb.sh:51-59` hard-exits when the file is
-  absent). Leading remaining cause: `.gitignore:6` `*.mcpb`. See "Next Action" for the fix.
+- Maintenance follow-up: Issue #121 — **root-caused 2026-08-16, and the failing job turns out to
+  be redundant.** `homebrew-release.yml`'s `upload-mcpb` job has failed on all five releases
+  (v2.0.2–v2.1.0), but no release was ever missing its asset: for v2.1.0 the
+  `himalaya-mcp-v2.1.0.mcpb` asset was created at `17:35:08Z`, one second *before* the release was
+  published (`17:35:09Z`) and ~9.5 min before the failing job ran (`17:44:42Z`). No workflow does
+  `gh release create`, so the asset is attached by the local release pipeline at release-creation
+  time; the CI job only ever tried to re-upload a file the release already had.
+  Mechanics of the failure: the `validate` job's `Upload MCPB artifact` step matched nothing
+  (`##[warning]No files were found with the provided path: himalaya-mcp-v*.mcpb`) and, lacking
+  `if-no-files-found: error`, stayed green — so the error surfaced one job later as a misleading
+  "Artifact not found for name: mcpb-bundle". **Why the glob missed is still unconfirmed and is
+  CI-specific**: a working-directory mismatch is ruled out (`checkout@v7`, no `path:`, no
+  `defaults.run.working-directory`), `scripts/build-mcpb.sh:51-59` hard-exits when the file is
+  absent, and a local `npm run build:mcpb` puts `himalaya-mcp-v2.1.0.mcpb` (253 KB) at the repo
+  root exactly where the glob expects. See "Next Action" for the fix.
 
 ## Install
 
@@ -316,15 +322,15 @@ himalaya-mcp doctor --fix
 ## Next Action
 
 - No active release work — v2.1.0 is fully shipped and verified end-to-end.
-- **Fix next:** issue #121 (`.mcpb` release artifact upload) — NOT a flake. Failed on all five
-  releases to date (v2.0.2–v2.1.0); the `.mcpb` asset reaches each release only via the manual
-  workaround. Root cause found 2026-08-16: `homebrew-release.yml:88-92` omits
-  `if-no-files-found: error`, so the glob miss (`himalaya-mcp-v*.mcpb` matched nothing) degrades
-  to a warning and `validate` stays green — the error only surfaces one job later in
-  `upload-mcpb` as a misleading "artifact not found". Ruled out a working-directory mismatch
-  (`checkout@v7`, no `path:`, no `defaults.run.working-directory`); leading remaining cause is
-  `.gitignore:6` `*.mcpb`. Fix: have `scripts/build-mcpb.sh` write to a dedicated `dist-mcpb/`
-  dir, upload that directory, and add `if-no-files-found: error`.
+- **Fix next:** issue #121 (`.mcpb` release artifact upload) — NOT a flake, and **not
+  load-bearing**. The `upload-mcpb` job has failed on all five releases (v2.0.2–v2.1.0) while
+  every release still shipped its `.mcpb`, because the local release pipeline attaches the asset
+  at release-creation time and the CI job only re-uploads it (see the timing evidence below).
+  Decision needed: **delete the redundant `upload-mcpb` job** and its feeding
+  `Upload MCPB artifact` step (simplest — five releases prove the job is dead weight), **or**
+  keep it as a CI-side safety net and make it honest by adding `if-no-files-found: error` plus a
+  pre-upload `ls -la` diagnostic so the next failure names its own cause. Either way, the silent
+  `if-no-files-found` default is the defect that hid this for five releases.
 - **Pending:** PR #82 (HTML compose_email, base=main) — the previously recorded manifest blocker
   is GONE (a 2026-08-07 force-push reduced the `mcpb/manifest.json` diff to +1/−1, a single tool
   description; it does not delete 8 tools + 1 prompt). Branch merges clean. Real blockers now:
