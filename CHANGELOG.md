@@ -4,7 +4,28 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [2.1.1] - 2026-08-16
+
+### Fixed
+
+- Three documented commands used himalaya v1 syntax and fail outright on the v2 CLI this
+  project targets. Verified against himalaya v2.1.0: `--output json` is rejected, and
+  `envelope get` no longer exists (v2 keeps only `envelope list` / `envelope search`).
+  - The verify-install command in the user guide — the first command a new user runs —
+    now reads `himalaya envelope list --json`.
+  - The Obsidian export snippet in the cookbook and integrations guide additionally assumed
+    a single call returning subject, from, date and body together. No such response shape
+    exists on v2: headers come from `envelope list --json`, the body from
+    `message read --json` (`{attachments, html_body, parts, text_body}`). Rewritten as the
+    two-call form. `from` is an array of `{email, name}`, so the previous `.from` would have
+    rendered `[object Object]` even with the flag corrected.
+- `docs/reference/commands.md` advertised "29 MCP tools" but documented 25. Added
+  `health_check`, `snooze_email`, `list_snoozed_emails`, and `create_reminder`, written from
+  their actual Zod schemas.
+- Resolved a high-severity advisory in the dev dependency tree (`nanoid` <3.3.18,
+  GHSA-2v37-7h3g-55p8). `npm audit` runs as the first step of the CI test job, so this had
+  been failing every pull request — and aborting the job before the suite ran. Dev-only
+  transitive (`vitest → vite → postcss → nanoid`); never shipped in the bundle.
 
 ### Removed
 

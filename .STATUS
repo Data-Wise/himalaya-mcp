@@ -3,8 +3,8 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.1.0 released (main/Homebrew/marketplace/aggregator), dev synced
-## Focus: Post-release verification — v2.1.0 shipped
+## Status: v2.1.1 release prepared on dev (docs correctness + CI cleanup)
+## Focus: Ship v2.1.1 — first release exercising the trimmed homebrew-release workflow (#121)
 ## Phase: Maintenance
 ## Priority: 1
 ## Progress: 100
@@ -38,6 +38,17 @@
 - **v1.9.0 CI Fix (PR #78)**: Fixed reminders.test.ts failing on Linux CI (process.platform mocking)
 
 ## Just Completed
+
+- 2026-08-16: Backlog triage + v2.1.1 prep. Closed all 7 open issues (#133/#114/#101/#109/#113
+  already fixed and verified against source, the installed libexec bundle, and the live Claude
+  Desktop config; #103 belongs to `Data-Wise/dotfiles`; #121 fixed by PR #137). Merged PR #138
+  (`npm audit fix`, nanoid 3.3.16→3.3.18) which had been failing every PR at CI's first step, and
+  PR #137 (dropped the redundant `upload-mcpb` job — it failed on all five releases while every
+  release still shipped its `.mcpb`, because the local pipeline attaches the asset at
+  release-creation time). Docs audit found and fixed three documented commands that fail outright
+  on himalaya v2 (`--output json`, and `envelope get`, which v2 removed) and four tools absent
+  from `commands.md` despite its "29 tools" header. Deleted 14 stale branches and 2 worktrees.
+  Version bumped to 2.1.1 across all 22 surfaces.
 
 - 2026-08-07: Published v2.1.0 docs. Docs audit refreshed all v2.1.0 references (version 2.0.2→2.1.0, tests 691→719 across 41 files, bundle ~910KB, health_check folder+envelope surfaces + himalayaVersion/himalayaBinary, architecture.md module map for diagnostics.ts/doctor.ts, v2 --json / envelope search notes). Docs commit `0ef207f` on `dev`, published via docs PR #136 (dev→main, merged as `3704924`, all 4 CI checks green); gh-pages force-updated on merge. `dev` synced to `3704924`.
 
@@ -170,8 +181,11 @@
 
 ## Current State
 
-- Branch: `dev` @ `c6940bd` (`origin/dev`) — v2.1.0 released and merged to `main`, dev synced.
-- Version: 2.1.0 (released to `main`/Homebrew/marketplace/aggregator, tag `v2.1.0`, `.mcpb` asset attached).
+- Branch: `dev` (`origin/dev`) — v2.1.1 bumped and staged for release; v2.1.0 is the last tag on `main`.
+- Version: 2.1.1 (bumped across all 22 surfaces: package.json + lockfile, `src/index.ts` VERSION,
+  mcpb/marketplace/plugin manifests, `tests/e2e.test.ts` + `tests/v150-features.test.ts`
+  assertions, CLAUDE.md/AGENTS.md, and the `.mcpb` filenames in packaging/installation/cli/
+  desktop-extensions/mcpb-format-reference docs).
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
 - Tests: 717 tests across 41 test files. CI and release validation passed, including bundle,
   TypeScript, JSON, plugin, MCPB, and docs checks. The full host baseline is 717/717.

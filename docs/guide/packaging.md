@@ -161,7 +161,7 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
   "owner": { "name": "Data-Wise" },
   "metadata": {
     "description": "Privacy-first email MCP server and Claude Code plugin wrapping himalaya CLI",
-    "version": "2.1.0"
+    "version": "2.1.1"
   },
   "plugins": [{
     "name": "himalaya",
@@ -170,7 +170,7 @@ The repository includes `.claude-plugin/marketplace.json` for GitHub-based plugi
     "category": "productivity",
     "tags": ["email", "mcp", "himalaya", "privacy"]
   }],
-  "version": "2.1.0"
+  "version": "2.1.1"
 }
 ```
 
@@ -189,7 +189,7 @@ The `.mcpb` format packages the MCP server as a Claude Desktop Extension -- a li
 
 ```bash
 npm run build:mcpb
-# Output: himalaya-mcp-v2.1.0.mcpb (253 KB)
+# Output: himalaya-mcp-v2.1.1.mcpb (253 KB)
 ```
 
 This runs `scripts/build-mcpb.sh` which:
@@ -206,7 +206,7 @@ Download `himalaya-mcp-v{version}.mcpb` from [GitHub Releases](https://github.co
 ### Install (CLI)
 
 ```bash
-himalaya-mcp install-ext himalaya-mcp-v2.1.0.mcpb   # Install from file
+himalaya-mcp install-ext himalaya-mcp-v2.1.1.mcpb   # Install from file
 himalaya-mcp install-ext                              # Auto-find in project root
 himalaya-mcp remove-ext                               # Uninstall
 ```
