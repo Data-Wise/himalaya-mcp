@@ -196,7 +196,7 @@ describe("E2E: MCP Server Headless", () => {
 
     expect(initResult.result).toBeDefined();
     expect(initResult.result.serverInfo.name).toBe("himalaya-mcp");
-    expect(initResult.result.serverInfo.version).toBe("2.1.1");
+    expect(initResult.result.serverInfo.version).toBe("2.1.2");
 
     // Send initialized notification
     sendNotification("notifications/initialized");

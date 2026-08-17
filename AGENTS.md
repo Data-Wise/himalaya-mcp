@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Codex plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Codex (plugin), Codex Desktop/Cowork (MCP server)
-- **Version:** 2.1.1
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 717 tests)
+- **Version:** 2.1.2
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 718 tests)
 
 ### What It Does
 
@@ -123,7 +123,7 @@ himalaya-mcp/
 │   ├── inbox.test.ts                  # 23 search/list inbox tests
 │   ├── dogfood.test.ts                # 152 dogfooding tests (realistic Codex usage)
 │   ├── dogfood-reliability.test.ts    # 20 reliability scenarios
-│   ├── setup.test.ts                  # 49 setup CLI + multi-account doctor E2E tests
+│   ├── setup.test.ts                  # 52 setup CLI + multi-account doctor E2E tests
 │   ├── e2e.test.ts                    # 39 E2E tests (headless MCP server pipeline + .mcpb build)
 │   └── v150-features.test.ts          # 37 v1.5.0 integration tests (hook, threads, prompts, skills)
 ├── docs/specs/                  # SPEC/GRILL/BUG planning artifacts (working docs, not in nav)
@@ -253,7 +253,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (717 tests across 41 test files)
+npm test                         # Run vitest (718 tests across 41 test files)
 npm run build:bundle             # Build root + plugin bundles (~908KB each)
 node dist/index.js               # Run MCP server directly
 ```
