@@ -32,28 +32,34 @@ npx --yes @anthropic-ai/mcpb validate "$MCPB_DIR/"
 echo "  [4/4] Packing .mcpb..."
 OUTPUT_NAME="himalaya-mcp-v${VERSION}.mcpb"
 MCPB_FILE="$PROJECT_ROOT/$OUTPUT_NAME"
+# `mcpb pack` ignores the output path it is handed and writes the archive under
+# its own name — `himalaya-mcp-<version>.mcpb`, with no `v` prefix — into either
+# the project root or the packed directory. So don't rely on the second
+# argument; pack, then reconcile the filename ourselves.
+#
+# This previously used a sleep-and-retry loop globbing only $PROJECT_ROOT, which
+# raced: it won on the v2.1.0 release and lost on v2.1.1, failing the build and
+# skipping the entire Homebrew formula update. There is nothing to wait for once
+# pack has exited — only a name to fix. See issue #121.
 npx @anthropic-ai/mcpb pack "$MCPB_DIR/" "$MCPB_FILE"
 
-for _ in 1 2 3 4 5; do
-  [ -f "$MCPB_FILE" ] && break
-
+if [ ! -f "$MCPB_FILE" ]; then
   shopt -s nullglob
-  MCPB_OUTPUTS=("$PROJECT_ROOT"/himalaya-mcp*.mcpb)
+  MCPB_OUTPUTS=("$PROJECT_ROOT"/himalaya-mcp*.mcpb "$MCPB_DIR"/himalaya-mcp*.mcpb)
   shopt -u nullglob
-  if [ ${#MCPB_OUTPUTS[@]} -gt 0 ]; then
-    mv "${MCPB_OUTPUTS[0]}" "$MCPB_FILE"
-    break
+
+  if [ ${#MCPB_OUTPUTS[@]} -eq 0 ]; then
+    echo "ERROR: pack produced no .mcpb file."
+    echo "       Searched: $PROJECT_ROOT"
+    echo "                 $MCPB_DIR"
+    exit 1
   fi
 
-  sleep 1
-done
-
-if [ -f "$MCPB_FILE" ]; then
-  SIZE=$(wc -c < "$MCPB_FILE" | tr -d ' ')
-  SIZE_KB=$((SIZE / 1024))
-  echo ""
-  echo "==> Built: $OUTPUT_NAME (${SIZE_KB} KB)"
-else
-  echo "ERROR: No .mcpb file found after pack"
-  exit 1
+  echo "  note: pack wrote $(basename "${MCPB_OUTPUTS[0]}") — renaming to $OUTPUT_NAME"
+  mv "${MCPB_OUTPUTS[0]}" "$MCPB_FILE"
 fi
+
+SIZE=$(wc -c < "$MCPB_FILE" | tr -d ' ')
+SIZE_KB=$((SIZE / 1024))
+echo ""
+echo "==> Built: $OUTPUT_NAME (${SIZE_KB} KB)"
