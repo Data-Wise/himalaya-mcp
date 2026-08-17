@@ -151,3 +151,19 @@ correct against the real, currently-shipping himalaya CLI.
 Do not send anyone chasing a himalaya CLI update — 2.0.0 **is** current stable. Telling a user to
 "upgrade himalaya" when they report broken email tools will send them in a circle: they're
 already on the CLI version that broke this integration.
+
+---
+
+## Resolved — 2026-08-17
+
+Fixed across v2.0.2 → v2.1.0 and verified against the installed CLI. No v1 call sites remain in
+`src/`, and — the check that actually mattered, since this bug was filed against the built bundle —
+none in the installed `libexec` artifact either. Issues #114, #101, and #109 (three filings of this
+same root cause) were closed 2026-08-16 on that evidence.
+
+The user-facing guidance above still holds: do not tell anyone to upgrade the himalaya CLI to fix
+broken email tools.
+
+See `.STATUS` for current state and
+[`SPEC-himalaya-v2-cli-compat-2026-08-03.md`](SPEC-himalaya-v2-cli-compat-2026-08-03.md) for the
+design that resolved it.
