@@ -119,7 +119,7 @@
     },
     {
       "name": "compose_email",
-      "description": "Compose and send a new email (not a reply). SAFETY: requires confirm=true to actually send. Without confirm, returns a preview for user review."
+      "description": "Compose and send a new email (not a reply). SAFETY: requires confirm=true to actually send. Without confirm, returns a preview for user review. HTML content is auto-detected; use html=true for explicit control."
     },
     {
       "name": "list_folders",
