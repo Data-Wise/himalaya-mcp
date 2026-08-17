@@ -11,9 +11,11 @@ VERSION=$(node -p "require('$PROJECT_ROOT/package.json').version")
 
 echo "==> Building himalaya-mcp v${VERSION} .mcpb bundle"
 
-# Clear stale .mcpb output so the last-resort fallback below can't pick up a
-# leftover file from a prior failed run.
-rm -f "$PROJECT_ROOT"/*.mcpb
+# Clear stale .mcpb output so the fallback below can't pick up a leftover file
+# from a prior failed run. Must cover BOTH directories the fallback searches —
+# a stale mcpb/himalaya-mcp-<old-version>.mcpb would otherwise be renamed to the
+# current version's filename and shipped as if it were this build.
+rm -f "$PROJECT_ROOT"/*.mcpb "$MCPB_DIR"/*.mcpb
 
 # Step 1: Build esbuild bundle
 echo "  [1/4] Building esbuild bundle..."
@@ -55,7 +57,21 @@ if [ ! -f "$MCPB_FILE" ]; then
     exit 1
   fi
 
-  echo "  note: pack wrote $(basename "${MCPB_OUTPUTS[0]}") — renaming to $OUTPUT_NAME"
+  FOUND_NAME="$(basename "${MCPB_OUTPUTS[0]}")"
+
+  # Refuse to rename an archive that isn't this version. The cleanup above
+  # should make this unreachable; if it ever fires, something left a stale
+  # build behind and renaming it would ship the wrong version silently.
+  case "$FOUND_NAME" in
+    *"$VERSION"*) ;;
+    *)
+      echo "ERROR: pack output '$FOUND_NAME' does not match version $VERSION."
+      echo "       Refusing to rename it to $OUTPUT_NAME."
+      exit 1
+      ;;
+  esac
+
+  echo "  note: pack wrote $FOUND_NAME — renaming to $OUTPUT_NAME"
   mv "${MCPB_OUTPUTS[0]}" "$MCPB_FILE"
 fi
 
