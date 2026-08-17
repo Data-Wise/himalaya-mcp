@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Removed
+
+- Dropped the redundant `upload-mcpb` job and its feeding `Upload MCPB artifact` step from
+  `homebrew-release.yml` (#121). The job had failed on all five releases to date
+  (v2.0.2–v2.1.0) while every release still shipped its `.mcpb`: the local release pipeline
+  attaches the asset at release-creation time, so the CI job only ever re-uploaded a file the
+  release already had. The `Build MCPB bundle` step stays as a pre-release build gate. The
+  underlying reason the job's artifact glob matched nothing in CI is still unexplained, but is
+  now moot — a local `npm run build:mcpb` writes the bundle to the repo root exactly where the
+  glob pointed.
+- `tests/dogfood.test.ts`'s `Packaging: release includes mcpb` block went 5 tests → 3: the four
+  assertions that the deleted job exists are replaced by two that assert it stays deleted (no
+  `upload-mcpb:` / `mcpb-bundle` / `gh release upload` in the workflow) and that the comment
+  explaining why survives. Suite total is now **717 across 41 files** (was 719).
+
 ## [2.1.0] - 2026-08-07
 
 ### Fixed

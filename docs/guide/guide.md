@@ -383,7 +383,7 @@ For the full failure-mode catalog and recovery steps, see the canonical [trouble
 ## Testing
 
 ```bash
-npm test    # 719 tests across 41 files (vitest, threads pool)
+npm test    # 717 tests across 41 files (vitest, threads pool)
 ```
 
 Test breakdown:

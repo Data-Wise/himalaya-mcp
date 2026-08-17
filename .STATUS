@@ -173,8 +173,10 @@
 - Branch: `dev` @ `c6940bd` (`origin/dev`) — v2.1.0 released and merged to `main`, dev synced.
 - Version: 2.1.0 (released to `main`/Homebrew/marketplace/aggregator, tag `v2.1.0`, `.mcpb` asset attached).
 - All phases complete: 29 MCP tools, 7 prompts, 3 resources, 16 skills
-- Tests: 719 tests across 41 test files. CI and release validation passed, including bundle,
-  TypeScript, JSON, plugin, MCPB, and docs checks. The full host baseline is 719/719.
+- Tests: 717 tests across 41 test files. CI and release validation passed, including bundle,
+  TypeScript, JSON, plugin, MCPB, and docs checks. The full host baseline is 717/717.
+  (Was 719 through v2.1.0; `tests/dogfood.test.ts`'s `Packaging: release includes mcpb` block
+  went 5 tests → 3 when the redundant `upload-mcpb` CI job was removed — see #121.)
   CI on `main` green
   (bundle/test/validate-mcpb/validate-plugin, `test` job ~9min).
 - Plugin: `himalaya` installed and enabled via marketplace (Data-Wise/himalaya-mcp)
