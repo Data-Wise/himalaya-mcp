@@ -582,6 +582,23 @@ function checkPreRelease(): CheckResult[] {
   }
 
   // 7. Test suite passes
+  //
+  // Guard against mutual recursion: tests/setup.test.ts spawns this CLI with
+  // --pre-release, and without this check we would spawn a full suite back,
+  // which spawns another doctor, unbounded. That produced 40+ orphaned vitest
+  // processes per run and starved the machine badly enough to fail unrelated
+  // tests on 5s timeouts. vitest sets VITEST in the environment and the spawned
+  // CLI inherits it through execFile, so a nested invocation sees it. See #139.
+  if (process.env.VITEST) {
+    results.push({
+      name: "Test suite",
+      category: "Pre-Release",
+      status: "warn",
+      message: "not run — already executing under vitest (see #139)",
+    });
+    return results;
+  }
+
   const testResult = execQuiet("npx", ["vitest", "run", "--reporter=verbose"], 180_000);
   if (testResult.ok) {
     const match = testResult.stdout.match(/Tests\s+(\d+) passed/);

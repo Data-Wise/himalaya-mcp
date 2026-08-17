@@ -839,6 +839,40 @@ describe.skipIf(!hasBuild)("CLI E2E: doctor release checks", () => {
     }
   }, 300_000);
 
+  // Regression fence for #139. These very tests spawn `doctor --pre-release`;
+  // without a guard, doctor's Pre-Release "Test suite" check spawns a full
+  // vitest run, which re-runs this file, which spawns doctor again — unbounded.
+  // Observed: 40+ orphaned vitest processes per run, starving the machine badly
+  // enough to fail unrelated tests on 5s timeouts and doubling wall time.
+  //
+  // vitest sets VITEST in the environment and the spawned CLI inherits it via
+  // execFile, so the nested invocation can detect itself. If the guard is
+  // removed, this assertion fails — and the suite gets slow and flaky again.
+  it("doctor --pre-release does not spawn a nested test suite under vitest", async () => {
+    expect(process.env.VITEST).toBeTruthy(); // precondition: we are under vitest
+
+    let stdout: string;
+    try {
+      const result = await execFileAsync(
+        "node",
+        ["dist/cli/index.js", "doctor", "--pre-release", "--json"],
+        { cwd: PROJECT_ROOT, env: { ...process.env, HOME: tempHome } }
+      );
+      stdout = result.stdout;
+    } catch (err: unknown) {
+      stdout = (err as { stdout?: string }).stdout ?? "";
+    }
+
+    const results = JSON.parse(stdout) as Array<{ name: string; message: string }>;
+    const suiteCheck = results.find((r) => r.name === "Test suite");
+
+    expect(suiteCheck).toBeDefined();
+    expect(suiteCheck!.message).toContain("already executing under vitest");
+    // and specifically NOT a real run's result, which reports a test count
+    expect(suiteCheck!.message).not.toMatch(/\d+ tests? pass/);
+    expect(suiteCheck!.message).not.toMatch(/\d+ test\(s\) failing/);
+  }, 60_000);
+
   it("doctor --post-release outputs Post-Release category checks", async () => {
     let stdout: string;
     try {

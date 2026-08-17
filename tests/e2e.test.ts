@@ -864,10 +864,15 @@ describe("E2E: MCPB Build Pipeline", () => {
       expect(output).toContain("Manifest schema validation passes");
       expect(output).toContain("Building esbuild bundle");
 
-      // build-mcpb.sh packs directly to the final filename (no intermediate
-      // name, no rename) and exits non-zero if the file is missing, so by the
-      // time execFileAsync resolves the file is guaranteed present or the
-      // script already failed loudly — no poll needed here.
+      // `mcpb pack` ignores the output path it is handed and writes
+      // `himalaya-mcp-<version>.mcpb` (no `v`) into either the project root or
+      // mcpb/. build-mcpb.sh reconciles that name after pack exits, and fails
+      // loudly naming both searched directories if nothing was produced — so by
+      // the time execFileAsync resolves, the file is present under the `v` name
+      // or the script already failed. No poll needed here. That rename used to
+      // be a sleep-and-retry loop that raced: it won on the v2.1.0 release and
+      // lost on v2.1.1, failing the build and skipping the entire Homebrew
+      // formula update (#121). This assertion is what fences it.
       const mcpbFiles = readdirSync(PROJECT_ROOT).filter((f: string) =>
         f.match(/^himalaya-mcp-v.*\.mcpb$/)
       );
