@@ -8,7 +8,7 @@
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
 - **Version:** 2.1.0
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 691 tests)
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 717 tests)
 
 ### What It Does
 
@@ -121,7 +121,7 @@ himalaya-mcp/
 │   ├── reminders.test.ts              # 7 create_reminder tests
 │   ├── snooze.test.ts                 # 10 snooze_email/list_snoozed_emails tests
 │   ├── inbox.test.ts                  # 23 search/list inbox tests
-│   ├── dogfood.test.ts                # 153 dogfooding tests (realistic Claude usage)
+│   ├── dogfood.test.ts                # 152 dogfooding tests (realistic Claude usage)
 │   ├── dogfood-reliability.test.ts    # 20 reliability scenarios
 │   ├── setup.test.ts                  # 49 setup CLI + multi-account doctor E2E tests
 │   ├── e2e.test.ts                    # 39 E2E tests (headless MCP server pipeline + .mcpb build)
@@ -253,7 +253,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (691 tests across 40 test files)
+npm test                         # Run vitest (717 tests across 41 test files)
 npm run build:bundle             # Build root + plugin bundles (~908KB each)
 node dist/index.js               # Run MCP server directly
 ```
