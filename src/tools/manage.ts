@@ -11,7 +11,7 @@ export function registerManageTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("flag_email", {
     description: "Add or remove flags on an email. Common flags: Seen, Flagged, Answered, Deleted, Draft. Use 'add' to set flags, 'remove' to clear them.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       flags: z.array(z.string()).describe("Flags to add/remove (e.g. ['Seen', 'Flagged'])"),
       action: z.enum(["add", "remove"]).describe("Whether to add or remove the flags"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
@@ -35,7 +35,7 @@ export function registerManageTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("move_email", {
     description: "Move an email to a different folder. Common targets: Archive, Trash, Spam, Sent, Drafts.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       target_folder: z.string().describe("Destination folder name (e.g. 'Archive', 'Trash')"),
       folder: z.string().optional().describe("Source folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),

@@ -16,7 +16,7 @@ export function registerRenderTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("render_email", {
     description: "Read an email body rendered as clean markdown. For HTML emails, converts to markdown for a clean reading experience. For plain text emails, returns the body as-is.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },

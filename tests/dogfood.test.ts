@@ -305,6 +305,20 @@ describe("Dogfooding: read_email", () => {
 
     expect(client.readMessage).toHaveBeenCalledWith("123", "Archive", undefined);
   });
+
+  it("accepts numeric IDs via coercion", async () => {
+    // list_emails returns numeric IDs; the Zod schema must coerce them to strings
+    const tool = getToolHandler(server, "read_email");
+    const schema = tool.inputSchema;
+    // Parse with a numeric ID — should succeed via z.coerce.string()
+    const parsed = schema.parse({ id: 157629 });
+    expect(parsed.id).toBe("157629");
+    // Also verify the handler works with the coerced value
+    const result = await tool.handler({ id: 157629, folder: undefined, account: undefined }, {} as any);
+    const text = result.content[0].text;
+    expect(text).toContain("Dear colleague");
+    expect(result.isError).toBeUndefined();
+  });
 });
 
 describe("Dogfooding: error handling", () => {

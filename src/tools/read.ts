@@ -13,7 +13,7 @@ export function registerReadTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("read_email", {
     description: "Read an email message body (plain text). Use the ID from list_emails or search_emails.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
@@ -40,7 +40,7 @@ export function registerReadTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("read_email_html", {
     description: "Read an email message body as HTML. Useful for formatted emails.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
