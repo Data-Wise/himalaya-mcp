@@ -1467,10 +1467,18 @@ describe("Packaging: marketplace.json", () => {
 });
 
 describe("Packaging: .mcp.json", () => {
-  const mcpJsonPath = join(PROJECT_ROOT, ".mcp.json");
+  // The MCP server is declared once, in the plugin root. A second copy at the
+  // repo root made Claude Code load it as a project server in this repo, where
+  // CLAUDE_PLUGIN_ROOT is unset: a duplicate, always-failing "email" entry
+  // next to the working plugin one.
+  const mcpJsonPath = join(PROJECT_ROOT, "himalaya-mcp-plugin", ".mcp.json");
 
-  it("exists at project root", () => {
+  it("exists in the plugin root", () => {
     expect(existsSync(mcpJsonPath)).toBe(true);
+  });
+
+  it("does not exist at the repo root (would duplicate the plugin's server)", () => {
+    expect(existsSync(join(PROJECT_ROOT, ".mcp.json"))).toBe(false);
   });
 
   it("declares himalaya server with CLAUDE_PLUGIN_ROOT", () => {

@@ -85,7 +85,6 @@ himalaya-mcp/
 │   └── hooks/                   # Plugin hooks (SessionStart, PreToolUse)
 ├── .claude-plugin/
 │   └── marketplace.json         # Marketplace manifest (source: ./himalaya-mcp-plugin)
-├── .mcp.json                    # MCP server config (uses ${CLAUDE_PLUGIN_ROOT})
 ├── docs/
 │   ├── index.md                 # Home page
 │   ├── getting-started/         # Installation, quickstart, desktop extension, diagnose
