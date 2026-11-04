@@ -402,6 +402,33 @@ describe("HimalayaClient", () => {
       expect(await client.readMessageHtml("12345")).toBe("");
     });
 
+    it("readMessageRaw on himalaya v2 uses message read --raw and unwraps {message}", async () => {
+      configureMock({ version: V2_VERSION_STDOUT, stdout: JSON.stringify({ message: "From: a@b.c\r\n\r\nbody" }) });
+      const client = new HimalayaClient();
+      const result = await client.readMessageRaw("12345", "INBOX");
+
+      expect(result).toBe("From: a@b.c\r\n\r\nbody");
+      const calls = mockExecFileAsync.mock.calls.map((c) => c[1] as string[]);
+      expect(calls.some((a) => a[0] === "message" && a[1] === "read" && a.includes("--raw"))).toBe(true);
+      expect(calls.some((a) => a[1] === "export")).toBe(false);
+    });
+
+    it("readMessageRaw on himalaya v1 uses message export --full", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "" });
+      vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/himalaya-mcp-raw-test");
+      vi.mocked(fs.readFileSync).mockReturnValue("RAW EML");
+      vi.mocked(fs.rmSync).mockImplementation(() => {});
+      vi.mocked(os.tmpdir).mockReturnValue("/tmp");
+
+      const client = new HimalayaClient();
+      expect(await client.readMessageRaw("12345")).toBe("RAW EML");
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["message", "export", "--full", "--destination"]),
+        expect.any(Object),
+      );
+    });
+
     it("listFolders calls mailbox list on himalaya v2", async () => {
       configureMock({ version: V2_VERSION_STDOUT, stdout: "[]" });
       const client = new HimalayaClient();

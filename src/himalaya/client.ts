@@ -300,6 +300,47 @@ export class HimalayaClient {
     }
   }
 
+  /**
+   * Read the raw RFC 5322 source of a message.
+   *
+   * himalaya v2 removed `message export`; `message read --raw` (with --json
+   * the bytes come out wrapped as {"message": "..."}) replaces `export --full`. v1 keeps
+   * the export-to-file path.
+   */
+  async readMessageRaw(id: string, folder?: string, account?: string): Promise<string> {
+    assertSafeArg(id, "id");
+    const version = await this.resolveVersion();
+
+    if (version.major >= 2) {
+      const args = ["message", "read", id, "--raw"];
+      const f = await this.applyFolderArg(args, folder);
+      const out = await this.exec(args, { folder: f, account });
+      try {
+        // Live v2.2.1 shape: {"message":"<raw RFC 5322>"}; accept a bare
+        // JSON string too, as the help text describes.
+        const parsed: unknown = JSON.parse(out);
+        if (typeof parsed === "string") return parsed;
+        const message = (parsed as { message?: unknown } | null)?.message;
+        if (typeof message === "string") return message;
+      } catch {
+        // not JSON: treat stdout as the raw message
+      }
+      return out;
+    }
+
+    const tmpDir = mkdtempSync(join(tmpdir(), "himalaya-mcp-raw-"));
+    try {
+      const emlPath = join(tmpDir, "message.eml");
+      const args = ["message", "export", "--full", "--destination", emlPath];
+      const f = await this.applyFolderArg(args, folder);
+      args.push(id);
+      await this.exec(args, { folder: f, account });
+      return readFileSync(emlPath, "utf-8");
+    } finally {
+      try { rmSync(tmpDir, { recursive: true }); } catch { /* ignore */ }
+    }
+  }
+
   /** Add or remove flags on a message. */
   async flagMessage(
     id: string,
