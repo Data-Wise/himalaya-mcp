@@ -30,7 +30,7 @@ Prints the semantic version on its own line and exits 0.
 
 ```bash
 himalaya-mcp --version   # also: -v, version
-# Example output: 2.1.2
+# Example output: 2.1.3
 ```
 
 ---
@@ -160,7 +160,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v2.1.2.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v2.1.3.mcpb     # Install specific file
 ```
 
 ### What it does
