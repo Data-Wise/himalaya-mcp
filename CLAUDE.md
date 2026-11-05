@@ -7,8 +7,8 @@
 - **Architecture:** TypeScript MCP server + Claude Code plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Claude Code (plugin), Claude Desktop/Cowork (MCP server)
-- **Version:** 2.1.2
-- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 718 tests)
+- **Version:** 2.1.3
+- **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 740 tests)
 
 ### What It Does
 
@@ -85,7 +85,6 @@ himalaya-mcp/
 │   └── hooks/                   # Plugin hooks (SessionStart, PreToolUse)
 ├── .claude-plugin/
 │   └── marketplace.json         # Marketplace manifest (source: ./himalaya-mcp-plugin)
-├── .mcp.json                    # MCP server config (uses ${CLAUDE_PLUGIN_ROOT})
 ├── docs/
 │   ├── index.md                 # Home page
 │   ├── getting-started/         # Installation, quickstart, desktop extension, diagnose
@@ -253,7 +252,7 @@ npm run build
 ### Testing
 
 ```bash
-npm test                         # Run vitest (718 tests across 41 test files)
+npm test                         # Run vitest (740 tests across 42 test files)
 npm run build:bundle             # Build root + plugin bundles (~908KB each)
 node dist/index.js               # Run MCP server directly
 ```

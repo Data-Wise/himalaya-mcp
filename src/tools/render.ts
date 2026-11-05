@@ -22,10 +22,17 @@ export function registerRenderTools(server: McpServer, client: HimalayaClient) {
     },
   }, async (args) => {
     try {
-      // Try HTML first — parse the JSON-quoted HTML body
-      const htmlRaw = await client.readMessageHtml(args.id, args.folder, args.account);
-      const htmlResult = parseMessageBody(htmlRaw);
-      if (htmlResult.ok && htmlResult.data && htmlResult.data.length > 0) {
+      // Try HTML first. A failure here (e.g. no HTML part, or a CLI without
+      // the HTML export path) must not abort the render: fall through to the
+      // plain-text body, which is the documented behavior.
+      let htmlRaw = "";
+      try {
+        htmlRaw = await client.readMessageHtml(args.id, args.folder, args.account);
+      } catch {
+        htmlRaw = "";
+      }
+      const htmlResult = htmlRaw.trim() ? parseMessageBody(htmlRaw) : null;
+      if (htmlResult?.ok && htmlResult.data && htmlResult.data.length > 0) {
         const { NodeHtmlMarkdown } = await import("node-html-markdown");
         const markdown = NodeHtmlMarkdown.translate(htmlResult.data);
         return {

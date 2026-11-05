@@ -191,13 +191,62 @@ export function parseMessageBody(raw: string): CommandOutput<MessageBody> {
     return { ok: false, error: "Empty message body", code: "EMPTY" };
   }
 
-  // himalaya message read --output json returns a JSON string (quoted)
-  // e.g., "Hello world\n\nThis is the body"
+  // himalaya v1 `message read --output json` returns a JSON string (quoted)
+  // e.g., "Hello world\n\nThis is the body". himalaya v2 `message read --json`
+  // returns the whole parsed message as an object (see extractV2Bodies).
+  let parsed: unknown;
   try {
-    const body = JSON.parse(trimmed) as string;
-    return { ok: true, data: body };
+    parsed = JSON.parse(trimmed);
   } catch {
     // If it's not valid JSON, it might be raw text (fallback)
     return { ok: true, data: trimmed };
   }
+
+  if (typeof parsed === "string") {
+    return { ok: true, data: parsed };
+  }
+
+  const bodies = extractV2Bodies(parsed);
+  if (bodies) {
+    // Plain text wins; an HTML-only message falls back to its markup so the
+    // caller always gets a string (an MCP text content item must be one).
+    return { ok: true, data: bodies.text || bodies.html };
+  }
+
+  // Valid JSON of an unexpected shape (number, array, unknown object):
+  // never forward a non-string as MCP text content.
+  return { ok: true, data: trimmed };
+}
+
+/**
+ * Extract the text and HTML bodies from himalaya v2's `message read --json`
+ * output: `{ text_body: [i...], html_body: [i...], parts: [{ body: ... }] }`
+ * where the index arrays point into `parts` and a part body is a tagged
+ * variant (`{ Text: "..." }`, `{ Html: "..." }`, `{ Multipart: [...] }`,
+ * `{ Binary: [...] }`).
+ *
+ * Returns null when `value` is not that shape. For non-multipart messages
+ * both index arrays point at the same part, so only the matching variant
+ * (`Text` for text, `Html` for html) is taken from each.
+ */
+export function extractV2Bodies(value: unknown): { text: string; html: string } | null {
+  if (typeof value !== "object" || value === null) return null;
+  const msg = value as { text_body?: unknown; html_body?: unknown; parts?: unknown };
+  if (!Array.isArray(msg.parts)) return null;
+  const parts = msg.parts as Array<{ body?: Record<string, unknown> } | null>;
+
+  const collect = (indexes: unknown, variant: "Text" | "Html"): string => {
+    if (!Array.isArray(indexes)) return "";
+    const out: string[] = [];
+    for (const i of indexes) {
+      const content = typeof i === "number" ? parts[i]?.body?.[variant] : undefined;
+      if (typeof content === "string") out.push(content);
+    }
+    return out.join("\n\n");
+  };
+
+  return {
+    text: collect(msg.text_body, "Text"),
+    html: collect(msg.html_body, "Html"),
+  };
 }

@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.1.3] - 2026-11-04
+
+Fixes for himalaya v2 compatibility and a duplicate MCP server, plus an install-docs audit.
+
+### Fixed
+
+- **`read_email` returned `text` as an object on himalaya v2** (#144). `parseMessageBody` now always
+  yields a string; v2 message parts are extracted with the new `extractV2Bodies` helper.
+- **`render_email` failed with ENOENT on `index.html`** (#145). v2 removed `message export`, so
+  `readMessageHtml` now reads the HTML part from `message read --json`; `render_email` falls back
+  to the plain-text body when a message has no HTML part.
+- **`read_email_raw` failed on himalaya v2** and ignored `folder`. It now uses
+  `message read --raw` (unwrapping the `{"message": ...}` envelope) through the new
+  `HimalayaClient.readMessageRaw`, and honors `folder`.
+- **A duplicate root `.mcp.json` started a failing "email" server** next to the plugin's working
+  server when Claude Code ran inside a clone (`${CLAUDE_PLUGIN_ROOT}` is unset outside a plugin).
+  Removed; the plugin keeps `himalaya-mcp-plugin/.mcp.json`.
+- **CI `npm audit` gate (`--audit-level=high`) failed on new advisories.** Lockfile refreshed and an
+  override points `@anthropic-ai/mcpb`'s nested zod at the root zod. Three moderate `vitest`
+  findings remain (need a semver-major bump).
+
+### Documentation
+
+- Installation: which-install-for-which-app table (Claude Code vs Claude Desktop), single-marketplace
+  warning, `claude --plugin-dir` for source installs, `claude mcp add` for the standalone server.
+- New guide: Microsoft 365 via `email-oauth2-proxy` (device-code flow, himalaya's 60s timeout, the
+  constant-password requirement, `AADSTS7000218`).
+- Test counts 718 to 740.
+
 ## [2.1.2] - 2026-08-17
 
 CI and build reliability. No runtime behavior changes — `src/cli/doctor.ts` is a maintainer
