@@ -23,6 +23,9 @@ import { detectHimalayaVersion } from "../himalaya/cli-version.js";
 import { HimalayaClient } from "../himalaya/client.js";
 import { probeAccountSurfaces } from "../himalaya/diagnostics.js";
 import { HimalayaError } from "../himalaya/errors.js";
+import {
+  checkMailPath, checkInstallHealth, checkDesktopServerEntry, describeExecFailure, defaultEnv,
+} from "./doctor-diagnostics.js";
 
 export interface CheckResult {
   name: string;
@@ -68,8 +71,8 @@ function execQuiet(bin: string, args: string[], timeout = 10_000): { ok: boolean
     const stdout = execFileSync(bin, args, { timeout, stdio: "pipe" }).toString().trim();
     return { ok: true, stdout, stderr: "" };
   } catch (err: unknown) {
-    const stderr = err instanceof Error ? err.message : String(err);
-    return { ok: false, stdout: "", stderr };
+    // One actionable line (himalaya's own error, or a timeout note), never the full command line.
+    return { ok: false, stdout: "", stderr: describeExecFailure(err, timeout) };
   }
 }
 
@@ -198,10 +201,10 @@ async function checkEmailConnectivity(): Promise<CheckResult[]> {
       results.push({ name: "Folder listing", category: "Email", status: "warn", message: "Could not parse folder list" });
     }
   } else {
-    results.push({ name: "Folder listing", category: "Email", status: "fail", message: "Failed. Check IMAP connection." });
+    results.push({ name: "Folder listing", category: "Email", status: "fail", message: `Failed: ${folders.stderr}. Check IMAP connection.` });
   }
 
-  const envelopes = execQuiet(himalayaPath, ["envelope", "list", "--page-size", "1", ...outputFlag]);
+  const envelopes = execQuiet(himalayaPath, ["envelope", "list", "--page-size", "1", ...outputFlag], 20_000);
   if (envelopes.ok) {
     try {
       // v2 wraps the array as {envelopes: [...]}; v1 returns a bare array.
@@ -212,7 +215,7 @@ async function checkEmailConnectivity(): Promise<CheckResult[]> {
       results.push({ name: "Envelope listing", category: "Email", status: "warn", message: "Could not parse envelope list" });
     }
   } else {
-    results.push({ name: "Envelope listing", category: "Email", status: "fail", message: "Failed to list emails" });
+    results.push({ name: "Envelope listing", category: "Email", status: "fail", message: `Failed to list emails: ${envelopes.stderr}` });
   }
 
   return results;
@@ -390,6 +393,16 @@ export function assessVersionDrift(opts: {
   }
 
   return results;
+}
+
+function checkDesktopEntry(): CheckResult[] {
+  const extensionInstalled = existsSync(join(EXTENSIONS_DIR, EXTENSION_ID, "manifest.json"));
+  return checkDesktopServerEntry(CONFIG_PATH, extensionInstalled);
+}
+
+async function newDiagnostics(): Promise<CheckResult[]> {
+  const env = defaultEnv();
+  return [...(await checkMailPath(env)), ...checkInstallHealth(env, getVersion())];
 }
 
 function checkCodePlugin(): CheckResult[] {
@@ -745,6 +758,8 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
       ...checkMcpServer(),
       ...(await checkEmailConnectivity()),
       ...checkDesktopExtension(),
+      ...checkDesktopEntry(),
+      ...(await newDiagnostics()),
       ...checkCodePlugin(),
       ...checkPluginCache(),
       ...checkEnvironment(),
@@ -848,6 +863,8 @@ async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; fai
       ...checkMcpServer(),
       ...(await checkEmailConnectivity()),
       ...checkDesktopExtension(),
+      ...checkDesktopEntry(),
+      ...(await newDiagnostics()),
       ...checkCodePlugin(),
       ...checkPluginCache(),
       ...checkEnvironment(),
