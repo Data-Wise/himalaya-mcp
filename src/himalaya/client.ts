@@ -134,6 +134,8 @@ export class HimalayaClient {
     cwd?: string;
     /** Positional args appended after all flags (e.g. reply body) */
     trailingArgs?: string[];
+    /** false: don't add the JSON output flag (commands whose plain stdout is the payload). Default true. */
+    json?: boolean;
   }): Promise<string> {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
       try {
@@ -161,6 +163,7 @@ export class HimalayaClient {
     timeout?: number;
     cwd?: string;
     trailingArgs?: string[];
+    json?: boolean;
   }): Promise<string> {
     // Version detection failures throw here as a HimalayaError with code
     // "himalaya_version_undetected" (not "transient"), so exec()'s retry
@@ -181,7 +184,10 @@ export class HimalayaClient {
     }
 
     // Output format — himalaya v2 dropped --output in favor of a bare --json flag.
-    if (version.major >= 2) {
+    if (options?.json === false) {
+      // plain stdout is the payload (e.g. v2 `message reply` prints the raw reply;
+      // with --json it prints decoded fields instead)
+    } else if (version.major >= 2) {
       args.push("--json");
     } else {
       args.push("--output", "json");
@@ -456,7 +462,9 @@ export class HimalayaClient {
       args.push("--cc", address);
     }
     const f = await this.applyFolderArg(args, folder);
-    return this.exec(args, { folder: f, account });
+    // No --json: with it, `message reply` returns decoded {from,to,subject,body}
+    // fields (no In-Reply-To/References), not the raw RFC 5322 reply this returns.
+    return this.exec(args, { folder: f, account, json: false });
   }
 
   /**
