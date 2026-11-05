@@ -6,6 +6,7 @@
  * plain text emails, returns the body as-is.
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
@@ -16,7 +17,7 @@ export function registerRenderTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("render_email", {
     description: "Read an email body rendered as clean markdown. For HTML emails, converts to markdown for a clean reading experience. For plain text emails, returns the body as-is.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: messageId(),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },

@@ -226,6 +226,28 @@ export function checkInstallHealth(
   return results;
 }
 
+/**
+ * Install directory of the himalaya plugin when it was installed through a
+ * marketplace (`claude plugin install himalaya@<marketplace>`): the `installPath`
+ * recorded in installed_plugins.json, if that directory exists. Returns null for
+ * the legacy symlink layout or when no such entry is recorded.
+ */
+export function findMarketplacePluginDir(home: string): string | null {
+  const raw = readText(join(home, ".claude", "plugins", "installed_plugins.json"));
+  if (raw === null) return null;
+  try {
+    const plugins = (JSON.parse(raw) as { plugins?: Record<string, Array<{ installPath?: string }>> }).plugins ?? {};
+    for (const key of Object.keys(plugins)) {
+      if (!key.startsWith("himalaya@")) continue;
+      const dir = plugins[key]?.[0]?.installPath;
+      if (dir && existsSync(join(dir, ".claude-plugin", "plugin.json"))) return dir;
+    }
+  } catch {
+    /* unreadable or malformed: treat as not installed via a marketplace */
+  }
+  return null;
+}
+
 /** The legacy claude_desktop_config.json server entry (himalaya-mcp setup). */
 export function checkDesktopServerEntry(configPath: string, extensionInstalled: boolean): CheckResult[] {
   const raw = readText(configPath);

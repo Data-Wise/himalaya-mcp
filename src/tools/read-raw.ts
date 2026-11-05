@@ -5,6 +5,7 @@
  * `message export --full` on v1, `message read --raw` on v2).
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
@@ -14,7 +15,7 @@ export function registerReadRawTools(server: McpServer, client: HimalayaClient) 
   server.registerTool("read_email_raw", {
     description: "Read the raw MIME source of an email. Returns the full, unedited message including all headers. Useful for debugging, email forensics, and exporting to .eml format.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: messageId(),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },

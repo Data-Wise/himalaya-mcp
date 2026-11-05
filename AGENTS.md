@@ -7,7 +7,7 @@
 - **Architecture:** TypeScript MCP server + Codex plugin
 - **Backend:** himalaya CLI (subprocess with JSON output)
 - **Platforms:** Codex (plugin), Codex Desktop/Cowork (MCP server)
-- **Version:** 2.2.1
+- **Version:** 2.2.2
 - **Current Phase:** All phases complete (29 tools, 7 prompts, 3 resources, 16 skills, 804 tests)
 
 ### What It Does

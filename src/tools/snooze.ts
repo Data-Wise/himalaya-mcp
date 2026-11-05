@@ -5,6 +5,7 @@
  * Cross-platform (no macOS dependency).
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -42,7 +43,7 @@ export function registerSnoozeTools(server: McpServer) {
   server.registerTool("snooze_email", {
     description: "Snooze an email until a specified time. The email will reappear in your inbox check after the snooze period expires.",
     inputSchema: {
-      id: z.string().describe("Email message ID to snooze"),
+      id: messageId("Email message ID to snooze"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name"),
       subject: z.string().optional().describe("Email subject (for display)"),

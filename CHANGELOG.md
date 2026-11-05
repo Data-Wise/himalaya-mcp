@@ -6,6 +6,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-11-05
+
+### Fixed
+
+- `doctor` no longer warns "Plugin not installed" (or fails the post-release check) for marketplace installs: when `~/.claude/plugins/himalaya-mcp` is absent it now uses the `himalaya@<marketplace>` `installPath` from `installed_plugins.json`.
+- Message `id` parameters accept a string or a non-negative integer (list_emails reports numeric IDs; #115) via a shared `messageId()` schema that rejects `null`, objects and floats instead of coercing them to `"null"`/`"[object Object]"`. The advertised JSON schema is now `string | integer`.
+
+### Changed
+
+- Dependencies: `@modelcontextprotocol/sdk` ^1.30.1 and `zod` ^4.6.5 (lockfile: 1.32.2 / 4.6.7); supersedes Dependabot #149. Plugin bundle rebuilt.
+
 ## [2.2.1] - 2026-11-04
 
 ### Fixed

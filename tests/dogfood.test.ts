@@ -308,6 +308,28 @@ describe("Dogfooding: read_email", () => {
 
     expect(client.readMessage).toHaveBeenCalledWith("123", "Archive", undefined);
   });
+
+  it("accepts numeric IDs (converted to strings)", async () => {
+    // list_emails returns numeric IDs; the Zod schema must convert them to strings
+    const tool = getToolHandler(server, "read_email");
+    const schema = tool.inputSchema;
+    // Parse with a numeric ID — should succeed via messageId()
+    const parsed = schema.parse({ id: 157629 });
+    expect(parsed.id).toBe("157629");
+    // Also verify the handler works with the coerced value
+    const result = await tool.handler({ id: 157629, folder: undefined, account: undefined }, {} as any);
+    const text = result.content[0].text;
+    expect(text).toContain("Dear colleague");
+    expect(result.isError).toBeUndefined();
+  });
+
+  it("rejects null, objects and floats instead of coercing them to bogus IDs", () => {
+    const schema = getToolHandler(server, "read_email").inputSchema;
+    for (const bad of [null, { a: 1 }, 1.5, -1, undefined, true]) {
+      expect(schema.safeParse({ id: bad }).success).toBe(false);
+    }
+    expect(schema.safeParse({ id: "abc" }).success).toBe(true);
+  });
 });
 
 describe("Dogfooding: error handling", () => {
