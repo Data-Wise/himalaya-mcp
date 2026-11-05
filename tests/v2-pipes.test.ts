@@ -59,8 +59,16 @@ ${body}
     const raw = await client.replyRaw("42", "ok", ["c1@x", "c2@x"], "Archive");
     expect(raw).toContain("Subject: Re: s");
     expect(argv()).toEqual(
-      ["message", "reply", "42", "--body", "ok", "--cc", "c1@x", "--cc", "c2@x", "--mailbox", "Archive", "--account", "work", "--json"],
+      ["message", "reply", "42", "--body", "ok", "--cc", "c1@x", "--cc", "c2@x", "--mailbox", "Archive", "--account", "work"],
     );
+  });
+
+  it("replyRaw never asks for --json: v2 would print decoded fields instead of the raw reply", async () => {
+    fake(`for a in "$@"; do [ "$a" = "--json" ] && { printf '%s' '{"from":"x","subject":"Re: s","body":"b"}'; exit 0; }; done; printf 'From: me@x\r\nSubject: Re: s\r\n\r\nraw\r\n'`);
+    const client = new HimalayaClient({ binary: bin, account: "work" });
+    const raw = await client.replyRaw("42", undefined, []);
+    expect(raw.startsWith("From: me@x")).toBe(true);
+    expect(argv()).not.toContain("--json");
   });
 
   it("readRawMessage reads --raw and unwraps {message}", async () => {
