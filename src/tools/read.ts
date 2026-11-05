@@ -2,6 +2,7 @@
  * MCP tools for reading email messages.
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
@@ -13,7 +14,7 @@ export function registerReadTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("read_email", {
     description: "Read an email message body (plain text). Use the ID from list_emails or search_emails.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID"),
+      id: messageId(),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
@@ -40,7 +41,7 @@ export function registerReadTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("read_email_html", {
     description: "Read an email message body as HTML. Useful for formatted emails.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID"),
+      id: messageId(),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },

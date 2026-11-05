@@ -2,6 +2,7 @@
  * MCP tools for managing emails: flagging and moving.
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
@@ -11,7 +12,7 @@ export function registerManageTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("flag_email", {
     description: "Add or remove flags on an email. Flags: Seen, Flagged, Answered, Draft (and Deleted on himalaya v1 only; on v2 delete by moving to the trash with move_email). Use 'add' to set flags, 'remove' to clear them.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID"),
+      id: messageId(),
       flags: z.array(z.string()).describe("Flags to add/remove (e.g. ['Seen', 'Flagged'])"),
       action: z.enum(["add", "remove"]).describe("Whether to add or remove the flags"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
@@ -35,7 +36,7 @@ export function registerManageTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("move_email", {
     description: "Move an email to a different folder. Common targets: Archive, Trash, Spam, Sent, Drafts.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID"),
+      id: messageId(),
       target_folder: z.string().describe("Destination folder name (e.g. 'Archive', 'Trash')"),
       folder: z.string().optional().describe("Source folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),

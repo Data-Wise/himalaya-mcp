@@ -6,6 +6,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Message `id` parameters accept a string or a non-negative integer (list_emails reports numeric IDs; #115) via a shared `messageId()` schema that rejects `null`, objects and floats instead of coercing them to `"null"`/`"[object Object]"`. The advertised JSON schema is now `string | integer`.
+
 ### Changed
 
 - Dependencies: `@modelcontextprotocol/sdk` ^1.30.1 and `zod` ^4.6.5 (lockfile: 1.32.2 / 4.6.7); supersedes Dependabot #149. Plugin bundle rebuilt.

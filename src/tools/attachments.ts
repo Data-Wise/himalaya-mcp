@@ -6,6 +6,7 @@
  * directory, then using fs operations to list/find specific files.
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
@@ -87,7 +88,7 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
   server.registerTool("list_attachments", {
     description: "List attachments for an email message. Downloads all attachments to inspect them, then returns filename, MIME type (inferred from extension), and size for each.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID"),
+      id: messageId(),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
@@ -127,7 +128,7 @@ export function registerAttachmentTools(server: McpServer, client: HimalayaClien
   server.registerTool("download_attachment", {
     description: "Download an email attachment to a temporary directory. Downloads all attachments, then returns the path to the requested file.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID"),
+      id: messageId(),
       filename: z.string().describe("Attachment filename to download"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),

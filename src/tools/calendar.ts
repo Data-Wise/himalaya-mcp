@@ -5,6 +5,7 @@
  * Uses shared downloadAndList helper from attachments module to find .ics files.
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
@@ -18,7 +19,7 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
   server.registerTool("extract_calendar_event", {
     description: "Extract calendar event details from an email's ICS attachment. Downloads all attachments, finds the .ics file, parses it, and returns event summary, dates, location, and organizer.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID containing the calendar invite"),
+      id: messageId("Email message ID containing the calendar invite"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
