@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Fixed
 
+- `doctor` no longer warns "Plugin not installed" (or fails the post-release check) for marketplace installs: when `~/.claude/plugins/himalaya-mcp` is absent it now uses the `himalaya@<marketplace>` `installPath` from `installed_plugins.json`.
 - Message `id` parameters accept a string or a non-negative integer (list_emails reports numeric IDs; #115) via a shared `messageId()` schema that rejects `null`, objects and floats instead of coercing them to `"null"`/`"[object Object]"`. The advertised JSON schema is now `string | integer`.
 
 ### Changed

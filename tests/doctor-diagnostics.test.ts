@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   localProxyServers, passwordCommands, proxyHasStoredToken, himalayaConfigPaths,
-  checkMailPath, checkInstallHealth, checkDesktopServerEntry, describeExecFailure,
+  checkMailPath, checkInstallHealth, checkDesktopServerEntry, describeExecFailure, findMarketplacePluginDir,
   type DiagnosticsEnv,
 } from "../src/cli/doctor-diagnostics.js";
 
@@ -166,5 +166,29 @@ describe("describeExecFailure", () => {
   it("falls back to the first plain stderr line", () => {
     expect(describeExecFailure({ stderr: "Error: boom\nmore" }, 10_000)).toBe("boom");
     expect(describeExecFailure(new Error("Command failed: himalaya x\nstuff"), 10_000)).toBe("Command failed: himalaya x");
+  });
+});
+
+describe("findMarketplacePluginDir", () => {
+  function installed(entries: Record<string, unknown>): void {
+    write(".claude/plugins/installed_plugins.json", JSON.stringify({ version: 2, plugins: entries }));
+  }
+
+  it("returns the recorded installPath of a himalaya@<marketplace> plugin", () => {
+    const dir = join(home, ".claude/plugins/cache/data-wise/himalaya/2.2.1");
+    write(".claude/plugins/cache/data-wise/himalaya/2.2.1/.claude-plugin/plugin.json", "{}");
+    installed({ "himalaya@data-wise": [{ scope: "user", installPath: dir, version: "2.2.1" }] });
+    expect(findMarketplacePluginDir(home)).toBe(dir);
+  });
+
+  it("ignores other plugins, missing directories, and a missing or malformed registry", () => {
+    expect(findMarketplacePluginDir(home)).toBeNull();
+    write(".claude/plugins/installed_plugins.json", "{ not json");
+    expect(findMarketplacePluginDir(home)).toBeNull();
+    installed({
+      "other@data-wise": [{ installPath: join(home, "nope") }],
+      "himalaya@data-wise": [{ installPath: join(home, "gone") }],
+    });
+    expect(findMarketplacePluginDir(home)).toBeNull();
   });
 });
