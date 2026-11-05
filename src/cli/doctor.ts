@@ -25,7 +25,7 @@ import { HimalayaClient } from "../himalaya/client.js";
 import { probeAccountSurfaces } from "../himalaya/diagnostics.js";
 import { HimalayaError } from "../himalaya/errors.js";
 import {
-  checkMailPath, checkInstallHealth, checkDesktopServerEntry, describeExecFailure, defaultEnv,
+  checkMailPath, checkInstallHealth, checkDesktopServerEntry, describeExecFailure, defaultEnv, findMarketplacePluginDir,
 } from "./doctor-diagnostics.js";
 
 export interface CheckResult {
@@ -455,9 +455,16 @@ function checkCodePlugin(): CheckResult[] {
       brewLibexecPath: brewLibexecPath(),
     }));
   } else {
+    // Marketplace installs (claude plugin install himalaya@<marketplace>) have no symlink.
+    const marketplaceDir = findMarketplacePluginDir(homedir());
+    if (marketplaceDir) {
+      results.push({ name: "Plugin install", category: "Claude Code Plugin", status: "pass", message: `marketplace install at ${marketplaceDir}` });
+      results.push({ name: "plugin.json", category: "Claude Code Plugin", status: "pass", message: "valid" });
+      return results;
+    }
     results.push({
       name: "Plugin symlink", category: "Claude Code Plugin", status: "warn",
-      message: `Not found at ${symlinkPath}. Plugin not installed for Claude Code.`,
+      message: `Not found at ${symlinkPath}, and no himalaya@<marketplace> entry in installed_plugins.json. Plugin not installed for Claude Code.`,
     });
     return results;
   }
@@ -653,7 +660,8 @@ function checkPostRelease(): CheckResult[] {
   const results: CheckResult[] = [];
 
   // 1. Plugin symlink exists
-  const symlinkPath = join(homedir(), ".claude", "plugins", "himalaya-mcp");
+  const legacyPath = join(homedir(), ".claude", "plugins", "himalaya-mcp");
+  const symlinkPath = existsSync(legacyPath) ? legacyPath : (findMarketplacePluginDir(homedir()) ?? legacyPath);
   if (existsSync(symlinkPath)) {
     results.push({ name: "Plugin installed", category: "Post-Release", status: "pass", message: symlinkPath });
   } else {
