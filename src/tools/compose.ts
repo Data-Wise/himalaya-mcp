@@ -7,6 +7,7 @@
  * - Without confirm, send_email returns a preview for user review
  */
 
+import { messageId } from "./_id.js";
 import { z } from "zod/v4";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { HimalayaClient } from "../himalaya/client.js";
@@ -38,7 +39,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
   server.registerTool("draft_reply", {
     description: "Generate a reply draft for an email. Returns the reply template with headers and quoted original message. Does NOT send — use send_email to send after user reviews.",
     inputSchema: {
-      id: z.coerce.string().describe("Email message ID to reply to"),
+      id: messageId("Email message ID to reply to"),
       body: z.string().optional().describe("Custom reply body text (prepended to quoted original)"),
       reply_all: z.boolean().optional().describe("Reply to all recipients (default: false)"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
