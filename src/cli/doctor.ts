@@ -15,6 +15,7 @@ import {
   EXTENSIONS_DIR,
   EXTENSIONS_SETTINGS_DIR,
   INSTALLATIONS_PATH,
+  findExtensionIds,
   findServerEntry,
   getVersion,
 } from "./shared.js";
@@ -23,6 +24,9 @@ import { detectHimalayaVersion } from "../himalaya/cli-version.js";
 import { HimalayaClient } from "../himalaya/client.js";
 import { probeAccountSurfaces } from "../himalaya/diagnostics.js";
 import { HimalayaError } from "../himalaya/errors.js";
+import {
+  checkMailPath, checkInstallHealth, checkDesktopServerEntry, describeExecFailure, defaultEnv,
+} from "./doctor-diagnostics.js";
 
 export interface CheckResult {
   name: string;
@@ -68,8 +72,8 @@ function execQuiet(bin: string, args: string[], timeout = 10_000): { ok: boolean
     const stdout = execFileSync(bin, args, { timeout, stdio: "pipe" }).toString().trim();
     return { ok: true, stdout, stderr: "" };
   } catch (err: unknown) {
-    const stderr = err instanceof Error ? err.message : String(err);
-    return { ok: false, stdout: "", stderr };
+    // One actionable line (himalaya's own error, or a timeout note), never the full command line.
+    return { ok: false, stdout: "", stderr: describeExecFailure(err, timeout) };
   }
 }
 
@@ -198,10 +202,10 @@ async function checkEmailConnectivity(): Promise<CheckResult[]> {
       results.push({ name: "Folder listing", category: "Email", status: "warn", message: "Could not parse folder list" });
     }
   } else {
-    results.push({ name: "Folder listing", category: "Email", status: "fail", message: "Failed. Check IMAP connection." });
+    results.push({ name: "Folder listing", category: "Email", status: "fail", message: `Failed: ${folders.stderr}. Check IMAP connection.` });
   }
 
-  const envelopes = execQuiet(himalayaPath, ["envelope", "list", "--page-size", "1", ...outputFlag]);
+  const envelopes = execQuiet(himalayaPath, ["envelope", "list", "--page-size", "1", ...outputFlag], 20_000);
   if (envelopes.ok) {
     try {
       // v2 wraps the array as {envelopes: [...]}; v1 returns a bare array.
@@ -212,21 +216,43 @@ async function checkEmailConnectivity(): Promise<CheckResult[]> {
       results.push({ name: "Envelope listing", category: "Email", status: "warn", message: "Could not parse envelope list" });
     }
   } else {
-    results.push({ name: "Envelope listing", category: "Email", status: "fail", message: "Failed to list emails" });
+    results.push({ name: "Envelope listing", category: "Email", status: "fail", message: `Failed to list emails: ${envelopes.stderr}` });
   }
 
   return results;
 }
 
-function checkDesktopExtension(): CheckResult[] {
+export interface DesktopPaths {
+  extensionsDir: string;
+  settingsDir: string;
+  installationsPath: string;
+}
+
+const DEFAULT_DESKTOP_PATHS: DesktopPaths = {
+  extensionsDir: EXTENSIONS_DIR,
+  settingsDir: EXTENSIONS_SETTINGS_DIR,
+  installationsPath: INSTALLATIONS_PATH,
+};
+
+export function checkDesktopExtension(paths: DesktopPaths = DEFAULT_DESKTOP_PATHS): CheckResult[] {
   const results: CheckResult[] = [];
 
-  const extDir = join(EXTENSIONS_DIR, EXTENSION_ID);
+  // Desktop's own .mcpb install is namespaced (local.mcpb.<author>.himalaya-mcp);
+  // `himalaya-mcp install-ext` writes plain `himalaya-mcp`. Accept either.
+  const ids = findExtensionIds(paths.extensionsDir);
+  const extensionId = ids[0] ?? EXTENSION_ID;
+  const extDir = join(paths.extensionsDir, extensionId);
   const manifestPath = join(extDir, "manifest.json");
-  const settingsPath = join(EXTENSIONS_SETTINGS_DIR, `${EXTENSION_ID}.json`);
+  const settingsPath = join(paths.settingsDir, `${extensionId}.json`);
 
-  if (existsSync(extDir) && existsSync(manifestPath)) {
+  if (ids.length > 0) {
     results.push({ name: "Extension installed", category: "Desktop Extension", status: "pass", message: extDir });
+    if (ids.length > 1) {
+      results.push({
+        name: "Duplicate extension", category: "Desktop Extension", status: "warn",
+        message: `Installed twice (${ids.join(", ")}), so Desktop may run two copies. Remove one (himalaya-mcp remove-ext removes only "${EXTENSION_ID}").`,
+      });
+    }
   } else {
     results.push({
       name: "Extension installed", category: "Desktop Extension", status: "fail",
@@ -243,8 +269,8 @@ function checkDesktopExtension(): CheckResult[] {
     results.push({ name: "manifest.json", category: "Desktop Extension", status: "fail", message: "Invalid JSON" });
   }
 
-  const registry = readRegistry();
-  if (registry.extensions[EXTENSION_ID]) {
+  const registry = readRegistry(paths.installationsPath);
+  if (registry.extensions[extensionId]) {
     results.push({ name: "Registry entry", category: "Desktop Extension", status: "pass", message: "exists in extensions-installations.json" });
   } else {
     results.push({ name: "Registry entry", category: "Desktop Extension", status: "warn", message: "Not in registry. May need reinstall." });
@@ -288,7 +314,7 @@ function checkDesktopExtension(): CheckResult[] {
       fix: {
         description: "Create default settings",
         auto: () => {
-          mkdirSync(EXTENSIONS_SETTINGS_DIR, { recursive: true });
+          mkdirSync(paths.settingsDir, { recursive: true });
           writeFileSync(settingsPath, JSON.stringify({ isEnabled: true, userConfig: {} }, null, 2) + "\n", "utf-8");
         },
       },
@@ -390,6 +416,16 @@ export function assessVersionDrift(opts: {
   }
 
   return results;
+}
+
+function checkDesktopEntry(): CheckResult[] {
+  const extensionInstalled = findExtensionIds().length > 0;
+  return checkDesktopServerEntry(CONFIG_PATH, extensionInstalled);
+}
+
+async function newDiagnostics(): Promise<CheckResult[]> {
+  const env = defaultEnv();
+  return [...(await checkMailPath(env)), ...checkInstallHealth(env, getVersion())];
 }
 
 function checkCodePlugin(): CheckResult[] {
@@ -692,10 +728,10 @@ function checkPostRelease(): CheckResult[] {
   return results;
 }
 
-function readRegistry(): { extensions: Record<string, unknown> } {
-  if (!existsSync(INSTALLATIONS_PATH)) return { extensions: {} };
+function readRegistry(path: string = INSTALLATIONS_PATH): { extensions: Record<string, unknown> } {
+  if (!existsSync(path)) return { extensions: {} };
   try {
-    return JSON.parse(readFileSync(INSTALLATIONS_PATH, "utf-8")) as { extensions: Record<string, unknown> };
+    return JSON.parse(readFileSync(path, "utf-8")) as { extensions: Record<string, unknown> };
   } catch {
     return { extensions: {} };
   }
@@ -745,6 +781,8 @@ export async function runDoctor(opts: DoctorOptions = {}): Promise<string> {
       ...checkMcpServer(),
       ...(await checkEmailConnectivity()),
       ...checkDesktopExtension(),
+      ...checkDesktopEntry(),
+      ...(await newDiagnostics()),
       ...checkCodePlugin(),
       ...checkPluginCache(),
       ...checkEnvironment(),
@@ -848,6 +886,8 @@ async function runDoctorJson(opts: DoctorOptions): Promise<{ output: string; fai
       ...checkMcpServer(),
       ...(await checkEmailConnectivity()),
       ...checkDesktopExtension(),
+      ...checkDesktopEntry(),
+      ...(await newDiagnostics()),
       ...checkCodePlugin(),
       ...checkPluginCache(),
       ...checkEnvironment(),

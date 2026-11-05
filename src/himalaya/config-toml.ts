@@ -7,7 +7,7 @@ import { join } from "node:path";
 /** Result of parsing a himalaya config.toml file. */
 export interface HimalayaConfigToml {
   /** Account name → email address mapping. */
-  accounts: Map<string, { email: string; isDefault: boolean }>;
+  accounts: Map<string, { email: string; isDefault: boolean; displayName?: string }>;
 }
 
 /**
@@ -21,7 +21,7 @@ export interface HimalayaConfigToml {
  *   5. `~/.himalayarc`
  */
 export function parseConfigToml(customPath?: string): HimalayaConfigToml {
-  const accounts = new Map<string, { email: string; isDefault: boolean }>();
+  const accounts = new Map<string, { email: string; isDefault: boolean; displayName?: string }>();
   const paths = resolveConfigPaths(customPath);
   let found = false;
 
@@ -120,19 +120,20 @@ function isMissingFile(error: unknown): boolean {
 }
 
 function mergeAccounts(
-  accounts: Map<string, { email: string; isDefault: boolean }>,
+  accounts: Map<string, { email: string; isDefault: boolean; displayName?: string }>,
   parsed: HimalayaConfigToml,
 ): void {
   for (const [name, info] of parsed.accounts) {
     const existing = accounts.get(name) ?? { email: "", isDefault: false };
     if (info.email) existing.email = info.email;
+    if (info.displayName) existing.displayName = info.displayName;
     existing.isDefault = existing.isDefault || info.isDefault;
     accounts.set(name, existing);
   }
 }
 
 function parseConfigDocument(content: string): HimalayaConfigToml {
-  const accounts = new Map<string, { email: string; isDefault: boolean }>();
+  const accounts = new Map<string, { email: string; isDefault: boolean; displayName?: string }>();
   let currentAccount: string | undefined;
 
   for (const rawLine of content.split(/\r?\n/)) {
@@ -158,6 +159,7 @@ function parseConfigDocument(content: string): HimalayaConfigToml {
     if (!entry) continue;
     if (key === "email" && typeof value === "string") entry.email = value;
     if (key === "default" && typeof value === "boolean") entry.isDefault = value;
+    if (key === "display-name" && typeof value === "string") entry.displayName = value;
   }
 
   return { accounts };
@@ -246,3 +248,32 @@ function parseValue(value: string): string | boolean | undefined {
 function parseDoubleQuoted(value: string): string {
   return JSON.parse(value) as string;
 }
+
+/**
+ * Resolve the account's `display-name`, with the same account priority as
+ * resolveFromAddress (explicit, then default, then the first with an email).
+ * Returns undefined when HIMALAYA_FROM is set (it is the whole sender) or no
+ * display name is configured.
+ */
+export function resolveDisplayName(account?: string): string | undefined {
+  const envFrom = process.env["HIMALAYA_FROM"];
+  if (envFrom && !envFrom.startsWith("${")) return undefined;
+  try {
+    const config = parseConfigToml();
+    const explicit = account ? config.accounts.get(account) : undefined;
+    const info =
+      (explicit?.email ? explicit : undefined) ??
+      [...config.accounts.values()].find((a) => a.isDefault && a.email) ??
+      [...config.accounts.values()].find((a) => a.email);
+    return info?.displayName || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Format a From header: `"Name" <addr>` when a display name is known. */
+export function formatFromHeader(address: string, displayName?: string): string {
+  if (!displayName || address.includes("<")) return address;
+  return `"${displayName.replace(/"/g, "")}" <${address}>`;
+}
+

@@ -76,7 +76,9 @@ describe("detectHimalayaVersion", () => {
     }
   });
 
-  it("throws himalaya_version_undetected when the binary is missing (ENOENT)", async () => {
+  // The probe runs before every command, so it is where a missing binary is
+  // first seen: it reports it as such rather than as a failed probe.
+  it("throws himalaya_not_installed when the binary is missing (ENOENT)", async () => {
     const err: any = new Error("spawn himalaya ENOENT");
     err.code = "ENOENT";
     mockExecFileAsync.mockRejectedValue(err);
@@ -86,7 +88,7 @@ describe("detectHimalayaVersion", () => {
       throw new Error("expected to throw");
     } catch (e) {
       expect(e).toBeInstanceOf(HimalayaError);
-      expect((e as HimalayaError).envelope.code).toBe("himalaya_version_undetected");
+      expect((e as HimalayaError).envelope.code).toBe("himalaya_not_installed");
     }
   });
 

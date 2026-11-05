@@ -35,6 +35,8 @@ Search your email using himalaya's filter syntax with a friendly interface.
    - `--unread` → `not flag Seen`
    - `--flagged` → `flag Flagged`
    - Date hints ("last week", "yesterday") → `after <date>`
+   - "Before <date>" / "older than" → `not after <day before that date>` (himalaya v2 has no `before`)
+   - Multi-word keyword → quote it: `subject "quarterly report"`
    - Combine with `and`/`or` as appropriate
 2. Call `search_emails` MCP tool with the constructed query
 3. Format results as a table

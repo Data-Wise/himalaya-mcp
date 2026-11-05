@@ -488,8 +488,8 @@ Example for `/himalaya:help search_emails`:
 |   to <text>          Recipient contains text              |
 |   body <text>        Body contains text                   |
 |   date <YYYY-MM-DD>  Sent on date                         |
-|   before <date>      Sent before date                     |
-|   after <date>       Sent after date                      |
+|   after <date>       Sent strictly after date             |
+|   not after <date>   On/before date (v2 has no before)    |
 |   flag <Flag>        Has flag (Seen, Flagged, etc.)       |
 |                                                           |
 | OPERATORS: and, or, not                                   |

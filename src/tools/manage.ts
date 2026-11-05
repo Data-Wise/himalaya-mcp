@@ -9,7 +9,7 @@ import { envelopeError } from "./_envelope.js";
 
 export function registerManageTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("flag_email", {
-    description: "Add or remove flags on an email. Common flags: Seen, Flagged, Answered, Deleted, Draft. Use 'add' to set flags, 'remove' to clear them.",
+    description: "Add or remove flags on an email. Flags: Seen, Flagged, Answered, Draft (and Deleted on himalaya v1 only; on v2 delete by moving to the trash with move_email). Use 'add' to set flags, 'remove' to clear them.",
     inputSchema: {
       id: z.string().describe("Email message ID"),
       flags: z.array(z.string()).describe("Flags to add/remove (e.g. ['Seen', 'Flagged'])"),
