@@ -6,6 +6,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Security
+
+- **v2 send preview now shows exactly what is sent.** `send_email` parses the template once; the preview is rendered from the normalized fields (decoded recipients including Bcc, subject, threading headers, attachment list) and the send uses the same object. A template with no recipient is now rejected at preview time. (Automated review finding: preview/send parser differential.)
+- **Header values are sanitized in `draft_reply` / `send_email`.** CR, LF, other control characters and Unicode line separators in decoded subjects, threading headers and display names become spaces, so a decoded RFC 2047 word can never start a new header line. Display names also lose `"` and `\`: a trailing backslash used to break quoting and garble the recipient (`<"x\" real"@x.test>`). `postal-mime` already collapsed CRLF in decoded subjects, so the injection was not reproducible, but the code no longer depends on that. (Automated review finding: header injection.)
+
 ### Fixed
 
 - **`doctor` reported "Extension installed: Not installed" for a working Desktop extension.** Claude Desktop's own `.mcpb` install registers `local.mcpb.<author>.himalaya-mcp`, while `doctor` only looked for the `himalaya-mcp` id that `install-ext` writes. It now finds either (Desktop's first), reads the registry and settings entries under the matching id, and warns when both exist.

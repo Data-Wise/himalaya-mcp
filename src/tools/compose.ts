@@ -13,7 +13,7 @@ import type { HimalayaClient } from "../himalaya/client.js";
 import { parseTemplate } from "../himalaya/parser.js";
 import { envelopeError } from "./_envelope.js";
 import { validateAttachmentPaths, buildAttachmentMml } from "./_attachments.js";
-import { addresses, buildMessage, parseMessage, renderForReview, templateToMessage } from "../himalaya/message.js";
+import { addresses, buildMessage, parseMessage, renderForReview, renderOutgoing, templateToMessage } from "../himalaya/message.js";
 import { formatFromHeader, resolveDisplayName } from "../himalaya/config-toml.js";
 
 /**
@@ -135,6 +135,24 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
         : buildAttachmentMml(args.attachments))
       : args.template;
 
+    // v2: parse the template once. The preview shows the normalized fields and
+    // the send uses the very same object, so what is approved is what is sent.
+    let v2Message: Awaited<ReturnType<typeof templateToMessage>> | undefined;
+    if (v2) {
+      try {
+        const address = client.fromForAccount(args.account);
+        v2Message = await templateToMessage(args.template, {
+          from: formatFromHeader(address, resolveDisplayName(args.account || client.account)),
+        });
+        v2Message.attachments = args.attachments;
+      } catch (err) {
+        return {
+          content: [{ type: "text" as const, text: `Cannot send: ${err instanceof Error ? err.message : String(err)}` }],
+          isError: true,
+        };
+      }
+    }
+
     // Safety gate: without confirm=true, just show preview
     if (!args.confirm) {
       return {
@@ -143,7 +161,7 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
           text: [
             "--- EMAIL PREVIEW (not sent) ---",
             "",
-            template,
+            v2Message ? renderOutgoing(v2Message) : template,
             "",
             "--- END PREVIEW ---",
             "",
@@ -156,15 +174,11 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
 
     // Actually send
     try {
-      if (v2) {
-        // v2 has no MML: rebuild the reviewed template as a real message,
-        // threading headers and attachments included, and keep a sent copy.
-        const address = client.fromForAccount(args.account);
-        const message = await templateToMessage(args.template, {
-          from: formatFromHeader(address, resolveDisplayName(args.account || client.account)),
-        });
-        message.attachments = args.attachments;
-        await client.sendRaw(await buildMessage(message), "sent", args.account);
+      if (v2Message) {
+        // v2 has no MML: the message parsed above (shown in the preview) is
+        // built as a real message, threading headers and attachments included,
+        // and a sent copy is kept.
+        await client.sendRaw(await buildMessage(v2Message), "sent", args.account);
       } else {
         await client.sendTemplate(template, args.account);
       }

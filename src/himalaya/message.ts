@@ -55,10 +55,29 @@ export async function parseMessage(raw: string): Promise<Email> {
   return PostalMime.parse(raw);
 }
 
+/**
+ * Make a decoded header value safe to write into a header line: control
+ * characters (CR, LF, NUL, ..., and the Unicode line separators) become a
+ * space, so a decoded RFC 2047 word can never start a new header line.
+ */
+export function cleanHeaderValue(value: string): string {
+  // eslint-disable-next-line no-control-regex
+  return value.replace(/[\u0000-\u001f\u007f\u0085\u2028\u2029]+/g, " ").trim();
+}
+
+/** A display name for a quoted-string: also drop `"` and `\`, which would break the quoting. */
+function cleanDisplayName(name: string): string {
+  return cleanHeaderValue(name).replace(/["\\]/g, "");
+}
+
 function addressList(list: Email["to"]): string {
   return (list ?? [])
     .flatMap((a) => ("group" in a && a.group ? a.group : [a]))
-    .map((a) => (a.name ? `"${a.name.replace(/"/g, "")}" <${a.address}>` : `${a.address}`))
+    .map((a) => {
+      const name = a.name ? cleanDisplayName(a.name) : "";
+      const address = cleanHeaderValue(a.address ?? "");
+      return name ? `"${name}" <${address}>` : address;
+    })
     .join(", ");
 }
 
@@ -81,10 +100,29 @@ export function renderForReview(email: Email): string {
   if (email.to?.length) headers.push(`To: ${addressList(email.to)}`);
   if (email.cc?.length) headers.push(`Cc: ${addressList(email.cc)}`);
   if (email.bcc?.length) headers.push(`Bcc: ${addressList(email.bcc)}`);
-  headers.push(`Subject: ${email.subject ?? ""}`);
-  if (email.inReplyTo) headers.push(`In-Reply-To: ${email.inReplyTo}`);
-  if (email.references) headers.push(`References: ${email.references}`);
+  headers.push(`Subject: ${cleanHeaderValue(email.subject ?? "")}`);
+  if (email.inReplyTo) headers.push(`In-Reply-To: ${cleanHeaderValue(email.inReplyTo)}`);
+  if (email.references) headers.push(`References: ${cleanHeaderValue(email.references)}`);
   return headers.join("\n") + "\n\n" + (email.text ?? "").replace(/\r\n/g, "\n");
+}
+
+/**
+ * Render exactly what {@link buildMessage} will send: the normalized fields
+ * (decoded recipients including Bcc, subject, threading headers), the body
+ * and the attachment list. The send preview uses this instead of echoing the
+ * template text, so what the user approves is what is sent.
+ */
+export function renderOutgoing(m: OutgoingMessage): string {
+  const headers = [`From: ${cleanHeaderValue(m.from)}`, `To: ${cleanHeaderValue(m.to)}`];
+  if (m.cc) headers.push(`Cc: ${cleanHeaderValue(m.cc)}`);
+  if (m.bcc) headers.push(`Bcc: ${cleanHeaderValue(m.bcc)}`);
+  headers.push(`Subject: ${cleanHeaderValue(m.subject)}`);
+  if (m.inReplyTo) headers.push(`In-Reply-To: ${cleanHeaderValue(m.inReplyTo)}`);
+  if (m.references) headers.push(`References: ${cleanHeaderValue(m.references)}`);
+  const attachments = m.attachments?.length
+    ? "\n\nAttachments:\n" + m.attachments.map((p) => `- ${p}`).join("\n")
+    : "";
+  return headers.join("\n") + "\n\n" + m.text + attachments;
 }
 
 /** Turn a reviewed template (or any raw message) back into sendable fields. */
@@ -100,9 +138,9 @@ export async function templateToMessage(
     to,
     cc: addressList(email.cc) || undefined,
     bcc: addressList(email.bcc) || undefined,
-    subject: email.subject ?? "",
+    subject: cleanHeaderValue(email.subject ?? ""),
     text: (email.text ?? "").replace(/\r\n/g, "\n"),
-    inReplyTo: email.inReplyTo,
-    references: email.references,
+    inReplyTo: email.inReplyTo ? cleanHeaderValue(email.inReplyTo) : undefined,
+    references: email.references ? cleanHeaderValue(email.references) : undefined,
   };
 }
