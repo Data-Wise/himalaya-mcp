@@ -164,7 +164,7 @@ If you have himalaya-mcp installed (Homebrew or source), you can install the ext
 
 ```bash
 npm run build:mcpb                                     # Build .mcpb (dev only)
-himalaya-mcp install-ext himalaya-mcp-v2.1.2.mcpb      # Install from file
+himalaya-mcp install-ext himalaya-mcp-v2.1.3.mcpb      # Install from file
 himalaya-mcp install-ext                                # Auto-find in project root
 himalaya-mcp remove-ext                                 # Uninstall extension
 ```
@@ -289,7 +289,7 @@ If that hangs or reports `stream stopped responding after 60s`, fix it there (Mi
 
 ### A failing "email" server appears next to the plugin
 
-Releases up to 2.1.2 shipped a project-level `.mcp.json` at the repository root. Running Claude Code inside a clone started a second server named `email` that failed with `CONNECTION_CLOSED` (the plugin's `${CLAUDE_PLUGIN_ROOT}` is unset outside a plugin) and shadowed the working plugin server. It is removed on `dev` and ships with the next release. Until then, `git pull` the clone or delete the root `.mcp.json`.
+Releases up to 2.1.2 shipped a project-level `.mcp.json` at the repository root. Running Claude Code inside a clone started a second server named `email` that failed with `CONNECTION_CLOSED` (the plugin's `${CLAUDE_PLUGIN_ROOT}` is unset outside a plugin) and shadowed the working plugin server. It is removed in 2.1.3. On an older clone, `git pull` or delete the root `.mcp.json`.
 
 ### MCP server not starting
 
