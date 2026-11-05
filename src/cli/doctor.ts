@@ -15,6 +15,7 @@ import {
   EXTENSIONS_DIR,
   EXTENSIONS_SETTINGS_DIR,
   INSTALLATIONS_PATH,
+  findExtensionIds,
   findServerEntry,
   getVersion,
 } from "./shared.js";
@@ -221,15 +222,37 @@ async function checkEmailConnectivity(): Promise<CheckResult[]> {
   return results;
 }
 
-function checkDesktopExtension(): CheckResult[] {
+export interface DesktopPaths {
+  extensionsDir: string;
+  settingsDir: string;
+  installationsPath: string;
+}
+
+const DEFAULT_DESKTOP_PATHS: DesktopPaths = {
+  extensionsDir: EXTENSIONS_DIR,
+  settingsDir: EXTENSIONS_SETTINGS_DIR,
+  installationsPath: INSTALLATIONS_PATH,
+};
+
+export function checkDesktopExtension(paths: DesktopPaths = DEFAULT_DESKTOP_PATHS): CheckResult[] {
   const results: CheckResult[] = [];
 
-  const extDir = join(EXTENSIONS_DIR, EXTENSION_ID);
+  // Desktop's own .mcpb install is namespaced (local.mcpb.<author>.himalaya-mcp);
+  // `himalaya-mcp install-ext` writes plain `himalaya-mcp`. Accept either.
+  const ids = findExtensionIds(paths.extensionsDir);
+  const extensionId = ids[0] ?? EXTENSION_ID;
+  const extDir = join(paths.extensionsDir, extensionId);
   const manifestPath = join(extDir, "manifest.json");
-  const settingsPath = join(EXTENSIONS_SETTINGS_DIR, `${EXTENSION_ID}.json`);
+  const settingsPath = join(paths.settingsDir, `${extensionId}.json`);
 
-  if (existsSync(extDir) && existsSync(manifestPath)) {
+  if (ids.length > 0) {
     results.push({ name: "Extension installed", category: "Desktop Extension", status: "pass", message: extDir });
+    if (ids.length > 1) {
+      results.push({
+        name: "Duplicate extension", category: "Desktop Extension", status: "warn",
+        message: `Installed twice (${ids.join(", ")}), so Desktop may run two copies. Remove one (himalaya-mcp remove-ext removes only "${EXTENSION_ID}").`,
+      });
+    }
   } else {
     results.push({
       name: "Extension installed", category: "Desktop Extension", status: "fail",
@@ -246,8 +269,8 @@ function checkDesktopExtension(): CheckResult[] {
     results.push({ name: "manifest.json", category: "Desktop Extension", status: "fail", message: "Invalid JSON" });
   }
 
-  const registry = readRegistry();
-  if (registry.extensions[EXTENSION_ID]) {
+  const registry = readRegistry(paths.installationsPath);
+  if (registry.extensions[extensionId]) {
     results.push({ name: "Registry entry", category: "Desktop Extension", status: "pass", message: "exists in extensions-installations.json" });
   } else {
     results.push({ name: "Registry entry", category: "Desktop Extension", status: "warn", message: "Not in registry. May need reinstall." });
@@ -291,7 +314,7 @@ function checkDesktopExtension(): CheckResult[] {
       fix: {
         description: "Create default settings",
         auto: () => {
-          mkdirSync(EXTENSIONS_SETTINGS_DIR, { recursive: true });
+          mkdirSync(paths.settingsDir, { recursive: true });
           writeFileSync(settingsPath, JSON.stringify({ isEnabled: true, userConfig: {} }, null, 2) + "\n", "utf-8");
         },
       },
@@ -396,7 +419,7 @@ export function assessVersionDrift(opts: {
 }
 
 function checkDesktopEntry(): CheckResult[] {
-  const extensionInstalled = existsSync(join(EXTENSIONS_DIR, EXTENSION_ID, "manifest.json"));
+  const extensionInstalled = findExtensionIds().length > 0;
   return checkDesktopServerEntry(CONFIG_PATH, extensionInstalled);
 }
 
@@ -705,10 +728,10 @@ function checkPostRelease(): CheckResult[] {
   return results;
 }
 
-function readRegistry(): { extensions: Record<string, unknown> } {
-  if (!existsSync(INSTALLATIONS_PATH)) return { extensions: {} };
+function readRegistry(path: string = INSTALLATIONS_PATH): { extensions: Record<string, unknown> } {
+  if (!existsSync(path)) return { extensions: {} };
   try {
-    return JSON.parse(readFileSync(INSTALLATIONS_PATH, "utf-8")) as { extensions: Record<string, unknown> };
+    return JSON.parse(readFileSync(path, "utf-8")) as { extensions: Record<string, unknown> };
   } catch {
     return { extensions: {} };
   }

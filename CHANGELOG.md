@@ -8,6 +8,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Fixed
 
+- **`doctor` reported "Extension installed: Not installed" for a working Desktop extension.** Claude Desktop's own `.mcpb` install registers `local.mcpb.<author>.himalaya-mcp`, while `doctor` only looked for the `himalaya-mcp` id that `install-ext` writes. It now finds either (Desktop's first), reads the registry and settings entries under the matching id, and warns when both exist.
 - **`draft_reply` returned an empty draft on himalaya v2.** `HimalayaClient.exec` always added `--json`, and with it `message reply` prints decoded `{from,to,subject,body}` fields instead of the raw reply, which the MIME parser then read as blank. `replyRaw` now omits `--json`. Found by a live send test; the mocked tests used raw fixtures and missed it.
 - **Every write path failed on himalaya v2.** v2 removed templates and MML, renamed options, and made `message read --json` a MIME tree. `compose_email`, `send_email`, `draft_reply`, `read_email`, `read_email_html`, `read_email_raw`, `flag_email`, `move_email` and the attachment tools still built v1 command lines. Each now has a v2 branch:
   - **Composing:** messages are built by the server (nodemailer's MailComposer), then handed to `message send --save sent` or `message add`. This is the external-composer pattern the v2 docs recommend.
