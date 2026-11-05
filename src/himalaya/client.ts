@@ -13,6 +13,7 @@ import { classifyStderr, HimalayaError, unsupportedBackendError } from "./errors
 import { resolveFromAddress } from "./config-toml.js";
 import { detectHimalayaVersion, type HimalayaVersion } from "./cli-version.js";
 import { isImapAccount, listAccounts } from "./accounts.js";
+import { extractV2Bodies } from "./parser.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -262,9 +263,29 @@ export class HimalayaClient {
    * himalaya v1.2.0 removed the --html flag from `message read`.
    * Instead, use `message export` (without --full) which exports
    * MIME parts as separate files: index.html for HTML, plain.txt for text.
+   * himalaya v2 removed `message export` again, so v2 reads the HTML part
+   * out of `message read --json` instead (see below).
    */
   async readMessageHtml(id: string, folder?: string, account?: string): Promise<string> {
     assertSafeArg(id, "id");
+
+    // himalaya v2 dropped `message export`; `message read --json` returns the
+    // whole parsed message, whose HTML part we extract directly (no temp dir).
+    // Returns "" when the message has no HTML part so callers can fall back.
+    const version = await this.resolveVersion();
+    if (version.major >= 2) {
+      const readArgs = ["message", "read", id];
+      const rf = await this.applyFolderArg(readArgs, folder);
+      const raw = await this.exec(readArgs, { folder: rf, account });
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        return "";
+      }
+      return extractV2Bodies(parsed)?.html ?? "";
+    }
+
     const tmpDir = mkdtempSync(join(tmpdir(), "himalaya-mcp-html-"));
     try {
       const args = ["message", "export"];
@@ -274,6 +295,47 @@ export class HimalayaClient {
       await this.exec(args, { folder: f, account });
       const htmlPath = join(tmpDir, "index.html");
       return readFileSync(htmlPath, "utf-8");
+    } finally {
+      try { rmSync(tmpDir, { recursive: true }); } catch { /* ignore */ }
+    }
+  }
+
+  /**
+   * Read the raw RFC 5322 source of a message.
+   *
+   * himalaya v2 removed `message export`; `message read --raw` (with --json
+   * the bytes come out wrapped as {"message": "..."}) replaces `export --full`. v1 keeps
+   * the export-to-file path.
+   */
+  async readMessageRaw(id: string, folder?: string, account?: string): Promise<string> {
+    assertSafeArg(id, "id");
+    const version = await this.resolveVersion();
+
+    if (version.major >= 2) {
+      const args = ["message", "read", id, "--raw"];
+      const f = await this.applyFolderArg(args, folder);
+      const out = await this.exec(args, { folder: f, account });
+      try {
+        // Live v2.2.1 shape: {"message":"<raw RFC 5322>"}; accept a bare
+        // JSON string too, as the help text describes.
+        const parsed: unknown = JSON.parse(out);
+        if (typeof parsed === "string") return parsed;
+        const message = (parsed as { message?: unknown } | null)?.message;
+        if (typeof message === "string") return message;
+      } catch {
+        // not JSON: treat stdout as the raw message
+      }
+      return out;
+    }
+
+    const tmpDir = mkdtempSync(join(tmpdir(), "himalaya-mcp-raw-"));
+    try {
+      const emlPath = join(tmpDir, "message.eml");
+      const args = ["message", "export", "--full", "--destination", emlPath];
+      const f = await this.applyFolderArg(args, folder);
+      args.push(id);
+      await this.exec(args, { folder: f, account });
+      return readFileSync(emlPath, "utf-8");
     } finally {
       try { rmSync(tmpDir, { recursive: true }); } catch { /* ignore */ }
     }

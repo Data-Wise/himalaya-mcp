@@ -343,8 +343,8 @@ describe("HimalayaClient", () => {
       );
     });
 
-    it("readMessageHtml uses message export instead of removed --html flag", async () => {
-      setupMock("");
+    it("readMessageHtml on himalaya v1 uses message export instead of removed --html flag", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "" });
       vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/himalaya-mcp-html-test");
       vi.mocked(fs.readFileSync).mockReturnValue("<p>Test HTML content</p>");
       vi.mocked(fs.rmSync).mockImplementation(() => {});
@@ -362,6 +362,71 @@ describe("HimalayaClient", () => {
       // Ensure the old --html flag is NOT used
       const args = mockExecFileAsync.mock.calls[0][1] as string[];
       expect(args).not.toContain("--html");
+    });
+
+    it("readMessageHtml on himalaya v2 reads the HTML part from message read --json (#145)", async () => {
+      const v2Message = JSON.stringify({
+        html_body: [2],
+        text_body: [1],
+        attachments: [],
+        parts: [
+          { headers: [], body: { Multipart: [1, 2] } },
+          { headers: [], body: { Text: "plain body" } },
+          { headers: [], body: { Html: "<p>html body</p>" } },
+        ],
+      });
+      configureMock({ version: V2_VERSION_STDOUT, stdout: v2Message });
+
+      const client = new HimalayaClient();
+      const result = await client.readMessageHtml("12345");
+
+      expect(result).toBe("<p>html body</p>");
+      const calls = mockExecFileAsync.mock.calls.map((c) => c[1] as string[]);
+      const readCall = calls.find((a) => a[0] === "message" && a[1] === "read");
+      expect(readCall).toEqual(expect.arrayContaining(["message", "read", "12345", "--json"]));
+      // `message export` no longer exists on v2 -- it must not be spawned.
+      expect(calls.some((a) => a[0] === "message" && a[1] === "export")).toBe(false);
+      expect(vi.mocked(fs.mkdtempSync)).not.toHaveBeenCalled();
+    });
+
+    it("readMessageHtml on himalaya v2 returns an empty string when there is no HTML part", async () => {
+      const plainOnly = JSON.stringify({
+        html_body: [0],
+        text_body: [0],
+        attachments: [],
+        parts: [{ headers: [], body: { Text: "only plain" } }],
+      });
+      configureMock({ version: V2_VERSION_STDOUT, stdout: plainOnly });
+
+      const client = new HimalayaClient();
+      expect(await client.readMessageHtml("12345")).toBe("");
+    });
+
+    it("readMessageRaw on himalaya v2 uses message read --raw and unwraps {message}", async () => {
+      configureMock({ version: V2_VERSION_STDOUT, stdout: JSON.stringify({ message: "From: a@b.c\r\n\r\nbody" }) });
+      const client = new HimalayaClient();
+      const result = await client.readMessageRaw("12345", "INBOX");
+
+      expect(result).toBe("From: a@b.c\r\n\r\nbody");
+      const calls = mockExecFileAsync.mock.calls.map((c) => c[1] as string[]);
+      expect(calls.some((a) => a[0] === "message" && a[1] === "read" && a.includes("--raw"))).toBe(true);
+      expect(calls.some((a) => a[1] === "export")).toBe(false);
+    });
+
+    it("readMessageRaw on himalaya v1 uses message export --full", async () => {
+      configureMock({ version: V1_VERSION_STDOUT, stdout: "" });
+      vi.mocked(fs.mkdtempSync).mockReturnValue("/tmp/himalaya-mcp-raw-test");
+      vi.mocked(fs.readFileSync).mockReturnValue("RAW EML");
+      vi.mocked(fs.rmSync).mockImplementation(() => {});
+      vi.mocked(os.tmpdir).mockReturnValue("/tmp");
+
+      const client = new HimalayaClient();
+      expect(await client.readMessageRaw("12345")).toBe("RAW EML");
+      expect(mockExecFileAsync).toHaveBeenCalledWith(
+        "himalaya",
+        expect.arrayContaining(["message", "export", "--full", "--destination"]),
+        expect.any(Object),
+      );
     });
 
     it("listFolders calls mailbox list on himalaya v2", async () => {

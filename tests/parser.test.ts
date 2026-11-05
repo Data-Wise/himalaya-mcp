@@ -5,6 +5,7 @@ import {
   parseFolders,
   parseAccounts,
   parseMessageBody,
+  extractV2Bodies,
   formatEnvelope,
   unwrapList,
 } from "../src/himalaya/parser.js";
@@ -295,5 +296,93 @@ describe("parseMessageBody", () => {
     if (result.ok) {
       expect(result.data).toBe("raw text body");
     }
+  });
+});
+
+// himalaya v2 `message read --json` returns the whole parsed message (#144).
+// Fixtures captured from himalaya v2.2.1 against a maildir account.
+const V2_MULTIPART = JSON.stringify({
+  html_body: [2],
+  text_body: [1],
+  attachments: [],
+  parts: [
+    { headers: [], body: { Multipart: [1, 2] } },
+    { headers: [], body: { Text: "plain body" } },
+    { headers: [], body: { Html: "<p>html <b>body</b></p>" } },
+  ],
+});
+const V2_PLAIN_ONLY = JSON.stringify({
+  html_body: [0],
+  text_body: [0],
+  attachments: [],
+  parts: [{ headers: [], body: { Text: "only plain" } }],
+});
+const V2_HTML_ONLY = JSON.stringify({
+  html_body: [0],
+  text_body: [0],
+  attachments: [],
+  parts: [{ headers: [], body: { Html: "<h1>only html</h1>" } }],
+});
+const V2_WITH_ATTACHMENT = JSON.stringify({
+  html_body: [1],
+  text_body: [1],
+  attachments: [2],
+  parts: [
+    { headers: [], body: { Multipart: [1, 2] } },
+    { headers: [], body: { Text: "with att" } },
+    { headers: [], body: { Binary: [37, 80, 68, 70] } },
+  ],
+});
+
+describe("parseMessageBody (himalaya v2 object payload, #144)", () => {
+  it("returns the plain-text part as a string for a multipart message", () => {
+    const result = parseMessageBody(V2_MULTIPART);
+    expect(result).toEqual({ ok: true, data: "plain body" });
+  });
+
+  it("returns the text for a single-part plain message", () => {
+    expect(parseMessageBody(V2_PLAIN_ONLY)).toEqual({ ok: true, data: "only plain" });
+  });
+
+  it("falls back to the HTML markup for an HTML-only message", () => {
+    expect(parseMessageBody(V2_HTML_ONLY)).toEqual({ ok: true, data: "<h1>only html</h1>" });
+  });
+
+  it("ignores binary attachment parts", () => {
+    expect(parseMessageBody(V2_WITH_ATTACHMENT)).toEqual({ ok: true, data: "with att" });
+  });
+
+  it.each([
+    ["an unrecognized object", '{"foo":{"bar":1}}'],
+    ["an array", "[1,2,3]"],
+    ["a number", "42"],
+  ])("never returns a non-string for %s", (_name, raw) => {
+    const result = parseMessageBody(raw);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(typeof result.data).toBe("string");
+  });
+});
+
+describe("extractV2Bodies", () => {
+  it("returns separate text and html bodies", () => {
+    expect(extractV2Bodies(JSON.parse(V2_MULTIPART))).toEqual({
+      text: "plain body",
+      html: "<p>html <b>body</b></p>",
+    });
+  });
+
+  it("takes only the matching variant when both indexes point at one part", () => {
+    expect(extractV2Bodies(JSON.parse(V2_PLAIN_ONLY))).toEqual({ text: "only plain", html: "" });
+    expect(extractV2Bodies(JSON.parse(V2_HTML_ONLY))).toEqual({ text: "", html: "<h1>only html</h1>" });
+  });
+
+  it("tolerates out-of-range and non-numeric indexes", () => {
+    expect(extractV2Bodies({ text_body: [9, "x"], html_body: null, parts: [] })).toEqual({ text: "", html: "" });
+  });
+
+  it("returns null for values that are not a v2 message", () => {
+    expect(extractV2Bodies(null)).toBeNull();
+    expect(extractV2Bodies("str")).toBeNull();
+    expect(extractV2Bodies({ parts: "nope" })).toBeNull();
   });
 });

@@ -47,6 +47,9 @@
   },
   "overrides": {
     "postcss": "^8.5.18",
-    "tmp": "^0.2.7"
+    "tmp": "^0.2.7",
+    "@anthropic-ai/mcpb": {
+      "zod": "$zod"
+    }
   }
 }
