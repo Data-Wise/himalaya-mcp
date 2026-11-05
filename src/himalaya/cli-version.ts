@@ -13,7 +13,7 @@
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { versionDetectionError } from "./errors.js";
+import { HimalayaError, versionDetectionError } from "./errors.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -51,6 +51,15 @@ export async function detectHimalayaVersion(binary: string): Promise<HimalayaVer
     });
     stdout = result.stdout.trim();
   } catch (err: unknown) {
+    // A missing binary is its own, actionable error, not a failed probe.
+    if ((err as NodeJS.ErrnoException)?.code === "ENOENT") {
+      throw new HimalayaError({
+        code: "himalaya_not_installed",
+        message: `himalaya CLI not found at "${binary}"`,
+        hint: "Run: brew install himalaya",
+        recoverable: true,
+      });
+    }
     const detail = err instanceof Error ? err.message : String(err);
     throw versionDetectionError(detail);
   }

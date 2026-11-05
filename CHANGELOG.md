@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Every write path failed on himalaya v2.** v2 removed templates and MML, renamed options, and made `message read --json` a MIME tree. `compose_email`, `send_email`, `draft_reply`, `read_email`, `read_email_html`, `read_email_raw`, `flag_email`, `move_email` and the attachment tools still built v1 command lines. Each now has a v2 branch:
+  - **Composing:** messages are built by the server (nodemailer's MailComposer), then handed to `message send --save sent` or `message add`. This is the external-composer pattern the v2 docs recommend.
+  - **Reading:** bodies are decoded from `message read --raw` (postal-mime), so a quoted-printable reply reads as text.
+  - **Reply-all:** v2 has no `--all`, so the cc list is computed from the original (To + Cc, minus the account and the reply target).
+  - **Flags:** v2 takes `--flag` per flag, only for seen, answered, flagged and draft.
+  - **Moves:** the source goes to `--from`, never `--mailbox`.
+  - **Attachments:** `--dir`.
+  v1 behaviour is unchanged.
+- **Multi-word search values failed on himalaya v2.** The query was split into tokens with the quotes stripped, so `subject "quarterly report"` reached v2 as `subject quarterly report`, which it rejects. v2 now receives the query verbatim as one argument; v1 keeps the tokenizer. The `search_emails` and `flag_email` descriptions, and the plugin's help and search skills, now describe the v2 grammar: no `before` (use `not after`), no bare words, and quoting.
+- **The compose tests depended on the himalaya installed on the machine.** They now pin the version like the other suites, so the suite passes with no himalaya on `PATH`, as in CI.
+- **`listAccounts` sent v2's `--json` to v1**, which rejects it. It now probes the version first.
+- **A missing binary surfaced as `himalaya_version_undetected`.** The version probe runs before every command, so it is where a missing binary shows first; it now reports `himalaya_not_installed`.
+- **`sendTemplate` left its timeout armed after every send.** Sending now goes through one stdin helper that clears it, and never retries, because a send or append that failed after the server acted would duplicate the message.
+
 ### Added
 
 - **`doctor` diagnostics**: new "Mail Path" checks for local OAuth-proxy setups (proxy port and
@@ -14,6 +30,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
   duplicate or legacy plugin entries, plugin vs binary version), and a legacy Claude Desktop
   server-entry check. Connectivity failures now report himalaya's own error or a timeout note
   instead of a generic message.
+
+- **`compose_email save_draft`** (himalaya v2). It saves the message, attachments included, to the drafts mailbox (`drafts_folder` to override) with `\Draft` and `\Seen` set on the APPEND itself. Some servers (OVH's Dovecot) refuse a later `STORE` of `\Draft`.
 
 ## [2.1.3] - 2026-11-04
 

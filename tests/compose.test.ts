@@ -15,6 +15,9 @@ const SAMPLE_REPLY_TEMPLATE = JSON.stringify(
 
 function createMockClient(): HimalayaClient {
   const client = new HimalayaClient();
+  // Hermetic: these cases exercise the v1 template flow; never probe the
+  // himalaya installed on the machine (v2 is covered in compose-v2.test.ts).
+  vi.spyOn(client, "resolveVersion").mockResolvedValue({ major: 1, raw: "himalaya v1.2.0" });
   vi.spyOn(client, "replyTemplate").mockResolvedValue(SAMPLE_REPLY_TEMPLATE);
   vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
   return client;

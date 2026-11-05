@@ -8,6 +8,9 @@ import { join } from "node:path";
 
 function createMockClient(): HimalayaClient {
   const client = new HimalayaClient({ from: "sender@example.com", account: "work" });
+  // Hermetic: these cases exercise the v1 template flow; never probe the
+  // himalaya installed on the machine (v2 is covered in compose-v2.test.ts).
+  vi.spyOn(client, "resolveVersion").mockResolvedValue({ major: 1, raw: "himalaya v1.2.0" });
   vi.spyOn(client, "sendTemplate").mockResolvedValue("{}");
   return client;
 }

@@ -13,6 +13,26 @@ import type { HimalayaClient } from "../himalaya/client.js";
 import { parseTemplate } from "../himalaya/parser.js";
 import { envelopeError } from "./_envelope.js";
 import { validateAttachmentPaths, buildAttachmentMml } from "./_attachments.js";
+import { addresses, buildMessage, parseMessage, renderForReview, templateToMessage } from "../himalaya/message.js";
+import { formatFromHeader, resolveDisplayName } from "../himalaya/config-toml.js";
+
+/**
+ * Reply-all recipients for himalaya v2, which has no --all: everyone on the
+ * original To and Cc, minus the replying account and whoever the reply
+ * already goes to.
+ */
+export function replyAllCc(original: Awaited<ReturnType<typeof parseMessage>>, self: string): string[] {
+  const exclude = new Set([
+    self.toLowerCase(),
+    ...addresses(original.replyTo?.length ? original.replyTo : original.from ? [original.from] : []),
+  ]);
+  const seen = new Set<string>();
+  return [...addresses(original.to), ...addresses(original.cc)].filter((a) => {
+    if (exclude.has(a) || seen.has(a)) return false;
+    seen.add(a);
+    return true;
+  });
+}
 
 export function registerComposeTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("draft_reply", {
@@ -26,6 +46,30 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
     },
   }, async (args) => {
     try {
+      if ((await client.resolveVersion()).major >= 2) {
+        // v2 prints the composed reply as raw RFC 5322 (quoted-printable
+        // body); decode it into a readable template send_email accepts back.
+        const self = client.fromForAccount(args.account);
+        const cc = args.reply_all
+          ? replyAllCc(await parseMessage(await client.readRawMessage(args.id, args.folder, args.account)), self)
+          : [];
+        const raw = await client.replyRaw(args.id, args.body, cc, args.folder, args.account);
+        return {
+          content: [{
+            type: "text" as const,
+            text: [
+              "--- DRAFT REPLY (not sent) ---",
+              "",
+              renderForReview(await parseMessage(raw)),
+              "",
+              "--- END DRAFT ---",
+              "",
+              "Review the draft above. To send, use send_email with the template text and confirm=true.",
+            ].join("\n"),
+          }],
+        };
+      }
+
       const raw = await client.replyTemplate(
         args.id,
         args.body,
@@ -81,9 +125,14 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
       }
     }
 
-    // Inject attachment MML parts into the template (after headers+body)
+    const v2 = (await client.resolveVersion()).major >= 2;
+
+    // Inject attachment MML parts into the template (after headers+body).
+    // v2 has no MML, so there the preview lists them instead.
     const template = args.attachments?.length
-      ? args.template + "\n\n" + buildAttachmentMml(args.attachments)
+      ? args.template + "\n\n" + (v2
+        ? "Attachments:\n" + args.attachments.map((p) => `- ${p}`).join("\n")
+        : buildAttachmentMml(args.attachments))
       : args.template;
 
     // Safety gate: without confirm=true, just show preview
@@ -107,7 +156,18 @@ export function registerComposeTools(server: McpServer, client: HimalayaClient) 
 
     // Actually send
     try {
-      await client.sendTemplate(template, args.account);
+      if (v2) {
+        // v2 has no MML: rebuild the reviewed template as a real message,
+        // threading headers and attachments included, and keep a sent copy.
+        const address = client.fromForAccount(args.account);
+        const message = await templateToMessage(args.template, {
+          from: formatFromHeader(address, resolveDisplayName(args.account || client.account)),
+        });
+        message.attachments = args.attachments;
+        await client.sendRaw(await buildMessage(message), "sent", args.account);
+      } else {
+        await client.sendTemplate(template, args.account);
+      }
       return {
         content: [{
           type: "text" as const,

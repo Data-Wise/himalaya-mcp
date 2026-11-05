@@ -129,6 +129,9 @@ const ATTACHMENT_FILES_WITH_ICS = ["invite.ics", "agenda.pdf", "plain.txt"];
 
 function createMockClient(): HimalayaClient {
   const client = new HimalayaClient({ from: "sender@example.com" });
+  // These scenarios exercise the v1 template flow; v2 is covered in
+  // compose-v2.test.ts.
+  vi.spyOn(client, "resolveVersion").mockResolvedValue({ major: 1, raw: "himalaya v1.2.0" });
   vi.spyOn(client, "listEnvelopes").mockResolvedValue(SAMPLE_ENVELOPES);
   vi.spyOn(client, "searchEnvelopes").mockResolvedValue(EMPTY_SEARCH);
   vi.spyOn(client, "readMessage").mockResolvedValue(SAMPLE_MESSAGE);
