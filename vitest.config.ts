@@ -3,6 +3,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     include: ["tests/**/*.test.ts"],
+    // Never let a test reach the real himalaya (and a real mailbox): see the file.
+    globalSetup: ["tests/global-himalaya-guard.ts"],
     testTimeout: 30_000,
     // e2e.test.ts's beforeAll rebuilds dist/ (tsc); run test files sequentially
     // so no other file can read/copy dist/ mid-rebuild (see tests/get-version.test.ts).

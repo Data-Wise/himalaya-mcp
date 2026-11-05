@@ -9,7 +9,7 @@ import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { realpathSync } from "node:fs";
+import { realpathSync, readdirSync } from "node:fs";
 
 /** Claude Desktop config directory per platform. */
 export function getConfigDir(): string {
@@ -28,10 +28,25 @@ export function getConfigDir(): string {
 export const CONFIG_DIR = getConfigDir();
 export const CONFIG_PATH = join(CONFIG_DIR, "claude_desktop_config.json");
 
+/** Id used by `himalaya-mcp install-ext`. Claude Desktop's own .mcpb install uses `local.mcpb.<author>.<name>` instead. */
 export const EXTENSION_ID = "himalaya-mcp";
 export const EXTENSIONS_DIR = join(CONFIG_DIR, "Claude Extensions");
 export const EXTENSIONS_SETTINGS_DIR = join(CONFIG_DIR, "Claude Extensions Settings");
 export const INSTALLATIONS_PATH = join(CONFIG_DIR, "extensions-installations.json");
+
+/**
+ * Ids of installed himalaya-mcp Desktop extensions: the one `install-ext` writes
+ * (`himalaya-mcp`) and the namespaced one Desktop's install dialog writes
+ * (`local.mcpb.<author>.himalaya-mcp`). Only directories holding a manifest.json count.
+ */
+export function findExtensionIds(extensionsDir: string = EXTENSIONS_DIR): string[] {
+  let names: string[];
+  try { names = readdirSync(extensionsDir); } catch { return []; }
+  return names
+    .filter((n) => n === EXTENSION_ID || n.endsWith(`.${EXTENSION_ID}`))
+    .filter((n) => existsSync(join(extensionsDir, n, "manifest.json")))
+    .sort((a, b) => (a === EXTENSION_ID ? 1 : 0) - (b === EXTENSION_ID ? 1 : 0)); // Desktop's own install first
+}
 
 /** Return the upgrade-safe Homebrew entry when this module runs from a keg. */
 export function stableBrewEntry(path: string): string | null {

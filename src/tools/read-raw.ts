@@ -1,9 +1,8 @@
 /**
  * read_email_raw MCP tool.
  *
- * Returns the raw MIME source of an email (the unedited .eml content).
- * Uses `message read --raw` on himalaya v2 and `message export --full`
- * on v1 (see HimalayaClient.readMessageRaw).
+ * Returns the raw MIME source of an email (see HimalayaClient.readRawMessage:
+ * `message export --full` on v1, `message read --raw` on v2).
  */
 
 import { z } from "zod/v4";
@@ -21,7 +20,7 @@ export function registerReadRawTools(server: McpServer, client: HimalayaClient) 
     },
   }, async (args) => {
     try {
-      const raw = await client.readMessageRaw(args.id, args.folder, args.account);
+      const raw = await client.readRawMessage(args.id, args.folder, args.account);
       return {
         content: [{ type: "text" as const, text: raw }],
       };

@@ -30,7 +30,7 @@ Prints the semantic version on its own line and exits 0.
 
 ```bash
 himalaya-mcp --version   # also: -v, version
-# Example output: 2.1.2
+# Example output: 2.1.3
 ```
 
 ---
@@ -54,8 +54,10 @@ himalaya-mcp doctor --post-release     # Maintainer-only: verify plugin install 
 |----------|---------------|
 | Prerequisites | Node.js version, himalaya binary, himalaya config |
 | MCP Server | `dist/index.js` exists and is non-empty |
-| Email Connectivity | Account list, folder list, envelope fetch |
-| Desktop Extension | Extension dir, manifest, registry, settings, user_config |
+| Email Connectivity | Account list, folder list, envelope fetch (failures now include himalaya's own error or a timeout note) |
+| Desktop Extension | Extension dir, manifest, registry, settings, user_config; legacy `claude_desktop_config.json` server entry (missing script, duplicate of the extension) |
+| Mail Path | Only when `config.toml` points IMAP/SMTP at `127.0.0.1`/`localhost` (an OAuth proxy): proxy port, `emailproxy` process, stored refresh token (key names only, never values), IMAP/SMTP password commands match. See [Microsoft 365 via email-oauth2-proxy](../guide/microsoft-365-oauth-proxy.md) |
+| Install Health | Duplicate himalaya config files (macOS platform dir shadows `~/.config`), a project `.mcp.json` using `${CLAUDE_PLUGIN_ROOT}`, duplicate or legacy (`email@…`) plugin entries, installed plugin version vs `himalaya-mcp` |
 | Claude Code Plugin | Symlink, plugin.json, marketplace registration, plugin version vs installed binary, marketplace source version + symlink state |
 | Plugin Cache | Stale cache at `~/.claude/plugins/cache/` |
 | Environment | `HIMALAYA_*` env vars, unresolved template variables |
@@ -160,7 +162,7 @@ Install a `.mcpb` Desktop Extension into Claude Desktop.
 
 ```bash
 himalaya-mcp install-ext                              # Auto-find .mcpb in project root
-himalaya-mcp install-ext himalaya-mcp-v2.1.2.mcpb     # Install specific file
+himalaya-mcp install-ext himalaya-mcp-v2.1.3.mcpb     # Install specific file
 ```
 
 ### What it does

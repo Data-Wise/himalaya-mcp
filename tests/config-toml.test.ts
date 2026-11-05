@@ -202,3 +202,40 @@ default = true
     expect(resolveFromAddress()).toBe("legacy@example.com");
   });
 });
+
+describe("display-name", () => {
+  it("formats a From header only when a display name is known", async () => {
+    const { formatFromHeader } = await import("../src/himalaya/config-toml.js");
+    expect(formatFromHeader("a@b.c", "Ada Lovelace")).toBe('"Ada Lovelace" <a@b.c>');
+    expect(formatFromHeader("a@b.c")).toBe("a@b.c");
+    expect(formatFromHeader("Ada <a@b.c>", "Other")).toBe("Ada <a@b.c>");
+  });
+
+  it("parses display-name per account and resolves it for the default account", async () => {
+    const { mkdtempSync, writeFileSync, rmSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const { tmpdir } = await import("node:os");
+    const { parseConfigToml, resolveDisplayName } = await import("../src/himalaya/config-toml.js");
+    const dir = mkdtempSync(join(tmpdir(), "display-name-"));
+    const path = join(dir, "config.toml");
+    writeFileSync(path, [
+      "[accounts.work]", "default = true", 'email = "w@example.com"', 'display-name = "Work Name"',
+      "[accounts.home]", 'email = "h@example.com"',
+    ].join("\n"));
+    const saved = { cfg: process.env["HIMALAYA_CONFIG"], from: process.env["HIMALAYA_FROM"] };
+    try {
+      expect(parseConfigToml(path).accounts.get("work")?.displayName).toBe("Work Name");
+      process.env["HIMALAYA_CONFIG"] = path;
+      delete process.env["HIMALAYA_FROM"];
+      expect(resolveDisplayName()).toBe("Work Name");
+      expect(resolveDisplayName("home")).toBeUndefined();
+      process.env["HIMALAYA_FROM"] = "x@example.com";
+      expect(resolveDisplayName()).toBeUndefined();
+    } finally {
+      if (saved.cfg === undefined) delete process.env["HIMALAYA_CONFIG"]; else process.env["HIMALAYA_CONFIG"] = saved.cfg;
+      if (saved.from === undefined) delete process.env["HIMALAYA_FROM"]; else process.env["HIMALAYA_FROM"] = saved.from;
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
