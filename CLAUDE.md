@@ -341,6 +341,14 @@ unreleased changes, not as the default dev setup.
    installed major version (`src/himalaya/cli-version.ts`, cached per-instance) and branches
    arg-building accordingly, rather than requiring a specific CLI generation. See
    `docs/specs/SPEC-himalaya-v2-cli-compat-2026-08-03.md` for the full design.
+7. **v2 send preview shows the parsed message** — `send_email` renders the preview from the same
+   normalized fields it sends (`DECISION-send-preview-from-parsed-message-2026-11-04.md`).
+8. **v2 body read paths** — `message read --json` for HTML, `--raw` for text/raw, and `exec` opts
+   out of `--json` where plain stdout is the payload (`DECISION-v2-body-read-paths-2026-11-04.md`).
+9. **Fork PRs land through an integration branch** — never approve fork CI or push to the
+   contributor's branch (`DECISION-fork-pr-integration-branch-2026-11-04.md`).
+10. **Fix the audit gate, don't relax it** — zod override for `@anthropic-ai/mcpb`, `postal-mime`
+    major bump (`DECISION-mcpb-zod-override-postal-mime-2026-11-04.md`).
 
 ---
 
@@ -354,4 +362,4 @@ Both wrap the same himalaya CLI and can coexist.
 
 ---
 
-**Last Updated:** 2026-08-17
+**Last Updated:** 2026-11-04
