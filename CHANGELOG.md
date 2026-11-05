@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-11-05
+
 ### Fixed
 
 - `doctor` no longer warns "Plugin not installed" (or fails the post-release check) for marketplace installs: when `~/.claude/plugins/himalaya-mcp` is absent it now uses the `himalaya@<marketplace>` `installPath` from `installed_plugins.json`.
