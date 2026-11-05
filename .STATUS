@@ -3,8 +3,8 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.2.0 release in progress (v2.1.3 was the last fully distributed release)
-## Focus: Ship v2.2.0 (v2 write paths, save_draft, doctor diagnostics, send hardening); then retarget stale PRs #115/#82 and Dependabot to dev
+## Status: v2.2.1 release in progress (v2.2.0 published but its brew CLI crashed; fixed in #165)
+## Focus: Ship v2.2.1 (bundled CLI fix for 2.2.0 brew installs); v2.2.0 shipped (v2 write paths, save_draft, doctor diagnostics, send hardening); then retarget stale PRs #115/#82 and Dependabot to dev
 ## Phase: Maintenance
 ## Priority: 1
 ## Progress: 100

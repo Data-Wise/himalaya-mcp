@@ -203,7 +203,10 @@ export function isMain(importMetaUrl: string = import.meta.url): boolean {
   try {
     const entry = process.argv[1];
     if (!entry) return false;
-    return importMetaUrl === pathToFileURL(entry).href;
+    if (importMetaUrl === pathToFileURL(entry).href) return true;
+    // Node resolves import.meta.url through symlinks but leaves argv[1] as typed
+    // (e.g. macOS /var -> /private/var), so compare real paths too.
+    return importMetaUrl === pathToFileURL(realpathSync(entry)).href;
   } catch {
     return false;
   }
