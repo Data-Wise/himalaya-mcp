@@ -3,8 +3,8 @@
 
 ## Project: himalaya-mcp
 ## Type: mcp-server / claude-code-plugin
-## Status: v2.2.1 release in progress (v2.2.0 published but its brew CLI crashed; fixed in #165)
-## Focus: Ship v2.2.1 (bundled CLI fix for 2.2.0 brew installs); v2.2.0 shipped (v2 write paths, save_draft, doctor diagnostics, send hardening); then retarget stale PRs #115/#82 and Dependabot to dev
+## Status: v2.2.1 released and distributed (2026-11-04)
+## Focus: Retarget stale PRs #115/#82 and Dependabot (#146/#149) to dev; CI guard that runs the brew-style install (CLI from a tree with no node_modules is covered by tests/cli-bundle.test.ts)
 ## Phase: Maintenance
 ## Priority: 1
 ## Progress: 100
@@ -193,10 +193,12 @@
 
 ## Current State
 
-- Branch: `dev` (`origin/dev`) — v2.2.0 bump on `feature/release-2.2.0`; `main` is still at v2.1.3 until the release PR merges.
-- **Shipping in 2.2.0 (prepared 2026-11-04):** `doctor` Mail Path / Install Health / Desktop-entry diagnostics and Desktop namespaced-id detection (#156, #159) · himalaya v2 write paths + `compose_email save_draft` + verbatim v2 search + global test guard (#157, supersedes external #148 with credit) · `draft_reply` v2 fix, found by a live send test (#158) · `postal-mime` ^4.2.0 (GHSA-f2hq-32vh-53cc). Suite: 797 tests across 47 files.
+- Branch: `dev` (`origin/dev`); `main` at v2.2.1 (6f69102).
+- **Shipped in 2.2.0 (2026-11-04):** `doctor` Mail Path / Install Health / Desktop-entry diagnostics and Desktop namespaced-id detection (#156, #159) · himalaya v2 write paths + `compose_email save_draft` + verbatim v2 search + global test guard (#157, supersedes external #148 with credit) · `draft_reply` v2 fix, found by a live send test (#158) · `postal-mime` ^4.2.0 (GHSA-f2hq-32vh-53cc). Suite: 797 tests across 47 files.
 - Live-verified 2026-11-04: v2.1.3 `.mcpb` installs in Claude Desktop and answers tools/prompts/resources; `compose_email` and reply sends delivered (self-addressed) via the OAuth proxy. Open: Desktop extension's `himalaya_binary` setting is empty (`doctor --fix` sets it); SMTP send paths otherwise covered by mocks only.
-- Version: 2.2.0 (bump prepared 2026-11-04; v2.1.3 released 2026-11-04).
+- Version: 2.2.1 (released 2026-11-04). 2.2.0 shipped a brew CLI that crashed (`node-html-markdown` missing: formula installs only `dist/`); 2.2.1 bundles the CLI (#165).
+- Distribution, verified 2026-11-04: GitHub releases `v2.2.0` and `v2.2.1` (`himalaya-mcp-v2.2.1.mcpb` sha256 `9d774022…`, built from a clean archive of `main`; stdio smoke: 2.2.1, 29 tools) · Homebrew tap 2.2.1 (`sha256 f91f7191…`, tap PR #252, auto-merged) · aggregator 2.2.0 verified (2.2.1 sync not re-checked) · `main` CI green at 6f69102 · local: brew 2.2.1 (`doctor` 21 passed), plugin updated, Desktop extension 2.2.1 installed (`himalaya_binary` set via `doctor --fix`).
+- Live re-test 2026-11-04: 2.2.1 server run over stdio against the real mailbox: `read_email`, `render_email`, `draft_reply` OK. In-session plugin server was still 2.1.2 until a Claude Code restart. Self-addressed send not re-run on 2.2.1.
 - Distribution, verified 2026-11-04: GitHub release `v2.1.3` + `himalaya-mcp-v2.1.3.mcpb` (292,006 bytes, built from a tree hash-identical to `main`) · Homebrew tap 2.1.3 (`sha256 378bc6c6…`, tap PR #250) · aggregator marketplace 2.1.3 · `main` CI + Deploy Docs green · local plugin updated 2.1.2 to 2.1.3.
 - Not verified: `.mcpb` installed in Claude Desktop (zod override only smoke-tested over stdio). `brew audit --strict` reports 2 pre-existing style issues in the tap formula (line length, `post_install` vs `post_install_steps`). Bumped across all 22 surfaces (package.json + lockfile,
   `src/index.ts` VERSION, mcpb/marketplace/plugin manifests, the `tests/e2e.test.ts` +
