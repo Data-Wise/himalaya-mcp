@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-11-04
+
 ### Fixed
 
 - **Homebrew CLI crash** — `himalaya-mcp --version`, `doctor` and `setup` failed with `ERR_MODULE_NOT_FOUND: node-html-markdown` on brew installs of 2.2.0, because the formula ships only `dist/` (no `node_modules`) and the CLI ran unbundled `tsc` output. `build:bundle` now also bundles the CLI into a self-contained `dist/cli/index.js` (new `build:cli` script); a regression test runs the bundled CLI from a tree with no `node_modules`.
