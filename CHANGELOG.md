@@ -6,6 +6,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Changed
+
+- Dependencies: `@modelcontextprotocol/sdk` ^1.30.1 and `zod` ^4.6.5 (lockfile: 1.32.2 / 4.6.7); supersedes Dependabot #149. Plugin bundle rebuilt.
+
 ## [2.2.1] - 2026-11-04
 
 ### Fixed
