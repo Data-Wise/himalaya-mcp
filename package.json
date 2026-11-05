@@ -35,11 +35,14 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "node-html-markdown": "^2.0.0",
+    "nodemailer": "^10.0.10",
+    "postal-mime": "^4.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@anthropic-ai/mcpb": "2.1.2",
     "@types/node": "^26.1.1",
+    "@types/nodemailer": "^8.0.2",
     "@vitest/coverage-v8": "^4.1.10",
     "esbuild": "^0.28.1",
     "typescript": "^6.0.3",

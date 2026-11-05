@@ -18,12 +18,15 @@ import { HimalayaError } from "../src/himalaya/errors";
 const mockExecFileAsync = (execFile as any)[promisify.custom] as ReturnType<typeof vi.fn>;
 
 describe("accounts", () => {
+  // listAccounts probes `himalaya --version` first to pick the JSON flag.
+  const V2 = { stdout: "himalaya v2.1.0 +imap", stderr: "" };
+
   beforeEach(() => {
     mockExecFileAsync.mockReset();
   });
 
   it("listAccounts returns parsed account names from himalaya CLI", async () => {
-    mockExecFileAsync.mockResolvedValue({
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({
       stdout: JSON.stringify({
         accounts: [
           { name: "unm", default: true, backends: ["imap", "smtp"] },
@@ -42,7 +45,7 @@ describe("accounts", () => {
   });
 
   it("listAccounts accepts legacy bare-array JSON output with singular `backend`", async () => {
-    mockExecFileAsync.mockResolvedValue({
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({
       stdout: JSON.stringify([
         { name: "unm", default: true, backend: "imap" },
       ]),
@@ -53,7 +56,7 @@ describe("accounts", () => {
   });
 
   it("listAccounts leaves backends undefined when neither backend nor backends is present", async () => {
-    mockExecFileAsync.mockResolvedValue({
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({
       stdout: JSON.stringify([{ name: "unm", default: true }]),
       stderr: "",
     });
@@ -62,7 +65,7 @@ describe("accounts", () => {
   });
 
   it("listAccounts leaves backends undefined for an empty backends array", async () => {
-    mockExecFileAsync.mockResolvedValue({
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({
       stdout: JSON.stringify([{ name: "unm", default: true, backends: [] }]),
       stderr: "",
     });
@@ -71,14 +74,27 @@ describe("accounts", () => {
   });
 
   it("listAccounts returns empty array when himalaya has no configured accounts", async () => {
-    mockExecFileAsync.mockResolvedValue({ stdout: "[]", stderr: "" });
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({ stdout: "[]", stderr: "" });
     expect(await listAccounts()).toEqual([]);
+  });
+
+  it("a missing binary surfaces as himalaya_not_installed from the version probe", async () => {
+    mockExecFileAsync.mockRejectedValueOnce(Object.assign(new Error("spawn himalaya ENOENT"), { code: "ENOENT" }));
+    await expect(listAccounts()).rejects.toMatchObject({ envelope: { code: "himalaya_not_installed" } });
+  });
+
+  it("v1: asks for JSON with --output json", async () => {
+    mockExecFileAsync
+      .mockResolvedValueOnce({ stdout: "himalaya v1.2.0 +imap", stderr: "" })
+      .mockResolvedValueOnce({ stdout: JSON.stringify([{ name: "a", default: true }]), stderr: "" });
+    await listAccounts();
+    expect(mockExecFileAsync).toHaveBeenLastCalledWith("himalaya", ["account", "list", "--output", "json"], { timeout: 15_000 });
   });
 
   it("listAccounts throws HimalayaError(himalaya_not_installed) on ENOENT", async () => {
     const err: any = new Error("spawn himalaya ENOENT");
     err.code = "ENOENT";
-    mockExecFileAsync.mockRejectedValue(err);
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockRejectedValue(err);
 
     try {
       await listAccounts();
@@ -90,7 +106,7 @@ describe("accounts", () => {
   });
 
   it("getDefaultAccount returns the account marked default", async () => {
-    mockExecFileAsync.mockResolvedValue({
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({
       stdout: JSON.stringify({
         accounts: [
           { name: "unm", default: false, backends: ["imap"] },
@@ -104,7 +120,7 @@ describe("accounts", () => {
   });
 
   it("getDefaultAccount returns null when no account is marked default", async () => {
-    mockExecFileAsync.mockResolvedValue({
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({
       stdout: JSON.stringify([{ name: "unm", default: false, backend: "imap" }]),
       stderr: "",
     });
@@ -113,7 +129,7 @@ describe("accounts", () => {
   });
 
   it("listAccounts throws HimalayaError(parse_error) on malformed JSON", async () => {
-    mockExecFileAsync.mockResolvedValue({ stdout: "not json", stderr: "" });
+    mockExecFileAsync.mockResolvedValueOnce(V2).mockResolvedValue({ stdout: "not json", stderr: "" });
     try {
       await listAccounts();
       throw new Error("expected to throw");

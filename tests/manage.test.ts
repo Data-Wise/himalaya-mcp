@@ -27,28 +27,35 @@ describe("Manage tools — client methods", () => {
   });
 
   describe("flagMessage", () => {
-    it("builds correct args for flag add", async () => {
-      setupMock("{}");
-      const client = new HimalayaClient();
-      await client.flagMessage("42", ["Seen", "Flagged"], "add");
+    const argvOf = () => mockExecFileAsync.mock.calls.at(-1)![1] as string[];
 
-      expect(mockExecFileAsync).toHaveBeenCalledWith(
-        "himalaya",
-        expect.arrayContaining(["flag", "add", "42", "Seen", "Flagged"]),
-        expect.any(Object),
-      );
+    it("v2: one --flag per flag, lowercased, id after the options", async () => {
+      setupMock("{}");
+      const client = new HimalayaClient({ account: "" });
+      await client.flagMessage("42", ["Seen", "Flagged"], "add");
+      expect(argvOf()).toEqual(["flag", "add", "--flag", "seen", "--flag", "flagged", "--json", "42"]);
     });
 
-    it("builds correct args for flag remove", async () => {
+    it("v2: flag remove", async () => {
       setupMock("{}");
-      const client = new HimalayaClient();
+      const client = new HimalayaClient({ account: "" });
       await client.flagMessage("42", ["Flagged"], "remove");
+      expect(argvOf()).toEqual(["flag", "remove", "--flag", "flagged", "--json", "42"]);
+    });
 
-      expect(mockExecFileAsync).toHaveBeenCalledWith(
-        "himalaya",
-        expect.arrayContaining(["flag", "remove", "42", "Flagged"]),
-        expect.any(Object),
-      );
+    it("v2: rejects a flag the shared command does not support", async () => {
+      setupMock("{}");
+      const client = new HimalayaClient({ account: "" });
+      await expect(client.flagMessage("42", ["Deleted"], "add")).rejects.toThrow(/not supported by himalaya v2/);
+    });
+
+    it("v1: flags as positionals after the id", async () => {
+      mockExecFileAsync
+        .mockResolvedValueOnce({ stdout: "himalaya v1.2.0 +imap", stderr: "" })
+        .mockResolvedValue({ stdout: "{}", stderr: "" });
+      const client = new HimalayaClient({ account: "" });
+      await client.flagMessage("42", ["Seen", "Flagged"], "add");
+      expect(argvOf()).toEqual(["flag", "add", "42", "Seen", "Flagged", "--output", "json"]);
     });
 
     it("passes folder when not INBOX", async () => {
@@ -77,27 +84,32 @@ describe("Manage tools — client methods", () => {
   });
 
   describe("moveMessage", () => {
-    it("builds correct args for message move", async () => {
+    it("v2: --to the target and --from the source, id after the options", async () => {
       setupMock("{}");
-      const client = new HimalayaClient();
+      const client = new HimalayaClient({ account: "" });
       await client.moveMessage("42", "Archive");
-
-      expect(mockExecFileAsync).toHaveBeenCalledWith(
-        "himalaya",
-        expect.arrayContaining(["message", "move", "Archive", "42"]),
-        expect.any(Object),
+      expect(mockExecFileAsync.mock.calls.at(-1)![1]).toEqual(
+        ["message", "move", "--to", "Archive", "--from", "INBOX", "--json", "42"],
       );
     });
 
-    it("passes folder when not INBOX", async () => {
+    it("v2: the source folder goes to --from, never --mailbox", async () => {
       setupMock("{}");
-      const client = new HimalayaClient();
+      const client = new HimalayaClient({ account: "" });
       await client.moveMessage("42", "Trash", "Sent Items");
+      const argv = mockExecFileAsync.mock.calls.at(-1)![1] as string[];
+      expect(argv).toEqual(["message", "move", "--to", "Trash", "--from", "Sent Items", "--json", "42"]);
+      expect(argv).not.toContain("--mailbox");
+    });
 
-      expect(mockExecFileAsync).toHaveBeenCalledWith(
-        "himalaya",
-        expect.arrayContaining(["--mailbox", "Sent Items"]),
-        expect.any(Object),
+    it("v1: target then id, source as --folder", async () => {
+      mockExecFileAsync
+        .mockResolvedValueOnce({ stdout: "himalaya v1.2.0 +imap", stderr: "" })
+        .mockResolvedValue({ stdout: "{}", stderr: "" });
+      const client = new HimalayaClient({ account: "" });
+      await client.moveMessage("42", "Trash", "Sent Items");
+      expect(mockExecFileAsync.mock.calls.at(-1)![1]).toEqual(
+        ["message", "move", "Trash", "42", "--folder", "Sent Items", "--output", "json"],
       );
     });
 

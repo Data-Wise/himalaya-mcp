@@ -9,6 +9,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { loadConfig } from "../config.js";
 import { HimalayaError, parseError } from "./errors.js";
+import { detectHimalayaVersion } from "./cli-version.js";
 
 const execFileAsync = promisify(execFile);
 const ACCOUNT_TIMEOUT = 15_000;
@@ -41,7 +42,10 @@ export async function listAccounts(): Promise<Account[]> {
   const binary = loadConfig().binary ?? "himalaya";
   let stdout: string;
   try {
-    const result = await execFileAsync(binary, ["account", "list", "--json"], { timeout: ACCOUNT_TIMEOUT });
+    // v1 spells JSON output `--output json`; v2 renamed it `--json`.
+    const { major } = await detectHimalayaVersion(binary);
+    const json = major >= 2 ? ["--json"] : ["--output", "json"];
+    const result = await execFileAsync(binary, ["account", "list", ...json], { timeout: ACCOUNT_TIMEOUT });
     stdout = result.stdout;
   } catch (err: unknown) {
     if (err instanceof Error && (err as NodeJS.ErrnoException).code === "ENOENT") {

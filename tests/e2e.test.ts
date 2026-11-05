@@ -1197,11 +1197,22 @@ if echo "$args" | grep -q "account list"; then
   echo '{"accounts":[{"name":"unm","default":true,"backends":["imap","smtp"]}]}'
   exit 0
 fi
+# v2's \`message read --json\` is a MIME tree, so the client reads --raw
+# ({"message": raw}) and decodes the body itself.
 if echo "$args" | grep -q "message read"; then
-  echo '"Read from non-INBOX mailbox: v2 body works"'
+  if ! echo "$args" | grep -q -- "--raw"; then
+    echo "fake v2: message read without --raw returns a MIME tree" >&2
+    exit 1
+  fi
+  echo '{"message":"From: a@b.c\\r\\nTo: d@e.f\\r\\nSubject: s\\r\\nContent-Type: text/plain; charset=utf-8\\r\\n\\r\\nRead from non-INBOX mailbox: v2 body works\\r\\n"}'
   exit 0
 fi
+# v2 moves with --to (and --from); v1's positional target is rejected.
 if echo "$args" | grep -q "message move"; then
+  if ! echo "$args" | grep -q -- "--to"; then
+    echo "error: the following required arguments were not provided: --to <NAME>" >&2
+    exit 1
+  fi
   echo '{}'
   exit 0
 fi

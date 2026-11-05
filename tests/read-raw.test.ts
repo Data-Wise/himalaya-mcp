@@ -47,13 +47,13 @@ describe("read_email_raw", () => {
   it("returns the raw message as a string via the client (#144 class: v2 has no message export)", async () => {
     const server = { registerTool: vi.fn() };
     const client = new HimalayaClient({ from: "test@example.com" });
-    vi.spyOn(client, "readMessageRaw").mockResolvedValue("From: a@b.c\r\n\r\nbody");
+    vi.spyOn(client, "readRawMessage").mockResolvedValue("From: a@b.c\r\n\r\nbody");
     registerReadRawTools(server as unknown as McpServer, client);
     const handler = (server.registerTool as ReturnType<typeof vi.fn>).mock.calls[0][2];
 
     const result = await handler({ id: "1", folder: "Archive", account: "work" });
 
-    expect(client.readMessageRaw).toHaveBeenCalledWith("1", "Archive", "work");
+    expect(client.readRawMessage).toHaveBeenCalledWith("1", "Archive", "work");
     expect(result.content[0].text).toBe("From: a@b.c\r\n\r\nbody");
   });
 });
