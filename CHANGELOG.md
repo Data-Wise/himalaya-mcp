@@ -6,6 +6,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-04
+
+himalaya v2 write paths, `compose_email save_draft`, new `doctor` diagnostics, and a hardened send preview.
+
 ### Security
 
 - **v2 send preview now shows exactly what is sent.** `send_email` parses the template once; the preview is rendered from the normalized fields (decoded recipients including Bcc, subject, threading headers, attachment list) and the send uses the same object. A template with no recipient is now rejected at preview time. (Automated review finding: preview/send parser differential.)
