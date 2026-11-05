@@ -12,7 +12,7 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("export_to_markdown", {
     description: "Export an email as formatted markdown with YAML frontmatter (date, from, to, subject, flags). Returns the markdown text — you can then save it to a file or clipboard.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
@@ -83,7 +83,7 @@ export function registerActionTools(server: McpServer, client: HimalayaClient) {
   server.registerTool("create_action_item", {
     description: "Read an email and extract action items, todos, deadlines, and commitments. Returns structured action items that can be used to create tasks, reminders, or calendar events.",
     inputSchema: {
-      id: z.string().describe("Email message ID"),
+      id: z.coerce.string().describe("Email message ID"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
       destination: z.string().optional().describe("File path to save action items (optional). Writes a markdown file with extracted action items."),

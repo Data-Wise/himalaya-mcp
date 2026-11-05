@@ -18,7 +18,7 @@ export function registerCalendarTools(server: McpServer, client: HimalayaClient)
   server.registerTool("extract_calendar_event", {
     description: "Extract calendar event details from an email's ICS attachment. Downloads all attachments, finds the .ics file, parses it, and returns event summary, dates, location, and organizer.",
     inputSchema: {
-      id: z.string().describe("Email message ID containing the calendar invite"),
+      id: z.coerce.string().describe("Email message ID containing the calendar invite"),
       folder: z.string().optional().describe("Folder name (default: INBOX)"),
       account: z.string().optional().describe("Account name (uses default if omitted)"),
     },
