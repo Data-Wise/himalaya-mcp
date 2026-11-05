@@ -280,3 +280,18 @@ folded into the design (see updated sections):
    path): reject `name` values containing `/`, `#`, or a leading `.` before they reach the raw
    IMAP CREATE/DELETE commands, since those commands have no backend-agnostic abstraction
    softening cross-namespace effects the way the removed shared API did.
+
+---
+
+## Closed — 2026-08-17
+
+Shipped and verified. Issue #133 closed 2026-08-16 after checking the implementation against a
+real `himalaya v2.1.0` binary, not just against the spec: `envelope list --help` has no positional
+argument, `envelope search --help` does, and the filed failing query returns results through the
+v2 path.
+
+Follow-on defects found after this spec closed were tracked separately and are not reopenings of
+it — #121 (`.mcpb` rename race) and #139 (test-suite recursion), both fixed in v2.1.2.
+
+Current project state lives in `.STATUS`; this document is history. Future v2-CLI work opens a new
+spec rather than extending this one.

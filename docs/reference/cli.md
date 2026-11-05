@@ -75,10 +75,16 @@ Two maintainer-only modes support the release pipeline rather than end-user diag
 
 | Flag | Category | Checks |
 |------|----------|--------|
-| `--pre-release` | Pre-Release | Build exists, TypeScript compiles, version sync (package.json ↔ plugin.json ↔ `src/index.ts`), CHANGELOG has an entry for the current version, git tree clean, full test suite passes |
+| `--pre-release` | Pre-Release | Build exists, TypeScript compiles, version sync (package.json ↔ plugin.json ↔ `src/index.ts`), CHANGELOG has an entry for the current version, git tree clean, full test suite passes<sup>†</sup> |
 | `--post-release` | Post-Release | Plugin symlink installed, `plugin.json` valid, MCP server handshake succeeds, marketplace registration present, skills directory populated |
 
 Both support `--json` and skip the per-account connectivity checks entirely (`--account` is ignored in these modes).
+
+<sup>†</sup> The test-suite check is skipped when `process.env.VITEST` is set, reporting
+`warn: not run — already executing under vitest`. Without that guard the suite and this command
+spawn each other without bound — the suite runs `doctor --pre-release`, which runs the suite
+([#139](https://github.com/Data-Wise/himalaya-mcp/issues/139)). Run `doctor --pre-release` from a
+normal shell, not from inside a test, to exercise the real check.
 
 ### Sample output
 

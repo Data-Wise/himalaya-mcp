@@ -197,7 +197,19 @@ This runs `scripts/build-mcpb.sh` which:
 1. Builds the esbuild bundle (`dist/index.js`)
 2. Copies the bundle to `mcpb/dist/`
 3. Validates the manifest (`npx @anthropic-ai/mcpb validate mcpb/`)
-4. Packs directly to `himalaya-mcp-v{version}.mcpb` (`npx @anthropic-ai/mcpb pack mcpb/ himalaya-mcp-v{version}.mcpb`)
+4. Packs the extension (`npx @anthropic-ai/mcpb pack mcpb/ …`), then reconciles the filename
+
+!!! warning "`mcpb pack` ignores the output path it is given"
+    Despite taking an output argument, `mcpb pack` writes the archive under its own name —
+    `himalaya-mcp-{version}.mcpb`, **without** the `v` prefix — into either the project root or
+    `mcpb/`, depending on version. `build-mcpb.sh` therefore renames it afterwards rather than
+    trusting the argument, and refuses to rename any archive whose filename does not carry the
+    current version.
+
+    This is not academic. The script previously used a sleep-and-retry loop that globbed only the
+    project root, and it raced: it won on the v2.1.0 release and lost on v2.1.1, failing the build
+    and skipping the entire Homebrew formula update ([#121](https://github.com/Data-Wise/himalaya-mcp/issues/121)).
+    If you script against `mcpb pack`, do not assume the output path is honored.
 
 ### Install (GUI)
 
