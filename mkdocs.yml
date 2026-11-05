@@ -110,6 +110,7 @@ nav:
     - Security: guide/security.md
     - Contributing: guide/contributing.md
     - Troubleshooting: guide/troubleshooting.md
+    - Microsoft 365 OAuth Proxy: guide/microsoft-365-oauth-proxy.md
   - Reference:
     - Cheat Sheet: reference/cheat-sheet.md
     - MCP Tools: reference/commands.md

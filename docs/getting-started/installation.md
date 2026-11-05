@@ -25,6 +25,18 @@ This should print JSON envelopes from your default account. If it fails, check t
     (`--output json`) — it detects the installed CLI's version automatically. If
     `himalaya --version` reports a v1.x release, use `himalaya --output json envelope list` instead.
 
+## Which install do I need?
+
+Claude Code and Claude Desktop are separate apps with separate plugin systems. An install in one does **not** show up in the other.
+
+| You use | Install | Appears in |
+|---------|---------|-----------|
+| Claude Code (terminal or desktop Code tab) | Option 1 (Homebrew) or Option 2 (GitHub plugin) | `claude plugin list`, `/himalaya:*` skills |
+| Claude Desktop chat (next to other connectors) | Option A (`.mcpb`) or Option B (`himalaya-mcp setup`) | Desktop's extensions / connectors list |
+| Both | One install from each row | Each app separately |
+
+No plugin marketplace is needed for Desktop: the `.mcpb` from GitHub Releases is enough.
+
 ## Install Methods
 
 ### Option 1: Homebrew (recommended)
@@ -91,6 +103,9 @@ claude plugin marketplace add Data-Wise/himalaya-mcp
 claude plugin install himalaya
 ```
 
+!!! warning "Install from one marketplace only"
+    The same plugin can also be offered by an aggregator marketplace (for example `himalaya@data-wise`). Installing it from two marketplaces creates duplicate entries in `claude plugin list`, one enabled and one not. Pick one source; to be explicit, use the scoped form `claude plugin install himalaya@<marketplace>`.
+
 **Verify:**
 
 ```bash
@@ -103,9 +118,11 @@ himalaya-mcp doctor
 git clone https://github.com/Data-Wise/himalaya-mcp.git
 cd himalaya-mcp
 npm install
-npm run build
-ln -s $(pwd) ~/.claude/plugins/himalaya-mcp
+npm run build:bundle        # builds himalaya-mcp-plugin/dist/index.js
+claude --plugin-dir ./himalaya-mcp-plugin
 ```
+
+`--plugin-dir` loads the plugin for that session only, so it never competes with an installed copy. Use it to try unreleased changes.
 
 **Verify:**
 
@@ -115,17 +132,11 @@ himalaya-mcp doctor
 
 ### Option 4: Standalone MCP Server
 
-Add to your Claude Code settings (`~/.claude/settings.json`):
+Register the server with Claude Code (no plugin, so no `/himalaya:*` skills):
 
-```json
-{
-  "mcpServers": {
-    "himalaya": {
-      "command": "node",
-      "args": ["/path/to/himalaya-mcp/dist/index.js"]
-    }
-  }
-}
+```bash
+claude mcp add himalaya -- node /path/to/himalaya-mcp/dist/index.js
+claude mcp list
 ```
 
 ## Claude Desktop Setup
@@ -224,7 +235,7 @@ himalaya-mcp doctor
 # Auto-fix common issues
 himalaya-mcp doctor --fix
 
-# Run tests (718 tests)
+# Run tests (740 tests)
 npm test
 
 # Check Claude Desktop config (legacy)
@@ -265,6 +276,20 @@ If `/himalaya:*` skills don't appear after Homebrew install:
 1. Check skills path: `ls ~/.claude/plugins/himalaya-mcp/skills/`
 2. If missing, upgrade: `brew upgrade himalaya-mcp`
 3. If still broken: `ln -sf $(brew --prefix)/opt/himalaya-mcp/libexec ~/.claude/plugins/himalaya-mcp`
+
+### Tools load but mail fails
+
+If `/himalaya:*` skills and tools appear but every call errors or hangs, the plugin is fine and the mail connection is not. Test the CLI first:
+
+```bash
+himalaya envelope list --json
+```
+
+If that hangs or reports `stream stopped responding after 60s`, fix it there (Microsoft 365 accounts: see [Microsoft 365 via email-oauth2-proxy](../guide/microsoft-365-oauth-proxy.md)). The plugin cannot work until the CLI does.
+
+### A failing "email" server appears next to the plugin
+
+Releases up to 2.1.2 shipped a project-level `.mcp.json` at the repository root. Running Claude Code inside a clone started a second server named `email` that failed with `CONNECTION_CLOSED` (the plugin's `${CLAUDE_PLUGIN_ROOT}` is unset outside a plugin) and shadowed the working plugin server. It is removed on `dev` and ships with the next release. Until then, `git pull` the clone or delete the root `.mcp.json`.
 
 ### MCP server not starting
 
