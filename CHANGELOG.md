@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+
+- **`doctor` diagnostics**: new "Mail Path" checks for local OAuth-proxy setups (proxy port and
+  process, stored refresh token by key name, IMAP/SMTP password commands match), new "Install
+  Health" checks (duplicate himalaya configs, `${CLAUDE_PLUGIN_ROOT}` in a project `.mcp.json`,
+  duplicate or legacy plugin entries, plugin vs binary version), and a legacy Claude Desktop
+  server-entry check. Connectivity failures now report himalaya's own error or a timeout note
+  instead of a generic message.
+
 ## [2.1.3] - 2026-11-04
 
 Fixes for himalaya v2 compatibility and a duplicate MCP server, plus an install-docs audit.
