@@ -42,12 +42,12 @@
   },
   "devDependencies": {
     "@anthropic-ai/mcpb": "2.1.2",
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.6.6",
     "@types/nodemailer": "^8.0.2",
-    "@vitest/coverage-v8": "^4.1.10",
-    "esbuild": "^0.28.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.10"
+    "@vitest/coverage-v8": "^5.1.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   },
   "overrides": {
     "postcss": "^8.5.18",
